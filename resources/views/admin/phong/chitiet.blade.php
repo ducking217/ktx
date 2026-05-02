@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="h-3 w-full overflow-hidden rounded-full bg-ui-bg ring-1 ring-inset ring-ui-border">
-                    <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" style="width: {{ $phantram }}%"></div>
+                    <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" @style(["width: $phantram%"])></div>
                 </div>
 
                 <div class="mt-8 space-y-4 pt-8 border-t border-ui-border">

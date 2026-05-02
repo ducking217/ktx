@@ -11,6 +11,7 @@ use App\Enums\RegistrationStatus;
 use App\Enums\RegistrationType;
 use App\Events\GiuongStatusChanged;
 use App\Contracts\Admin\DangkyServiceInterface;
+use App\Contracts\Admin\HoanTienServiceInterface;
 use App\Mail\DangkyDaDuyetMail;
 use App\Mail\DangkyKhachThanhCongMail;
 use App\Models\Dangky;
@@ -36,6 +37,10 @@ class DangkyService implements DangkyServiceInterface
     use HoTroNghiepVu, PhanHoiService, KiemtraKyluat;
 
     private const MESSAGE_ROOM_CONFLICT = 'Phòng đã đầy hoặc đang có người khác đăng ký, vui lòng thử lại.';
+
+    public function __construct(
+        private readonly HoanTienServiceInterface $hoanTienService
+    ) {}
 
     public function luuDangKySinhVien(array $data): array
     {
@@ -437,8 +442,18 @@ class DangkyService implements DangkyServiceInterface
     private function approveLeaveRoomLogic(Dangky $dangky, Sinhvien $sinhvien): array
     {
         $dangky->transitionTo(RegistrationStatus::Approved->value);
+        
+        $hopdong = Hopdong::where('sinhvien_id', $sinhvien->id)
+            ->where('trang_thai', ContractStatus::Active->value)
+            ->first();
+            
         $this->chamDutHopDongHienTai($sinhvien->id);
         $sinhvien->update(['phong_id' => null]);
+
+        if ($hopdong) {
+            $this->hoanTienService->xuLyHoanTien($hopdong);
+        }
+
         return ['is_leave_room' => true];
     }
 

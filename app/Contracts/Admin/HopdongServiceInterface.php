@@ -39,5 +39,5 @@ interface HopdongServiceInterface
 
     public function giaHanHopDong(int $contractId, string $newEndDate, string $currentEndDate): array;
 
-    public function thanhLyHopDong(int $contractId): array;
+    public function thanhLyHopDong(int $contractId, int $phiHuHai = 0): array;
 }

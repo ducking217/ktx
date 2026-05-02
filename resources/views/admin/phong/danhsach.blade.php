@@ -83,7 +83,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="flex-1 h-1.5 min-w-[80px] overflow-hidden rounded-full bg-ui-bg ring-1 ring-inset ring-ui-border">
-                                            <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" style="width: {{ $phantram }}%"></div>
+                                            <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" @style(["width: $phantram%"])></div>
                                         </div>
                                         <span class="text-xs font-black text-ink-primary tabular-nums tracking-widest">{{ $soluongdango }}/{{ $phong->soluongtoida }}</span>
                                     </div>
@@ -165,7 +165,7 @@
                                 <span class="text-sm font-black text-ink-primary tabular-nums">{{ $soluongdango }}/{{ $phong->soluongtoida }}</span>
                             </div>
                             <div class="h-2 w-full overflow-hidden rounded-full bg-ui-bg ring-1 ring-inset ring-ui-border">
-                                <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" style="width: {{ $phantram }}%"></div>
+                                <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" @style(["width: $phantram%"])></div>
                             </div>
                             
                             <div class="mt-4 flex items-center justify-between">

@@ -1,6 +1,6 @@
 @php
     $vaitro = auth()->user()->vaitro;
-    $isAdmin = in_array($vaitro, ['admin', 'admin_truong', 'admin_toanha', 'le_tan'], true);
+    $isAdmin = auth()->user()->isAdminGroup();
     $layout = $isAdmin ? 'admin-layout' : 'student-layout';
 @endphp
 

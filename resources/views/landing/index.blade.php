@@ -204,7 +204,7 @@
                                 </div>
                                 <div class="w-full bg-ui-bg h-1 rounded-full overflow-hidden">
                                      
-                                     <div class="h-full rounded-full transition-all duration-500 ease-out {{ $isAvailable ? 'bg-brand-emerald' : 'bg-red-500' }}" style="--w: {{ (int)$percentage }}%; width: var(--w);"></div>
+                                     <div class="h-full rounded-full transition-all duration-500 ease-out {{ $isAvailable ? 'bg-brand-emerald' : 'bg-red-500' }}" @style(["width: " . (int)$percentage . "%"])></div>
                                  </div>
                             </div>
                             

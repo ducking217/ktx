@@ -12,6 +12,7 @@ use App\Notifications\HoadonMoiNotification;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HoadonService implements HoadonServiceInterface
 {
@@ -24,16 +25,38 @@ class HoadonService implements HoadonServiceInterface
         return [
             'dongiadien' => (int) $this->layGiaTuCauhinh('gia_dien', (string) self::DEFAULT_ELECTRICITY_RATE),
             'dongianuoc' => (int) $this->layGiaTuCauhinh('gia_nuoc', (string) self::DEFAULT_WATER_RATE),
+            'phidichvu' => (int) $this->layGiaTuCauhinh('phi_dich_vu', '50000'),
         ];
     }
 
     public function lietKeHoaDonAdmin(Request $request): array
     {
+        $danhsachphong = Phong::withCount('danhsachsinhvien')->get()->map(function($phong) {
+            $lastInvoice = Hoadon::where('phong_id', $phong->id)
+                ->where('loai_hoadon', Hoadon::LOAI_MONTHLY)
+                ->orderByDesc('nam')
+                ->orderByDesc('thang')
+                ->first();
+            
+            $phong->chisodien_cuoi = $lastInvoice ? $lastInvoice->chisodienmoi : 0;
+            $phong->chisonuoc_cuoi = $lastInvoice ? $lastInvoice->chisonuocmoi : 0;
+            return $phong;
+        });
+
         return [
-            'danhsachhoadon' => Hoadon::with('phong')->orderByDesc('created_at')->paginate(20)->withQueryString(),
-            'danhsachphong' => Phong::all(),
+            'danhsachhoadon' => Hoadon::with(['phong', 'sinhvien.taikhoan'])->orderByDesc('created_at')->paginate(20)->withQueryString(),
+            'danhsachphong' => $danhsachphong,
             'dongiadien' => $this->layBangGia()['dongiadien'],
             'dongianuoc' => $this->layBangGia()['dongianuoc'],
+            'thongke' => [
+                'tong_no' => (int) Hoadon::where('trangthaithanhtoan', '!=', InvoiceStatus::Paid->value)->sum('tongtien'),
+                'so_qua_han' => Hoadon::where('trangthaithanhtoan', InvoiceStatus::Overdue->value)->count(),
+                'so_cho_duyet' => Hoadon::where('trangthaithanhtoan', InvoiceStatus::Pending->value)->count(),
+                'da_thu_thang' => (int) Hoadon::where('trangthaithanhtoan', InvoiceStatus::Paid->value)
+                    ->where('thang', now()->month)
+                    ->where('nam', now()->year)
+                    ->sum('tongtien'),
+            ]
         ];
     }
 
@@ -91,18 +114,32 @@ class HoadonService implements HoadonServiceInterface
 
     public function xuLyHoaDon(array $data): array
     {
-        // Existing logic... (simplified for migration)
         $phong = Phong::find($data['phong_id']);
+        if (!$phong) return $this->traVeLoi('Không tìm thấy phòng.');
+
+        $existing = Hoadon::where([
+            'phong_id' => $data['phong_id'],
+            'thang' => $data['thang'],
+            'nam' => $data['nam'],
+            'loai_hoadon' => Hoadon::LOAI_MONTHLY,
+        ])->first();
+
+        if ($existing && $existing->trangthaithanhtoan === InvoiceStatus::Paid) {
+            return $this->traVeLoi('Hóa đơn tháng này đã được thanh toán. Không thể ghi đè.');
+        }
+
         $bangGia = $this->layBangGia();
         
         $tiendien = ($data['chisodienmoi'] - $data['chisodiencu']) * $bangGia['dongiadien'];
         $tiennuoc = ($data['chisonuocmoi'] - $data['chisonuoccu']) * $bangGia['dongianuoc'];
-        $tongtien = $phong->giaphong + $tiendien + $tiennuoc;
+        $phidichvu = $bangGia['phidichvu'];
+        $tongtien = $phong->giaphong + $tiendien + $tiennuoc + $phidichvu;
 
         $hoadon = Hoadon::updateOrCreate([
             'phong_id' => $data['phong_id'],
             'thang' => $data['thang'],
             'nam' => $data['nam'],
+            'loai_hoadon' => Hoadon::LOAI_MONTHLY,
         ], [
             'chisodiencu' => $data['chisodiencu'],
             'chisodienmoi' => $data['chisodienmoi'],
@@ -111,10 +148,10 @@ class HoadonService implements HoadonServiceInterface
             'tienphong' => $phong->giaphong,
             'tiendien' => $tiendien,
             'tiennuoc' => $tiennuoc,
+            'phidichvu' => $phidichvu,
             'tongtien' => $tongtien,
             'ngayxuat' => now()->format('Y-m-d'),
             'trangthaithanhtoan' => InvoiceStatus::Pending->value,
-            'loai_hoadon' => Hoadon::LOAI_MONTHLY,
         ]);
 
         $this->thongBaoPhong($phong->id, $hoadon);
@@ -135,9 +172,14 @@ class HoadonService implements HoadonServiceInterface
     public function taoHoaDonHangThang(Sinhvien $sinhvien, int $month, int $year, ?string $startDate = null): Hoadon
     {
         $finalPrice = $startDate ? $this->tinhTienPhongTheoNgay((int)$sinhvien->phong->giaphong, $startDate) : (int)$sinhvien->phong->giaphong;
+        $phidichvu = (int) $this->layGiaTuCauhinh('phi_dich_vu', '50000');
+        
         return Hoadon::create([
             'sinhvien_id' => $sinhvien->id, 'phong_id' => $sinhvien->phong_id,
-            'thang' => $month, 'nam' => $year, 'tongtien' => $finalPrice, 'tienphong' => $finalPrice,
+            'thang' => $month, 'nam' => $year, 
+            'tongtien' => $finalPrice + $phidichvu, 
+            'tienphong' => $finalPrice,
+            'phidichvu' => $phidichvu,
             'loai_hoadon' => Hoadon::LOAI_MONTHLY, 'trangthaithanhtoan' => InvoiceStatus::Pending->value,
             'ngayxuat' => now()->format('Y-m-d'),
         ]);
@@ -160,6 +202,36 @@ class HoadonService implements HoadonServiceInterface
         $daysInMonth = $start->daysInMonth;
         $remainingDays = $daysInMonth - $start->day + 1;
         return (int) round(($baseRoomFee / $daysInMonth) * $remainingDays);
+    }
+
+    public function xuLyHoaDonHangLoat(array $data): array
+    {
+        try {
+            return DB::transaction(function () use ($data) {
+                $thang = (int) $data['thang'];
+                $nam = (int) $data['nam'];
+                $count = 0;
+
+                foreach ($data['hoa_don'] as $phongId => $chiSo) {
+                    if (!isset($chiSo['chisodienmoi']) || !isset($chiSo['chisonuocmoi'])) continue;
+
+                    $this->xuLyHoaDon([
+                        'phong_id' => $phongId,
+                        'thang' => $thang,
+                        'nam' => $nam,
+                        'chisodiencu' => (int) ($chiSo['chisodiencu'] ?? 0),
+                        'chisodienmoi' => (int) $chiSo['chisodienmoi'],
+                        'chisonuoccu' => (int) ($chiSo['chisonuoccu'] ?? 0),
+                        'chisonuocmoi' => (int) $chiSo['chisonuocmoi'],
+                    ]);
+                    $count++;
+                }
+
+                return $this->traVeThanhCong("Đã xử lý thành công {$count} hóa đơn.");
+            });
+        } catch (\Throwable $e) {
+            return $this->traVeLoi('Lỗi khi xử lý hàng loạt: ' . $e->getMessage());
+        }
     }
 
     private function layThongKeTaiChinhSinhVien(int $phongId): array

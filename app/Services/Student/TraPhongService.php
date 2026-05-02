@@ -11,6 +11,9 @@ use App\Enums\ContractStatus;
 use App\Enums\InvoiceStatus;
 use App\Traits\PhanHoiService;
 use App\Contracts\Student\TraPhongServiceInterface;
+use App\Contracts\Admin\HoanTienServiceInterface;
+use App\Services\Admin\HopdongService;
+use App\Services\Admin\HoadonService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -19,8 +22,9 @@ class TraPhongService implements TraPhongServiceInterface
     use PhanHoiService;
 
     public function __construct(
-        private ContractService $contractService,
-        private HoadonService $invoiceService
+        private HopdongService $contractService,
+        private HoadonService $invoiceService,
+        private HoanTienServiceInterface $refundService
     ) {}
 
     public function kiemTraNo(Sinhvien $sinhvien): array
@@ -41,10 +45,17 @@ class TraPhongService implements TraPhongServiceInterface
                 if ($debtStatus['has_debt']) return $this->traVeLoi("Còn {$debtStatus['count']} hóa đơn chưa thanh toán.");
 
                 $oldData = $hopdong->toArray();
+                
+                // Xử lý hoàn cọc / phạt trước khi thanh lý
+                $refundResult = $this->refundService->xuLyHoanTien($hopdong);
+                if (!$refundResult['success']) {
+                    return $this->traVeLoi($refundResult['message']);
+                }
+
                 $this->hoanTatTraPhong($hopdong, $sinhvien);
                 $this->ghiNhatKyTraPhong($contractId, $oldData);
 
-                return $this->traVeThanhCong('Thanh lý thành công.');
+                return $this->traVeThanhCong('Thanh lý thành công. ' . $refundResult['message']);
             });
         } catch (\Exception $e) {
             Log::error("Checkout failed: " . $e->getMessage());

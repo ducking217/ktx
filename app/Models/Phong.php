@@ -24,6 +24,20 @@ class Phong extends Model
         'gioitinh',
     ];
 
+    /**
+     * Backward compatibility for soluongtoida
+     */
+    public function getSoluongtoidaAttribute(): int
+    {
+        return (int) ($this->attributes['soluongtoida'] ?? $this->succhuamax);
+    }
+
+    public function setSoluongtoidaAttribute($value): void
+    {
+        $this->attributes['soluongtoida'] = $value;
+        $this->attributes['succhuamax'] = $value;
+    }
+
     public function danhsachsinhvien(): HasMany
     {
         return $this->hasMany(Sinhvien::class, 'phong_id');

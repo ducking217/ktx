@@ -8,6 +8,7 @@ use App\Enums\BedStatus;
 use App\Enums\ContractStatus;
 use App\Events\GiuongStatusChanged;
 use App\Contracts\Admin\HopdongServiceInterface;
+use App\Contracts\Admin\HoanTienServiceInterface;
 use App\Models\Hopdong;
 use App\Models\Phong;
 use App\Models\Sinhvien;
@@ -22,12 +23,16 @@ class HopdongService implements HopdongServiceInterface
 {
     use HoTroNghiepVu, PhanHoiService;
 
+    public function __construct(
+        private readonly HoanTienServiceInterface $hoanTienService
+    ) {}
+
     public function lietKeHopDongAdmin(Request $request): array
     {
         $tuKhoa = $request->query('q', '');
         $trangThai = $request->query('trangthai', 'Tất cả');
         $contracts = Hopdong::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', "%{$tuKhoa}%"));
+            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
         })->when($trangThai !== 'Tất cả', function ($q) use ($trangThai) {
             $q->where('trang_thai', $trangThai);
         })->with(['sinhvien.taikhoan', 'phong'])->orderByDesc('created_at')->paginate(20);
@@ -89,9 +94,9 @@ class HopdongService implements HopdongServiceInterface
         return ['success' => true, 'message' => 'Gia hạn thành công.'];
     }
 
-    public function thanhLyHopDong(int $contractId): array
+    public function thanhLyHopDong(int $contractId, int $phiHuHai = 0): array
     {
-        return DB::transaction(function () use ($contractId) {
+        return DB::transaction(function () use ($contractId, $phiHuHai) {
                 $hopdong = Hopdong::find($contractId);
                 if (!$hopdong || $hopdong->trang_thai === ContractStatus::Terminated) {
                     return ['success' => false, 'message' => 'Lỗi.'];
@@ -105,6 +110,10 @@ class HopdongService implements HopdongServiceInterface
                     $sinhvien->update(['phong_id' => null, 'ngay_vao' => null, 'ngay_het_han' => null]);
                     if ($pid) Event::dispatch(new GiuongStatusChanged((int)$pid, null, BedStatus::Available, BedStatus::Occupied, 'Thanh lý'));
                 }
+
+                // Kích hoạt tính toán Hoàn tiền / Thu thêm sau khi thanh lý
+                $this->hoanTienService->xuLyHoanTien($hopdong, $phiHuHai);
+
                 return ['success' => true, 'message' => 'Thành công.'];
             });
     }

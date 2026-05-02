@@ -87,7 +87,7 @@ class User extends Authenticatable
             return $role->isAdminGroup();
         }
         
-        return in_array((string)$role, ['admin', 'admin_truong', 'admin_toanha', 'le_tan'], true);
+        return in_array((string)$role, ['admin', 'admin_truong', 'admin_toanha'], true);
     }
 
     /**

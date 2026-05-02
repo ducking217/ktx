@@ -25,7 +25,6 @@ class AuthServiceProvider extends ServiceProvider
                 \App\Enums\UserRole::Admin,
                 \App\Enums\UserRole::AdminTruong,
                 \App\Enums\UserRole::AdminToaNha,
-                \App\Enums\UserRole::LeTan,
             ]);
         });
 
@@ -42,7 +41,6 @@ class AuthServiceProvider extends ServiceProvider
                 \App\Enums\UserRole::Admin,
                 \App\Enums\UserRole::AdminTruong,
                 \App\Enums\UserRole::AdminToaNha,
-                \App\Enums\UserRole::LeTan,
             ]);
         });
 

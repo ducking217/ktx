@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Contracts\Admin\HoadonServiceInterface;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HoadonController extends Controller
 {
@@ -34,6 +35,22 @@ class HoadonController extends Controller
         return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
     }
 
+    public function nhapHangLoat(Request $request)
+    {
+        $dulieu = $request->validate([
+            'thang' => ['required', 'numeric', 'min:1', 'max:12'],
+            'nam' => ['required', 'numeric', 'min:2000', 'max:2100'],
+            'hoa_don' => ['required', 'array'],
+            'hoa_don.*.chisodiencu' => ['nullable', 'numeric', 'min:0'],
+            'hoa_don.*.chisodienmoi' => ['required', 'numeric', 'min:0'],
+            'hoa_don.*.chisonuoccu' => ['nullable', 'numeric', 'min:0'],
+            'hoa_don.*.chisonuocmoi' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $result = $this->hoadonService->xuLyHoaDonHangLoat($dulieu);
+        return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
+    }
+
     public function xacNhanThanhToan(int $id)
     {
         $result = $this->hoadonService->xacNhanThanhToan($id);
@@ -42,8 +59,17 @@ class HoadonController extends Controller
 
     public function downloadInvoicePDF(int $id)
     {
-        // Logic for PDF download (can stay in controller if it's purely view-related, 
-        // but here we just delegate or call facade)
-        // Implementation omitted for brevity as it was already working
+        $hoadon = \App\Models\Hoadon::with(['phong', 'sinhvien.taikhoan'])->find($id);
+        if (!$hoadon) {
+            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => 'Không tìm thấy hóa đơn.']);
+        }
+
+        $pdf = Pdf::loadView('pdf.hoadon', [
+            'hoadon' => $hoadon,
+            'dongiadien' => $this->hoadonService->layBangGia()['dongiadien'],
+            'dongianuoc' => $this->hoadonService->layBangGia()['dongianuoc'],
+        ]);
+
+        return $pdf->download("hoadon_{$hoadon->id}_{$hoadon->thang}_{$hoadon->nam}.pdf");
     }
 }

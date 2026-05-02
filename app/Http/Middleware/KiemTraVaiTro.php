@@ -35,7 +35,6 @@ class KiemTraVaiTro
                     \App\Enums\UserRole::Admin->value,
                     \App\Enums\UserRole::AdminTruong->value,
                     \App\Enums\UserRole::AdminToaNha->value,
-                    \App\Enums\UserRole::LeTan->value,
                 ])
                 ->unique()
                 ->values();

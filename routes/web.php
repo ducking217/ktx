@@ -18,14 +18,14 @@ use App\Http\Controllers\Shared\ProfileController;
 // --------------------------------------------------------------------------
 Route::namespace('App\Http\Controllers\Guest')->group(function () {
     Route::get('/', 'LandingController@index')->name('home');
-    Route::post('/lien-he', 'LandingController@guiLienHe')->name('landing.lienhe');
+    Route::post('/lien-he', 'LandingController@guiLienHe')->middleware('throttle:guest_submit')->name('landing.lienhe');
 
     // Guest Registration & Lookup
     Route::prefix('dang-ky-ktx')->name('guest.dangky.')->group(function () {
         Route::get('/', 'DangkyController@create')->name('create');
-        Route::post('/', 'DangkyController@store')->name('store');
+        Route::post('/', 'DangkyController@store')->middleware('throttle:guest_submit')->name('store');
     });
-    Route::get('/tra-cuu-don/{token?}', 'DangkyController@lookup')->name('guest.lookup');
+    Route::get('/tra-cuu-don/{token?}', 'DangkyController@lookup')->middleware('throttle:guest_lookup')->name('guest.lookup');
 
     // Public Room Info
     Route::prefix('phong')->name('public.')->group(function () {
@@ -38,7 +38,7 @@ Route::namespace('App\Http\Controllers\Guest')->group(function () {
 // 2. ADMIN ROUTES
 // --------------------------------------------------------------------------
 Route::prefix('admin')
-    ->middleware(['auth', 'kiemtravaitro:admin,admin_truong,admin_toanha,le_tan'])
+    ->middleware(['auth', 'kiemtravaitro:admin,admin_truong,admin_toanha'])
     ->namespace('App\Http\Controllers\Admin')
     ->name('admin.')
     ->group(function () {
@@ -84,6 +84,7 @@ Route::prefix('admin')
         Route::controller('HoadonController')->middleware('can:hoadon.manage')->group(function () {
             Route::get('/quanlyhoadon', 'lietKeHoaDonAdmin')->name('quanlyhoadon');
             Route::post('/xulyhoadon', 'xuLyHoaDon')->name('xulyhoadon');
+            Route::post('/nhap-hoadon-hang-loat', 'nhapHangLoat')->name('hoadon.bulk');
             Route::post('/xacnhanthanhtoan/{id}', 'xacNhanThanhToan')->name('xacnhanthanhtoan');
             Route::get('/hoadon/{id}/pdf', 'downloadInvoicePDF')->name('hoadon.pdf');
         });
@@ -201,13 +202,14 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/private-files/{path}', [FileController::class, 'showPrivateFile'])
     ->where('path', '.*')
-    ->middleware(['auth', 'kiemtravaitro:admin,admin_truong,admin_toanha,le_tan'])
+    ->middleware(['auth', 'kiemtravaitro:admin,admin_truong,admin_toanha'])
     ->name('private.file');
 
 // Trạm điều hướng trung gian
 Route::get('/dieuhuong', function () {
+    /** @var \App\Models\User $user */
     $user = Auth::user();
-    if ($user->isAdminGroup()) {
+    if ($user && $user->isAdminGroup()) {
         return redirect()->route('admin.trangchu');
     }
     return redirect()->route('student.trangchu');

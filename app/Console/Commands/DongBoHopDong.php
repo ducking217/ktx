@@ -63,7 +63,7 @@ class DongBoHopDong extends Command
                 if ($hopdongCanThanhLy->isNotEmpty()) {
                     Hopdong::whereIn('id', $hopdongCanThanhLy->pluck('id'))
                         ->update([
-                            'trang_thai' => Hopdong::trangThaiDaThanhLy(),
+                            'trang_thai' => \App\Enums\ContractStatus::Terminated->value,
                         ]);
                 }
 

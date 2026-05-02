@@ -46,6 +46,8 @@ use App\Services\Student\PhongSinhvienService;
 use App\Services\Core\TienIchService;
 use App\Services\Admin\HopdongService;
 use App\Services\Admin\DangkyService;
+use App\Contracts\Admin\HoanTienServiceInterface;
+use App\Services\Admin\HoanTienService;
 use App\Models\Baohong;
 use App\Models\Cauhinh;
 use App\Models\Danhgia;
@@ -85,6 +87,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(DangkyServiceInterface::class, DangkyService::class);
         $this->app->bind(HopdongServiceInterface::class, HopdongService::class);
+        $this->app->bind(HoanTienServiceInterface::class, HoanTienService::class);
         // Repository bindings
         $this->app->bind(KiemToanServiceInterface::class, KiemToanService::class);
         $this->app->bind(TraPhongServiceInterface::class, TraPhongService::class);

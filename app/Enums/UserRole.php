@@ -7,7 +7,6 @@ enum UserRole: string
     case Admin       = 'admin';
     case AdminTruong = 'admin_truong';
     case AdminToaNha = 'admin_toanha';
-    case LeTan       = 'le_tan';
     case SinhVien    = 'sinhvien';
     case CuuSinhVien = 'cuu_sinhvien';
 
@@ -17,7 +16,6 @@ enum UserRole: string
             self::Admin       => 'Quản trị viên hệ thống',
             self::AdminTruong => 'Quản trị viên trường',
             self::AdminToaNha => 'Quản lý tòa nhà',
-            self::LeTan       => 'Lễ tân',
             self::SinhVien    => 'Sinh viên',
             self::CuuSinhVien => 'Cựu sinh viên',
         };
@@ -25,7 +23,7 @@ enum UserRole: string
 
     public function isAdminGroup(): bool
     {
-        return in_array($this, [self::Admin, self::AdminTruong, self::AdminToaNha, self::LeTan]);
+        return in_array($this, [self::Admin, self::AdminTruong, self::AdminToaNha]);
     }
 
     public static function values(): array

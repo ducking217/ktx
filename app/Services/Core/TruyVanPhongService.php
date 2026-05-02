@@ -22,7 +22,7 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
 
         $danhsachphong = Phong::withCount('danhsachsinhvien')
             ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('tenphong', 'like', '%'.trim($tuKhoa).'%');
+                return $query->where('tenphong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
             })
             ->when($tangLoc, function ($query) use ($tangLoc) {
                 return $query->where('tang', $tangLoc);
@@ -47,7 +47,7 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
 
         $danhsachphong = Phong::withCount('danhsachsinhvien')
             ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('tenphong', 'like', '%'.trim($tuKhoa).'%');
+                return $query->where('tenphong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
             })
             ->when($tangLoc, function ($query) use ($tangLoc) {
                 return $query->where('tang', $tangLoc);
@@ -77,7 +77,7 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
 
         $danhsachphong = Phong::withCount('danhsachsinhvien')
             ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('tenphong', 'like', '%'.trim($tuKhoa).'%');
+                return $query->where('tenphong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
             })
             ->when($gioitinhSinhvien, function ($query) use ($gioitinhSinhvien) {
                 return $query->where('gioitinh', $gioitinhSinhvien);

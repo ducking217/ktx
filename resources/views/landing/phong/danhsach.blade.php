@@ -63,7 +63,7 @@
                                     <span class="{{ $isAvailable ? 'text-ink-primary' : 'text-red-500' }}">Đang ở: {{ $phong->dango }}</span>
                                 </div>
                                 <div class="w-full bg-ui-bg h-1 overflow-hidden">
-                                    <div class="h-full transition-all duration-500 ease-out {{ $isAvailable ? 'bg-brand-emerald' : 'bg-red-500' }}" style="width:{{ $pct }}%"></div>
+                                    <div class="h-full transition-all duration-500 ease-out {{ $isAvailable ? 'bg-brand-emerald' : 'bg-red-500' }}" @style(["width: $pct%"])></div>
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-1.5">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Contracts\Admin\HopdongServiceInterface;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HopdongController extends Controller
 {
@@ -67,9 +68,15 @@ class HopdongController extends Controller
         return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Khong the gia han hop dong.']);
     }
 
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
-        $ketQua = $this->hopdongService->thanhLyHopDong($id);
+        $dulieu = $request->validate([
+            'phi_hu_hai' => ['nullable', 'numeric', 'min:0'],
+        ]);
+        
+        $phiHuHai = (int) ($dulieu['phi_hu_hai'] ?? 0);
+
+        $ketQua = $this->hopdongService->thanhLyHopDong($id, $phiHuHai);
         $loai = ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi';
 
         return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Khong the thanh ly hop dong.']);
@@ -77,14 +84,15 @@ class HopdongController extends Controller
 
     public function downloadPDF(int $id)
     {
-        $ketQua = $this->hopdongService->layChiTietHopDong($id);
-        if (isset($ketQua['toast_loai']) && $ketQua['toast_loai'] === 'loi') {
-            return redirect()->route('admin.quanlyhopdong')->with($ketQua);
+        $hopdong = \App\Models\Hopdong::with(['sinhvien.taikhoan', 'phong'])->find($id);
+        if (!$hopdong) {
+            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => 'Không tìm thấy hợp đồng.']);
         }
 
-        return redirect()->route('admin.quanlyhopdong')->with([
-            'toast_loai' => 'thongtin',
-            'toast_noidung' => 'Chuc nang tai PDF hop dong se duoc bo sung o phase tiep theo.',
+        $pdf = Pdf::loadView('pdf.hopdong', [
+            'hopdong' => $hopdong,
         ]);
+
+        return $pdf->download("hopdong_{$hopdong->id}_{$hopdong->sinhvien->masinhvien}.pdf");
     }
 }

@@ -17,7 +17,7 @@ class KyluatService implements KyluatServiceInterface
     {
         $tuKhoa = $request->query('q', '');
         $data = Kyluat::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', "%{$tuKhoa}%"));
+            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
         })->with(['sinhvien.taikhoan'])->orderByDesc('ngayvipham')->paginate(20);
 
         return ['kyluat' => $data, 'tuKhoa' => $tuKhoa, 'sinhviens' => Sinhvien::with('taikhoan')->get()];

@@ -17,7 +17,7 @@ class BaoTriService implements BaoTriServiceInterface
     {
         $tuKhoa = $request->query('q', '');
         $data = Lichsubaotri::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('phong', fn($pq) => $pq->where('tenphong', 'like', "%{$tuKhoa}%"));
+            $q->whereHas('phong', fn($pq) => $pq->where('tenphong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
         })->with(['phong', 'vattu'])->orderByDesc('ngaybaotri')->paginate(20);
 
         return [

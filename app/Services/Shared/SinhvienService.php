@@ -18,7 +18,7 @@ class SinhvienService implements SinhvienServiceInterface
     public function listStudents(Request $request): array
     {
         $tuKhoa = $request->query('q', '');
-        $students = Sinhvien::when($tuKhoa, fn($q) => $q->where('masinhvien', 'like', '%'.trim($tuKhoa).'%'))
+        $students = Sinhvien::when($tuKhoa, fn($q) => $q->where('masinhvien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%'))
             ->with(['taikhoan', 'phong'])
             ->orderByDesc('created_at')
             ->paginate(20)
@@ -74,8 +74,22 @@ class SinhvienService implements SinhvienServiceInterface
                     throw new \Exception('Giới tính không phù hợp.');
                 }
 
-                $sinhvien->update(['phong_id' => $phong->id]);
-                return $this->traVeThanhCong('Chuyển phòng thành công.');
+                $sinhvien->update([
+                    'phong_id' => $phong->id,
+                    'ngay_vao' => now()->format('Y-m-d'),
+                    'ngay_het_han' => now()->addMonths(5)->format('Y-m-d')
+                ]);
+
+                Hopdong::create([
+                    'sinhvien_id' => $sinhvien->id,
+                    'phong_id' => $phong->id,
+                    'ngay_bat_dau' => $sinhvien->ngay_vao,
+                    'ngay_ket_thuc' => $sinhvien->ngay_het_han,
+                    'giaphong_luc_ky' => (int) $phong->giaphong,
+                    'trang_thai' => ContractStatus::Active->value,
+                ]);
+
+                return $this->traVeThanhCong('Chuyển phòng và tạo hợp đồng mới thành công.');
             });
         } catch (\Throwable $e) {
             return $this->traVeLoi($e->getMessage());

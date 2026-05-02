@@ -62,4 +62,9 @@ interface HoadonServiceInterface
      * Lấy bảng giá hiện tại.
      */
     public function layBangGia(): array;
+
+    /**
+     * Xử lý nhập hóa đơn hàng loạt.
+     */
+    public function xuLyHoaDonHangLoat(array $data): array;
 }

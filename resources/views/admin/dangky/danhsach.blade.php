@@ -63,7 +63,7 @@
                                     @if($dangky->giuong_no)
                                         <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-secondary/60">Giường #{{ $dangky->giuong_no }}</span>
                                     @endif
-                                    <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-emerald/80">{{ $dangky->loaidangky }}</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-emerald/80">{{ $dangky->loaidangky instanceof \App\Enums\RegistrationType ? $dangky->loaidangky->label() : $dangky->loaidangky }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-5 text-center">
@@ -88,9 +88,26 @@
                             </td>
                             <td class="px-6 py-5 text-center">
                                 @if($dangky->anh_cccd_path)
-                                    <a href="{{ route('private.file', ['path' => $dangky->anh_cccd_path]) }}" target="_blank" class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-ui-bg text-ink-secondary transition-all hover:bg-white hover:text-ink-primary hover:shadow-sm">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                    </a>
+                                    <div x-data="{ openPreview: false }">
+                                        <button @click="openPreview = true" type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-ui-bg text-ink-secondary transition-all hover:bg-white hover:text-ink-primary hover:shadow-sm">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        </button>
+                                        
+                                        <template x-teleport="body">
+                                            <div x-show="openPreview" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+                                                <div @click.away="openPreview = false" class="relative max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                                                    <div class="absolute top-4 right-4 z-10">
+                                                        <button @click="openPreview = false" class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/50 text-white backdrop-blur-md hover:bg-slate-900/80 transition-all">
+                                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                        </button>
+                                                    </div>
+                                                    <div class="p-2 bg-slate-100">
+                                                        <img src="{{ route('private.file', ['path' => $dangky->anh_cccd_path]) }}" class="w-full h-auto max-h-[85vh] object-contain rounded-xl" alt="CCCD Preview">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 @else
                                     <span class="text-[10px] font-bold uppercase text-ink-secondary/30">N/A</span>
                                 @endif

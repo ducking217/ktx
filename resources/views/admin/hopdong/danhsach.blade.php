@@ -103,10 +103,7 @@
                                     @endif
 
                                     @if ($item->trang_thai !== \App\Enums\ContractStatus::Terminated)
-                                        <form action="{{ route('admin.hopdong.thanhly', $item->id) }}" method="post" class="inline" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
-                                            @csrf
-                                            <button type="button" @click="$dispatch('open-confirm', { message: 'Xác nhận thanh lý hợp đồng này?', action: () => showConfirm = true })" class="flex h-8 items-center justify-center rounded-lg border border-rose-100 bg-rose-50 px-3 text-[10px] font-bold uppercase tracking-widest text-rose-600 shadow-sm transition-colors hover:bg-rose-600 hover:text-white">Thanh lý</button>
-                                        </form>
+                                        <button type="button" data-modal-target="modal-thanh-ly-{{ $item->id }}" data-modal-toggle="modal-thanh-ly-{{ $item->id }}" class="flex h-8 items-center justify-center rounded-lg border border-rose-100 bg-rose-50 px-3 text-[10px] font-bold uppercase tracking-widest text-rose-600 shadow-sm transition-colors hover:bg-rose-600 hover:text-white">Thanh lý</button>
                                     @endif
                                 </div>
                             </td>
@@ -193,6 +190,36 @@
                     <div class="flex gap-3 pt-4">
                         <button type="button" data-modal-hide="modal-gia-han-{{ $item->id }}" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Hủy bỏ</button>
                         <button type="submit" class="flex-[2] rounded-xl bg-ink-primary py-3 text-sm font-bold text-white shadow-lg shadow-ink-primary/20 transition-all hover:bg-brand-emerald">Xác nhận gia hạn</button>
+                    </div>
+                </form>
+            </x-modal>
+
+            <x-modal id="modal-thanh-ly-{{ $item->id }}" title="Thanh lý hợp đồng" subtitle="Xác nhận kết thúc hợp đồng #{{ $item->id }} và tính toán khoản hoàn tiền cọc.">
+                <form action="{{ route('admin.hopdong.thanhly', $item->id) }}" method="post" class="space-y-6">
+                    @csrf
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Tiền cọc ban đầu</label>
+                        <div class="mt-1.5 p-3 rounded-xl bg-ui-bg text-sm font-bold text-ink-primary tabular-nums">
+                            @php
+                                $hoadonCoc = \App\Models\Hoadon::where('sinhvien_id', $item->sinhvien_id)
+                                    ->where('phong_id', $item->phong_id)
+                                    ->where('loai_hoadon', \App\Models\Hoadon::LOAI_DEPOSIT)
+                                    ->where('trangthaithanhtoan', \App\Enums\InvoiceStatus::Paid->value)
+                                    ->first();
+                                $tienCoc = $hoadonCoc ? $hoadonCoc->tongtien : 0;
+                            @endphp
+                            {{ number_format($tienCoc) }}đ
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Phí hư hại / Vi phạm (nếu có)</label>
+                        <input name="phi_hu_hai" type="number" min="0" value="0" class="linear-input mt-1.5 font-bold" />
+                        <p class="mt-2 text-[11px] text-ink-secondary/60">Hệ thống sẽ tự động đối trừ tiền cọc với phí hư hại và sinh ra biên lai hoàn tiền/thu thêm tương ứng.</p>
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" data-modal-hide="modal-thanh-ly-{{ $item->id }}" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Hủy bỏ</button>
+                        <button type="submit" class="flex-[2] rounded-xl bg-rose-600 py-3 text-sm font-bold text-white shadow-lg shadow-rose-600/20 transition-all hover:bg-rose-700">Xác nhận thanh lý</button>
                     </div>
                 </form>
             </x-modal>
