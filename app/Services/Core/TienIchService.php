@@ -19,6 +19,7 @@ class TienIchService implements TienIchServiceInterface
     {
         foreach ($data as $key => $value) {
             Cauhinh::updateOrCreate(['ten' => $key], ['giatri' => $value]);
+            \Illuminate\Support\Facades\Cache::forget("cauhinh_$key");
         }
     }
 

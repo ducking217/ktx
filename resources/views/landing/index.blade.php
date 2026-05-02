@@ -73,7 +73,7 @@
                         <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500">Sinh viên</span>
                     </div>
                     <div class="p-8 flex flex-col items-center text-center group">
-                        <span class="font-display text-4xl font-bold text-gray-900 mb-1 tracking-tight">{{ $tongPhong }}</span>
+                        <span class="font-display text-4xl font-bold text-gray-900 mb-1 tracking-tight">{{ $tongSoPhong }}</span>
                         <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500">Phòng ở</span>
                     </div>
                     <div class="p-8 flex flex-col items-center text-center group">

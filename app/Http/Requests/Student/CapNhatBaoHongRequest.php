@@ -16,10 +16,10 @@ class CapNhatBaoHongRequest extends FormRequest
     {
         return [
             'trangthai' => ['required', 'in:' . implode(',', [
-                MaintenanceStatus::PENDING->value,
-                MaintenanceStatus::SCHEDULED->value,
-                MaintenanceStatus::IN_PROGRESS->value,
-                MaintenanceStatus::COMPLETED->value,
+                MaintenanceStatus::Pending->value,
+                MaintenanceStatus::Scheduled->value,
+                MaintenanceStatus::InProgress->value,
+                MaintenanceStatus::Completed->value,
             ])],
             'ngayhen' => ['nullable', 'date'],
             'noidung' => ['nullable', 'string'],

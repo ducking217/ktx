@@ -1,91 +1,140 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Hóa đơn #{{ $hoadon->id }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Hóa đơn {{ $hoadon->ma_hd }}</title>
     <style>
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; line-height: 1.6; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .title { font-size: 20px; font-weight: bold; text-transform: uppercase; }
-        .section { margin-bottom: 20px; }
-        .section-title { font-weight: bold; border-bottom: 1px solid #000; margin-bottom: 10px; }
-        table { border-collapse: collapse; margin-bottom: 20px; width: 100%; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 20px; }
-        .footer { text-align: right; margin-top: 50px; font-style: italic; }
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 40px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            text-transform: uppercase;
+            color: #1a1a1a;
+        }
+        .info-section {
+            margin-bottom: 30px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-table td {
+            padding: 5px 0;
+        }
+        .info-table td.label {
+            font-weight: bold;
+            width: 150px;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .details-table th, .details-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .details-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .total-section {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: right;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="title">Hóa đơn Tiền điện, Nước & Phòng</div>
-        <div>Kỳ quyết toán: Tháng {{ $hoadon->thang }}/{{ $hoadon->nam }}</div>
-        <div>Mã hóa đơn: #{{ $hoadon->id }}</div>
+        <h1>Hóa đơn thanh toán</h1>
+        <p>Mã hóa đơn: {{ $hoadon->ma_hd }}</p>
     </div>
 
-    <div class="section">
-        <div class="section-title">Thông tin khách hàng</div>
-        <p>
-            <strong>Sinh viên:</strong> {{ $hoadon->sinhvien->taikhoan->name ?? 'N/A' }}<br>
-            <strong>Mã sinh viên:</strong> {{ $hoadon->sinhvien->masinhvien ?? 'N/A' }}<br>
-            <strong>Phòng:</strong> {{ $hoadon->phong->tenphong ?? 'N/A' }}
-        </p>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Chi tiết tiêu thụ</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Loại</th>
-                    <th>Chỉ số cũ</th>
-                    <th>Chỉ số mới</th>
-                    <th>Tiêu thụ</th>
-                    <th>Đơn giá</th>
-                    <th>Thành tiền</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Điện (kWh)</td>
-                    <td>{{ $hoadon->chisodiencu }}</td>
-                    <td>{{ $hoadon->chisodienmoi }}</td>
-                    <td>{{ $hoadon->chisodienmoi - $hoadon->chisodiencu }}</td>
-                    <td>{{ number_format($dongiadien) }}đ</td>
-                    <td>{{ number_format($hoadon->tiendien) }}đ</td>
-                </tr>
-                <tr>
-                    <td>Nước (m³)</td>
-                    <td>{{ $hoadon->chisonuoccu }}</td>
-                    <td>{{ $hoadon->chisonuocmoi }}</td>
-                    <td>{{ $hoadon->chisonuocmoi - $hoadon->chisonuoccu }}</td>
-                    <td>{{ number_format($dongianuoc) }}đ</td>
-                    <td>{{ number_format($hoadon->tiennuoc) }}đ</td>
-                </tr>
-                <tr>
-                    <td colspan="5">Tiền phòng cơ bản</td>
-                    <td>{{ number_format($hoadon->tienphong) }}đ</td>
-                </tr>
-                <tr>
-                    <td colspan="5">Phí dịch vụ</td>
-                    <td>{{ number_format($hoadon->phidichvu ?? 0) }}đ</td>
-                </tr>
-            </tbody>
+    <div class="info-section">
+        <table class="info-table">
+            <tr>
+                <td class="label">Sinh viên:</td>
+                <td>{{ $hoadon->sinhvien->hovaten }} ({{ $hoadon->sinhvien->masv }})</td>
+            </tr>
+            <tr>
+                <td class="label">Phòng:</td>
+                <td>{{ $hoadon->phong->tenphong }}</td>
+            </tr>
+            <tr>
+                <td class="label">Kỳ thanh toán:</td>
+                <td>Tháng {{ $hoadon->thang }}/{{ $hoadon->nam }}</td>
+            </tr>
+            <tr>
+                <td class="label">Ngày phát hành:</td>
+                <td>{{ $hoadon->created_at->format('d/m/Y') }}</td>
+            </tr>
         </table>
     </div>
 
-    <div class="total">
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th>Hạng mục</th>
+                <th>Số tiền (VNĐ)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tiền phòng</td>
+                <td>{{ number_format($hoadon->tienphong) }}</td>
+            </tr>
+            <tr>
+                <td>Tiền điện</td>
+                <td>{{ number_format($hoadon->tiendien) }}</td>
+            </tr>
+            <tr>
+                <td>Tiền nước</td>
+                <td>{{ number_format($hoadon->tiennuoc) }}</td>
+            </tr>
+            @if($hoadon->phidichvu > 0)
+            <tr>
+                <td>Tiền dịch vụ</td>
+                <td>{{ number_format($hoadon->phidichvu) }}</td>
+            </tr>
+            @endif
+            @if($hoadon->tienphat > 0)
+            <tr>
+                <td>Tiền phạt/Bồi thường</td>
+                <td>{{ number_format($hoadon->tienphat) }}</td>
+            </tr>
+            @endif
+        </tbody>
+    </table>
+
+    <div class="total-section">
         Tổng cộng: {{ number_format($hoadon->tongtien) }} VNĐ
     </div>
 
-    <div class="section">
-        <p><strong>Trạng thái:</strong> {{ $hoadon->trangthaithanhtoan }}</p>
-        <p><strong>Ngày xuất:</strong> {{ \Carbon\Carbon::parse($hoadon->ngayxuat)->format('d/m/Y') }}</p>
-    </div>
-
     <div class="footer">
-        Ban Quản lý Ký túc xá<br>
-        (Đã ký điện tử)
+        <p>Ngày .... tháng .... năm ....</p>
+        <p style="font-weight: bold; padding-right: 50px;">Người lập phiếu</p>
+        <br><br><br>
+        <p style="padding-right: 40px;">(Ký và ghi rõ họ tên)</p>
     </div>
 </body>
 </html>

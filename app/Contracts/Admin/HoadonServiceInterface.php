@@ -67,4 +67,9 @@ interface HoadonServiceInterface
      * Xử lý nhập hóa đơn hàng loạt.
      */
     public function xuLyHoaDonHangLoat(array $data): array;
+
+    /**
+     * Lấy dữ liệu cho giao diện nhập hàng loạt.
+     */
+    public function duLieuNhapHangLoat(): array;
 }

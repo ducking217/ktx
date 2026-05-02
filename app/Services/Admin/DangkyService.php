@@ -57,7 +57,7 @@ class DangkyService implements DangkyServiceInterface
                 $phong = Phong::where('id', (int)$data['phong_id'])->lockForUpdate()->first();
                 if (!$phong) return $this->traVeLoi('Phòng không tồn tại.');
 
-                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->soluongtoida) {
+                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->succhuamax) {
                     return $this->traVeLoi(self::MESSAGE_ROOM_CONFLICT);
                 }
 
@@ -251,7 +251,7 @@ class DangkyService implements DangkyServiceInterface
     public function xacNhanThanhToan(int $id): array
     {
         try {
-            DB::transaction(function () use ($id) {
+            $emailData = DB::transaction(function () use ($id) {
                 $dangky = Dangky::where('id', $id)->lockForUpdate()->first();
                 if (!$dangky || $dangky->trangthai !== RegistrationStatus::ApprovedPendingPayment) throw new \Exception('Không hợp lệ.');
 
@@ -283,8 +283,25 @@ class DangkyService implements DangkyServiceInterface
                         'Payment confirmed'
                     ));
                 }
+
+                // [MAGIC LINK FLOW] Chuẩn bị dữ liệu gửi mail magic link
+                $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                    'magic-link.login',
+                    now()->addHours(72),
+                    ['user_id' => $user->id]
+                );
+
+                return ['user' => $user, 'url' => $url];
             });
-            return $this->traVeThanhCong('Xác nhận thanh toán thành công.');
+
+            // Gửi Magic Link Mail ngoài transaction để tránh delay/error làm rollback
+            try {
+                Mail::to($emailData['user']->email)->queue(new \App\Mail\LoginMagicLinkMail($emailData['user'], $emailData['url']));
+            } catch (\Throwable $e) {
+                Log::error("Failed to send Magic Link Mail to {$emailData['user']->email}: " . $e->getMessage());
+            }
+
+            return $this->traVeThanhCong('Xác nhận thanh toán thành công. Link đăng nhập đã được gửi tới sinh viên.');
         } catch (\Throwable $e) {
             return $this->traVeLoi($e->getMessage());
         }

@@ -175,6 +175,7 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
 
     private function demPhongConTrong(): int
     {
+        // [FIX N+1] Sử dụng whereColumn để so sánh trực tiếp trong Database thay vì loop qua từng bản ghi
         return Phong::whereColumn('dango', '<', 'succhuamax')->count();
     }
 
@@ -182,7 +183,8 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
     {
         $sauThangTruoc = now()->subMonths(5)->startOfMonth();
         
-        $data = Hoadon::selectRaw('thang, nam, SUM(tienphong) as total_phong, SUM(tiendien + tiennuoc) as total_dichvu')
+        // [FIX N+1] Thay thế logic loop-queries bằng 1 query GROUP BY duy nhất cho 6 tháng
+        $data = Hoadon::selectRaw('thang, nam, SUM(tienphong) as total_phong, SUM(tiendien + tiennuoc + phidichvu + tienphat) as total_dichvu')
             ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
             ->where(function($q) use ($sauThangTruoc) {
                 $q->where('nam', '>', $sauThangTruoc->year)

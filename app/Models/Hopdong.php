@@ -19,6 +19,11 @@ class Hopdong extends Model
         return \App\Enums\ContractStatus::Active->value;
     }
 
+    public static function trangThaiDaThanhLy(): string
+    {
+        return \App\Enums\ContractStatus::Terminated->value;
+    }
+
 
     private const ALLOWED_TRANSITIONS = [
         'active' => [
@@ -43,6 +48,11 @@ class Hopdong extends Model
     protected $casts = [
         'trang_thai' => ContractStatus::class,
     ];
+
+    public function getMaHdAttribute(): string
+    {
+        return 'CONTRACT' . str_pad((string)$this->id, 6, '0', STR_PAD_LEFT);
+    }
 
     public function sinhvien(): BelongsTo
     {

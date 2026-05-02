@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Student;
 
+use App\Contracts\Core\KiemToanServiceInterface;
 use App\Models\Hopdong;
 use App\Models\Hoadon;
 use App\Models\Sinhvien;
@@ -15,16 +16,16 @@ use App\Contracts\Admin\HoanTienServiceInterface;
 use App\Services\Admin\HopdongService;
 use App\Services\Admin\HoadonService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class TraPhongService implements TraPhongServiceInterface
 {
     use PhanHoiService;
 
     public function __construct(
-        private HopdongService $contractService,
-        private HoadonService $invoiceService,
-        private HoanTienServiceInterface $refundService
+        private readonly HopdongService $contractService,
+        private readonly HoadonService $invoiceService,
+        private readonly HoanTienServiceInterface $refundService,
+        private readonly KiemToanServiceInterface $kiemToanService
     ) {}
 
     public function kiemTraNo(Sinhvien $sinhvien): array
@@ -81,10 +82,12 @@ class TraPhongService implements TraPhongServiceInterface
 
     private function ghiNhatKyTraPhong(int $id, array $oldData)
     {
-        \App\Models\TblLog::create([
-            'user_id' => auth()->id() ?? 0, 'hanh_dong' => 'Thanh lý hợp đồng', 'ten_model' => 'Hopdong',
-            'id_ban_ghi' => $id, 'du_lieu_cu' => $oldData,
-            'du_lieu_moi' => ['trang_thai' => ContractStatus::Terminated->value, 'sinhvien_phong_id' => null],
-        ]);
+        $this->kiemToanService->ghiNhatKy(
+            'Thanh lý hợp đồng',
+            'Hopdong',
+            $id,
+            $oldData,
+            ['trang_thai' => ContractStatus::Terminated->value, 'sinhvien_phong_id' => null]
+        );
     }
 }

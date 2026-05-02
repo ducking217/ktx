@@ -40,18 +40,21 @@ class PhongController extends Controller
 
     public function store(LuuPhongRequest $request)
     {
+        $this->authorize('phong.manage');
         $result = $this->nghiepVuPhongService->luuPhong($request->validated());
         return redirect()->back()->with(['toast_loai' => $result['success'] ? 'thanhcong' : 'loi', 'toast_noidung' => $result['message']]);
     }
 
     public function update(CapNhatPhongRequest $request, int $id)
     {
+        $this->authorize('phong.manage');
         $result = $this->nghiepVuPhongService->capNhatPhong($id, $request->validated());
         return redirect()->back()->with(['toast_loai' => $result['success'] ? 'thanhcong' : 'loi', 'toast_noidung' => $result['message']]);
     }
 
     public function destroy(int $id)
     {
+        $this->authorize('phong.manage');
         $result = $this->nghiepVuPhongService->xoaPhong($id);
         return redirect()->back()->with(['toast_loai' => $result['success'] ? 'thanhcong' : 'loi', 'toast_noidung' => $result['message']]);
     }
@@ -64,6 +67,7 @@ class PhongController extends Controller
 
     public function storeAsset(Request $request, int $id)
     {
+        $this->authorize('phong.manage');
         $duLieu = $request->validate([
             'tentaisan' => ['required', 'string', 'max:100'],
             'soluong' => ['required', 'integer', 'min:1'],
@@ -80,6 +84,7 @@ class PhongController extends Controller
 
     public function updateAsset(Request $request, int $id, int $taisanId)
     {
+        $this->authorize('phong.manage');
         $duLieu = $request->validate([
             'tentaisan' => ['required', 'string', 'max:100'],
             'soluong' => ['required', 'integer', 'min:1'],
@@ -96,6 +101,7 @@ class PhongController extends Controller
 
     public function destroyAsset(int $id, int $taisanId)
     {
+        $this->authorize('phong.manage');
         $result = $this->taiSanPhongService->destroy($id, $taisanId);
 
         return redirect()->back()->with([

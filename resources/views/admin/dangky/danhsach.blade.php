@@ -80,7 +80,7 @@
                                 <span class="inline-flex items-center rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider {{ $badgeClass }}">
                                     {{ $statusEnum->label() }}
                                 </span>
-                                @if($dangky->expires_at && $dangky->trangthai === \App\Enums\RegistrationStatus::ApprovedPendingPayment->value)
+                                @if($dangky->expires_at && $dangky->trangthai === \App\Enums\RegistrationStatus::ApprovedPendingPayment)
                                     <div class="mt-1.5 text-[9px] font-bold text-rose-500 uppercase tracking-tighter tabular-nums">
                                         Hết hạn: {{ $dangky->expires_at->format('d/m H:i') }}
                                     </div>
@@ -114,26 +114,26 @@
                             </td>
                             <td class="px-6 py-5 text-right">
                                 <div class="flex justify-end gap-2">
-                                    @if ($dangky->trangthai === \App\Enums\RegistrationStatus::Pending->value)
+                                    @if ($dangky->trangthai === \App\Enums\RegistrationStatus::Pending)
                                         <form method="POST" action="{{ route('admin.xulyduyetdangky', ['id' => $dangky->id]) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
                                             @csrf
                                             <button type="button" @click="$dispatch('open-confirm', { message: 'Xác nhận duyệt hồ sơ cho ứng viên này?', action: () => showConfirm = true })" class="h-8 flex items-center justify-center rounded-lg bg-ink-primary px-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm transition-all hover:bg-brand-emerald active:scale-[0.98]">Duyệt</button>
                                         </form>
-                                    @elseif($dangky->trangthai === \App\Enums\RegistrationStatus::ApprovedPendingPayment->value)
+                                    @elseif($dangky->trangthai === \App\Enums\RegistrationStatus::ApprovedPendingPayment)
                                         <form method="POST" action="{{ route('admin.dangky.xacnhanthanhtoan', ['id' => $dangky->id]) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
                                             @csrf
                                             <button type="button" @click="$dispatch('open-confirm', { message: 'Xác nhận sinh viên đã thanh toán phí cư trú?', action: () => showConfirm = true })" class="h-8 flex items-center justify-center rounded-lg bg-brand-emerald px-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm transition-all hover:bg-brand-jade active:scale-[0.98]">XN Tiền</button>
                                         </form>
                                     @endif
 
-                                    @if (in_array($dangky->trangthai, [\App\Enums\RegistrationStatus::Pending->value, \App\Enums\RegistrationStatus::ApprovedPendingPayment->value]))
+                                    @if (in_array($dangky->trangthai, [\App\Enums\RegistrationStatus::Pending, \App\Enums\RegistrationStatus::ApprovedPendingPayment]))
                                         <form method="POST" action="{{ route('admin.xulytuchoidangky', ['id' => $dangky->id]) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
                                             @csrf
                                             <button type="button" @click="$dispatch('open-confirm', { message: 'Bạn có chắc chắn muốn từ chối đăng ký này?', action: () => showConfirm = true })" class="h-8 flex items-center justify-center rounded-lg border border-rose-200 bg-white px-3 text-[10px] font-bold uppercase tracking-widest text-rose-600 shadow-sm transition-all hover:bg-rose-50 active:scale-[0.98]">Từ chối</button>
                                         </form>
                                     @endif
                                     
-                                    @if($dangky->trangthai === \App\Enums\RegistrationStatus::Completed->value)
+                                    @if($dangky->trangthai === \App\Enums\RegistrationStatus::Completed)
                                         <div class="h-8 flex items-center px-3 text-[10px] font-bold uppercase tracking-widest text-emerald-600/50 italic">Đã hoàn tất</div>
                                     @endif
                                 </div>

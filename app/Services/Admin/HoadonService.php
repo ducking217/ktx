@@ -98,8 +98,28 @@ class HoadonService implements HoadonServiceInterface
         $hoadon = Hoadon::find($id);
         if (!$hoadon) return $this->traVeLoi('Không tìm thấy hóa đơn.');
         if (!$hoadon->transitionTo(InvoiceStatus::Paid->value)) return $this->traVeLoi('Không thể xác nhận.');
+        return $this->traVeThanhCong('Đã xác nhận thanh toán.');
+    }
 
-        return $this->traVeThanhCong('Xác nhận thanh toán thành công.');
+    public function duLieuNhapHangLoat(): array
+    {
+        $danhsachphong = Phong::whereHas('danhsachsinhvien')->get()->map(function($phong) {
+            $lastInvoice = Hoadon::where('phong_id', $phong->id)
+                ->where('loai_hoadon', Hoadon::LOAI_MONTHLY)
+                ->orderByDesc('nam')
+                ->orderByDesc('thang')
+                ->first();
+            
+            $phong->chisodien_cuoi = $lastInvoice ? $lastInvoice->chisodienmoi : 0;
+            $phong->chisonuoc_cuoi = $lastInvoice ? $lastInvoice->chisonuocmoi : 0;
+            return $phong;
+        });
+
+        return [
+            'danhsachphong' => $danhsachphong,
+            'thangHienTai' => now()->month,
+            'namHienTai' => now()->year,
+        ];
     }
 
     public function xacNhanViPham(int $id): array
@@ -124,8 +144,9 @@ class HoadonService implements HoadonServiceInterface
             'loai_hoadon' => Hoadon::LOAI_MONTHLY,
         ])->first();
 
+        // [PAID GUARD LOGIC] Ngăn chặn ghi đè hóa đơn đã thanh toán để bảo vệ dữ liệu tài chính
         if ($existing && $existing->trangthaithanhtoan === InvoiceStatus::Paid) {
-            return $this->traVeLoi('Hóa đơn tháng này đã được thanh toán. Không thể ghi đè.');
+            return $this->traVeLoi('Hóa đơn phòng này trong tháng ' . $data['thang'] . '/' . $data['nam'] . ' đã được thanh toán. Không thể cập nhật chỉ số mới.');
         }
 
         $bangGia = $this->layBangGia();
@@ -255,7 +276,9 @@ class HoadonService implements HoadonServiceInterface
 
     private function layGiaTuCauhinh(string $key, string $defaultValue): string
     {
-        $c = Cauhinh::where('ten', $key)->first();
-        return $c ? $c->giatri : $defaultValue;
+        return \Illuminate\Support\Facades\Cache::remember("cauhinh_$key", 3600, function () use ($key, $defaultValue) {
+            $c = Cauhinh::where('ten', $key)->first();
+            return $c ? $c->giatri : $defaultValue;
+        });
     }
 }

@@ -27,6 +27,11 @@ Route::namespace('App\Http\Controllers\Guest')->group(function () {
     });
     Route::get('/tra-cuu-don/{token?}', 'DangkyController@lookup')->middleware('throttle:guest_lookup')->name('guest.lookup');
 
+    // Magic Link Login
+    Route::get('/magic-link-login/{user_id}', [\App\Http\Controllers\Auth\MagicLinkController::class, 'login'])
+        ->name('magic-link.login')
+        ->middleware('signed');
+
     // Public Room Info
     Route::prefix('phong')->name('public.')->group(function () {
         Route::get('/', 'PhongController@index')->name('danhsachphong');
@@ -80,10 +85,15 @@ Route::prefix('admin')
             Route::post('/tuchoidangky/{id}', 'tuChoiDangKy')->name('xulytuchoidangky');
         });
 
+        // Nhật ký hoạt động (Chỉ Super Admin)
+        Route::get('/activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('admin.activity-log');
+
         // Quản lý Hóa đơn & Công nợ
         Route::controller('HoadonController')->middleware('can:hoadon.manage')->group(function () {
             Route::get('/quanlyhoadon', 'lietKeHoaDonAdmin')->name('quanlyhoadon');
             Route::post('/xulyhoadon', 'xuLyHoaDon')->name('xulyhoadon');
+            Route::get('/dien-nuoc/nhap-hang-loat', 'giaoDienNhapHangLoat')->name('hoadon.nhap_hang_loat');
+            Route::post('/dien-nuoc/luu-hang-loat', 'luuHangLoat')->name('hoadon.luu_hang_loat');
             Route::post('/nhap-hoadon-hang-loat', 'nhapHangLoat')->name('hoadon.bulk');
             Route::post('/xacnhanthanhtoan/{id}', 'xacNhanThanhToan')->name('xacnhanthanhtoan');
             Route::get('/hoadon/{id}/pdf', 'downloadInvoicePDF')->name('hoadon.pdf');

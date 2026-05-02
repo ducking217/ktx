@@ -32,6 +32,14 @@
                         <span>Dashboard</span>
                     </div>
                 </a>
+                @if(auth()->user()->vaitro === \App\Enums\UserRole::Admin)
+                    <a href="{{ route('admin.activity-log') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.activity-log') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="h-5 w-5 {{ request()->routeIs('admin.activity-log') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Nhật ký hoạt động</span>
+                        </div>
+                    </a>
+                @endif
             </div>
 
             <!-- Quản lý -->

@@ -59,17 +59,42 @@ class HoadonController extends Controller
 
     public function downloadInvoicePDF(int $id)
     {
-        $hoadon = \App\Models\Hoadon::with(['phong', 'sinhvien.taikhoan'])->find($id);
+        $hoadon = \App\Models\Hoadon::with(['phong', 'sinhvien'])->find($id);
         if (!$hoadon) {
             return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => 'Không tìm thấy hóa đơn.']);
         }
 
         $pdf = Pdf::loadView('pdf.hoadon', [
             'hoadon' => $hoadon,
-            'dongiadien' => $this->hoadonService->layBangGia()['dongiadien'],
-            'dongianuoc' => $this->hoadonService->layBangGia()['dongianuoc'],
         ]);
 
-        return $pdf->download("hoadon_{$hoadon->id}_{$hoadon->thang}_{$hoadon->nam}.pdf");
+        return $pdf->download("hoadon_{$hoadon->ma_hd}.pdf");
+    }
+
+    public function giaoDienNhapHangLoat()
+    {
+        $data = $this->hoadonService->duLieuNhapHangLoat();
+        return view('admin.hoadon.nhap-hang-loat', $data);
+    }
+
+    public function luuHangLoat(Request $request)
+    {
+        $dulieu = $request->validate([
+            'thang' => ['required', 'numeric', 'min:1', 'max:12'],
+            'nam' => ['required', 'numeric', 'min:2000', 'max:2100'],
+            'hoa_don' => ['required', 'array'],
+            'hoa_don.*.phong_id' => ['required', 'numeric'],
+            'hoa_don.*.chisodiencu' => ['required', 'numeric', 'min:0'],
+            'hoa_don.*.chisodienmoi' => ['required', 'numeric', 'min:0'],
+            'hoa_don.*.chisonuoccu' => ['required', 'numeric', 'min:0'],
+            'hoa_don.*.chisonuocmoi' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $result = $this->hoadonService->xuLyHoaDonHangLoat($dulieu);
+        
+        return redirect()->route('admin.quanlyhoadon')->with([
+            'toast_loai' => $result['toast_loai'], 
+            'toast_noidung' => $result['toast_noidung']
+        ]);
     }
 }

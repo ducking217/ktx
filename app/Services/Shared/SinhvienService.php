@@ -2,6 +2,7 @@
 
 namespace App\Services\Shared;
 
+use App\Contracts\Core\KiemToanServiceInterface;
 use App\Contracts\Shared\SinhvienServiceInterface;
 use App\Enums\ContractStatus;
 use App\Models\Hopdong;
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\DB;
 class SinhvienService implements SinhvienServiceInterface
 {
     use PhanHoiService;
+
+    public function __construct(
+        private readonly KiemToanServiceInterface $kiemToanService
+    ) {}
 
     public function listStudents(Request $request): array
     {
@@ -51,49 +56,78 @@ class SinhvienService implements SinhvienServiceInterface
     {
         try {
             return DB::transaction(function () use ($id, $phongId) {
-                $sinhvien = Sinhvien::where('id', $id)->lockForUpdate()->first();
+                $sinhvien = Sinhvien::where('id', $id)->with('taikhoan')->lockForUpdate()->first();
                 if (!$sinhvien) throw new \Exception('Không tìm thấy sinh viên.');
+
+                $oldPhongId = $sinhvien->phong_id;
 
                 if ($phongId === null || $phongId === 0) {
                     $this->terminateActiveContracts($sinhvien->id);
-                    $sinhvien->update(['phong_id' => null]);
-                    return $this->traVeThanhCong('Cập nhật thành công.');
+                    $sinhvien->update(['phong_id' => null, 'ngay_vao' => null, 'ngay_het_han' => null]);
+                    
+                    if ($oldPhongId) {
+                        $this->capNhatDango($oldPhongId);
+                        $this->auditLog('Rời phòng', 'Sinhvien', $sinhvien->id, ['phong_id' => $oldPhongId], ['phong_id' => null]);
+                    }
+                    
+                    return $this->traVeThanhCong('Rời phòng thành công.');
                 }
 
                 $phong = Phong::where('id', $phongId)->lockForUpdate()->first();
                 if (!$phong) throw new \Exception('Phòng không tồn tại.');
-                if ((int)$sinhvien->phong_id === (int)$phong->id) return $this->traVeThanhCong('Đang ở đúng phòng.');
+                if ((int)$oldPhongId === (int)$phong->id) return $this->traVeThanhCong('Đang ở đúng phòng.');
 
+                // [CONTRACT FLOW] Chấm dứt hợp đồng cũ
                 $this->terminateActiveContracts($sinhvien->id);
 
-                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->soluongtoida) {
+                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->succhuamax) {
                     throw new \Exception('Phòng đã đủ người.');
                 }
 
-                if ($phong->gioitinh && $phong->gioitinh !== ($sinhvien->taikhoan->gioitinh ?? null)) {
+                if ($phong->gioitinh && $phong->gioitinh !== ($sinhvien->taikhoan->gioitinh->value ?? $sinhvien->taikhoan->gioitinh ?? null)) {
                     throw new \Exception('Giới tính không phù hợp.');
                 }
 
+                $ngayVao = now()->format('Y-m-d');
+                $ngayHetHan = now()->addMonths(5)->format('Y-m-d');
+
                 $sinhvien->update([
                     'phong_id' => $phong->id,
-                    'ngay_vao' => now()->format('Y-m-d'),
-                    'ngay_het_han' => now()->addMonths(5)->format('Y-m-d')
+                    'ngay_vao' => $ngayVao,
+                    'ngay_het_han' => $ngayHetHan
                 ]);
 
+                // [CONTRACT FLOW] Tạo hợp đồng mới tự động khi chuyển phòng
                 Hopdong::create([
                     'sinhvien_id' => $sinhvien->id,
                     'phong_id' => $phong->id,
-                    'ngay_bat_dau' => $sinhvien->ngay_vao,
-                    'ngay_ket_thuc' => $sinhvien->ngay_het_han,
+                    'ngay_bat_dau' => $ngayVao,
+                    'ngay_ket_thuc' => $ngayHetHan,
                     'giaphong_luc_ky' => (int) $phong->giaphong,
                     'trang_thai' => ContractStatus::Active->value,
                 ]);
+
+                $this->capNhatDango($phong->id);
+                if ($oldPhongId) $this->capNhatDango($oldPhongId);
+
+                $this->auditLog('Chuyển phòng', 'Sinhvien', $sinhvien->id, ['phong_id' => $oldPhongId], ['phong_id' => $phong->id]);
 
                 return $this->traVeThanhCong('Chuyển phòng và tạo hợp đồng mới thành công.');
             });
         } catch (\Throwable $e) {
             return $this->traVeLoi($e->getMessage());
         }
+    }
+
+    private function capNhatDango(int $phongId): void
+    {
+        $count = Sinhvien::where('phong_id', $phongId)->count();
+        Phong::where('id', $phongId)->update(['dango' => $count]);
+    }
+
+    private function auditLog(string $action, string $model, int $id, array $old, array $new): void
+    {
+        $this->kiemToanService->ghiNhatKy($action, $model, $id, $old, $new);
     }
 
     public function removeFromRoom(int $id): array

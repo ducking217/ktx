@@ -33,12 +33,12 @@
                 <h3 class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mb-6">Trạng thái lấp đầy</h3>
                 @php
                     $soluongdango = count($sinhviens);
-                    $daydu = $soluongdango >= (int) $phong->soluongtoida;
-                    $phantram = $phong->soluongtoida > 0 ? min(100, round($soluongdango / $phong->soluongtoida * 100)) : 0;
+                    $daydu = $soluongdango >= (int) $phong->succhuamax;
+                    $phantram = $phong->succhuamax > 0 ? min(100, round($soluongdango / $phong->succhuamax * 100)) : 0;
                 @endphp
                 
                 <div class="flex items-end justify-between mb-4">
-                    <span class="text-5xl font-black text-ink-primary tabular-nums font-display">{{ $soluongdango }}<span class="text-xl text-ink-secondary/40">/{{ $phong->soluongtoida }}</span></span>
+                    <span class="text-5xl font-black text-ink-primary tabular-nums font-display">{{ $soluongdango }}<span class="text-xl text-ink-secondary/40">/{{ $phong->succhuamax }}</span></span>
                     <span class="text-sm font-bold text-ink-secondary uppercase">Giường đã ở</span>
                 </div>
 

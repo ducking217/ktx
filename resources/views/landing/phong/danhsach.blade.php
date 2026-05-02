@@ -30,9 +30,9 @@
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5" id="room-container">
                 @forelse($danhsachphong as $phong)
                     @php
-                        $conTrong = $phong->succhuamax - $phong->dango;
+                        $conTrong = max(0, $phong->succhuamax - $phong->dango);
                         $isAvailable = $conTrong > 0;
-                        $pct = ($phong->dango / $phong->succhuamax) * 100;
+                        $pct = $phong->succhuamax > 0 ? min(100, ($phong->dango / $phong->succhuamax) * 100) : 0;
                     @endphp
                     <div class="room-card bg-white p-5 border border-ui-border hover:border-ink-primary transition-colors duration-300 flex flex-col group shadow-sm hover:shadow-md"
                          data-gender="{{ $phong->gioitinh }}"

@@ -25,17 +25,29 @@ class Phong extends Model
     ];
 
     /**
-     * Backward compatibility for soluongtoida
+     * Đồng bộ hóa soluongtoida và succhuamax
+     * Ưu tiên sử dụng succhuamax làm nguồn chính
      */
     public function getSoluongtoidaAttribute(): int
     {
-        return (int) ($this->attributes['soluongtoida'] ?? $this->succhuamax);
+        return (int) ($this->attributes['succhuamax'] ?? ($this->attributes['soluongtoida'] ?? 0));
     }
 
     public function setSoluongtoidaAttribute($value): void
     {
         $this->attributes['soluongtoida'] = $value;
         $this->attributes['succhuamax'] = $value;
+    }
+
+    public function getSucchuamaxAttribute(): int
+    {
+        return (int) ($this->attributes['succhuamax'] ?? ($this->attributes['soluongtoida'] ?? 0));
+    }
+
+    public function setSucchuamaxAttribute($value): void
+    {
+        $this->attributes['succhuamax'] = $value;
+        $this->attributes['soluongtoida'] = $value;
     }
 
     public function danhsachsinhvien(): HasMany

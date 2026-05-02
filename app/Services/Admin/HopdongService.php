@@ -75,7 +75,7 @@ class HopdongService implements HopdongServiceInterface
     {
         if ($sinhvien->phong_id) return ['success' => false, 'message' => 'Đã có phòng.'];
         if (Hopdong::where('sinhvien_id', $sinhvien->id)->where('trang_thai', ContractStatus::Active->value)->exists()) return ['success' => false, 'message' => 'Đang có hợp đồng.'];
-        if ($phong->dango >= $phong->soluongtoida) return ['success' => false, 'message' => 'Phòng đầy.'];
+        if ($phong->dango >= $phong->succhuamax) return ['success' => false, 'message' => 'Phòng đầy.'];
         if ($phong->gioitinh && $phong->gioitinh !== ($sinhvien->taikhoan->gioitinh ?? null)) return ['success' => false, 'message' => 'Giới tính không hợp.'];
         return ['success' => true];
     }
@@ -87,7 +87,7 @@ class HopdongService implements HopdongServiceInterface
         if (strtotime($newEndDate) <= strtotime($currentEndDate)) return ['success' => false, 'message' => 'Ngày mới không hợp lệ.'];
 
         $phong = $hopdong->phong; $sinhvien = $hopdong->sinhvien;
-        if ($phong->fresh()->dango >= (int)$phong->soluongtoida) return ['success' => false, 'message' => 'Phòng đầy.'];
+        if ($phong->fresh()->dango >= (int)$phong->succhuamax) return ['success' => false, 'message' => 'Phòng đầy.'];
 
         $hopdong->update(['ngay_ket_thuc' => $newEndDate]);
         if ($sinhvien?->phong_id === $phong->id) $sinhvien->update(['ngay_het_han' => $newEndDate]);

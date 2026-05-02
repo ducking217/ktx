@@ -2,6 +2,7 @@
 
 namespace App\Services\Student;
 
+use App\Contracts\Core\KiemToanServiceInterface;
 use App\Contracts\Student\BaohongServiceInterface;
 use App\Models\Baohong;
 use App\Models\Phong;
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\Log;
 class BaohongService implements BaohongServiceInterface
 {
     use PhanHoiService;
+
+    public function __construct(
+        private readonly KiemToanServiceInterface $kiemToanService
+    ) {}
 
     public function getStudentMaintenanceRequests(): array
     {
@@ -46,7 +51,7 @@ class BaohongService implements BaohongServiceInterface
                 'mota' => $data['mota'],
                 'noidung' => $data['noidung'] ?? null,
                 'anhminhhoa' => $imagePath,
-                'trangthai' => MaintenanceStatus::PENDING->value,
+                'trangthai' => MaintenanceStatus::Pending->value,
             ]);
 
             return ['success' => true, 'message' => 'Gửi báo hỏng thành công.'];
@@ -93,7 +98,7 @@ class BaohongService implements BaohongServiceInterface
 
                 $this->auditLog('Cap nhat trang thai bao hong', 'Baohong', $baohong->id, $oldData, $baohong->toArray());
 
-                if ($data['trangthai'] === MaintenanceStatus::COMPLETED->value && $isFault && $fee > 0) {
+                if ($data['trangthai'] === MaintenanceStatus::Completed->value && $isFault && $fee > 0) {
                     $this->taoHoaDonPhat($baohong, $fee);
                 }
 
@@ -119,14 +124,7 @@ class BaohongService implements BaohongServiceInterface
 
     private function auditLog(string $action, string $model, int $id, array $old, array $new): void
     {
-        \App\Models\TblLog::create([
-            'user_id' => auth()->id() ?? 0,
-            'hanh_dong' => $action,
-            'ten_model' => $model,
-            'id_ban_ghi' => $id,
-            'du_lieu_cu' => $old,
-            'du_lieu_moi' => $new,
-        ]);
+        $this->kiemToanService->ghiNhatKy($action, $model, $id, $old, $new);
     }
 
     private function taoHoaDonPhat(object $baohong, int $fee): void

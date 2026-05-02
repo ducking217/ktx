@@ -17,8 +17,7 @@ class LuuPhongRequest extends FormRequest
             'tenphong' => ['required'],
             'tang' => ['required', 'numeric', 'min:1'],
             'giaphong' => ['required', 'numeric', 'min:0'],
-            'soluongtoida' => ['required', 'numeric', 'min:1'],
-            'succhuamax' => ['required', 'numeric', 'min:1', 'same:soluongtoida'],
+            'succhuamax' => ['required', 'numeric', 'min:1'],
             'mota' => ['nullable'],
             'gioitinh' => ['required', 'in:Nam,Nữ'],
         ];
@@ -27,16 +26,14 @@ class LuuPhongRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'tenphong.required' => 'Ten phong khong duoc de trong.',
-            'tang.required' => 'Tang khong duoc de trong.',
-            'giaphong.required' => 'Gia phong khong duoc de trong.',
-            'giaphong.numeric' => 'Gia phong phai la so.',
-            'soluongtoida.required' => 'So luong toi da khong duoc de trong.',
-            'soluongtoida.numeric' => 'So luong toi da phai la so.',
-            'soluongtoida.min' => 'So luong toi da phai lon hon hoac bang 1.',
-            'succhuamax.required' => 'Suc chua toi da khong duoc de trong.',
-            'succhuamax.same' => 'Suc chua toi da phai bang so luong toi da.',
-            'gioitinh.required' => 'Gioi tinh khong duoc de trong.',
+            'tenphong.required' => 'Tên phòng không được để trống.',
+            'tang.required' => 'Tầng không được để trống.',
+            'giaphong.required' => 'Giá phòng không được để trống.',
+            'giaphong.numeric' => 'Giá phòng phải là số.',
+            'succhuamax.required' => 'Sức chứa tối đa không được để trống.',
+            'succhuamax.numeric' => 'Sức chứa tối đa phải là số.',
+            'succhuamax.min' => 'Sức chứa tối đa phải lớn hơn hoặc bằng 1.',
+            'gioitinh.required' => 'Giới tính không được để trống.',
         ];
     }
 }

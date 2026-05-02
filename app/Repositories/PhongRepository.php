@@ -34,7 +34,7 @@ class PhongRepository implements PhongRepositoryInterface
     {
         return Phong::with($with)
             ->when($filters['q'] ?? null, function ($query, $q) {
-                return $query->where('tenphong', 'like', '%'.trim($q).'%');
+                return $query->where('tenphong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($q)) . '%');
             })
             ->when($filters['tang'] ?? null, function ($query, $tang) {
                 return $query->where('tang', $tang);

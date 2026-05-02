@@ -49,19 +49,14 @@
                                 <td class="px-8 py-6 text-center">
                                     @php
                                         $status = $item->trangthaithanhtoan;
-                                        $badgeClass = match($status?->value ?? $status) {
-                                            \App\Enums\InvoiceStatus::Paid->value => 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20',
-                                            \App\Enums\InvoiceStatus::PendingConfirmation->value => 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10',
+                                        $badgeClass = match($status) {
+                                            \App\Enums\InvoiceStatus::Paid => 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20',
+                                            \App\Enums\InvoiceStatus::PendingConfirmation => 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10',
                                             default => 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20 animate-pulse'
-                                        };
-                                        $statusText = match($status?->value ?? $status) {
-                                            \App\Enums\InvoiceStatus::Paid->value => 'Đã thanh toán',
-                                            \App\Enums\InvoiceStatus::PendingConfirmation->value => 'Chờ xác nhận',
-                                            default => 'Chưa thanh toán'
                                         };
                                     @endphp
                                     <span class="inline-flex items-center rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest {{ $badgeClass }}">
-                                        {{ $statusText }}
+                                        {{ $status->label() }}
                                     </span>
                                 </td>
                                 <td class="px-8 py-6 text-right">

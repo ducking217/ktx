@@ -61,6 +61,7 @@ class Hoadon extends Model
         'tiendien',
         'tiennuoc',
         'phidichvu',
+        'tienphat',
         'trangthaithanhtoan',
         'ngayxuat',
         'calculation_details',
@@ -70,6 +71,11 @@ class Hoadon extends Model
         'trangthaithanhtoan' => \App\Enums\InvoiceStatus::class,
         'calculation_details' => 'array',
     ];
+
+    public function getMaHdAttribute(): string
+    {
+        return 'HD' . str_pad((string)$this->id, 6, '0', STR_PAD_LEFT);
+    }
 
     public function phong(): BelongsTo
     {
@@ -81,35 +87,14 @@ class Hoadon extends Model
         return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
     }
 
-    public function canTransitionTo(string|InvoiceStatus $targetState): bool
+    public function transitionTo(string $newStatus): bool
     {
-        $currentState = $this->trangthaithanhtoan instanceof InvoiceStatus 
-            ? $this->trangthaithanhtoan->value 
-            : $this->trangthaithanhtoan;
-
-        $targetValue = $targetState instanceof InvoiceStatus 
-            ? $targetState->value 
-            : $targetState;
-
-        if (! array_key_exists($currentState, self::ALLOWED_TRANSITIONS)) {
-            return false;
+        $currentStatus = $this->trangthaithanhtoan->value ?? $this->trangthaithanhtoan;
+        
+        if (isset(self::ALLOWED_TRANSITIONS[$currentStatus]) && in_array($newStatus, self::ALLOWED_TRANSITIONS[$currentStatus])) {
+            return $this->update(['trangthaithanhtoan' => $newStatus]);
         }
 
-        return in_array($targetValue, self::ALLOWED_TRANSITIONS[$currentState], true);
-    }
-
-    public function transitionTo(string|InvoiceStatus $targetState): bool
-    {
-        $targetValue = $targetState instanceof InvoiceStatus 
-            ? $targetState->value 
-            : $targetState;
-
-        if (! $this->canTransitionTo($targetValue)) {
-            return false;
-        }
-
-        return $this->update([
-            'trangthaithanhtoan' => $targetValue,
-        ]);
+        return false;
     }
 }

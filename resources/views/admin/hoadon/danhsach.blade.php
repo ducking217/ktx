@@ -7,10 +7,10 @@
             <p class="mt-1 text-sm font-medium text-ink-secondary italic">Quản lý dòng tiền, chỉ số điện nước và trạng thái thanh toán.</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-            <button type="button" data-modal-target="modal-nhaphangloat" data-modal-toggle="modal-nhaphangloat" class="pdu-btn-ghost group">
+            <a href="{{ route('admin.hoadon.nhap_hang_loat') }}" class="pdu-btn-ghost group">
                 <svg class="mr-2 h-4 w-4 text-ink-secondary group-hover:text-brand-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Nhập hàng loạt
-            </button>
+            </a>
             <button type="button" data-modal-target="modal-xulyhoadon" data-modal-toggle="modal-xulyhoadon" class="pdu-btn-primary">
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                 Ghi chỉ số mới
@@ -73,18 +73,13 @@
                                 @php
                                     $status = $hoadon->trangthaithanhtoan;
                                     $class = match($status) {
-                                        'paid' => 'bg-status-success/10 text-status-success ring-status-success/20',
-                                        'overdue' => 'bg-status-error/10 text-status-error ring-status-error/20',
+                                        \App\Enums\InvoiceStatus::Paid => 'bg-status-success/10 text-status-success ring-status-success/20',
+                                        \App\Enums\InvoiceStatus::Overdue => 'bg-status-error/10 text-status-error ring-status-error/20',
                                         default => 'bg-status-warning/10 text-status-warning ring-status-warning/20',
-                                    };
-                                    $label = match($status) {
-                                        'paid' => 'Đã thu',
-                                        'overdue' => 'Quá hạn',
-                                        default => 'Chờ duyệt',
                                     };
                                 @endphp
                                 <span class="inline-flex rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-widest ring-1 {{ $class }}">
-                                    {{ $label }}
+                                    {{ $status->label() }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -93,7 +88,7 @@
                                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </a>
                                     
-                                    @if ($hoadon->trangthaithanhtoan !== 'paid')
+                                    @if ($hoadon->trangthaithanhtoan !== \App\Enums\InvoiceStatus::Paid)
                                         <form action="{{ route('admin.xacnhanthanhtoan', $hoadon->id) }}" method="POST" onsubmit="return confirm('Xác nhận sinh viên đã đóng tiền?')">
                                             @csrf
                                             <button type="submit" class="h-9 w-9 rounded-xl bg-ink-primary flex items-center justify-center text-white hover:bg-brand-emerald transition-all active:scale-95 shadow-lg shadow-ink-primary/10">
@@ -261,7 +256,11 @@
                     </div>
 
                     <div class="flex gap-3 pt-2">
-                        <button type="button" data-modal-hide="modal-chitiethoadon-{{ $hoadon->id }}" class="w-full rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Đóng bản tóm tắt</button>
+                        <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-brand-emerald py-3 text-sm font-bold text-white shadow-lg shadow-brand-emerald/20 transition-all hover:bg-brand-emerald/90">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Tải bản in PDF
+                        </a>
+                        <button type="button" data-modal-hide="modal-chitiethoadon-{{ $hoadon->id }}" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Đóng bản tóm tắt</button>
                     </div>
                 </div>
             </x-modal>

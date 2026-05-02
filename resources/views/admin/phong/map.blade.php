@@ -94,9 +94,11 @@
                     </div>
 
                     <header class="mb-5">
-                        <h3 class="text-lg font-bold text-ink-primary font-display">{{ $phong->tenphong }}</h3>
+                        <a href="{{ route('admin.chitietphong', $phong->id) }}" class="group/title block">
+                            <h3 class="text-lg font-bold text-ink-primary font-display uppercase tracking-tight group-hover/title:text-ink-primary/70 transition-colors">{{ $phong->tenphong }}</h3>
+                        </a>
                         <div class="mt-1 flex items-center gap-2">
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-ink-secondary/40">{{ $soluongdango }}/{{ $phong->soluongtoida }} Giường đã ở</span>
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-ink-secondary/40"><span class="tabular-nums">{{ $soluongdango }}/{{ $phong->succhuamax }}</span> Giường đã ở</span>
                         </div>
                     </header>
 

@@ -64,8 +64,8 @@
                         @forelse ($danhsachphong as $phong)
                             @php
                                 $soluongdango = $soluongdango_theophong[$phong->id] ?? 0;
-                                $daydu = $soluongdango >= (int) $phong->soluongtoida;
-                                $phantram = $phong->soluongtoida > 0 ? min(100, round($soluongdango / $phong->soluongtoida * 100)) : 0;
+                                $daydu = $soluongdango >= (int) $phong->succhuamax;
+                                $phantram = $phong->succhuamax > 0 ? min(100, round($soluongdango / $phong->succhuamax * 100)) : 0;
                             @endphp
                             <tr class="group transition-colors hover:bg-ui-bg/50">
                                 <td class="px-6 py-4">
@@ -85,7 +85,7 @@
                                         <div class="flex-1 h-1.5 min-w-[80px] overflow-hidden rounded-full bg-ui-bg ring-1 ring-inset ring-ui-border">
                                             <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" @style(["width: $phantram%"])></div>
                                         </div>
-                                        <span class="text-xs font-black text-ink-primary tabular-nums tracking-widest">{{ $soluongdango }}/{{ $phong->soluongtoida }}</span>
+                                        <span class="text-xs font-black text-ink-primary tabular-nums tracking-widest">{{ $soluongdango }}/{{ $phong->succhuamax }}</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
@@ -141,8 +141,8 @@
             @forelse ($danhsachphong as $phong)
                 @php
                     $soluongdango = $soluongdango_theophong[$phong->id] ?? 0;
-                    $daydu = $soluongdango >= (int) $phong->soluongtoida;
-                    $phantram = $phong->soluongtoida > 0 ? min(100, round($soluongdango / $phong->soluongtoida * 100)) : 0;
+                    $daydu = $soluongdango >= (int) $phong->succhuamax;
+                    $phantram = $phong->succhuamax > 0 ? min(100, round($soluongdango / $phong->succhuamax * 100)) : 0;
                     $isFemale = $phong->gioitinh === 'Nữ';
                 @endphp
                 <article class="overflow-hidden rounded-2xl border border-ui-border bg-white shadow-sm transition-all hover:shadow-md flex flex-col">
@@ -162,7 +162,7 @@
                         <div class="mb-6 flex-1">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs font-bold text-ink-secondary">Tỷ lệ lấp đầy</span>
-                                <span class="text-sm font-black text-ink-primary tabular-nums">{{ $soluongdango }}/{{ $phong->soluongtoida }}</span>
+                                <span class="text-sm font-black text-ink-primary tabular-nums">{{ $soluongdango }}/{{ $phong->succhuamax }}</span>
                             </div>
                             <div class="h-2 w-full overflow-hidden rounded-full bg-ui-bg ring-1 ring-inset ring-ui-border">
                                 <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $daydu ? 'bg-ink-primary' : 'bg-brand-emerald' }}" @style(["width: $phantram%"])></div>
@@ -239,14 +239,10 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-5">
+                <div class="grid grid-cols-1">
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Số lượng giường</label>
-                        <input name="soluongtoida" type="number" value="{{ old('soluongtoida', 8) }}" class="linear-input mt-1.5" required />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Sức chứa tối đa</label>
-                        <input name="succhuamax" type="number" value="{{ old('succhuamax', 8) }}" class="linear-input mt-1.5" required />
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Sức chứa tối đa (Số giường)</label>
+                        <input name="succhuamax" type="number" value="{{ old('succhuamax', 8) }}" class="linear-input mt-1.5" placeholder="VD: 8" required />
                     </div>
                 </div>
 
@@ -291,13 +287,9 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-5">
+                    <div class="grid grid-cols-1">
                         <div>
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Số giường</label>
-                            <input name="soluongtoida" type="number" value="{{ $phong->soluongtoida }}" class="linear-input mt-1.5" required />
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Sức chứa</label>
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Sức chứa tối đa (Số giường)</label>
                             <input name="succhuamax" type="number" value="{{ $phong->succhuamax }}" class="linear-input mt-1.5" required />
                         </div>
                     </div>

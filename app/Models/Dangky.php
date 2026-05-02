@@ -52,9 +52,9 @@ class Dangky extends Model
     ];
 
     protected $casts = [
-        'expires_at' => 'datetime',
-        'trangthai' => RegistrationStatus::class,
+        'trangthai' => \App\Enums\RegistrationStatus::class,
         'loaidangky' => \App\Enums\RegistrationType::class,
+        'expires_at' => 'datetime',
     ];
 
     public function getHoTenAttribute($value)
@@ -155,6 +155,17 @@ class Dangky extends Model
         return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
     }
 
+    public function transitionTo(string $newStatus): bool
+    {
+        $currentStatus = $this->trangthai->value ?? $this->trangthai;
+        
+        if (isset(self::ALLOWED_TRANSITIONS[$currentStatus]) && in_array($newStatus, self::ALLOWED_TRANSITIONS[$currentStatus])) {
+            return $this->update(['trangthai' => $newStatus]);
+        }
+
+        return false;
+    }
+
     public function phong(): BelongsTo
     {
         return $this->belongsTo(Phong::class, 'phong_id');
@@ -172,36 +183,5 @@ class Dangky extends Model
         return $query->where('so_cccd_blind_index', hash('sha256', $normalized));
     }
 
-    public function canTransitionTo(string|RegistrationStatus $targetState): bool
-    {
-        $currentState = $this->trangthai instanceof RegistrationStatus 
-            ? $this->trangthai->value 
-            : $this->trangthai;
 
-        $targetValue = $targetState instanceof RegistrationStatus 
-            ? $targetState->value 
-            : $targetState;
-
-        if (! array_key_exists($currentState, self::ALLOWED_TRANSITIONS)) {
-            return false;
-        }
-
-        return in_array($targetValue, self::ALLOWED_TRANSITIONS[$currentState], true);
-    }
-
-    public function transitionTo(string|RegistrationStatus $targetState, ?string $note = null): bool
-    {
-        $targetValue = $targetState instanceof RegistrationStatus 
-            ? $targetState->value 
-            : $targetState;
-
-        if (! $this->canTransitionTo($targetValue)) {
-            return false;
-        }
-
-        return $this->update([
-            'trangthai' => $targetValue,
-            'ghichu' => $note,
-        ]);
-    }
 }

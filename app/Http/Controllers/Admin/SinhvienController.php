@@ -20,6 +20,7 @@ class SinhvienController extends Controller
 
     public function capNhatSinhVien(Request $request, int $id)
     {
+        $this->authorize('sinhvien.manage');
         $dulieu = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'masinhvien' => ['required', 'string', 'max:20'],
@@ -34,6 +35,7 @@ class SinhvienController extends Controller
 
     public function chuyenPhong(Request $request, int $id)
     {
+        $this->authorize('sinhvien.manage');
         $dulieu = $request->validate(['phong_id' => ['nullable', 'numeric']]);
         $result = $this->sinhvienService->assignRoom($id, $dulieu['phong_id'] ?? null);
         return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
@@ -41,6 +43,7 @@ class SinhvienController extends Controller
 
     public function choRoiOPhong(int $id)
     {
+        $this->authorize('sinhvien.manage');
         $result = $this->sinhvienService->removeFromRoom($id);
         return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
     }

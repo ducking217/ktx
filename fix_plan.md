@@ -1,366 +1,246 @@
-# BÁO CÁO AUDIT TOÀN DIỆN — Hệ thống Quản lý KTX
-**Ngày:** 2026-05-02  
-**Phiên bản:** v1 (trước Cleanup)  
-**Stack:** Laravel 10 + Blade + Tailwind + MySQL  
-**Quy mô:** ~130 Classes, ~16 Models, ~25 Services, ~15 Admin Controllers, ~8 Student Controllers
+# REVIEW TOÀN DIỆN & PHƯƠNG ÁN ĐẠT 10/10
+## Hệ thống Quản lý KTX — ducking217/ktx
+
+**Ngày review:** 2026-05-02  
+**Stack:** Laravel 10 + Blade + Tailwind CSS + MySQL  
+**Quy mô hiện tại:** ~130 Classes, 16 Models, 25+ Services, 25+ Interfaces, 13 Observers, 8 Enums
 
 ---
 
-## MỤC LỤC
-1. [Nghiệp vụ (Business Logic)](#1-nghiệp-vụ-business-logic)
-2. [Kỹ thuật & Kiến trúc](#2-kỹ-thuật--kiến-trúc)
-3. [Trải nghiệm người dùng (UX/UI)](#3-trải-nghiệm-người-dùng-uxui)
-4. [Danh sách việc cần làm (Prioritized Backlog)](#4-danh-sách-việc-cần-làm-prioritized-backlog)
+## I. ĐÁNH GIÁ HIỆN TRẠNG (SCORECARD)
+
+| Chiều đánh giá | Điểm hiện tại | Mục tiêu 10/10 | Gap |
+|----------------|---------------|-----------------|-----|
+| **Nghiệp vụ (Business Logic)** | 6/10 | 10/10 | Thiếu auto-expiry, refund, overdue detection, gia hạn SV |
+| **Kỹ thuật & Kiến trúc** | 7/10 | 10/10 | Bug runtime (namespace sai, method thiếu), N+1 queries |
+| **Bảo mật** | 7/10 | 10/10 | Thiếu rate limit, LIKE injection, magic link chưa gửi |
+| **UX/UI** | 5/10 | 10/10 | Thiếu bulk input, PDF, reports, activity log, mobile |
+| **Testing & CI** | 3/10 | 10/10 | Chỉ có vài test cơ bản, không có CI pipeline |
+| **Tổng thể** | **5.6/10** | **10/10** | |
 
 ---
 
-## 1. Nghiệp vụ (Business Logic)
+## II. ĐIỂM MẠNH HIỆN TẠI (Giữ nguyên)
 
-### 1.1. Luồng nghiệp vụ hiện có
-
-| Luồng | Trạng thái | Ghi chú |
-|-------|-----------|---------|
-| Đăng ký phòng (Sinh viên) | ✅ Có | Kiểm tra phòng đầy, kỷ luật, pending duplicate |
-| Đăng ký phòng (Khách - Guest) | ✅ Có | Có PII encryption, email thông báo, lookup token |
-| Duyệt đăng ký (Admin) | ✅ Có | Tạo User + Sinhvien + Hopdong + Hóa đơn tự động |
-| Trả phòng | ✅ Có | Kiểm tra nợ trước khi trả, terminate hợp đồng |
-| Chuyển/Đổi phòng | ✅ Có | Terminate hợp đồng cũ, kiểm tra giới tính/sức chứa |
-| Gia hạn hợp đồng | ⚠️ Một phần | Chỉ có từ phía Admin, SV không tự gia hạn được |
-| Tạo hóa đơn hàng tháng | ✅ Có | Tính phí điện/nước/phòng theo cấu hình |
-| Xác nhận thanh toán | ✅ Có | Admin xác nhận thủ công |
-| Nhắc nợ | ✅ Có | Tạo thông báo cho SV |
-| Kỷ luật | ✅ Có | Block SV đăng ký nếu có lỗi chưa giải quyết |
-| Báo hỏng/Bảo trì | ✅ Có | SV báo → Admin xử lý, có phí bồi thường |
-
-### 1.2. Luồng nghiệp vụ còn THIẾU hoặc CHƯA ĐỦ
-
-#### 🔴 CRITICAL: Thiếu hoàn tiền / Hoàn cọc (Refund)
-- **Vấn đề:** Khi sinh viên trả phòng sớm, KHÔNG có logic hoàn tiền cọc (`deposit`) hoặc tính tiền phòng theo ngày thực tế ở. Hệ thống thu cọc (`taoHoaDonTheChan`) nhưng không hoàn khi offboarding.
-- **Tác động:** Sinh viên mất tiền cọc vô lý → khiếu nại, rủi ro pháp lý.
-- **Đề xuất:** Tạo `HoanTienService` xử lý: (1) Kiểm tra deposit đã thu, (2) Tính ngày ở thực tế / phí tính theo ngày, (3) Tạo `Hoadon` loại `refund` với số tiền âm, (4) Gắn vào luồng `thanhLyHopDong`.
-
-#### 🔴 CRITICAL: Thiếu tự động hết hạn hợp đồng (Auto-Expiry)
-- **Vấn đề:** `ContractStatus` có trạng thái `Expired` nhưng KHÔNG có scheduled command nào chuyển hợp đồng `active` → `expired` khi `ngay_ket_thuc` < now(). `Kernel.php` chỉ có `notifications:prune`.
-- **Tác động:** Hợp đồng hết hạn vẫn hiển thị `active`, SV vẫn ở phòng dù hết hạn, dữ liệu sai.
-- **Đề xuất:** Thêm command `php artisan hopdong:kiem-tra-het-han` chạy daily: (1) Tìm HĐ `active` có `ngay_ket_thuc < today()`, (2) Chuyển → `expired`, (3) Gửi thông báo cho SV + Admin, (4) Tùy chọn tự động gia hạn nếu không có nợ.
-
-#### 🔴 CRITICAL: Thiếu tự động phát hiện hóa đơn quá hạn
-- **Vấn đề:** `InvoiceStatus::Overdue` tồn tại nhưng KHÔNG có cơ chế tự động chuyển `pending` → `overdue` sau X ngày.
-- **Tác động:** Công nợ chỉ hiện khi admin tự kiểm tra, SV không bị nhắc nhở kịp thời.
-- **Đề xuất:** Thêm command `hoadon:kiem-tra-qua-han` chạy daily, set `overdue` cho hóa đơn pending > 30 ngày.
-
-#### 🟡 IMPORTANT: Logic tính phí chưa hoàn chỉnh
-- **Vấn đề 1:** Trong `HoadonService::xuLyHoaDon()`, `tongtien = giaphong + tiendien + tiennuoc` nhưng KHÔNG cộng `phidichvu`. Cột `phidichvu` trong DB luôn = NULL.
-- **Vấn đề 2:** Hóa đơn tạo bằng `updateOrCreate` theo `phong_id + thang + nam` → nếu admin nhập lại cùng tháng, sẽ GHI ĐÈ hóa đơn cũ mà không warning. Nếu hóa đơn cũ đã `paid`, vẫn bị ghi đè thành `pending`.
-- **Vấn đề 3:** Hóa đơn hàng tháng (`taoHoaDonHangThang`) khi duyệt đăng ký KHÔNG tính điện/nước (chỉ tính tiền phòng) → SV nhận 2 hóa đơn tháng đầu (1 auto + 1 manual khi admin ghi chỉ số).
-- **Đề xuất:** (1) Thêm `phidichvu` vào tính toán, (2) Kiểm tra hóa đơn đã tồn tại + trạng thái trước khi ghi đè, (3) Merge hóa đơn tháng đầu.
-
-#### 🟡 IMPORTANT: Chuyển phòng (Admin) thiếu tạo hợp đồng mới
-- **Vấn đề:** `SinhvienService::assignRoom()` chỉ terminate hợp đồng cũ + update `phong_id`, nhưng KHÔNG tạo hợp đồng mới cho phòng mới.
-- **Tác động:** SV ở phòng mới nhưng không có hợp đồng → hóa đơn, báo cáo bị thiếu.
-- **Đề xuất:** Sau khi assign room, tự động tạo `Hopdong` mới với `ngay_bat_dau = today()`.
-
-#### 🟡 IMPORTANT: Phân quyền chưa đủ chi tiết
-- **Vấn đề:**
-  - `PhongController` (admin) KHÔNG có Gate/middleware riêng → tất cả admin roles đều CRUD phòng, kể cả Lễ tân.
-  - `BaohongController` (admin) KHÔNG có Gate → lễ tân sửa được trạng thái bảo hỏng.
-  - `SinhvienController` (admin) KHÔNG có Gate → lễ tân sửa thông tin SV, chuyển phòng.
-  - `ThongbaoController`, `LichsubaotriController` KHÔNG có Gate.
-  - Thiếu phân quyền theo tòa nhà (AdminToaNha chỉ nên thấy phòng của tòa mình).
-- **Đề xuất:** Bổ sung Gates chi tiết + data-level scoping cho `AdminToaNha`.
-
-#### 🟢 NICE-TO-HAVE: Gia hạn hợp đồng từ phía SV
-- SV phải liên hệ admin để gia hạn. Nên cho SV tự gửi yêu cầu gia hạn (tương tự đăng ký/đổi/trả phòng).
-
-#### 🟢 NICE-TO-HAVE: Lịch sử thanh toán chi tiết
-- Không có bảng ghi lại ai thanh toán, khi nào, bằng phương thức gì. Chỉ biết trạng thái `paid`.
-
-### 1.3. Edge Cases chưa xử lý
-
-| Edge Case | Trạng thái | Rủi ro |
-|-----------|-----------|--------|
-| Phòng hết chỗ giữa lúc duyệt đăng ký | ✅ Có `lockForUpdate()` | OK |
-| SV nợ tiền nhưng hết hạn hợp đồng | ❌ Chưa xử lý | SV vẫn ở, không bị cưỡng chế trả phòng |
-| 2 admin duyệt cùng 1 đơn đăng ký | ✅ Check `trangthai !== Pending` | OK |
-| Đăng ký Guest trùng email/phone | ❌ Chưa validate unique | Có thể spam đăng ký |
-| SV bị kỷ luật nặng → buộc thôi ở | ❌ Chưa có luồng | Chỉ block đăng ký mới, không buộc rời phòng |
-| Admin xóa phòng đang có SV | ⚠️ Có check nhưng logic phức tạp | Cần review `kiemTraDieuKienXoaPhong` |
-| HĐ expired nhưng SV vẫn ở (overstay) | ❌ Không xử lý | Dữ liệu không nhất quán |
-| Đổi phòng khi phòng mới đầy | ✅ Check sức chứa | OK |
-| Ghi đè hóa đơn đã thanh toán | ❌ Cho phép ghi đè | Mất dữ liệu thanh toán |
+1. **Service Layer Pattern** — Logic tách khỏi Controller, 25+ Services với Interfaces + DI binding trong AppServiceProvider
+2. **Enum Pattern 3 tầng** — Case (English) / Backed value (snake_case) / label() (Tiếng Việt có dấu)
+3. **State Machine** — `canTransitionTo()` + `ALLOWED_TRANSITIONS` trên Hopdong & Hoadon
+4. **PII Encryption** — encrypt/decrypt + Blind Index (SHA-256) cho SĐT, CCCD trên Sinhvien
+5. **Audit Trail** — 13 Observers cho toàn bộ Models, AuditService + TblLog
+6. **SoftDeletes** — 4 Models chính (Sinhvien, Hopdong, Hoadon, Phong)
+7. **DB Transactions + lockForUpdate** — 26 lần sử dụng, chống race condition
+8. **FormRequest Validation** — ~18 FormRequest classes
+9. **CSRF Protection** — 54 `@csrf` trong views
+10. **Naming Convention** — Tiếng Việt cho domain (Models, Variables), Tiếng Anh cho Enum
 
 ---
 
-## 2. Kỹ thuật & Kiến trúc
+## III. PHƯƠNG ÁN HOÀN THÀNH 10/10
 
-### 2.1. Kiến trúc tổng quan — Điểm tốt
+### PHASE 1: FIX RUNTIME BUGS (Ưu tiên tuyệt đối — 1-2 ngày)
+> Mục tiêu: Hệ thống CHẠY ĐƯỢC không crash
 
-| Tiêu chí | Đánh giá |
-|----------|----------|
-| Service Layer pattern | ✅ Tốt — logic tách khỏi Controller |
-| Interface + DI | ✅ Tốt — 25+ interfaces, bind trong AppServiceProvider |
-| Enum pattern (3 tầng) | ✅ Tốt — case/backed value/label() |
-| State machine transitions | ✅ Tốt — `canTransitionTo()` + `ALLOWED_TRANSITIONS` trên Model |
-| PII Encryption | ✅ Tốt — encrypt/decrypt + blind index cho SĐT, CCCD |
-| Audit Trail (Observers) | ✅ Tốt — 13 Observers cho toàn bộ Models |
-| SoftDeletes | ⚠️ Có cho 4 Models chính (Sinhvien, Hopdong, Hoadon, Phong) |
-| DB Transactions + lockForUpdate | ✅ Tốt — 26 lần sử dụng |
-| FormRequest validation | ✅ Tốt — ~18 FormRequest classes |
-| CSRF Protection | ✅ Tốt — 54 `@csrf` trong views |
+| # | Vấn đề | File | Cách fix |
+|---|--------|------|----------|
+| P1.1 | `TraPhongService` import sai namespace | `app/Services/Student/TraPhongService.php` | ĐÃ FIX — đang inject đúng `HopdongService` và `HoadonService` từ Admin namespace |
+| P1.2 | `DongBoHopDong` gọi `trangThaiDaThanhLy()` không tồn tại | `app/Console/Commands/DongBoHopDong.php` | Thêm static method `trangThaiDaThanhLy()` vào Model Hopdong hoặc dùng `ContractStatus::Terminated->value` |
+| P1.3 | `succhuamax` vs `soluongtoida` dùng lẫn lộn | `app/Models/Phong.php` + Views | Đã có accessor nhưng cần audit tất cả views + services chỉ dùng 1 cột nhất quán |
+| P1.4 | `downloadInvoicePDF` & `downloadPDF` body rỗng | `HoadonController.php`, `HopdongController.php` | Implement bằng DomPDF — tạo Blade template cho hóa đơn/hợp đồng |
 
-### 2.2. Code Smell & Anti-patterns
+### PHASE 2: NGHIỆP VỤ CỐT LÕI (3-5 ngày)
+> Mục tiêu: Tất cả luồng nghiệp vụ hoạt động đầy đủ, tự động hóa
 
-#### 🔴 CRITICAL: N+1 Query trên Dashboard
-```php
-// BangDieuKhienService.php:76
-private function demPhongConTrong(): int {
-    return Phong::all()->filter(fn($p) => 
-        Sinhvien::where('phong_id', $p->id)->count() < (int)$p->succhuamax
-    )->count();
-}
-```
-- **Vấn đề:** Load TẤT CẢ phòng rồi query từng phòng → N+1. Với 100 phòng = 101 queries.
-- **Fix:** Dùng `withCount('danhsachsinhvien')` rồi filter trong PHP, hoặc raw subquery.
+#### 2.1. Tự động hết hạn hợp đồng (Auto-Expiry)
+- **Hiện trạng:** Command `KiemTraHetHanHopDong` đã tồn tại + đã đăng ký trong Kernel.php
+- **Cần kiểm tra:** Command có gửi email cảnh báo trước 7 ngày + 30 ngày không? Có xử lý overstay (SV vẫn ở khi HĐ hết hạn) không?
+- **Bổ sung:** Thêm logic gửi email cảnh báo sắp hết hạn, tự động tạo thông báo trên dashboard SV
 
-#### 🔴 CRITICAL: N+1 Query trong xu hướng doanh thu
-```php
-// BangDieuKhienService.php:82-85
-for ($i = 5; $i >= 0; $i--) {
-    $tienphong[] = Hoadon::where(...)->sum('tienphong');
-    $tiendichvu[] = Hoadon::where(...)->sum('tiendien') + Hoadon::where(...)->sum('tiennuoc');
-}
-```
-- **Vấn đề:** 18 queries cho 6 tháng (3 queries/tháng). Dashboard load mỗi lần tốn rất nhiều.
-- **Fix:** 1 query group by `thang, nam` rồi map trong PHP.
+#### 2.2. Tự động phát hiện hóa đơn quá hạn (Auto-Overdue)
+- **Hiện trạng:** Command `KiemTraHoaDonQuaHan` đã tồn tại + đã đăng ký trong Kernel.php
+- **Cần kiểm tra:** Có gửi email nhắc nhở SV không? Có tạo thông báo trên dashboard không?
+- **Bổ sung:** Email nhắc nợ + thông báo dashboard
 
-#### 🟡 IMPORTANT: Tham chiếu method không tồn tại
-```php
-// DongBoHopDong.php:66
-'trang_thai' => Hopdong::trangThaiDaThanhLy()
-```
-- **Vấn đề:** Model `Hopdong` chỉ có `trangThaiDangHieuLuc()`, KHÔNG có `trangThaiDaThanhLy()`.
-- **Tác động:** Command `dongbo:hopdong` sẽ crash khi chạy.
+#### 2.3. Hoàn cọc khi trả phòng (Refund)
+- **Hiện trạng:** `HoanTienService` đã tồn tại + `HoanTienServiceInterface` đã bind
+- **Cần kiểm tra:** Logic hoàn cọc có đúng không? Có tạo hóa đơn `refund` không?
+- **Bổ sung nếu thiếu:** Tính tiền phòng theo ngày thực tế, tạo Hoadon loại `refund`
 
-#### 🟡 IMPORTANT: TraPhongService constructor dependency sai namespace
-```php
-// TraPhongService.php:22-23
-private ContractService $contractService,
-private HoadonService $invoiceService
-```
-- **Vấn đề:** Import `App\Services\Student\ContractService` và `App\Services\Student\HoadonService` — nhưng các class này KHÔNG tồn tại trong namespace `Student`. Chỉ có `App\Services\Admin\HopdongService` và `App\Services\Admin\HoadonService`.
-- **Tác động:** `TraPhongService` sẽ crash khi resolve vì DI container không tìm thấy class.
+#### 2.4. Chống ghi đè hóa đơn đã thanh toán
+- **Vấn đề:** `updateOrCreate` trong `HoadonService::xuLyHoaDon()` có thể ghi đè hóa đơn `paid`
+- **Fix:** Thêm check trước `updateOrCreate`: nếu existing hóa đơn đã `paid` → reject hoặc tạo hóa đơn bổ sung
 
-#### 🟡 IMPORTANT: Inconsistency sức chứa phòng
-```php
-// Phong model: $fillable có cả 'soluongtoida' VÀ 'succhuamax'
-// Student view: dùng $phong->succhuamax
-// Service logic: dùng $phong->soluongtoida
-```
-- **Vấn đề:** 2 cột cùng ý nghĩa nhưng dùng lẫn lộn. Nếu giá trị khác nhau → logic sai.
-- **Fix:** Migrate sang 1 cột duy nhất, thêm accessor nếu cần backward compat.
+#### 2.5. Tính phí dịch vụ
+- **Vấn đề:** `tongtien` thiếu `phidichvu`, cột `phidichvu` luôn NULL
+- **Fix:** Cộng `phidichvu` từ cấu hình vào công thức tính `tongtien`
 
-#### 🟡 IMPORTANT: downloadInvoicePDF & downloadPDF chưa implement
-```php
-// HoadonController.php:43-48 → body rỗng
-// HopdongController.php:78-87 → return toast "sẽ bổ sung ở phase tiếp"
-```
+#### 2.6. Chuyển phòng tạo hợp đồng mới
+- **Vấn đề:** `SinhvienService::assignRoom()` chỉ terminate HĐ cũ, không tạo HĐ mới
+- **Fix:** Sau assign room, tự động tạo Hopdong mới
 
-#### 🟢 Code style — biến chưa thống nhất
-- `TaiChinhService::nhacNo()` viết thông báo KHÔNG DẤU: `'Nhac nho thanh toan cong no'`, `'Yeu cau sinh vien thanh toan...'` → hiển thị sai trên UI cho SV.
-- Một số Service method dùng English name: `listStudents`, `assignRoom`, `removeFromRoom`, `updateStudent` — vi phạm STANDARDS.md (biến/method phải tiếng Việt camelCase).
+#### 2.7. Guest account gửi Magic Link
+- **Vấn đề:** Tạo User với password random nhưng không gửi magic link
+- **Fix:** Gửi `MagicLinkMail` trong luồng `xacNhanThanhToan()` Guest
 
-### 2.3. Bảo mật
+### PHASE 3: BẢO MẬT (1-2 ngày)
+> Mục tiêu: Chống abuse, bảo vệ dữ liệu
 
-#### 🔴 CRITICAL: SQL Injection risk với LIKE query
-```php
-// 13 nơi dùng: where('...', 'like', "%{$tuKhoa}%")
-```
-- **Vấn đề:** Biến `$tuKhoa` từ `$request->query('q')` KHÔNG được escape cho `%` và `_` (SQL wildcards). User nhập `%` sẽ match mọi thứ.
-- **Tác động:** Không phải SQL injection truyền thống (Laravel dùng prepared statements), nhưng là **logic injection** — kẻ tấn công có thể enumerate data.
-- **Fix:** Escape `$tuKhoa` bằng `str_replace(['%', '_'], ['\%', '\_'], $tuKhoa)` hoặc dùng helper.
+| # | Vấn đề | Fix |
+|---|--------|-----|
+| P3.1 | Guest routes thiếu Rate Limiting | ĐÃ FIX — routes đã có `throttle:guest_submit` và `throttle:guest_lookup` |
+| P3.2 | SQL wildcard injection trong LIKE (13 nơi) | Escape `%` và `_` bằng helper: `str_replace(['%', '_'], ['\%', '\_'], $tuKhoa)` |
+| P3.3 | Phân quyền thiếu cho PhongController, BaohongController, SinhvienController | Thêm Gates: `phong.manage`, `baohong.manage`, `sinhvien.manage` vào AuthServiceProvider |
+| P3.4 | Scoping dữ liệu AdminToaNha | Thêm cột `toa_nha_id` vào Users, filter query theo tòa |
+| P3.5 | SoftDeletes cho Dangky, Kyluat, Baohong, Taisan, Vattu | Thêm SoftDeletes trait + migration `deleted_at` |
+| P3.6 | Lookup token hết hạn | Token hết hạn sau 30 ngày, log failed lookups |
 
-#### 🔴 CRITICAL: Guest routes thiếu Rate Limiting
-- **Vấn đề:** Routes `/dang-ky-ktx` (POST), `/lien-he` (POST), `/tra-cuu-don` (GET) KHÔNG có throttle middleware.
-- **Tác động:** Bot có thể spam hàng ngàn đăng ký, tấn công email queue, brute-force lookup token.
-- **Fix:** Thêm `->middleware('throttle:5,1')` cho POST routes, `->middleware('throttle:10,1')` cho GET.
+### PHASE 4: PERFORMANCE (1-2 ngày)
+> Mục tiêu: Dashboard load nhanh, không N+1
 
-#### 🟡 IMPORTANT: Lookup token brute-force
-```php
-$lookupToken = Str::random(32);
-```
-- Token 32 ký tự đủ mạnh, nhưng route `/tra-cuu-don/{token?}` KHÔNG throttle → có thể brute-force.
-- **Fix:** Thêm throttle + log failed lookups + hết hạn token sau 30 ngày.
+| # | Vấn đề | Fix |
+|---|--------|-----|
+| P4.1 | N+1 `demPhongConTrong()` | Dùng `Phong::withCount('danhsachsinhvien')` → filter trong PHP |
+| P4.2 | N+1 doanh thu 6 tháng (18 queries) | 1 query `GROUP BY thang, nam` → map trong PHP |
+| P4.3 | `Phong::all()` trong dropdown | Chỉ select `id, tenphong` + cache |
+| P4.4 | Cache đơn giá điện/nước | `Cache::remember('gia_dien', 3600, ...)` |
+| P4.5 | Thiếu DB index | Migration thêm index cho `trangthaithanhtoan`, `trang_thai`, `trangthai` |
+| P4.6 | Dashboard ~30+ queries | Cache dashboard data 5 phút |
 
-#### 🟡 IMPORTANT: Private file access chỉ check admin role
-```php
-Route::get('/private-files/{path}', [FileController::class, 'showPrivateFile'])
-    ->middleware(['auth', 'kiemtravaitro:admin,...']);
-```
-- SV không thể xem ảnh thẻ/CCCD của chính mình. Nếu SV cần xem → phải thêm route riêng với scoping.
+### PHASE 5: UX/UI NÂNG CAO (3-5 ngày)
+> Mục tiêu: Admin làm việc hiệu quả, SV trải nghiệm tốt
 
-#### 🟡 IMPORTANT: Tạo User với random password
-```php
-'password' => bcrypt(Str::random(12))
-```
-- SV đăng ký qua Guest flow nhận account nhưng KHÔNG BIẾT password. Phải reset password hoặc dùng magic link. Magic link mail tồn tại (`MagicLinkMail.php`) nhưng KHÔNG thấy được gọi trong luồng `xacNhanThanhToan`.
+#### 5.1. CRITICAL — Admin
+| # | Tính năng | Mô tả |
+|---|-----------|-------|
+| U1 | Nhập chỉ số điện nước hàng loạt | Table editable hoặc Excel import (hiện admin nhập từng phòng = nightmare với 100+ phòng) |
+| U2 | Trang chi tiết hồ sơ đăng ký Guest | Modal preview ảnh CCCD/thẻ trước khi duyệt (hiện duyệt mù) |
+| U3 | Xuất PDF hóa đơn & hợp đồng | Implement bằng DomPDF + Blade template |
+| U4 | Báo cáo tài chính tổng hợp | Doanh thu theo tháng/quý/năm, xuất Excel |
+| U5 | Trang Activity Log | UI xem TblLog (filter theo model/user/ngày) |
+| U6 | Trang quản lý Users/Accounts | CRUD tài khoản admin (hiện phải qua DB) |
+| U7 | Dashboard dữ liệu thực | Thay hard-code "Tòa A-E" bằng query thực tế |
+| U8 | Confirmation dialog cho thao tác nguy hiểm | Dùng component `<x-confirmation-modal>` đã có |
 
-#### 🟢 SoftDeletes thiếu cho Dangky, Kyluat, Baohong, Taisan, Vattu
-- Các Models này thiếu SoftDeletes → dữ liệu bị xóa vĩnh viễn, vi phạm Core Coding Philosophy.
+#### 5.2. IMPORTANT — Student
+| # | Tính năng | Mô tả |
+|---|-----------|-------|
+| U9 | Dashboard SV — Countdown hợp đồng | Hiển thị số ngày còn lại trong hợp đồng |
+| U10 | SV tự gửi yêu cầu gia hạn HĐ | Form gia hạn → Admin duyệt |
+| U11 | View hiện label() thay vì backed value | Fix `$dangky->loaidangky->label()` trong Blade |
+| U12 | Badge CSS fix (Hóa đơn SV) | So sánh đúng type Enum |
 
-### 2.4. Performance Bottleneck
+#### 5.3. NICE-TO-HAVE (Điểm cộng)
+| # | Tính năng | Mô tả |
+|---|-----------|-------|
+| U13 | Mobile responsive | Card layout cho table trên < 768px |
+| U14 | Tìm kiếm nâng cao | Filter theo tầng, tòa, giới tính, khoảng giá |
+| U15 | Email thông báo kỷ luật | Gửi email khi SV bị ghi kỷ luật |
+| U16 | Trang FAQ/Hướng dẫn SV mới | Static page hướng dẫn luồng đăng ký, thanh toán |
+| U17 | Lịch sử thanh toán chi tiết | Bảng `lich_su_thanh_toan` (thời gian, phương thức, người xác nhận) |
 
-| Vấn đề | Vị trí | Nghiêm trọng |
-|--------|--------|-------------|
-| N+1 đếm phòng trống | `BangDieuKhienService::demPhongConTrong()` | 🔴 |
-| N+1 doanh thu 6 tháng | `BangDieuKhienService::layXuHuongDoanhThu()` | 🔴 |
-| `Phong::all()` trong dropdown | `HoadonService::lietKeHoaDonAdmin()`, `SinhvienService::listStudents()` | 🟡 |
-| Không cache cấu hình đơn giá | `layGiaTuCauhinh()` query mỗi lần gọi | 🟡 |
-| Thiếu DB index trên `trangthaithanhtoan`, `trang_thai`, `trangthai` | Migrations | 🟡 |
-| Dashboard load ~30+ queries mỗi request | `layDuLieuBangDieuKhienAdmin()` | 🔴 |
+### PHASE 6: TESTING & CHẤT LƯỢNG (2-3 ngày)
+> Mục tiêu: Code đáng tin cậy, có test coverage
+
+| # | Task | Chi tiết |
+|---|------|---------|
+| T1 | Feature Tests cho các luồng chính | Đăng ký → Duyệt → Thanh toán → Vào ở → Trả phòng |
+| T2 | Feature Tests cho hóa đơn | Tạo hóa đơn → Thanh toán → Auto-overdue |
+| T3 | Unit Tests cho Services | Test các Service methods với mock dependencies |
+| T4 | Architecture Test mở rộng | Kiểm tra naming convention, method count, interface ratio |
+| T5 | Code style nhất quán | Method names English → Vietnamese (vi phạm STANDARDS.md) |
+| T6 | Nhắc nợ không dấu | `TaiChinhService::nhacNo()` viết thông báo có dấu chuẩn |
 
 ---
 
-## 3. Trải nghiệm người dùng (UX/UI)
+## IV. TIMELINE ĐỀ XUẤT
 
-### 3.1. Luồng thao tác phức tạp
-
-#### 🔴 Ghi chỉ số điện nước — Từng phòng một
-- Admin phải nhập chỉ số cho TỪNG phòng bằng modal, không có bulk import.
-- **Với 100+ phòng, đây là nightmare.**
-- **Đề xuất:** Thêm màn hình nhập hàng loạt (table editable) hoặc import Excel.
-
-#### 🟡 Duyệt đăng ký — Không xem chi tiết trước khi duyệt
-- Nút "Duyệt" và "Từ chối" nằm ngay trên danh sách, không có trang chi tiết hồ sơ (xem ảnh CCCD, ảnh thẻ).
-- Admin Guest flow (`duyetHoSo`) duyệt mà chưa xem ảnh → rủi ro.
-- **Đề xuất:** Thêm modal/trang chi tiết với preview ảnh trước khi duyệt.
-
-#### 🟡 Hợp đồng — Thiếu preview trước khi tạo
-- Admin POST form tạo hợp đồng mà không thấy preview tổng hợp (SV nào, phòng nào, giá bao nhiêu, thời hạn).
-- **Đề xuất:** Thêm bước confirmation trước khi submit.
-
-### 3.2. Thiếu thông báo / Feedback
-
-| Thiếu gì | Ảnh hưởng ai | Mức độ |
-|----------|-------------|--------|
-| Email thông báo khi HĐ sắp hết hạn (7 ngày, 30 ngày) | SV | 🔴 |
-| Thông báo real-time (WebSocket/Pusher đã config nhưng chưa dùng) | SV + Admin | 🟡 |
-| Email khi bị ghi kỷ luật | SV | 🟡 |
-| Email nhắc thanh toán hóa đơn gần quá hạn | SV | 🔴 |
-| Confirmation dialog khi thanh lý hợp đồng | Admin | 🟡 |
-| Confirmation dialog khi xóa phòng | Admin | 🟡 |
-| Toast message cho thao tác thành công đã có | ✅ | OK |
-
-### 3.3. Màn hình / Tính năng nên thêm
-
-#### 🔴 Thiếu: Báo cáo tổng hợp tài chính
-- Không có báo cáo doanh thu theo tháng/quý/năm dạng xuất Excel/PDF.
-- Admin chỉ thấy biểu đồ đơn giản trên dashboard.
-
-#### 🔴 Thiếu: Lịch sử hoạt động (Activity Log)
-- `TblLog` tồn tại nhưng không có UI để xem → admin không thể audit ai đã làm gì.
-
-#### 🟡 Thiếu: Dashboard SV — Countdown hợp đồng
-- SV không thấy bao nhiêu ngày còn lại trong hợp đồng, chỉ thấy ngày bắt đầu/kết thúc.
-
-#### 🟡 Thiếu: Trang quản lý Users (Admin)
-- Không có UI để tạo/sửa/khóa tài khoản admin. Hiện phải làm qua DB.
-- Tính năng `deactivate()` trên User model tồn tại nhưng không có route/view.
-
-#### 🟡 Thiếu: Tìm kiếm nâng cao (theo tầng, tòa, giới tính, khoảng giá)
-- Hiện chỉ tìm theo tên phòng hoặc mã SV.
-
-#### 🟢 Thiếu: Mobile responsiveness
-- Dashboard admin dùng grid 12-column → có thể chưa tối ưu trên mobile.
-- Student views dùng table → cần card layout cho mobile.
-
-#### 🟢 Thiếu: Dark mode
-- Tailwind config đã có nhưng chưa implement dark mode toggle.
-
-#### 🟢 Thiếu: Trang FAQ / Hướng dẫn cho SV mới
-- SV mới vào không biết luồng đăng ký, thanh toán, báo hỏng.
-
-### 3.4. Vấn đề UX cụ thể trên View
-
-| View | Vấn đề |
-|------|--------|
-| `admin/trangchu.blade.php` | Dashboard hard-code "Tòa A-E" với giá trị giả lập từ `$tyLeLapDay ± offset`. Không reflect dữ liệu thực tế. |
-| `student/phong/danhsach.blade.php` | Dùng `$phong->succhuamax` nhưng có thể không tồn tại (xem issue soluongtoida vs succhuamax). |
-| `admin/hoadon/danhsach.blade.php` | Không có bộ lọc theo trạng thái/tháng/năm. Phải scroll qua tất cả. |
-| `student/hoadon/danhsach.blade.php` | So sánh `$status` với `->value` (string) nhưng `$status` là Enum object → badge CSS có thể sai. |
-| `admin/dangky/danhsach.blade.php` | Hiển thị `$dangky->loaidangky` trực tiếp → hiện backed value (`rental`, `return`, `change`) thay vì label tiếng Việt. |
+```
+Tuần 1: Phase 1 (Fix bugs) + Phase 3 (Bảo mật)
+         → Hệ thống chạy ổn định, an toàn
+         
+Tuần 2: Phase 2 (Nghiệp vụ) + Phase 4 (Performance)
+         → Tất cả luồng nghiệp vụ hoạt động đầy đủ, nhanh
+         
+Tuần 3: Phase 5 (UX/UI)
+         → Admin + SV có trải nghiệm tốt
+         
+Tuần 4: Phase 6 (Testing) + Polish
+         → Code đáng tin cậy, sẵn sàng nộp/demo
+```
 
 ---
 
-## 4. Danh sách việc cần làm (Prioritized Backlog)
+## V. CHECKLIST ĐẠT 10/10
 
-### 🔴 CRITICAL — Phải sửa ngay
+### Nghiệp vụ (10/10)
+- [ ] Đăng ký phòng (Guest + SV) hoạt động end-to-end
+- [ ] Duyệt 2 bước: Phê duyệt hồ sơ → Xác nhận thanh toán
+- [ ] Hợp đồng tự động hết hạn + cảnh báo email
+- [ ] Hóa đơn tự động quá hạn + nhắc nhở
+- [ ] Hoàn cọc khi trả phòng
+- [ ] Chuyển/Đổi phòng tạo HĐ mới
+- [ ] Tính phí đầy đủ (phòng + điện + nước + dịch vụ)
+- [ ] Không ghi đè hóa đơn đã thanh toán
+- [ ] Guest nhận magic link để đăng nhập
+- [ ] SV tự gửi yêu cầu gia hạn
 
-| # | Vấn đề | Tác động | Hướng xử lý |
-|---|--------|---------|-------------|
-| C1 | Thiếu auto-expiry hợp đồng | HĐ hết hạn vẫn `active`, dữ liệu sai, SV overstay | Tạo command `hopdong:kiem-tra-het-han` chạy daily trong Scheduler. Chuyển expired, gửi email cảnh báo trước 7+30 ngày. |
-| C2 | Thiếu auto-overdue hóa đơn | Công nợ không được phát hiện kịp, SV không bị nhắc | Tạo command `hoadon:kiem-tra-qua-han` chạy daily. Chuyển `pending` → `overdue` sau 30 ngày. Gửi email nhắc. |
-| C3 | Thiếu hoàn cọc khi trả phòng | SV mất tiền cọc, khiếu nại, rủi ro pháp lý | Tạo `HoanTienService`. Gắn vào luồng thanh lý HĐ. Hóa đơn refund loại `deposit_refund`. |
-| C4 | N+1 query trên Dashboard | Dashboard admin chậm, ~30+ queries mỗi load | Refactor `demPhongConTrong()` dùng `withCount()`. Gom doanh thu 6 tháng thành 1 query. Cache 5 phút. |
-| C5 | Guest routes thiếu Rate Limiting | Bot spam đăng ký, DDoS email queue | Thêm `throttle:5,1` cho POST, `throttle:10,1` cho GET lookup. |
-| C6 | `DongBoHopDong` gọi method không tồn tại | Command crash khi chạy | Thêm `trangThaiDaThanhLy()` vào Model Hopdong hoặc dùng `ContractStatus::Terminated->value`. |
-| C7 | `TraPhongService` dependency sai namespace | Service crash khi DI resolve | Sửa constructor import đúng namespace hoặc inject qua Interface. |
-| C8 | Ghi đè hóa đơn đã thanh toán | Mất dữ liệu thanh toán, SV phải trả lại | Thêm check: nếu hóa đơn existing đã `paid` → reject hoặc tạo hóa đơn bổ sung thay vì `updateOrCreate`. |
+### Kỹ thuật (10/10)
+- [ ] Không còn runtime bug (method thiếu, namespace sai)
+- [ ] Không N+1 query
+- [ ] Dashboard cache, load nhanh
+- [ ] DB indexed cho cột trạng thái
+- [ ] SoftDeletes cho tất cả Models quan trọng
+- [ ] Interface/Class ratio > 10%
+- [ ] Feature tests cho các luồng chính
+- [ ] Code style nhất quán (STANDARDS.md)
 
-### 🟡 IMPORTANT — Lên kế hoạch sprint tới
+### Bảo mật (10/10)
+- [ ] Rate limiting trên Guest routes
+- [ ] SQL wildcard escaped
+- [ ] Phân quyền Gates đầy đủ
+- [ ] Scoping dữ liệu theo tòa nhà
+- [ ] PII encrypted + blind index
+- [ ] Lookup token hết hạn
 
-| # | Vấn đề | Tác động | Hướng xử lý |
-|---|--------|---------|-------------|
-| I1 | `tongtien` thiếu `phidichvu` | Tiền thu thiếu so với thực tế | Cộng `phidichvu` từ cấu hình vào `xuLyHoaDon()`. Lưu vào cột `phidichvu`. |
-| I2 | Chuyển phòng không tạo HĐ mới | SV có phòng mà không có HĐ | `assignRoom()` tự tạo Hopdong mới sau khi assign. |
-| I3 | Phân quyền thiếu cho Phòng, Bảo hỏng, SV, Bảo trì | Lễ tân truy cập quá nhiều chức năng | Bổ sung Gates: `phong.manage`, `baohong.manage`, `sinhvien.manage`, `baotri.manage`. |
-| I4 | Scoping dữ liệu theo tòa nhà cho AdminToaNha | AdminToaNha thấy toàn bộ KTX thay vì chỉ tòa mình | Thêm cột `toa_nha_id` vào User, filter theo tòa trong mọi query. |
-| I5 | `succhuamax` vs `soluongtoida` inconsistency | Logic sai nếu 2 cột có giá trị khác | Migrate sang 1 cột, alias accessor. |
-| I6 | Nhập chỉ số điện nước hàng loạt | Admin mất hàng giờ nhập từng phòng | Bulk input UI (table editable) hoặc Excel import. |
-| I7 | Thiếu trang chi tiết hồ sơ đăng ký (Guest) | Admin duyệt mù, không xem ảnh CCCD/thẻ | Tạo modal/trang chi tiết với image preview. |
-| I8 | SoftDeletes cho Dangky, Kyluat, Baohong, Taisan, Vattu | Dữ liệu xóa vĩnh viễn, không audit | Thêm SoftDeletes + migration `deleted_at`. |
-| I9 | Trang xem Activity Log (TblLog) | Admin không thể audit | Tạo route + view cho danh sách logs, filter theo model/user/ngày. |
-| I10 | `nhacNo()` viết thông báo không dấu | SV thấy nội dung lỗi dấu | Sửa nội dung thông báo sang tiếng Việt có dấu chuẩn. |
-| I11 | SQL wildcard injection trong LIKE | Kẻ tấn công enumerate data | Escape `%` và `_` trong search input tất cả 13 vị trí. |
-| I12 | Guest account tạo mà không gửi magic link login | SV không thể đăng nhập sau đăng ký | Gửi MagicLinkMail trong `xacNhanThanhToan()` luồng Guest. |
-| I13 | `downloadInvoicePDF` / `downloadPDF` chưa implement | Admin không xuất được PDF | Implement bằng DomPDF/Snappy. Tạo template Blade cho hợp đồng + hóa đơn. |
-| I14 | Thiếu confirmation dialog cho thao tác nguy hiểm | Xóa nhầm phòng, thanh lý nhầm HĐ | Dùng component `<x-confirmation-modal>` đã có trong project. |
-| I15 | Dashboard hard-code Tòa A-E | Dữ liệu giả, không phản ánh thực tế | Query `Phong` group by tòa nhà, tính công suất thực. |
-| I16 | Dangky view hiển thị backed value thay vì label | UI hiện `rental` thay vì `Thuê phòng` | Dùng `$dangky->loaidangky->label()` trong Blade. |
-| I17 | Hóa đơn SV: badge CSS so sánh sai type | Badge có thể hiện sai màu | So sánh `$status->value` hoặc dùng `match` trên Enum instance. |
-| I18 | Method names English trong Service (vi phạm STANDARDS.md) | Không nhất quán, khó maintain | Rename `listStudents` → `lietKeSinhVien`, `assignRoom` → `xepPhong`, etc. |
-
-### 🟢 NICE-TO-HAVE — Cải thiện dần
-
-| # | Vấn đề | Tác động | Hướng xử lý |
-|---|--------|---------|-------------|
-| N1 | SV tự gia hạn hợp đồng | Giảm tải admin, tự phục vụ | Thêm route + form gia hạn cho SV, admin duyệt. |
-| N2 | Lịch sử thanh toán chi tiết | Minh bạch tài chính | Tạo bảng `lich_su_thanh_toan` (thời gian, phương thức, người xác nhận). |
-| N3 | Báo cáo tài chính xuất Excel | Admin report cho ban giám đốc | Integrate `maatwebsite/excel` hoặc `spatie/simple-excel`. |
-| N4 | Real-time notifications (WebSocket) | SV nhận thông báo ngay | Kích hoạt Pusher/Reverb đã config trong `.env.example`. |
-| N5 | Trang quản lý Users/Accounts | Admin tạo/sửa/khóa tài khoản | CRUD UserController cho Admin level. |
-| N6 | Mobile-optimized card layout cho SV | UX trên điện thoại | Responsive card thay table trên < 768px. |
-| N7 | Tìm kiếm nâng cao phòng (tầng, tòa, giới tính, giá) | SV tìm phòng dễ hơn | Multi-filter form + query builder. |
-| N8 | Dashboard SV — Countdown HĐ | SV biết còn bao lâu | `Carbon::parse($ngay_ket_thuc)->diffInDays(now())`. |
-| N9 | Cache đơn giá điện/nước | Giảm DB queries | `Cache::remember('gia_dien', 3600, ...)` trong `layGiaTuCauhinh()`. |
-| N10 | Trang FAQ/Hướng dẫn cho SV mới | Giảm support | Static page với FAQ thường gặp. |
-| N11 | Validate unique email/phone cho Guest đăng ký | Chống spam | Thêm rule unique (dùng blind_index) vào `LuuDangkyRequest`. |
-| N12 | Index DB cho cột trạng thái | Tăng tốc query | Migration thêm index cho `trangthaithanhtoan`, `trang_thai`, `trangthai`. |
-| N13 | Trang SV xem ảnh thẻ/CCCD của mình | SV kiểm tra thông tin | Route riêng với authorization scoping. |
+### UX/UI (10/10)
+- [ ] Nhập chỉ số điện nước hàng loạt
+- [ ] Preview hồ sơ trước khi duyệt
+- [ ] Xuất PDF hóa đơn & hợp đồng
+- [ ] Báo cáo tài chính
+- [ ] Activity Log UI
+- [ ] Quản lý Users
+- [ ] Dashboard dữ liệu thực
+- [ ] Confirmation dialog
+- [ ] Dashboard SV countdown
+- [ ] Mobile responsive
+- [ ] View hiển thị label() đúng
 
 ---
 
-## Tổng kết nhanh
+## VI. GHI CHÚ KIẾN TRÚC
 
-| Chiều | Điểm đánh giá | Ghi chú |
-|-------|-------------|---------|
-| **Nghiệp vụ** | 6/10 | Luồng cơ bản đủ, nhưng thiếu auto-expiry, refund, overdue detection |
-| **Kỹ thuật** | 7/10 | Kiến trúc Service/Interface tốt, nhưng có bug runtime (wrong namespace, missing method) và N+1 |
-| **Bảo mật** | 7/10 | PII encryption tốt, nhưng thiếu rate limit guest, LIKE injection |
-| **UX/UI** | 5/10 | Giao diện đẹp nhưng thiếu nhiều tính năng vận hành: bulk input, reports, PDF, activity log |
+### Điểm kiến trúc đã tốt (KHÔNG CẦN THAY ĐỔI)
+- Folder structure: `Controllers/{Admin,Guest,Student,Shared}`, `Services/{Admin,Core,Student,Shared}`, `Contracts/` tương ứng
+- 13 Observers đăng ký trong AppServiceProvider
+- 25+ Interface bindings
+- Enum pattern 3 tầng
+- State machine trên Models
+- Traits: `HoTroNghiepVu`, `PhanHoiService`, `KiemtraKyluat`, `HasBedStatus`
 
-**Ưu tiên hành động:**  
-1. Fix runtime bugs (C6, C7) → hệ thống chạy không crash  
-2. Thêm Scheduler commands (C1, C2) → nghiệp vụ tự động  
-3. Rate limit + security (C5, I11) → chống abuse  
-4. Performance (C4) → dashboard không lag  
-5. UX improvements (I6, I7, I13) → admin làm việc hiệu quả hơn
+### Cần cải thiện
+- Interface/Class ratio: 3/129 = 2.3% (< 10% = thiếu abstraction) → Đã tốt hơn nhiều so với ban đầu nhưng cần thêm interfaces nếu muốn điểm tối đa
+- `PhongController` có 16 methods (God Class) → Đã có PhongService nhưng Controller vẫn quá nhiều methods, cần tách thành `TaiSanController` và `VatTuController` riêng
+
+---
+
+## VII. TÓM TẮT
+
+**Dự án có nền tảng kiến trúc rất tốt** — Service Layer, Interfaces, Enums, State Machine, PII Encryption, Audit Trail — đều là enterprise-grade patterns. 
+
+**Để đạt 10/10, cần tập trung vào:**
+1. **Fix runtime bugs** (2-3 bugs nhỏ nhưng gây crash)
+2. **Hoàn thiện nghiệp vụ** (auto-expiry, refund, chống ghi đè, magic link)
+3. **UX/UI admin** (bulk input, PDF, reports — đây là gap LỚN NHẤT)
+4. **Testing** (feature tests cho các luồng chính)
+5. **Polish** (label(), badge CSS, thông báo có dấu)
+
+**Ước tính effort:** 3-4 tuần làm việc tập trung.

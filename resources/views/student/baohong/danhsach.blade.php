@@ -5,8 +5,8 @@
 @section('noidung')
     @php
         $total = $danhsachbaohong->count();
-        $pending = $danhsachbaohong->whereIn('trangthai', [\App\Enums\MaintenanceStatus::PENDING->value, \App\Enums\MaintenanceStatus::SCHEDULED->value, \App\Enums\MaintenanceStatus::IN_PROGRESS->value])->count();
-        $fixed = $danhsachbaohong->where('trangthai', \App\Enums\MaintenanceStatus::COMPLETED->value)->count();
+        $pending = $danhsachbaohong->whereIn('trangthai', [\App\Enums\MaintenanceStatus::Pending->value, \App\Enums\MaintenanceStatus::Scheduled->value, \App\Enums\MaintenanceStatus::InProgress->value])->count();
+        $fixed = $danhsachbaohong->where('trangthai', \App\Enums\MaintenanceStatus::Completed->value)->count();
     @endphp
 
     <div class="mb-6 flex justify-end">
