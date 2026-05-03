@@ -17,8 +17,24 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $hoadons = collect();
+        
+        if ($user->vaitro instanceof \App\Enums\UserRole ? $user->vaitro === \App\Enums\UserRole::SinhVien : $user->vaitro === 'sinhvien') {
+            $user->load(['sinhvien.phong.toanha', 'sinhvien.dangkys', 'sinhvien.hopdongs', 'sinhvien.kyluats', 'sinhvien.danhgias']);
+            
+            if ($user->sinhvien && $user->sinhvien->phong_id) {
+                $hoadons = \App\Models\Hoadon::where('phong_id', $user->sinhvien->phong_id)
+                    ->orderByDesc('nam')
+                    ->orderByDesc('thang')
+                    ->get();
+            }
+        }
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'sinhvien' => $user->sinhvien,
+            'hoadons' => $hoadons,
         ]);
     }
 
@@ -43,6 +59,10 @@ class ProfileController extends Controller
                 'masinhvien' => $request->masinhvien,
                 'lop' => $request->lop,
                 'sodienthoai' => $request->sodienthoai,
+                'ngaysinh' => $request->ngaysinh,
+                'diachi' => $request->diachi,
+                'dantoc' => $request->dantoc,
+                'so_cccd' => $request->so_cccd,
             ]);
             $sinhvien->save();
         }

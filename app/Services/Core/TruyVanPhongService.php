@@ -92,13 +92,45 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
 
     public function layChiTietPhong(int $id): array
     {
-        $phong = Phong::find($id);
+        $phong = Phong::with(['danhsachsinhvien.taikhoan'])->find($id);
         if (!$phong) return ['error' => 'Không tìm thấy phòng.'];
+
+        $sinhviens = $phong->danhsachsinhvien;
+        $svMap = $sinhviens->keyBy('giuong_no');
+        $dkMap = $phong->danhsachdangky()
+            ->with('user')
+            ->whereIn('trangthai', [RegistrationStatus::Pending->value, RegistrationStatus::ApprovedPendingPayment->value])
+            ->get()
+            ->keyBy('giuong_no');
+
+        $beds = [];
+        for ($i = 1; $i <= (int)$phong->succhuamax; $i++) {
+            $sv = $svMap->get($i);
+            $dk = $dkMap->get($i);
+            
+            $status = 'AVAILABLE';
+            $occupant = null;
+
+            if ($sv) {
+                $status = 'OCCUPIED';
+                $occupant = ['name' => $sv->taikhoan?->name, 'type' => 'student'];
+            } elseif ($dk) {
+                $status = 'PENDING';
+                $occupant = ['name' => $dk->ho_ten, 'type' => 'applicant'];
+            }
+
+            $beds[$i] = [
+                'status' => $status,
+                'occupant' => $occupant
+            ];
+        }
 
         return [
             'phong' => $phong,
+            'sinhviens' => $sinhviens,
             'taisan' => $phong->danhsachtaisan()->get(),
-            'vattu' => $phong->danhsachvattu()->get()
+            'vattu' => $phong->danhsachvattu()->get(),
+            'beds' => $beds
         ];
     }
 

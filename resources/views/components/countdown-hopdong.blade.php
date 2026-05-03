@@ -70,7 +70,7 @@
             </div>
 
             <div class="flex flex-col gap-2">
-                <a href="{{ route('student.gia-han.tao') }}" class="pdu-btn pdu-btn-primary w-full justify-center group">
+                <a href="{{ route('student.giahan.tao') }}" class="pdu-btn pdu-btn-primary w-full justify-center group">
                     <span>Gửi yêu cầu gia hạn</span>
                     <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </a>
@@ -82,7 +82,7 @@
                 </div>
                 <p class="text-sm font-bold text-ink-primary mb-1">Bạn chưa có hợp đồng thuê phòng</p>
                 <p class="text-[10px] text-ink-secondary mb-4">Hãy đăng ký phòng để bắt đầu sử dụng dịch vụ.</p>
-                <a href="{{ route('student.dang-ky.tao') }}" class="pdu-btn pdu-btn-secondary py-1.5 px-4 text-[10px] mx-auto">
+                <a href="{{ route('student.danhsachphong') }}" class="pdu-btn pdu-btn-secondary py-1.5 px-4 text-[10px] mx-auto">
                     Đăng ký phòng ngay
                 </a>
             </div>

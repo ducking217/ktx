@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        @if($user->vaitro === 'sinhvien')
+        @if($user->vaitro === 'sinhvien' || $user->vaitro === \App\Enums\UserRole::SinhVien)
             <div class="pt-10 border-t border-ui-border grid gap-8 md:grid-cols-2">
                 {{-- Mã sinh viên --}}
                 <div class="space-y-2 group">
@@ -99,10 +99,38 @@
                     <label for="gioitinh" class="text-[10px] font-black uppercase tracking-[0.2em] text-ink-secondary/40 ml-1 transition-colors group-focus-within:text-brand-emerald">Giới tính</label>
                     <select id="gioitinh" name="gioitinh" class="pdu-select" required>
                         <option value="">-- Chọn giới tính --</option>
-                        <option value="Nam" {{ old('gioitinh', optional($user->sinhvien)->gioitinh) === 'Nam' ? 'selected' : '' }}>Nam giới</option>
-                        <option value="Nữ" {{ old('gioitinh', optional($user->sinhvien)->gioitinh) === 'Nữ' ? 'selected' : '' }}>Nữ giới</option>
+                        <option value="Nam" {{ old('gioitinh', $user->gioitinh) === 'Nam' ? 'selected' : '' }}>Nam giới</option>
+                        <option value="Nữ" {{ old('gioitinh', $user->gioitinh) === 'Nữ' ? 'selected' : '' }}>Nữ giới</option>
                     </select>
                     <x-input-error class="mt-1 ml-1" :messages="$errors->get('gioitinh')" />
+                </div>
+
+                {{-- Ngày sinh --}}
+                <div class="space-y-2 group">
+                    <label for="ngaysinh" class="text-[10px] font-black uppercase tracking-[0.2em] text-ink-secondary/40 ml-1 transition-colors group-focus-within:text-brand-emerald">Ngày sinh</label>
+                    <input id="ngaysinh" name="ngaysinh" type="date" class="pdu-input" value="{{ old('ngaysinh', optional($user->sinhvien)->ngaysinh?->format('Y-m-d')) }}" />
+                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('ngaysinh')" />
+                </div>
+
+                {{-- Dân tộc --}}
+                <div class="space-y-2 group">
+                    <label for="dantoc" class="text-[10px] font-black uppercase tracking-[0.2em] text-ink-secondary/40 ml-1 transition-colors group-focus-within:text-brand-emerald">Dân tộc</label>
+                    <input id="dantoc" name="dantoc" type="text" class="pdu-input" value="{{ old('dantoc', optional($user->sinhvien)->dantoc ?? 'Kinh') }}" />
+                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('dantoc')" />
+                </div>
+
+                {{-- CCCD --}}
+                <div class="space-y-2 group">
+                    <label for="so_cccd" class="text-[10px] font-black uppercase tracking-[0.2em] text-ink-secondary/40 ml-1 transition-colors group-focus-within:text-brand-emerald">Số CCCD / Định danh</label>
+                    <input id="so_cccd" name="so_cccd" type="text" class="pdu-input" value="{{ old('so_cccd', optional($user->sinhvien)->so_cccd) }}" />
+                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('so_cccd')" />
+                </div>
+
+                {{-- Địa chỉ --}}
+                <div class="md:col-span-2 space-y-2 group">
+                    <label for="diachi" class="text-[10px] font-black uppercase tracking-[0.2em] text-ink-secondary/40 ml-1 transition-colors group-focus-within:text-brand-emerald">Địa chỉ liên hệ</label>
+                    <textarea id="diachi" name="diachi" rows="2" class="pdu-input" placeholder="Số nhà, tên đường, xã/phường, quận/huyện, tỉnh/thành phố...">{{ old('diachi', optional($user->sinhvien)->diachi) }}</textarea>
+                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('diachi')" />
                 </div>
             </div>
         @endif

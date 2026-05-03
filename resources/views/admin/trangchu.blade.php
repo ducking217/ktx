@@ -4,7 +4,7 @@
     <!-- STATS - Bento Grid -->
     <section class="mb-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <!-- 1. Operational Narrative (Bento Large) -->
-        <article class="md:col-span-12 xl:col-span-8 pdu-card flex flex-col justify-between min-h-[260px] relative overflow-hidden group">
+        <article class="md:col-span-12 xl:col-span-8 pdu-card flex flex-col justify-between min-h-[280px] relative overflow-hidden group">
             <div class="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-brand-emerald/5 blur-3xl transition-all duration-500 group-hover:bg-brand-emerald/10"></div>
             
             <div class="relative z-10">
@@ -55,7 +55,7 @@
             <div class="relative z-10">
                 <div class="flex items-center justify-between mb-8">
                     <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Doanh thu T{{ $thanghientai }}</div>
-                    <div class="h-10 w-10 rounded-xl bg-ui-bg flex items-center justify-center text-ink-primary border border-ui-border transition-colors group-hover:border-brand-emerald/30 group-hover:bg-brand-emerald/5">
+                    <div class="h-11 w-11 rounded-xl bg-ui-bg flex items-center justify-center text-ink-primary border border-ui-border transition-colors group-hover:border-brand-emerald/30 group-hover:bg-brand-emerald/5">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                 <div class="flex items-end gap-1.5 h-16 mb-4">
                     @foreach($xuHuongDoanhThu as $item)
                         <div class="flex-1 bg-ui-muted rounded-t-lg transition-all duration-300 hover:bg-brand-emerald relative group/bar" @style(["height: {$item['height']}%"])>
-                            <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-ink-primary text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-all pointer-events-none font-bold tabular-nums whitespace-nowrap shadow-xl">
+                            <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-ink-primary text-ink-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-all pointer-events-none font-bold tabular-nums whitespace-nowrap shadow-xl ring-1 ring-ink-white/10">
                                 {{ number_format($item['value']) }}
                                 <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-ink-primary rotate-45"></div>
                             </div>
@@ -89,12 +89,12 @@
     <!-- ACTION TILES -->
     <section class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Registration Tile -->
-        <a href="{{ route('admin.duyetdangky') }}" class="pdu-card group flex items-center justify-between hover:border-brand-emerald/40">
+        <a href="{{ route('admin.duyetdangky') }}" class="pdu-card group flex items-center justify-between hover:border-brand-emerald/40 min-h-[88px]">
             <div class="flex items-center gap-5 relative z-10">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-ui-bg text-ink-primary border border-ui-border transition-all duration-300 group-hover:bg-brand-emerald/5 group-hover:border-brand-emerald/30 relative">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     @if($dangKyChoDuyet > 0)
-                        <span class="absolute -top-2 -right-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-emerald px-1.5 text-[10px] font-black text-white ring-2 ring-ui-card tabular-nums">{{ $dangKyChoDuyet }}</span>
+                        <span class="absolute -top-2 -right-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-emerald px-1.5 text-[10px] font-black text-ink-white ring-2 ring-ui-card tabular-nums shadow-sm">{{ $dangKyChoDuyet }}</span>
                     @endif
                 </div>
                 <div>
@@ -102,18 +102,18 @@
                     <div class="text-xl font-display font-black text-ink-primary tracking-tight">Đơn đăng ký</div>
                 </div>
             </div>
-            <div class="h-10 w-10 rounded-full bg-ui-bg flex items-center justify-center text-ink-secondary/20 transition-all group-hover:text-brand-emerald group-hover:bg-brand-emerald/10 shadow-inner">
+            <div class="h-11 w-11 rounded-full bg-ui-bg flex items-center justify-center text-ink-secondary/20 transition-all group-hover:text-brand-emerald group-hover:bg-brand-emerald/10 shadow-inner">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </div>
         </a>
 
         <!-- Maintenance Tile -->
-        <a href="{{ route('admin.quanlybaohong') }}" class="pdu-card group flex items-center justify-between hover:border-status-warning/40">
+        <a href="{{ route('admin.quanlybaohong') }}" class="pdu-card group flex items-center justify-between hover:border-status-warning/40 min-h-[88px]">
             <div class="flex items-center gap-5 relative z-10">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-ui-bg text-ink-primary border border-ui-border transition-all duration-300 group-hover:bg-status-warning/5 group-hover:border-status-warning/30 relative">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     @if($suCoMo > 0)
-                        <span class="absolute -top-2 -right-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-status-warning px-1.5 text-[10px] font-black text-white ring-2 ring-ui-card tabular-nums">{{ $suCoMo }}</span>
+                        <span class="absolute -top-2 -right-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-status-warning px-1.5 text-[10px] font-black text-ink-white ring-2 ring-ui-card tabular-nums shadow-sm">{{ $suCoMo }}</span>
                     @endif
                 </div>
                 <div>
@@ -121,13 +121,13 @@
                     <div class="text-xl font-display font-black text-ink-primary tracking-tight">Sự cố hạ tầng</div>
                 </div>
             </div>
-            <div class="h-10 w-10 rounded-full bg-ui-bg flex items-center justify-center text-ink-secondary/20 transition-all group-hover:text-status-warning group-hover:bg-status-warning/10 shadow-inner">
+            <div class="h-11 w-11 rounded-full bg-ui-bg flex items-center justify-center text-ink-secondary/20 transition-all group-hover:text-status-warning group-hover:bg-status-warning/10 shadow-inner">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </div>
         </a>
 
         <!-- Map Tile -->
-        <a href="{{ route('admin.phong.map') }}" class="pdu-card group flex items-center justify-between hover:border-ink-primary/20">
+        <a href="{{ route('admin.phong.map') }}" class="pdu-card group flex items-center justify-between hover:border-ink-primary/20 min-h-[88px]">
             <div class="flex items-center gap-5 relative z-10">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-ui-bg text-ink-primary border border-ui-border transition-all duration-300 group-hover:bg-ink-primary/5 group-hover:border-ink-primary/30 relative">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 013 15.488V5.488a2 2 0 011.553-1.944L9 2l6 3 5.447-2.724A2 2 0 0121 4.224v10a2 2 0 01-1.553 1.944L15 19l-6 1z"/></svg>
@@ -137,7 +137,7 @@
                     <div class="text-xl font-display font-black text-ink-primary tracking-tight italic">Visualizer</div>
                 </div>
             </div>
-            <div class="h-10 w-10 rounded-full bg-ui-bg flex items-center justify-center text-ink-secondary/20 transition-all group-hover:text-ink-primary group-hover:bg-ink-primary/10 shadow-inner">
+            <div class="h-11 w-11 rounded-full bg-ui-bg flex items-center justify-center text-ink-secondary/20 transition-all group-hover:text-ink-primary group-hover:bg-ink-primary/10 shadow-inner">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </div>
         </a>

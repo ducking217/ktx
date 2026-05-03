@@ -57,13 +57,13 @@
                         <tr class="group hover:bg-ui-bg/50 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="font-bold text-ink-primary tabular-nums">#{{ $hoadon->id }}</div>
-                                <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-tighter">Tháng {{ $hoadon->thang }}/{{ $hoadon->nam }}</div>
+                                <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-tighter">Kỳ T{{ $hoadon->thang }}/{{ $hoadon->nam }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-bold text-ink-primary">{{ optional($hoadon->sinhvien->taikhoan)->name ?? 'N/A' }}</div>
-                                <div class="flex items-center gap-1.5 text-[10px] font-bold text-ink-secondary/60 uppercase">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-brand-emerald"></span>
-                                    Phòng {{ optional($hoadon->phong)->tenphong ?? 'N/A' }}
+                                <div class="font-bold text-ink-primary font-display">{{ $hoadon->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
+                                <div class="flex items-center gap-1.5 text-[10px] font-bold text-ink-secondary/60 uppercase tracking-widest mt-0.5">
+                                    <span class="h-1 w-1 rounded-full bg-brand-emerald"></span>
+                                    {{ $hoadon->phong?->tenphong ?? 'N/A' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -136,11 +136,11 @@
                     <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
                         <div class="space-y-1">
                             <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Cư dân</div>
-                            <div class="text-xs font-bold text-ink-primary truncate">{{ optional($hoadon->sinhvien->taikhoan)->name ?? 'N/A' }}</div>
+                            <div class="text-xs font-bold text-ink-primary truncate font-display">{{ $hoadon->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
                         </div>
                         <div class="space-y-1">
                             <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Vị trí</div>
-                            <div class="text-xs font-bold text-ink-primary">Phòng {{ optional($hoadon->phong)->tenphong ?? 'N/A' }}</div>
+                            <div class="text-xs font-bold text-ink-primary">{{ $hoadon->phong?->tenphong ?? 'N/A' }}</div>
                         </div>
                         <div class="space-y-1 col-span-2">
                             <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Tổng quyết toán</div>

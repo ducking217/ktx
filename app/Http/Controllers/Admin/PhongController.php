@@ -28,9 +28,11 @@ class PhongController extends Controller
     {
         $data = $this->truyVanPhongService->layChiTietPhong($id);
         if (isset($data['error'])) {
-            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => $data['error']]);
+            return redirect()->route('admin.phong.index')->with([
+                'toast_loai' => 'loi',
+                'toast_noidung' => $data['error'],
+            ]);
         }
-
         return view('admin.phong.chitiet', $data);
     }
 

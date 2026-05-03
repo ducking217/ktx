@@ -9,48 +9,59 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@100..900&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="linear-shell transition-colors duration-300 font-sans antialiased text-slate-800 bg-slate-50">
+    <body class="bg-ui-bg font-sans antialiased text-ink-primary transition-colors duration-300">
         <div class="min-h-screen flex">
-            <!-- Left Side: Image/Branding (Hidden on mobile) -->
-            <div class="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-center justify-center overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80" alt="KTX Background" class="absolute inset-0 w-full h-full object-cover opacity-50">
+            <!-- Left Side: Branding (Hidden on mobile) -->
+            <div class="hidden lg:flex lg:w-1/2 relative bg-ink-primary items-center justify-center overflow-hidden">
+                <!-- Visual Pattern -->
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(oklch(var(--brand-emerald-lch))_1.5px,transparent_1.5px)] [background-size:32px_32px]"></div>
                 
-                <!-- Decorative overlay -->
-                <div class="absolute inset-0 bg-slate-900/70"></div>
-                
-                <div class="relative z-10 max-w-lg px-10">
-                    <div class="w-16 h-16 rounded-2xl bg-ui-card/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white font-display font-bold text-3xl mb-8 shadow-xl">
-                        K
+                <div class="relative z-10 max-w-lg px-12">
+                    <div class="flex items-center gap-4 mb-12">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-emerald text-white shadow-lg shadow-brand-emerald/20">
+                            <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>
+                        </div>
+                        <div class="font-display text-3xl font-black tracking-tighter text-white uppercase">PDU <span class="text-brand-emerald">PORTAL</span></div>
                     </div>
-                    <h2 class="text-4xl font-display font-bold text-white mb-6 leading-tight">Khám phá không gian sống lý tưởng.</h2>
-                    <p class="text-lg text-slate-300 leading-relaxed">Hệ thống quản lý Ký túc xá hiện đại. Giúp bạn dễ dàng tra cứu, đăng ký phòng và trải nghiệm môi trường sống tiện nghi nhất trong suốt quãng đời sinh viên.</p>
+
+                    <h2 class="text-5xl font-display font-black text-white mb-8 leading-[1.1] tracking-tight">
+                        Kiến tạo <br>
+                        <span class="text-brand-emerald">trải nghiệm sống</span> <br>
+                        sinh viên vượt trội.
+                    </h2>
+                    
+                    <p class="text-lg text-white/50 leading-relaxed font-medium max-w-[40ch]">
+                        Hệ thống quản lý cư trú tập trung. Minh bạch, an toàn và tối ưu cho hành trình học tập của bạn.
+                    </p>
                 </div>
             </div>
 
-            <!-- Right Side: Form -->
-            <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative bg-slate-50 lg:bg-ui-card">
-                <!-- Decorative blobs -->
-                <div class="absolute top-0 right-0 w-96 h-96 bg-brand-100 rounded-full blur-[100px] opacity-60 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-72 h-72 bg-sky-100 rounded-full blur-[80px] opacity-60 pointer-events-none"></div>
-                
-                <div class="relative w-full max-w-md animate-fade-up z-10">
+            <!-- Right Side: Form Area -->
+            <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative bg-ui-bg">
+                <!-- Dot Grid Overlay -->
+                <div class="absolute inset-0 opacity-100 bg-[radial-gradient(oklch(var(--ui-border-lch))_1.5px,transparent_1.5px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none"></div>
+
+                <div class="relative w-full max-w-md z-10">
                     <!-- Mobile Logo -->
-                    <div class="mb-8 flex justify-center lg:hidden">
-                        <div class="w-14 h-14 rounded-2xl bg-brand-600 flex items-center justify-center text-white font-display font-bold text-2xl shadow-lg shadow-brand-500/30">
-                            K
+                    <div class="mb-12 flex justify-center lg:hidden">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-emerald text-white shadow-lg shadow-brand-emerald/20">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>
+                            </div>
+                            <div class="font-display text-2xl font-black tracking-tighter text-ink-primary uppercase">PDU <span class="text-brand-emerald">PORTAL</span></div>
                         </div>
                     </div>
 
-                    <div class="bg-ui-card rounded-[2rem] p-8 sm:p-10 shadow-2xl shadow-slate-200/50 border border-slate-100 relative">
+                    <div class="animate-fade-up">
                         {{ $slot }}
                     </div>
                     
-                    <div class="mt-8 text-center text-xs text-slate-500 lg:hidden">
-                        &copy; {{ date('Y') }} KTX ABC. Mọi quyền được bảo lưu.
+                    <div class="mt-12 text-center text-[10px] font-black uppercase tracking-[0.2em] text-ink-secondary/20">
+                        &copy; {{ date('Y') }} PDU DORMITORY SYSTEM. ALL RIGHTS RESERVED.
                     </div>
                 </div>
             </div>

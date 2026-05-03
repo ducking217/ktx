@@ -99,17 +99,10 @@
                                             {{ $log->hanh_dong }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 max-w-xs">
-                                        @if($log->du_lieu_moi)
-                                            <div class="text-[11px] leading-relaxed text-ink-secondary line-clamp-2" title="{{ json_encode($log->du_lieu_moi) }}">
-                                                @foreach(array_slice($log->du_lieu_moi, 0, 3) as $key => $val)
-                                                    <span class="font-bold">{{ $key }}:</span> {{ is_array($val) ? '...' : $val }}{{ !$loop->last ? ', ' : '' }}
-                                                @endforeach
-                                                @if(count($log->du_lieu_moi) > 3)...@endif
-                                            </div>
-                                        @else
-                                            <span class="text-[10px] italic text-ink-secondary/30">Không có dữ liệu chi tiết</span>
-                                        @endif
+                                    <td class="px-6 py-4 text-right">
+                                        <button type="button" data-modal-target="modal-log-{{ $log->id }}" data-modal-toggle="modal-log-{{ $log->id }}" class="flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-brand-emerald">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -130,4 +123,49 @@
             </div>
         </div>
     </div>
+
+    @push('modals')
+        @foreach($logs as $log)
+            <x-modal id="modal-log-{{ $log->id }}" title="Chi tiết nhật ký hoạt động" subtitle="Thông tin đầy đủ về thay đổi dữ liệu của bản ghi #{{ $log->id }}.">
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4 rounded-2xl bg-ui-bg/50 p-4 ring-1 ring-inset ring-ui-border">
+                        <div>
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Thời gian</div>
+                            <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
+                        </div>
+                        <div>
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Người thực hiện</div>
+                            <div class="text-xs font-bold text-ink-primary">{{ $log->user->name ?? 'Hệ thống' }}</div>
+                        </div>
+                        <div>
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Hành động</div>
+                            <div class="text-xs font-bold text-ink-primary uppercase">{{ $log->hanh_dong }}</div>
+                        </div>
+                        <div>
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Đối tượng</div>
+                            <div class="text-xs font-bold text-ink-primary">{{ $log->ten_model }} #{{ $log->id_ban_ghi }}</div>
+                        </div>
+                    </div>
+
+                    @if($log->du_lieu_cu)
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-ink-primary uppercase tracking-widest">Dữ liệu trước thay đổi</label>
+                            <pre class="w-full bg-ui-bg border-ui-border rounded-xl px-4 py-3 text-[10px] text-ink-secondary overflow-x-auto custom-scrollbar font-mono">{{ json_encode($log->du_lieu_cu, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                        </div>
+                    @endif
+
+                    @if($log->du_lieu_moi)
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-brand-emerald uppercase tracking-widest">Dữ liệu sau thay đổi</label>
+                            <pre class="w-full bg-brand-emerald/5 border border-brand-emerald/10 rounded-xl px-4 py-3 text-[10px] text-brand-emerald overflow-x-auto custom-scrollbar font-mono">{{ json_encode($log->du_lieu_moi, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                        </div>
+                    @endif
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" data-modal-hide="modal-log-{{ $log->id }}" class="w-full rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Đóng chi tiết</button>
+                    </div>
+                </div>
+            </x-modal>
+        @endforeach
+    @endpush
 </x-admin-layout>

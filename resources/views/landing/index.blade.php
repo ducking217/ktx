@@ -1,15 +1,15 @@
 <x-landing-layout>
     <x-slot:title>Ký túc xá Đại học Phương Đông - Không gian sống lý tưởng</x-slot:title>
 
-    <div class="relative z-10 bg-[#fafafa]">
+    <div class="relative z-10 bg-ui-bg">
     @if(session('success'))
         <div class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-6">
-            <div class="bg-black text-white px-5 py-3.5 rounded-xl shadow-lg border border-gray-800 flex items-center justify-between">
+            <div class="bg-ink-primary text-ink-white px-5 py-3.5 rounded-xl shadow-lg border border-ui-border flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <svg class="w-5 h-5 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    <span class="font-medium text-[13px] tracking-wide">{{ session('success') }}</span>
+                    <svg class="w-5 h-5 text-brand-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span class="font-bold text-[13px] tracking-wide">{{ session('success') }}</span>
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-white transition-colors"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                <button onclick="this.parentElement.parentElement.remove()" class="text-ink-secondary/60 hover:text-ink-white transition-colors"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
         </div>
     @endif
@@ -26,39 +26,39 @@
     @endif
 
     {{-- ═══ HERO MINIMAL ═══ --}}
-    <section id="hero" class="relative pt-32 pb-24 lg:pt-48 lg:pb-32 overflow-hidden border-b border-gray-200 bg-[#fafafa]">
+    <section id="hero" class="relative pt-32 pb-24 lg:pt-48 lg:pb-32 overflow-hidden border-b border-ui-border bg-ui-bg">
         <!-- Minimal Dot Grid - Enhanced for Hero -->
-        <div class="absolute inset-0 opacity-100 bg-[radial-gradient(#d1d5db_1.5px,transparent_1.5px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
+        <div class="absolute inset-0 opacity-100 bg-[radial-gradient(oklch(var(--ui-border-lch))_1.5px,transparent_1.5px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
 
         <div class="max-w-[1280px] mx-auto px-6 relative z-10 w-full">
             <div class="max-w-[800px] mx-auto text-center flex flex-col items-center">
                 
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-8 shadow-sm">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-ui-card border border-ui-border text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60 mb-8 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-emerald animate-pulse"></span>
                     Năm học 2026–2027
                 </div>
                 
-                <h1 class="font-display text-[clamp(3.5rem,8vw,6rem)] font-bold tracking-tighter text-gray-900 leading-[1.05] mb-6">
+                <h1 class="font-display text-[clamp(3.5rem,8vw,6rem)] font-bold tracking-tighter text-ink-primary leading-[1.05] mb-6">
                     Sống hiện đại.<br>
-                    <span class="text-gray-400">Học hiệu quả.</span>
+                    <span class="text-ink-secondary/40">Học hiệu quả.</span>
                 </h1>
                 
-                <p class="text-[clamp(1rem,2vw,1.25rem)] text-gray-600 max-w-[60ch] leading-relaxed mb-10 font-medium">
+                <p class="text-[clamp(1rem,2vw,1.25rem)] text-ink-secondary max-w-[60ch] leading-relaxed mb-10 font-medium">
                     Ký túc xá Đại học Phương Đông mang đến không gian lưu trú an toàn, tiện nghi và minh bạch. Bệ phóng cho những năm tháng đại học rực rỡ nhất của bạn.
                 </p>
                 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                     @auth
-                        <a href="{{ route('dieuhuong') }}" class="w-full sm:w-auto bg-black text-white px-8 py-4 rounded-xl text-[14px] font-bold tracking-wide transition-all duration-200 hover:bg-gray-800 hover:-translate-y-0.5 flex items-center justify-center gap-2 shadow-lg shadow-black/10">
+                        <a href="{{ route('dieuhuong') }}" class="pdu-btn-primary w-full sm:w-auto gap-2 shadow-lg shadow-ink-primary/10">
                             Đi đến Dashboard
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     @else
-                        <a href="{{ route('public.danhsachphong') }}" class="w-full sm:w-auto bg-black text-white px-8 py-4 rounded-xl text-[14px] font-bold tracking-wide transition-all duration-200 hover:bg-gray-800 hover:-translate-y-0.5 flex items-center justify-center gap-2 shadow-lg shadow-black/10">
+                        <a href="{{ route('public.danhsachphong') }}" class="pdu-btn-primary w-full sm:w-auto gap-2 shadow-lg shadow-ink-primary/10">
                             Đăng ký giữ chỗ
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
-                        <a href="#phong-o" class="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 px-8 py-4 rounded-xl text-[14px] font-bold tracking-wide transition-all duration-200 shadow-sm hover:-translate-y-0.5 flex items-center justify-center">
+                        <a href="#phong-o" class="pdu-btn-ghost w-full sm:w-auto bg-ui-card">
                             Xem phòng trống
                         </a>
                     @endauth
@@ -66,23 +66,23 @@
             </div>
 
             {{-- Crisp Stats --}}
-            <div class="mt-24 max-w-[1000px] mx-auto relative z-20 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-gray-100">
+            <div class="mt-24 max-w-[1000px] mx-auto relative z-20 bg-ui-card rounded-2xl border border-ui-border shadow-sm overflow-hidden">
+                <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-ui-border">
                     <div class="p-8 flex flex-col items-center text-center group">
-                        <span class="font-display text-4xl font-bold text-gray-900 mb-1 tracking-tight">{{ $sinhVienDangO }}</span>
-                        <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500">Sinh viên</span>
+                        <span class="font-display text-4xl font-bold text-ink-primary mb-1 tracking-tight">{{ $sinhVienDangO }}</span>
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Sinh viên</span>
                     </div>
                     <div class="p-8 flex flex-col items-center text-center group">
-                        <span class="font-display text-4xl font-bold text-gray-900 mb-1 tracking-tight">{{ $tongSoPhong }}</span>
-                        <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500">Phòng ở</span>
+                        <span class="font-display text-4xl font-bold text-ink-primary mb-1 tracking-tight">{{ $tongSoPhong }}</span>
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Phòng ở</span>
                     </div>
                     <div class="p-8 flex flex-col items-center text-center group">
-                        <span class="font-display text-4xl font-bold text-gray-900 mb-1 tracking-tight">{{ $soTang }}</span>
-                        <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500">Tầng lầu</span>
+                        <span class="font-display text-4xl font-bold text-ink-primary mb-1 tracking-tight">{{ $soTang }}</span>
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Tầng lầu</span>
                     </div>
-                    <div class="p-8 flex flex-col items-center text-center group bg-gray-50/50">
-                        <span class="font-display text-4xl font-bold text-[#10b981] mb-1 tracking-tight">4.9<span class="text-2xl text-gray-300">/5</span></span>
-                        <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500">Đánh giá</span>
+                    <div class="p-8 flex flex-col items-center text-center group bg-ui-bg/50">
+                        <span class="font-display text-4xl font-bold text-brand-emerald mb-1 tracking-tight">PDU</span>
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Ký túc xá</span>
                     </div>
                 </div>
             </div>
@@ -94,31 +94,31 @@
         <div class="max-w-[1280px] mx-auto px-6">
             <div class="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
                 <div class="flex-1 relative z-10">
-                    <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-tighter text-gray-900 mb-6 leading-[1.1]">
+                    <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-tighter text-ink-primary mb-6 leading-[1.1]">
                         Hơn cả một nơi để ở.<br>
-                        <span class="text-gray-400">Đó là một cộng đồng.</span>
+                        <span class="text-ink-secondary/40">Đó là một cộng đồng.</span>
                     </h2>
-                    <p class="text-lg text-gray-600 mb-12 max-w-[55ch] leading-relaxed">
+                    <p class="text-lg text-ink-secondary/60 mb-12 max-w-prose leading-relaxed">
                         Được xây dựng theo tiêu chuẩn hiện đại, KTX Phương Đông hướng tới môi trường sống chất lượng cao. Nơi sự riêng tư được tôn trọng và cộng đồng được kết nối.
                     </p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="flex flex-col gap-4 p-6 rounded-2xl bg-[#fafafa] border border-gray-100 hover:border-gray-200 transition-colors">
-                            <div class="w-10 h-10 rounded-lg bg-black text-white flex items-center justify-center shadow-sm">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div class="flex flex-col gap-4 p-6 rounded-2xl bg-ui-bg border border-ui-border hover:border-brand-emerald/30 transition-colors">
+                            <div class="w-10 h-10 rounded-lg bg-ink-primary flex items-center justify-center shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8a7 7 0 0 1-7 7c-1.14 0-2.23-.3-3.17-.85"/><path d="M11 20c0-2.33.66-4.5 1.84-6.34"/></svg>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 text-base mb-1">Không gian Xanh</h4>
-                                <p class="text-sm text-gray-500 leading-relaxed">Mảng xanh phân bổ tinh tế khắp hành lang và sân thượng.</p>
+                                <h4 class="font-bold text-ink-primary text-base mb-1 uppercase tracking-tight">Không gian Xanh</h4>
+                                <p class="text-sm text-ink-secondary/60 leading-relaxed">Mảng xanh phân bổ tinh tế khắp hành lang và sân thượng.</p>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-4 p-6 rounded-2xl bg-[#fafafa] border border-gray-100 hover:border-gray-200 transition-colors">
-                            <div class="w-10 h-10 rounded-lg bg-black text-white flex items-center justify-center shadow-sm">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <div class="flex flex-col gap-4 p-6 rounded-2xl bg-ui-bg border border-ui-border hover:border-brand-emerald/30 transition-colors">
+                            <div class="w-10 h-10 rounded-lg bg-ink-primary flex items-center justify-center shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 text-base mb-1">An ninh 24/7</h4>
-                                <p class="text-sm text-gray-500 leading-relaxed">Camera giám sát AI, bảo vệ trực ban và thẻ từ đa lớp.</p>
+                                <h4 class="font-bold text-ink-primary text-base mb-1 uppercase tracking-tight">An ninh 24/7</h4>
+                                <p class="text-sm text-ink-secondary/60 leading-relaxed">Camera giám sát AI, bảo vệ trực ban và thẻ từ đa lớp.</p>
                             </div>
                         </div>
                     </div>
@@ -208,10 +208,15 @@
                                  </div>
                             </div>
                             
-                            <!-- Features -->
                             <div class="flex flex-wrap gap-1.5">
-                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-ui-bg text-ink-primary text-[10px] font-medium border border-ui-border"><span class="text-[10px] opacity-50">❄️</span> Máy lạnh</span>
-                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-ui-bg text-ink-primary text-[10px] font-medium border border-ui-border"><span class="text-[10px] opacity-50">🛏️</span> Giường tầng</span>
+                                <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-ui-bg text-ink-primary text-[10px] font-bold uppercase tracking-widest border border-ui-border">
+                                    <svg class="w-3 h-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Máy lạnh
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-ui-bg text-ink-primary text-[10px] font-bold uppercase tracking-widest border border-ui-border">
+                                    <svg class="w-3 h-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                    Giường tầng
+                                </span>
                             </div>
                         </div>
 
@@ -255,38 +260,48 @@
                     <div class="space-y-3">
                         <div class="flex justify-between items-center p-4 bg-ui-bg border border-ui-border group-hover:border-ink-primary/20 transition-colors">
                             <div class="flex items-center gap-4">
-                                <span class="text-lg opacity-80">⚡</span>
-                                <span class="font-bold text-ink-primary">Giá điện</span>
+                                <div class="w-10 h-10 flex items-center justify-center border border-ui-border text-ink-primary">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                </div>
+                                <span class="font-bold text-ink-primary text-xs uppercase tracking-widest">Giá điện</span>
                             </div>
-                            <span class="font-bold text-ink-primary text-lg">{{ isset($cauhinh['gia_dien']) ? number_format($cauhinh['gia_dien'], 0, ',', '.') : '3.500' }}đ<span class="text-sm text-ink-secondary font-medium">/kWh</span></span>
+                            <span class="font-bold text-ink-primary text-lg tabular-nums tracking-tighter">{{ isset($cauhinh['gia_dien']) ? number_format($cauhinh['gia_dien'], 0, ',', '.') : '3.500' }}đ<span class="text-[10px] text-ink-secondary font-black uppercase tracking-widest ml-1">/kWh</span></span>
                         </div>
                         <div class="flex justify-between items-center p-4 bg-ui-bg border border-ui-border group-hover:border-ink-primary/20 transition-colors">
                             <div class="flex items-center gap-4">
-                                <span class="text-lg opacity-80">💧</span>
-                                <span class="font-bold text-ink-primary">Nước sinh hoạt</span>
+                                <div class="w-10 h-10 flex items-center justify-center border border-ui-border text-ink-primary">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5s-3 3.5-3 5.5a7 7 0 0 0 7 7z"/></svg>
+                                </div>
+                                <span class="font-bold text-ink-primary text-xs uppercase tracking-widest">Nước sinh hoạt</span>
                             </div>
-                            <span class="font-bold text-ink-primary text-lg">{{ isset($cauhinh['gia_nuoc']) ? number_format($cauhinh['gia_nuoc'], 0, ',', '.') : '15.000' }}đ<span class="text-sm text-ink-secondary font-medium">/m³</span></span>
+                            <span class="font-bold text-ink-primary text-lg tabular-nums tracking-tighter">{{ isset($cauhinh['gia_nuoc']) ? number_format($cauhinh['gia_nuoc'], 0, ',', '.') : '15.000' }}đ<span class="text-[10px] text-ink-secondary font-black uppercase tracking-widest ml-1">/m³</span></span>
                         </div>
                         <div class="flex justify-between items-center p-4 bg-brand-emerald/5 border border-brand-emerald/20">
                             <div class="flex items-center gap-4">
-                                <span class="text-lg opacity-80">🌐</span>
-                                <span class="font-bold text-brand-emerald">Internet / WiFi</span>
+                                <div class="w-10 h-10 flex items-center justify-center border border-brand-emerald/20 text-brand-emerald">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                                </div>
+                                <span class="font-bold text-brand-emerald text-xs uppercase tracking-widest">Internet / WiFi</span>
                             </div>
-                            <span class="font-bold text-brand-emerald text-sm uppercase tracking-wider">Miễn phí</span>
+                            <span class="font-black text-brand-emerald text-[10px] uppercase tracking-[0.2em]">Miễn phí</span>
                         </div>
                         <div class="flex justify-between items-center p-4 bg-brand-emerald/5 border border-brand-emerald/20">
                             <div class="flex items-center gap-4">
-                                <span class="text-lg opacity-80">🧹</span>
-                                <span class="font-bold text-brand-emerald">Vệ sinh hành lang</span>
+                                <div class="w-10 h-10 flex items-center justify-center border border-brand-emerald/20 text-brand-emerald">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                </div>
+                                <span class="font-bold text-brand-emerald text-xs uppercase tracking-widest">Vệ sinh hành lang</span>
                             </div>
-                            <span class="font-bold text-brand-emerald text-sm uppercase tracking-wider">Miễn phí</span>
+                            <span class="font-black text-brand-emerald text-[10px] uppercase tracking-[0.2em]">Miễn phí</span>
                         </div>
                         <div class="flex justify-between items-center p-4 bg-ui-bg border border-ui-border group-hover:border-ink-primary/20 transition-colors">
                             <div class="flex items-center gap-4">
-                                <span class="text-lg opacity-80">🛵</span>
-                                <span class="font-bold text-ink-primary">Gửi xe máy</span>
+                                <div class="w-10 h-10 flex items-center justify-center border border-ui-border text-ink-primary">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M12 17h1"/><path d="m14 10 2 2 3.5-3.5"/><path d="M15 17h1"/><path d="M7 10h1.5l1.5 2 2-2 1.5 2H17"/><path d="M9 17h1"/></svg>
+                                </div>
+                                <span class="font-bold text-ink-primary text-xs uppercase tracking-widest">Gửi xe máy</span>
                             </div>
-                            <span class="font-bold text-ink-primary text-lg">120.000đ<span class="text-sm text-ink-secondary font-medium">/tháng</span></span>
+                            <span class="font-bold text-ink-primary text-lg tabular-nums tracking-tighter">120.000đ<span class="text-[10px] text-ink-secondary font-black uppercase tracking-widest ml-1">/tháng</span></span>
                         </div>
                     </div>
                 </div>
@@ -324,38 +339,6 @@
                         </li>
                     </ul>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- ═══ TESTIMONIALS MINIMAL ═══ --}}
-    <section class="py-24 lg:py-32 bg-white relative border-b border-ui-border">
-        <div class="max-w-[1280px] mx-auto px-6">
-            <div class="text-center max-w-[800px] mx-auto mb-16">
-                <p class="text-xs font-bold uppercase tracking-widest text-brand-emerald mb-3">Sinh viên Đại học Phương Đông</p>
-                <h2 class="font-display text-[clamp(2.25rem,4vw,3rem)] font-bold text-ink-primary tracking-tight">Hơn 500+ sinh viên đã coi đây là ngôi nhà thứ hai.</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @foreach([
-                    ['name'=>'Nguyễn Mai Phương','school'=>'SV năm 2 – ĐH Phương Đông','text'=>'Phòng ốc sạch sẽ và thoáng mát. An ninh rất tốt, đi làm thêm về trễ vẫn rất an tâm vì luôn có bảo vệ trực.','img'=>'photo-1438761681033-6461ffad8d80'],
-                    ['name'=>'Trần Tuấn Kiệt','school'=>'SV năm 4 – ĐH Phương Đông','text'=>'Đăng ký hoàn toàn online, không rườm rà. Gym và Căng tin rất tiện, không cần ra ngoài KTX.','img'=>'photo-1500648767791-00dcc994a43e'],
-                    ['name'=>'Lê Hoàng Lan','school'=>'SV năm 1 – ĐH Phương Đông','text'=>'App quản lý rất xịn. Báo sự cố trên web là hôm sau có người lên sửa ngay. 10 điểm dịch vụ!','img'=>'photo-1494790108377-be9c29b29330'],
-                ] as $review)
-                <div class="bg-ui-bg p-8 border border-ui-border hover:border-ink-primary transition-colors duration-300 flex flex-col">
-                    <div class="flex gap-1 text-ink-primary mb-6 text-sm">★★★★★</div>
-                    <p class="text-base text-ink-secondary mb-10 leading-relaxed flex-grow">"{{ $review['text'] }}"</p>
-                    <div class="flex items-center gap-4 pt-6 border-t border-ui-border">
-                        <div class="w-12 h-12 overflow-hidden bg-ui-border shrink-0 grayscale">
-                            <img src="https://images.unsplash.com/{{ $review['img'] }}?auto=format&fit=crop&w=100&q=80" alt="{{ $review['name'] }}" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-ink-primary text-sm">{{ $review['name'] }}</h4>
-                            <p class="text-xs font-medium text-brand-emerald mt-0.5">{{ $review['school'] }}</p>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
             </div>
         </div>
     </section>
@@ -412,21 +395,27 @@
                     
                     <div class="space-y-8">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 flex items-center justify-center shrink-0 border border-ui-border text-ink-primary">📍</div>
+                            <div class="w-12 h-12 flex items-center justify-center shrink-0 border border-ui-border text-ink-secondary/40">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
                             <div>
                                 <h4 class="font-bold text-sm mb-1 text-ink-primary uppercase tracking-wide">Văn phòng BQL</h4>
                                 <p class="text-sm text-ink-secondary leading-relaxed">Phòng 101, Tầng trệt, Tòa nhà KTX<br>Số 4, Ngõ 228 Minh Khai, Q.Hai Bà Trưng, HN</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 flex items-center justify-center shrink-0 border border-ui-border text-ink-primary">📞</div>
+                            <div class="w-12 h-12 flex items-center justify-center shrink-0 border border-ui-border text-ink-secondary/40">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            </div>
                             <div>
                                 <h4 class="font-bold text-sm mb-1 text-ink-primary uppercase tracking-wide">Hotline (Zalo)</h4>
                                 <p class="text-sm text-ink-secondary leading-relaxed">{{ $cauhinh['hotline'] ?? '024 3624 1394' }}</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 flex items-center justify-center shrink-0 border border-ui-border text-ink-primary">✉️</div>
+                            <div class="w-12 h-12 flex items-center justify-center shrink-0 border border-ui-border text-ink-secondary/40">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v12z"/></svg>
+                            </div>
                             <div>
                                 <h4 class="font-bold text-sm mb-1 text-ink-primary uppercase tracking-wide">Email hỗ trợ</h4>
                                 <p class="text-sm text-ink-secondary leading-relaxed">ktx@phuongdong.edu.vn</p>
@@ -490,12 +479,12 @@
         <div id="chat-box" class="absolute bottom-16 right-0 w-[320px] origin-bottom-right scale-0 opacity-0 transition-all duration-200 ease-out border border-ui-border bg-white shadow-xl">
             <div class="bg-ink-primary px-5 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-white/10 flex items-center justify-center">
-                        <span class="text-sm">💬</span>
+                    <div class="w-8 h-8 bg-white/10 flex items-center justify-center rounded-lg">
+                        <svg class="w-5 h-5 text-brand-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
                     </div>
                     <div>
-                        <span class="font-bold text-white text-sm block">Trợ lý KTX</span>
-                        <span class="text-[10px] text-white/60 uppercase tracking-wider">Đang trực tuyến</span>
+                        <span class="font-black text-white text-[10px] uppercase tracking-widest block leading-none mb-1">Trợ lý KTX</span>
+                        <span class="text-[8px] text-brand-emerald uppercase font-black tracking-widest animate-pulse">Online</span>
                     </div>
                 </div>
             </div>

@@ -23,7 +23,7 @@
                     <span class="text-[10px] font-bold text-emerald-600/40 uppercase italic">Trống</span>
                 </div>
                 <div class="mt-4 h-1 w-full overflow-hidden rounded-full bg-ui-bg">
-                    <div class="h-full bg-emerald-500" @style(['width' => ($campusStats['available'] / 384 * 100) . '%'])></div>
+                    <div class="h-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" @style(['width' => ($campusStats['available'] / 384 * 100) . '%'])></div>
                 </div>
             </article>
 
@@ -45,7 +45,7 @@
                     <span class="text-[10px] font-bold text-amber-600/40 uppercase italic">Hồ sơ</span>
                 </div>
                 <div class="mt-4 h-1 w-full overflow-hidden rounded-full bg-ui-bg">
-                    <div class="h-full bg-amber-500" @style(['width' => ($campusStats['pending'] / 384 * 100) . '%'])></div>
+                    <div class="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]" @style(['width' => ($campusStats['pending'] / 384 * 100) . '%'])></div>
                 </div>
             </article>
         </div>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TblLog extends Model
 {
@@ -21,4 +22,12 @@ class TblLog extends Model
         'du_lieu_cu' => 'array',
         'du_lieu_moi' => 'array',
     ];
+
+    /**
+     * Lấy thông tin người dùng thực hiện hành động.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

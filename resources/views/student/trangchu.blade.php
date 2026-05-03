@@ -130,7 +130,7 @@
                         </div>
                         <span class="text-[10px] font-black text-ink-secondary uppercase tracking-widest group-hover:text-ink-primary transition-colors">Thanh toán</span>
                     </a>
-                    <a href="{{ route('student.phongcuatoi') }}" class="pdu-card group flex flex-col items-center gap-4 text-center hover:border-brand-emerald/40">
+                    <a href="{{ route('student.giahan.index') }}" class="pdu-card group flex flex-col items-center gap-4 text-center hover:border-brand-emerald/40">
                         <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-ui-bg text-ink-secondary border border-ui-border group-hover:bg-brand-emerald group-hover:text-white group-hover:border-brand-emerald transition-all duration-300">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </div>

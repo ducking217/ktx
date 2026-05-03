@@ -1,9 +1,9 @@
 <x-landing-layout>
     <x-slot:title>Đăng ký cư trú KTX</x-slot:title>
 
-    <div class="pt-36 pb-24 min-h-screen bg-[#fafafa] relative overflow-hidden">
+    <div class="pt-36 pb-24 min-h-screen bg-ui-bg relative overflow-hidden">
         <!-- Minimal Dot Grid -->
-        <div class="absolute inset-0 opacity-100 bg-[radial-gradient(#d1d5db_1.5px,transparent_1.5px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none"></div>
+        <div class="absolute inset-0 opacity-100 bg-[radial-gradient(oklch(var(--ui-border-lch))_1.5px,transparent_1.5px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none"></div>
         
         <div class="max-w-[1200px] mx-auto px-6 relative z-10">
             
@@ -45,8 +45,8 @@
                 <div class="lg:col-span-7">
                     <section class="bg-white border border-ui-border p-8 lg:p-10 shadow-sm">
                         <header class="mb-10 border-b border-ui-border pb-6">
-                            <h1 class="text-3xl font-display font-bold text-ink-primary tracking-tight mb-2">Thông tin đăng ký.</h1>
-                            <p class="text-sm text-ink-secondary leading-relaxed">Vui lòng cung cấp chính xác các thông tin cá nhân và tài liệu cần thiết để khởi tạo hồ sơ cư trú của bạn.</p>
+                            <h1 class="text-3xl font-display font-bold text-ink-primary tracking-tight mb-2 uppercase">Thông tin đăng ký.</h1>
+                            <p class="text-sm text-ink-secondary/60 leading-relaxed max-w-prose">Vui lòng cung cấp chính xác các thông tin cá nhân và tài liệu cần thiết để khởi tạo hồ sơ cư trú của bạn.</p>
                         </header>
                         
                         <form action="{{ route('guest.dangky.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">

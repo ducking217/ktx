@@ -18,6 +18,15 @@ class SinhvienController extends Controller
         return view('admin.sinhvien.danhsach', $data);
     }
 
+    public function chiTiet(int $id)
+    {
+        $data = $this->sinhvienService->getStudentProfile($id);
+        if (isset($data['error'])) {
+            return redirect()->route('admin.quanlysinhvien')->with(['toast_loai' => 'loi', 'toast_noidung' => $data['error']]);
+        }
+        return view('admin.sinhvien.chitiet', $data);
+    }
+
     public function capNhatSinhVien(Request $request, int $id)
     {
         $this->authorize('sinhvien.manage');

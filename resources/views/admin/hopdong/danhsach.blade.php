@@ -52,19 +52,19 @@
                                 <span class="text-xs font-bold text-ink-secondary/60 tabular-nums">#{{ $item->id }}</span>
                             </td>
                             <td class="px-6 py-5">
-                                <div class="font-bold text-ink-primary font-display text-base">{{ $item->sinhvien->taikhoan->name ?? '-' }}</div>
-                                <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mt-0.5">{{ $item->sinhvien->masinhvien ?? '-' }}</div>
+                                <div class="font-bold text-ink-primary font-display text-base">{{ $item->sinhvien?->taikhoan?->name ?? '-' }}</div>
+                                <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mt-0.5">{{ $item->sinhvien?->masinhvien ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-2 font-bold text-ink-primary">
                                     <div class="h-8 w-8 flex items-center justify-center rounded-lg bg-ui-bg text-ink-secondary/60 ring-1 ring-ui-border">
                                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                                     </div>
-                                    {{ $item->phong->tenphong ?? '-' }}
+                                    {{ $item->phong?->tenphong ?? '-' }}
                                 </div>
                             </td>
                             <td class="px-6 py-5">
-                                <div class="flex items-center gap-2 text-xs font-bold text-ink-secondary">
+                                <div class="flex items-center gap-2 text-xs font-bold text-ink-secondary tabular-nums tracking-tight">
                                     <span class="text-ink-primary">{{ $item->ngay_bat_dau }}</span>
                                     <svg class="h-3 w-3 text-ink-secondary/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                                     <span class="text-brand-emerald">{{ $item->ngay_ket_thuc }}</span>
@@ -133,8 +133,8 @@
                 <div class="p-5 space-y-4">
                     <div class="flex items-start justify-between">
                         <div>
-                            <div class="font-bold text-ink-primary font-display text-base">{{ $item->sinhvien->taikhoan->name ?? '-' }}</div>
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/40">#{{ $item->id }} • {{ $item->sinhvien->masinhvien ?? '-' }}</div>
+                            <div class="font-bold text-ink-primary font-display text-base">{{ $item->sinhvien?->taikhoan?->name ?? '-' }}</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/40">#{{ $item->id }} • {{ $item->sinhvien?->masinhvien ?? '-' }}</div>
                         </div>
                         @php
                             $badgeType = match ($item->trang_thai) {
@@ -158,7 +158,7 @@
                     <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
                         <div class="space-y-1">
                             <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Vị trí phòng</div>
-                            <div class="text-xs font-bold text-ink-primary">{{ $item->phong->tenphong ?? '-' }}</div>
+                            <div class="text-xs font-bold text-ink-primary">{{ $item->phong?->tenphong ?? '-' }}</div>
                         </div>
                         <div class="space-y-1">
                             <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Giá trị ký</div>
@@ -166,7 +166,7 @@
                         </div>
                         <div class="space-y-1 col-span-2">
                             <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Thời hạn lưu trú</div>
-                            <div class="flex items-center gap-2 text-[10px] font-bold">
+                            <div class="flex items-center gap-2 text-[10px] font-bold tabular-nums tracking-tight">
                                 <span class="text-ink-primary">{{ $item->ngay_bat_dau }}</span>
                                 <svg class="h-3 w-3 text-ink-secondary/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                                 <span class="text-brand-emerald">{{ $item->ngay_ket_thuc }}</span>
@@ -193,7 +193,7 @@
                 <div class="py-20 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không tìm thấy hợp đồng</div>
             @endforelse
         </div>
-    </article>
+
         @if(method_exists($hopdong, 'links'))
             <div class="border-t border-ui-border px-6 py-4 bg-ui-bg/30">
                 {{ $hopdong->appends(request()->query())->links() }}
@@ -221,11 +221,11 @@
                         <div class="grid grid-cols-2 gap-4 py-3">
                             <div>
                                 <span class="block text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Khởi tạo</span>
-                                <span class="text-sm font-bold text-ink-primary tabular-nums">{{ $item->ngay_bat_dau }}</span>
+                                <span class="text-sm font-bold text-ink-primary tabular-nums tracking-tight">{{ $item->ngay_bat_dau }}</span>
                             </div>
                             <div>
                                 <span class="block text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Đáo hạn</span>
-                                <span class="text-sm font-bold text-ink-primary tabular-nums">{{ $item->ngay_ket_thuc }}</span>
+                                <span class="text-sm font-bold text-ink-primary tabular-nums tracking-tight">{{ $item->ngay_ket_thuc }}</span>
                             </div>
                         </div>
                         <div class="flex items-center justify-between py-3">
@@ -259,7 +259,7 @@
                     @csrf
                     <div>
                         <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Ngày kết thúc mới</label>
-                        <input name="ngay_ket_thuc" type="date" value="{{ old('ngay_ket_thuc', $item->ngay_ket_thuc) }}" class="linear-input mt-1.5 font-bold" required />
+                        <input name="ngay_ket_thuc" type="date" value="{{ old('ngay_ket_thuc', $item->ngay_ket_thuc) }}" class="linear-input mt-1.5 font-bold tabular-nums tracking-tight" required />
                         <x-input-error :messages="$errors->get('ngay_ket_thuc')" class="mt-2" />
                     </div>
 

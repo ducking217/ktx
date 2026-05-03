@@ -19,6 +19,9 @@ class Sinhvien extends Model
         'user_id',
         'masinhvien',
         'lop',
+        'ngaysinh',
+        'diachi',
+        'dantoc',
         'sodienthoai',
         'so_cccd',
         'phong_id',
@@ -30,6 +33,7 @@ class Sinhvien extends Model
     protected $casts = [
         'ngay_vao' => 'date',
         'ngay_het_han' => 'date',
+        'ngaysinh' => 'date',
     ];
 
     public function getSodienthoaiAttribute($value)
@@ -119,18 +123,28 @@ class Sinhvien extends Model
         return $this->belongsTo(Phong::class, 'phong_id');
     }
 
-    public function danhsachdangky(): HasMany
+    public function dangkys(): HasMany
     {
         return $this->hasMany(Dangky::class, 'sinhvien_id');
     }
 
-    public function danhsachbaohong(): HasMany
+    public function baohongs(): HasMany
     {
         return $this->hasMany(Baohong::class, 'sinhvien_id');
     }
 
-    public function danhsachhopdong(): HasMany
+    public function hopdongs(): HasMany
     {
         return $this->hasMany(Hopdong::class, 'sinhvien_id');
+    }
+
+    public function kyluats(): HasMany
+    {
+        return $this->hasMany(Kyluat::class, 'sinhvien_id');
+    }
+
+    public function danhgias(): HasMany
+    {
+        return $this->hasMany(Danhgia::class, 'sinhvien_id');
     }
 }

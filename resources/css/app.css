@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Sans:wght@100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -19,6 +19,8 @@
         /* Typography Colors (tinted neutrals) */
         --ink-primary-lch: 0.18 0.015 165;
         --ink-secondary-lch: 0.45 0.02 165;
+        --ink-white-lch: 0.995 0.003 165;
+        --ink-black-lch: 0.12 0.015 165;
 
         /* Functional Status */
         --success-lch: 0.72 0.15 150;
@@ -29,6 +31,7 @@
         --ui-bg: oklch(var(--ui-bg-lch));
         --ui-card: oklch(var(--ui-card-lch));
         --ink-primary: oklch(var(--ink-primary-lch));
+        --ink-white: oklch(var(--ink-white-lch));
         --brand-emerald: oklch(var(--brand-emerald-lch));
 
         /* Spacing scale (4pt) */
@@ -47,7 +50,7 @@
     }
 
     body {
-        font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        font-family: 'Geist Sans', system-ui, -apple-system, sans-serif;
         background-color: var(--ui-bg);
         color: var(--ink-primary);
         @apply antialiased;
@@ -94,11 +97,12 @@
         box-shadow: 0 8px 24px oklch(0.18 0.015 165 / 0.08);
     }
 
-    /* ── Buttons – ease-out, no bounce ── */
+    /* ── Buttons – ease-out, no bounce, Touch Target (min 44px) ── */
     .pdu-btn-primary {
         background-color: var(--brand-emerald);
-        color: oklch(0.995 0.003 165);
-        @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ease-out;
+        color: var(--ink-white);
+        @apply inline-flex items-center justify-center rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ease-out;
+        min-height: 44px;
     }
     .pdu-btn-primary:hover {
         background-color: oklch(var(--brand-jade-lch));
@@ -110,7 +114,8 @@
         background-color: transparent;
         color: var(--ink-primary);
         border: 1px solid oklch(var(--ui-border-lch));
-        @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ease-out;
+        @apply inline-flex items-center justify-center rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ease-out;
+        min-height: 44px;
     }
     .pdu-btn-ghost:hover {
         background-color: oklch(var(--ui-muted-lch));

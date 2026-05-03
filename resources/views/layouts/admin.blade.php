@@ -7,11 +7,11 @@
 
     <title>{{ $title ?? config('app.name', 'Laravel') }} - Admin KTX</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@100..900&family=DM+Sans:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Geist+Sans:wght@100..900&family=DM+Sans:wght@100..900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-ui-bg font-sans antialiased text-ink-primary">
+<body class="bg-ui-bg font-sans antialiased text-ink-primary selection:bg-brand-emerald/10 selection:text-brand-emerald">
     <div class="linear-shell flex min-h-screen">
         <!-- Sidebar -->
         @include('admin.partials.sidebar')

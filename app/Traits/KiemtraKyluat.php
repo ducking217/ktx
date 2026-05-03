@@ -10,28 +10,11 @@ trait KiemtraKyluat
 {
     public function kiemTraKyluat(int $sinhvienId): array
     {
-        $mocSauThang = now()->subMonths(6)->startOfDay();
-
-        $danhSachViPham = Kyluat::where('sinhvien_id', $sinhvienId)
-            ->orderByDesc('ngayvipham')
-            ->get();
-
-        $loiConHieuLuc = $danhSachViPham->filter(function (Kyluat $kyluat) use ($mocSauThang) {
-            return $this->laLoiConHieuLuc($kyluat, $mocSauThang);
-        })->values();
-
-        if ($loiConHieuLuc->isEmpty()) {
-            return [
-                'bi_chan' => false,
-                'ly_do' => null,
-                'loi_con_hieu_luc' => [],
-            ];
-        }
-
+        // Đã gỡ bỏ quy định chặn đăng ký do vi phạm kỷ luật theo yêu cầu
         return [
-            'bi_chan' => true,
-            'ly_do' => $this->taoThongDiepChanKyluat($loiConHieuLuc),
-            'loi_con_hieu_luc' => $this->dinhDangDanhSachLoi($loiConHieuLuc),
+            'bi_chan' => false,
+            'ly_do' => null,
+            'loi_con_hieu_luc' => [],
         ];
     }
 
@@ -46,7 +29,9 @@ trait KiemtraKyluat
             return false;
         }
 
-        return Carbon::parse($kyluat->ngayvipham)->greaterThanOrEqualTo($mocSauThang);
+        $ngayViPham = $kyluat->ngayvipham instanceof Carbon ? $kyluat->ngayvipham : Carbon::parse($kyluat->ngayvipham);
+
+        return $ngayViPham->greaterThanOrEqualTo($mocSauThang);
     }
 
     private function laLoiChuaGiaiQuyet(Kyluat $kyluat): bool

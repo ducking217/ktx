@@ -87,6 +87,7 @@ Route::prefix('admin')
         // Quản lý Sinh viên
         Route::controller('SinhvienController')->group(function () {
             Route::get('/quanlysinhvien', 'lietKeSinhVien')->name('quanlysinhvien');
+            Route::get('/quanlysinhvien/{id}', 'chiTiet')->name('sinhvien.chitiet');
             Route::post('/chuyenphong/{id}', 'chuyenPhong')->name('chuyenphong');
             Route::post('/choroiophong/{id}', 'choRoiOPhong')->name('choroiophong');
             Route::post('/capnhatsinhvien/{id}', 'capNhatSinhVien')->name('capnhatsinhvien');
@@ -102,7 +103,7 @@ Route::prefix('admin')
         });
 
         // Nhật ký hoạt động (Chỉ Super Admin)
-        Route::get('/activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('admin.activity-log');
+        Route::get('/activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-log');
 
         // Quản lý Hóa đơn & Công nợ
         Route::controller('HoadonController')->middleware('can:hoadon.manage')->group(function () {

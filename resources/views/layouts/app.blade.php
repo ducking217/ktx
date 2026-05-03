@@ -10,7 +10,7 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -21,7 +21,7 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="border-b border-gray-200/70 bg-[#F7F7F8]/90 backdrop-blur">
+                <header class="border-b border-ui-border bg-ui-card/90 backdrop-blur">
                     <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>

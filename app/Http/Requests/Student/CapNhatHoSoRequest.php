@@ -37,6 +37,10 @@ class CapNhatHoSoRequest extends FormRequest
             'lop' => ['nullable', 'string', 'max:50'],
             'sodienthoai' => ['nullable', 'string', 'max:15'],
             'gioitinh' => ['nullable', 'in:Nam,Nữ'],
+            'ngaysinh' => ['nullable', 'date'],
+            'diachi' => ['nullable', 'string', 'max:500'],
+            'dantoc' => ['nullable', 'string', 'max:50'],
+            'so_cccd' => ['nullable', 'string', 'max:20'],
         ];
     }
 

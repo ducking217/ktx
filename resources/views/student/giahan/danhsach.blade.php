@@ -1,6 +1,6 @@
 @extends('student.layouts.chinh')
 
-@section('student_page_title', 'Lịch sử gia hạn')
+@section('student_page_title', 'Gia hạn hợp đồng')
 
 @section('noidung')
     <div class="space-y-8 animate-fade-up">

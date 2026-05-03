@@ -36,6 +36,34 @@ class SinhvienService implements SinhvienServiceInterface
         ];
     }
 
+    public function getStudentProfile(int $id): array
+    {
+        $sinhvien = Sinhvien::with([
+            'taikhoan',
+            'phong.toanha',
+            'dangkys' => fn($q) => $q->orderByDesc('created_at'),
+            'hopdongs' => fn($q) => $q->orderByDesc('ngay_bat_dau'),
+            'kyluats' => fn($q) => $q->orderByDesc('ngayvipham'),
+            'danhgias' => fn($q) => $q->orderByDesc('ngaydanhgia'),
+        ])->find($id);
+
+        if (!$sinhvien) return $this->traVeLoi('Không tìm thấy sinh viên.');
+
+        // Lấy lịch sử hóa đơn của phòng mà sinh viên này đang ở
+        $hoadons = collect();
+        if ($sinhvien->phong_id) {
+            $hoadons = \App\Models\Hoadon::where('phong_id', $sinhvien->phong_id)
+                ->orderByDesc('nam')
+                ->orderByDesc('thang')
+                ->get();
+        }
+
+        return [
+            'sinhvien' => $sinhvien,
+            'hoadons' => $hoadons,
+        ];
+    }
+
     public function updateStudent(int $id, array $data): array
     {
         $sinhvien = Sinhvien::find($id);

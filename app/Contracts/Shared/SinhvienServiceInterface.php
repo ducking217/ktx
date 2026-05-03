@@ -12,6 +12,11 @@ interface SinhvienServiceInterface
     public function listStudents(Request $request): array;
 
     /**
+     * Lấy chi tiết hồ sơ sinh viên.
+     */
+    public function getStudentProfile(int $id): array;
+
+    /**
      * Cập nhật thông tin sinh viên.
      */
     public function updateStudent(int $id, array $data): array;
