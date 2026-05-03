@@ -34,11 +34,11 @@ class AccountController extends Controller
         $this->authorize('accounts.manage');
         $response = $this->accountService->luu($request->validated());
 
-        if ($response['success']) {
-            return redirect()->route('admin.accounts.index')->with('success', $response['message']);
+        if ($response['toast_loai'] === 'thanhcong') {
+            return redirect()->route('admin.accounts.index')->with('success', $response['toast_noidung']);
         }
 
-        return back()->withInput()->with('error', $response['message']);
+        return back()->withInput()->with('error', $response['toast_noidung']);
     }
 
     public function sua(int $id)
@@ -52,11 +52,11 @@ class AccountController extends Controller
         $this->authorize('accounts.manage');
         $response = $this->accountService->capNhat($id, $request->validated());
 
-        if ($response['success']) {
-            return redirect()->route('admin.accounts.index')->with('success', $response['message']);
+        if ($response['toast_loai'] === 'thanhcong') {
+            return redirect()->route('admin.accounts.index')->with('success', $response['toast_noidung']);
         }
 
-        return back()->withInput()->with('error', $response['message']);
+        return back()->withInput()->with('error', $response['toast_noidung']);
     }
 
     public function xoa(int $id)
@@ -64,11 +64,11 @@ class AccountController extends Controller
         $this->authorize('accounts.manage');
         $response = $this->accountService->xoa($id);
 
-        if ($response['success']) {
-            return redirect()->route('admin.accounts.index')->with('success', $response['message']);
+        if ($response['toast_loai'] === 'thanhcong') {
+            return redirect()->route('admin.accounts.index')->with('success', $response['toast_noidung']);
         }
 
-        return back()->with('error', $response['message']);
+        return back()->with('error', $response['toast_noidung']);
     }
 
     public function khoiPhuc(int $id)

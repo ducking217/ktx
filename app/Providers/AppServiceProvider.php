@@ -49,7 +49,9 @@ use App\Services\Core\TienIchService;
 use App\Services\Admin\HopdongService;
 use App\Services\Admin\DangkyService;
 use App\Contracts\Admin\HoanTienServiceInterface;
+use App\Contracts\Admin\ToaNhaServiceInterface;
 use App\Services\Admin\HoanTienService;
+use App\Services\Admin\ToaNhaService;
 use App\Models\Baohong;
 use App\Models\Cauhinh;
 use App\Models\Danhgia;
@@ -115,6 +117,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Contracts\Shared\GiaHanServiceInterface::class, \App\Services\Shared\GiaHanService::class);
         $this->app->bind(\App\Contracts\Admin\BaoCaoServiceInterface::class, \App\Services\Admin\BaoCaoService::class);
         $this->app->bind(\App\Contracts\Admin\AccountServiceInterface::class, \App\Services\Admin\AccountService::class);
+        $this->app->bind(ToaNhaServiceInterface::class, ToaNhaService::class);
     }
 
     /**

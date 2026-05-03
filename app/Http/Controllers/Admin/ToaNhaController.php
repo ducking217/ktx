@@ -3,16 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Contracts\Admin\ToaNhaServiceInterface;
 use App\Models\ToaNha;
 use App\Http\Requests\Admin\LuuToaNhaRequest;
 use App\Http\Requests\Admin\CapNhatToaNhaRequest;
+use Exception;
 use Illuminate\Http\Request;
 
 class ToaNhaController extends Controller
 {
+    public function __construct(
+        private readonly ToaNhaServiceInterface $toaNhaService
+    ) {}
+
     public function index()
     {
-        $danhSachToaNha = ToaNha::withCount('danhsachphong')->get();
+        $danhSachToaNha = $this->toaNhaService->danhSach();
         return view('admin.toanha.index', compact('danhSachToaNha'));
     }
 
@@ -23,7 +29,7 @@ class ToaNhaController extends Controller
 
     public function luu(LuuToaNhaRequest $request)
     {
-        ToaNha::create($request->validated());
+        $this->toaNhaService->luu($request->validated());
 
         return redirect()->route('admin.toanha.index')->with([
             'toast_loai' => 'thanhcong',
@@ -33,14 +39,14 @@ class ToaNhaController extends Controller
 
     public function chiTiet(int $id)
     {
-        $toaNha = ToaNha::findOrFail($id);
+        $toaNha = $this->toaNhaService->timKiem($id);
         return view('admin.toanha.form', compact('toaNha'));
     }
 
     public function capNhat(CapNhatToaNhaRequest $request, int $id)
     {
-        $toaNha = ToaNha::findOrFail($id);
-        $toaNha->update($request->validated());
+        $toaNha = $this->toaNhaService->timKiem($id);
+        $this->toaNhaService->capNhat($toaNha, $request->validated());
 
         return redirect()->route('admin.toanha.index')->with([
             'toast_loai' => 'thanhcong',
@@ -50,20 +56,19 @@ class ToaNhaController extends Controller
 
     public function xoa(int $id)
     {
-        $toaNha = ToaNha::withCount('danhsachphong')->findOrFail($id);
+        try {
+            $toaNha = $this->toaNhaService->timKiem($id);
+            $this->toaNhaService->xoa($toaNha);
 
-        if ($toaNha->danhsachphong_count > 0) {
+            return redirect()->route('admin.toanha.index')->with([
+                'toast_loai' => 'thanhcong',
+                'toast_noidung' => 'Đã xóa tòa nhà khỏi hệ thống.',
+            ]);
+        } catch (Exception $e) {
             return redirect()->back()->with([
                 'toast_loai' => 'loi',
-                'toast_noidung' => 'Không thể xóa: Tòa nhà còn phòng đang hoạt động.',
+                'toast_noidung' => $e->getMessage(),
             ]);
         }
-
-        $toaNha->delete();
-
-        return redirect()->route('admin.toanha.index')->with([
-            'toast_loai' => 'thanhcong',
-            'toast_noidung' => 'Đã xóa tòa nhà khỏi hệ thống.',
-        ]);
     }
 }

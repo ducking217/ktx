@@ -59,7 +59,7 @@ class AccountService implements AccountServiceInterface
                 'toa_nha_id' => $data['toa_nha_id'] ?? null,
             ]);
 
-            return $this->traVeThanhCong('Tạo tài khoản thành công.', $user);
+            return $this->traVeThanhCong('Tạo tài khoản thành công.', ['user' => $user]);
         } catch (\Throwable $e) {
             return $this->traVeLoi('Không thể tạo tài khoản: ' . $e->getMessage());
         }
@@ -98,7 +98,7 @@ class AccountService implements AccountServiceInterface
 
             $user->update($updateData);
 
-            return $this->traVeThanhCong('Cập nhật tài khoản thành công.', $user);
+            return $this->traVeThanhCong('Cập nhật tài khoản thành công.', ['user' => $user]);
         } catch (\Throwable $e) {
             return $this->traVeLoi('Lỗi khi cập nhật: ' . $e->getMessage());
         }

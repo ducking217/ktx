@@ -22,9 +22,9 @@ class BaoCaoService implements BaoCaoServiceInterface
             ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
             ->whereNotNull('ngay_thanh_toan')
             ->where('ngay_thanh_toan', '>=', now()->subMonths(12))
-            ->groupBy('nam', 'thang')
-            ->orderBy('nam')
-            ->orderBy('thang')
+            ->groupBy(DB::raw('YEAR(ngay_thanh_toan)'), DB::raw('MONTH(ngay_thanh_toan)'))
+            ->orderBy(DB::raw('YEAR(ngay_thanh_toan)'))
+            ->orderBy(DB::raw('MONTH(ngay_thanh_toan)'))
             ->get();
 
         // 2. Tổng cọc đang giữ (Hóa đơn LOAI_DEPOSIT đã thanh toán)
@@ -50,15 +50,15 @@ class BaoCaoService implements BaoCaoServiceInterface
         $thangNay = now()->month;
         $namNay = now()->year;
         $doanhThuThangNay = (float) Hoadon::where('trangthaithanhtoan', InvoiceStatus::Paid->value)
-            ->where('thang', $thangNay)
-            ->where('nam', $namNay)
+            ->whereMonth('ngay_thanh_toan', $thangNay)
+            ->whereYear('ngay_thanh_toan', $namNay)
             ->sum('tongtien');
 
         $thangTruoc = now()->subMonth()->month;
         $namTruoc = now()->subMonth()->year;
         $doanhThuThangTruoc = (float) Hoadon::where('trangthaithanhtoan', InvoiceStatus::Paid->value)
-            ->where('thang', $thangTruoc)
-            ->where('nam', $namTruoc)
+            ->whereMonth('ngay_thanh_toan', $thangTruoc)
+            ->whereYear('ngay_thanh_toan', $namTruoc)
             ->sum('tongtien');
 
         $tangTruong = 0;
@@ -106,9 +106,9 @@ class BaoCaoService implements BaoCaoServiceInterface
             }
         }
 
-        return $query->groupBy('nam', 'thang')
-            ->orderBy('nam')
-            ->orderBy('thang')
+        return $query->groupBy(DB::raw('YEAR(ngay_thanh_toan)'), DB::raw('MONTH(ngay_thanh_toan)'))
+            ->orderBy(DB::raw('YEAR(ngay_thanh_toan)'))
+            ->orderBy(DB::raw('MONTH(ngay_thanh_toan)'))
             ->get()
             ->map(function ($row) {
                 return [
