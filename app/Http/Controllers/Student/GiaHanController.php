@@ -28,16 +28,12 @@ class GiaHanController extends Controller
 
     public function create()
     {
-        $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
+        $sinhvien = auth()->user()->sinhvien;
         if (! $sinhvien) {
             return redirect()->route('student.trangchu')->with(['toast_loai' => 'loi', 'toast_noidung' => 'Không tìm thấy thông tin sinh viên.']);
         }
 
-        $hopdong = Hopdong::with('phong')
-            ->where('sinhvien_id', $sinhvien->id)
-            ->where('trang_thai', ContractStatus::Active->value)
-            ->orderByDesc('id')
-            ->first();
+        $hopdong = $this->giaHanService->layHopdongHieuLuc($sinhvien->id);
 
         if (! $hopdong) {
             return redirect()->route('student.hopdongcuatoi')->with(['toast_loai' => 'loi', 'toast_noidung' => 'Bạn chưa có hợp đồng hiệu lực để gia hạn.']);

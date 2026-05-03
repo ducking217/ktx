@@ -56,6 +56,18 @@ class GiaHanService implements GiaHanServiceInterface
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function layHopdongHieuLuc(int $sinhvienId): ?Hopdong
+    {
+        return Hopdong::with('phong')
+            ->where('sinhvien_id', $sinhvienId)
+            ->where('trang_thai', ContractStatus::Active->value)
+            ->orderByDesc('id')
+            ->first();
+    }
+
     public function guiYeuCau(int $hopdongId, string $ngayKetThucMoi, ?string $lyDo): array
     {
         try {

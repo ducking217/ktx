@@ -22,11 +22,6 @@
         </div>
     </div>
 
-    @php
-        $mapsinhvien = $danhsachsinhvien->keyBy('id');
-        $mapphong = $danhsachphong->keyBy('id');
-    @endphp
-
     <article class="overflow-hidden rounded-2xl bg-white border border-ui-border shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-ink-primary">
@@ -44,15 +39,15 @@
                     @forelse ($danhsachbaohong as $baohong)
                         <tr class="group transition-colors hover:bg-ui-bg/50">
                             <td class="px-6 py-5">
-                                <div class="font-bold text-ink-primary font-display text-base">{{ $mapsinhvien[$baohong->sinhvien_id]->ho_ten ?? 'N/A' }}</div>
-                                <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mt-0.5">{{ $mapsinhvien[$baohong->sinhvien_id]->masinhvien ?? 'N/A' }}</div>
+                                <div class="font-bold text-ink-primary font-display text-base">{{ $baohong->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
+                                <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mt-0.5">{{ $baohong->sinhvien?->masinhvien ?? 'N/A' }}</div>
                             </td>
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-2 font-bold text-ink-primary">
                                     <div class="h-8 w-8 flex items-center justify-center rounded-lg bg-ui-bg text-ink-secondary/60 ring-1 ring-ui-border">
                                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                                     </div>
-                                    {{ $mapphong[$baohong->phong_id]->tenphong ?? 'N/A' }}
+                                    {{ $baohong->phong?->tenphong ?? 'N/A' }}
                                 </div>
                             </td>
                             <td class="px-6 py-5 max-w-sm">

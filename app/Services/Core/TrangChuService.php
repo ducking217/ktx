@@ -17,7 +17,7 @@ class TrangChuService implements TrangChuServiceInterface
         $tongCho = $phongList->sum('dango');
 
         return [
-            'tongPhong' => $phongList->count(),
+            'tongSoPhong' => $phongList->count(),
             'tongCho' => $tongCho,
             'tongConTrong' => $phongList->sum('succhuamax') - $tongCho,
             'phongHoanToanTrong' => Phong::whereDoesntHave('danhsachsinhvien')->count(),

@@ -24,11 +24,13 @@ class ToaNhaController extends Controller
 
     public function taoMoi()
     {
+        $this->authorize('toanha.manage');
         return view('admin.toanha.form');
     }
 
     public function luu(LuuToaNhaRequest $request)
     {
+        $this->authorize('toanha.manage');
         $this->toaNhaService->luu($request->validated());
 
         return redirect()->route('admin.toanha.index')->with([
@@ -45,6 +47,7 @@ class ToaNhaController extends Controller
 
     public function capNhat(CapNhatToaNhaRequest $request, int $id)
     {
+        $this->authorize('toanha.manage');
         $toaNha = $this->toaNhaService->timKiem($id);
         $this->toaNhaService->capNhat($toaNha, $request->validated());
 
@@ -56,6 +59,7 @@ class ToaNhaController extends Controller
 
     public function xoa(int $id)
     {
+        $this->authorize('toanha.manage');
         try {
             $toaNha = $this->toaNhaService->timKiem($id);
             $this->toaNhaService->xoa($toaNha);

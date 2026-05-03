@@ -67,6 +67,14 @@ class AuthServiceProvider extends ServiceProvider
             ]);
         });
 
+        Gate::define('toanha.manage', function (User $user): bool {
+            return $user->hasAnyRole([
+                \App\Enums\UserRole::Admin,
+                \App\Enums\UserRole::AdminTruong,
+                \App\Enums\UserRole::AdminToaNha,
+            ]);
+        });
+
         Gate::define('baohong.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,

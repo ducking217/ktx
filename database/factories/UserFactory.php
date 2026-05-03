@@ -56,6 +56,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Role: Admin Toa Nha
+     */
+    public function adminToaNha(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'vaitro' => \App\Enums\UserRole::AdminToaNha,
+        ]);
+    }
+
+    /**
      * Role: Sinh vien
      */
     public function sinhvien(): static

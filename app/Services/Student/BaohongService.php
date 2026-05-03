@@ -64,15 +64,14 @@ class BaohongService implements BaohongServiceInterface
     public function listMaintenanceRequestsAdmin(Request $request): array
     {
         $status = $request->query('status', 'Tất cả');
-        $requests = Baohong::when($status !== 'Tất cả', fn($q) => $q->where('trangthai', $status))
+        $requests = Baohong::with(['sinhvien.taikhoan', 'phong'])
+            ->when($status !== 'Tất cả', fn($q) => $q->where('trangthai', $status))
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
 
         return [
             'danhsachbaohong' => $requests,
-            'danhsachsinhvien' => Sinhvien::all(),
-            'danhsachphong' => Phong::all(),
             'status' => $status,
         ];
     }

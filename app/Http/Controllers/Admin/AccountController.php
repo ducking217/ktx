@@ -43,6 +43,7 @@ class AccountController extends Controller
 
     public function sua(int $id)
     {
+        $this->authorize('accounts.manage');
         $user = User::findOrFail($id);
         return view('admin.accounts.form', compact('user'));
     }
