@@ -25,11 +25,13 @@ class AccountController extends Controller
 
     public function taoMoi()
     {
+        $this->authorize('accounts.manage');
         return view('admin.accounts.form');
     }
 
     public function luu(LuuAccountRequest $request)
     {
+        $this->authorize('accounts.manage');
         $response = $this->accountService->luu($request->validated());
 
         if ($response['success']) {
@@ -47,6 +49,7 @@ class AccountController extends Controller
 
     public function capNhat(CapNhatAccountRequest $request, int $id)
     {
+        $this->authorize('accounts.manage');
         $response = $this->accountService->capNhat($id, $request->validated());
 
         if ($response['success']) {
@@ -58,6 +61,7 @@ class AccountController extends Controller
 
     public function xoa(int $id)
     {
+        $this->authorize('accounts.manage');
         $response = $this->accountService->xoa($id);
 
         if ($response['success']) {
@@ -65,5 +69,13 @@ class AccountController extends Controller
         }
 
         return back()->with('error', $response['message']);
+    }
+
+    public function khoiPhuc(int $id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+
+        return redirect()->route('admin.accounts.index')->with('success', 'Đã khôi phục tài khoản thành công.');
     }
 }

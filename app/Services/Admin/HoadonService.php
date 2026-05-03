@@ -97,7 +97,10 @@ class HoadonService implements HoadonServiceInterface
     {
         $hoadon = Hoadon::find($id);
         if (!$hoadon) return $this->traVeLoi('Không tìm thấy hóa đơn.');
+        
+        $hoadon->ngay_thanh_toan = now();
         if (!$hoadon->transitionTo(InvoiceStatus::Paid->value)) return $this->traVeLoi('Không thể xác nhận.');
+        
         return $this->traVeThanhCong('Đã xác nhận thanh toán.');
     }
 

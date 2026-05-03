@@ -6,7 +6,7 @@
     {{-- Desktop View --}}
     <div class="animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <article class="overflow-hidden rounded-xl border border-ui-border bg-ui-card shadow-sm transition-all hover:border-brand-emerald/10">
-            <div class="overflow-x-auto">
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-sm text-ink-primary">
                     <thead class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-bold uppercase tracking-widest text-ink-secondary">
                         <tr>
@@ -81,9 +81,59 @@
                                 </td>
                             </tr>
                         @endforelse
-
                     </tbody>
                 </table>
+            </div>
+
+            {{-- Mobile Card List --}}
+            <div class="md:hidden divide-y divide-ui-border">
+                @forelse ($hoadon as $item)
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="font-display text-lg font-black text-ink-primary tabular-nums tracking-tight">Tháng {{ $item->thang }}/{{ $item->nam }}</div>
+                                <div class="text-[9px] font-bold text-ink-secondary/40 uppercase tracking-widest mt-0.5">#INV-{{ str_pad((string)$item->id, 6, '0', STR_PAD_LEFT) }}</div>
+                            </div>
+                            @php
+                                $status = $item->trangthaithanhtoan;
+                                $badgeClass = match($status) {
+                                    \App\Enums\InvoiceStatus::Paid => 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20',
+                                    \App\Enums\InvoiceStatus::PendingConfirmation => 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10',
+                                    default => 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20 animate-pulse'
+                                };
+                            @endphp
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-widest {{ $badgeClass }}">
+                                {{ $status->label() }}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
+                            <div class="space-y-1">
+                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Tiêu thụ điện</div>
+                                <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $item->chisodienmoi }} kWh</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Tiêu thụ nước</div>
+                                <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $item->chisonuocmoi }} m³</div>
+                            </div>
+                            <div class="space-y-1 col-span-2 pt-2 border-t border-ui-border/50">
+                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Tổng quyết toán</div>
+                                <div class="text-xl font-display font-black text-ink-primary tabular-nums tracking-tight">{{ number_format($item->tongtien) }}đ</div>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            data-modal-target="modal-bienlai-{{ $item->id }}"
+                            data-modal-toggle="modal-bienlai-{{ $item->id }}"
+                            class="w-full h-11 flex items-center justify-center rounded-xl bg-ink-primary text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-ink-primary/10 transition-all active:scale-[0.98]"
+                        >
+                            Xem chi tiết & Thanh toán
+                        </button>
+                    </div>
+                @empty
+                    <div class="py-16 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Chưa có hóa đơn nào</div>
+                @endforelse
             </div>
         </article>
         

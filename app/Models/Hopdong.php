@@ -48,6 +48,8 @@ class Hopdong extends Model
     ];
     protected $casts = [
         'trang_thai' => ContractStatus::class,
+        'ngay_bat_dau' => 'date',
+        'ngay_ket_thuc' => 'date',
     ];
 
     public function getMaHdAttribute(): string

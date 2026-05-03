@@ -23,7 +23,8 @@
     </div>
 
     <article class="overflow-hidden rounded-2xl bg-white border border-ui-border shadow-sm">
-        <div class="overflow-x-auto">
+        {{-- Desktop View --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-sm text-ink-primary">
                 <thead class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-bold uppercase tracking-widest text-ink-secondary">
                     <tr>
@@ -79,7 +80,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-24 text-center">
+                            <td colspan="6" class="px-6 py-24 text-center">
                                 <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ui-bg text-ink-secondary/50 mb-3">
                                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                                 </div>
@@ -90,6 +91,46 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- Mobile Card List --}}
+        <div class="md:hidden divide-y divide-ui-border">
+            @forelse($danhsachsinhvien as $sinhvien)
+                <div class="p-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl border border-ui-border bg-ui-bg p-0.5">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($sinhvien->taikhoan->name ?? 'N/A') }}&background=f8f9fa&color=0f172a&bold=true" alt="Avatar" class="h-full w-full rounded-lg object-cover">
+                        </div>
+                        <div>
+                            <div class="font-bold text-ink-primary font-display text-base uppercase tracking-tight">{{ $sinhvien->taikhoan->name ?? 'N/A' }}</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/40">{{ $sinhvien->masinhvien }} • {{ $sinhvien->lop }}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
+                        <div class="space-y-1">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Phòng</div>
+                            <div class="text-xs font-bold text-ink-primary">
+                                {{ $sinhvien->phong->tenphong ?? 'Chưa xếp' }}
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Số điện thoại</div>
+                            <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $sinhvien->sodienthoai }}</div>
+                        </div>
+                        <div class="space-y-1 col-span-2">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Email liên hệ</div>
+                            <div class="text-xs font-bold text-ink-primary truncate">{{ $sinhvien->taikhoan->email ?? 'N/A' }}</div>
+                        </div>
+                    </div>
+
+                    <button type="button" data-modal-target="modal-chitiet-{{ $sinhvien->id }}" data-modal-toggle="modal-chitiet-{{ $sinhvien->id }}" class="w-full flex h-10 items-center justify-center gap-2 rounded-xl bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-primary ring-1 ring-ui-border">
+                        Xem hồ sơ chi tiết
+                    </button>
+                </div>
+            @empty
+                <div class="py-20 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có dữ liệu sinh viên</div>
+            @endforelse
         </div>
         @if(method_exists($danhsachsinhvien, 'links'))
             <div class="border-t border-ui-border px-6 py-4 bg-ui-bg/30">

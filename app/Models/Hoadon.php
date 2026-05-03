@@ -16,8 +16,8 @@ class Hoadon extends Model
     protected $table = 'hoadon';
 
     // Phân loại hóa đơn
-    public const LOAI_MONTHLY  = 'monthly';   // Hóa đơn tháng thường
-    public const LOAI_DEPOSIT  = 'deposit';   // Phí thế chân
+    public const LOAI_MONTHLY = 'monthly';   // Hóa đơn tháng thường
+    public const LOAI_DEPOSIT = 'deposit';   // Phí thế chân
     public const LOAI_PENALTY  = 'penalty';   // Phí bồi thường lỗi thiết bị
     public const LOAI_REFUND   = 'refund';    // Hoàn tiền cọc
     
@@ -63,6 +63,7 @@ class Hoadon extends Model
         'phidichvu',
         'tienphat',
         'trangthaithanhtoan',
+        'ngay_thanh_toan',
         'ngayxuat',
         'calculation_details',
         'toa_nha_id',
@@ -70,6 +71,7 @@ class Hoadon extends Model
 
     protected $casts = [
         'trangthaithanhtoan' => \App\Enums\InvoiceStatus::class,
+        'ngay_thanh_toan' => 'datetime',
         'calculation_details' => 'array',
     ];
 

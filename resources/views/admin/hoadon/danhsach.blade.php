@@ -38,9 +38,10 @@
         </div>
     </div>
 
-    <!-- Main Table -->
-    <div class="pdu-card overflow-hidden !p-0">
-        <div class="overflow-x-auto">
+    <!-- Main Content -->
+    <div class="pdu-card overflow-hidden !p-0 shadow-xl shadow-ink-primary/5">
+        {{-- Desktop View --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-secondary border-b border-ui-border">
                     <tr>
@@ -109,12 +110,61 @@
                 </tbody>
             </table>
         </div>
-        
-        @if ($danhsachhoadon->hasPages())
-            <div class="border-t border-ui-border bg-ui-bg/30 px-6 py-4">
-                {{ $danhsachhoadon->links() }}
-            </div>
-        @endif
+
+        {{-- Mobile Card List --}}
+        <div class="md:hidden divide-y divide-ui-border">
+            @forelse ($danhsachhoadon as $hoadon)
+                <div class="p-5 space-y-4">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="font-bold text-ink-primary tabular-nums">#{{ $hoadon->id }}</div>
+                            <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-tighter">Tháng {{ $hoadon->thang }}/{{ $hoadon->nam }}</div>
+                        </div>
+                        @php
+                            $status = $hoadon->trangthaithanhtoan;
+                            $class = match($status) {
+                                \App\Enums\InvoiceStatus::Paid => 'bg-status-success/10 text-status-success ring-status-success/20',
+                                \App\Enums\InvoiceStatus::Overdue => 'bg-status-error/10 text-status-error ring-status-error/20',
+                                default => 'bg-status-warning/10 text-status-warning ring-status-warning/20',
+                            };
+                        @endphp
+                        <span class="inline-flex rounded-lg px-2 py-0.5 text-[8px] font-black uppercase tracking-widest ring-1 {{ $class }}">
+                            {{ $status->label() }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
+                        <div class="space-y-1">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Cư dân</div>
+                            <div class="text-xs font-bold text-ink-primary truncate">{{ optional($hoadon->sinhvien->taikhoan)->name ?? 'N/A' }}</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Vị trí</div>
+                            <div class="text-xs font-bold text-ink-primary">Phòng {{ optional($hoadon->phong)->tenphong ?? 'N/A' }}</div>
+                        </div>
+                        <div class="space-y-1 col-span-2">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Tổng quyết toán</div>
+                            <div class="text-lg font-display font-black text-ink-primary tabular-nums">{{ number_format($hoadon->tongtien) }}đ</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="flex-1 flex h-10 items-center justify-center gap-2 rounded-xl bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-secondary ring-1 ring-ui-border">
+                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Tải PDF
+                        </a>
+                        @if ($hoadon->trangthaithanhtoan !== \App\Enums\InvoiceStatus::Paid)
+                            <form action="{{ route('admin.xacnhanthanhtoan', $hoadon->id) }}" method="POST" class="flex-1">
+                                @csrf
+                                <button type="submit" class="w-full h-10 rounded-xl bg-ink-primary text-[10px] font-bold uppercase tracking-widest text-white shadow-lg shadow-ink-primary/10">Xác nhận</button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="py-20 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có dữ liệu hóa đơn</div>
+            @endforelse
+        </div>
     </div>
 
     @push('modals')

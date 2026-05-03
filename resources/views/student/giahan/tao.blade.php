@@ -32,7 +32,7 @@
                         </div>
                         <div>
                             <span class="text-[9px] font-black uppercase text-ink-secondary/50 block tracking-widest">Ngày kết thúc</span>
-                            <span class="font-bold text-ink-primary tabular-nums tracking-tight">{{ $hopdong->ngay_ket_thuc->format('d/m/Y') }}</span>
+                            <span class="font-bold text-ink-primary tabular-nums tracking-tight">{{ $hopdong->ngay_ket_thuc?->format('d/m/Y') ?? 'Chưa xác định' }}</span>
                         </div>
                     </div>
                 </div>

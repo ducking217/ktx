@@ -21,7 +21,7 @@
         </header>
 
         <article class="pdu-card !p-0 overflow-hidden shadow-xl shadow-ink-primary/5">
-            <div class="overflow-x-auto">
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">
@@ -46,7 +46,7 @@
                                     <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-widest">{{ $item->hopdong->phong->tenphong }}</div>
                                 </td>
                                 <td class="px-6 py-5 font-medium text-ink-secondary tabular-nums tracking-tight">
-                                    {{ $item->hopdong->ngay_ket_thuc->format('d/m/Y') }}
+                                    {{ $item->hopdong->ngay_ket_thuc?->format('d/m/Y') ?? 'Chưa xác định' }}
                                 </td>
                                 <td class="px-6 py-5 font-bold text-brand-emerald tabular-nums tracking-tight">
                                     {{ $item->ngay_ket_thuc_moi->format('d/m/Y') }}
@@ -72,6 +72,69 @@
                                             <button onclick="openModal('modal-approve-{{ $item->id }}')" class="pdu-btn-ghost !text-status-success !bg-status-success/5 hover:!bg-status-success/10 !px-3 !py-1.5 text-[9px] uppercase tracking-widest">Duyệt</button>
                                             <button onclick="openModal('modal-reject-{{ $item->id }}')" class="pdu-btn-ghost !text-status-error !bg-status-error/5 hover:!bg-status-error/10 !px-3 !py-1.5 text-[9px] uppercase tracking-widest">Từ chối</button>
                                         </div>
+                                    @else
+                                        <span class="text-[9px] font-black text-ink-secondary/30 uppercase tracking-widest">Đã xử lý</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="py-32 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có yêu cầu nào</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Mobile Card List --}}
+            <div class="md:hidden divide-y divide-ui-border">
+                @forelse ($yeuCauGiaHan as $item)
+                    <div class="p-5 space-y-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="font-bold text-ink-primary tracking-tight">{{ $item->sinhvien->taikhoan->name }}</div>
+                                <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-widest">{{ $item->sinhvien->masinhvien }}</div>
+                            </div>
+                            <span @class([
+                                'inline-flex items-center rounded-lg px-2 py-0.5 text-[8px] font-black uppercase tracking-widest ring-1',
+                                'bg-status-warning/10 text-status-warning ring-status-warning/20' => $item->trang_thai->value === 'pending',
+                                'bg-status-success/10 text-status-success ring-status-success/20' => $item->trang_thai->value === 'approved',
+                                'bg-status-error/10 text-status-error ring-status-error/20' => $item->trang_thai->value === 'rejected',
+                            ])>
+                                {{ $item->trang_thai->label() }}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
+                            <div class="space-y-1">
+                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Phòng cư trú</div>
+                                <div class="text-xs font-bold text-ink-primary">{{ $item->hopdong->phong->tenphong }}</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Hợp đồng</div>
+                                <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $item->hopdong->ma_hd }}</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Hết hạn cũ</div>
+                                <div class="text-xs font-bold text-ink-secondary tabular-nums">{{ $item->hopdong->ngay_ket_thuc?->format('d/m/Y') ?? 'N/A' }}</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest text-brand-emerald">Gia hạn đến</div>
+                                <div class="text-xs font-bold text-brand-emerald tabular-nums">{{ $item->ngay_ket_thuc_moi->format('d/m/Y') }}</div>
+                            </div>
+                        </div>
+
+                        @if($item->trang_thai->value === 'pending')
+                            <div class="flex items-center gap-2">
+                                <button onclick="openModal('modal-approve-{{ $item->id }}')" class="flex-1 h-11 flex items-center justify-center rounded-xl bg-status-success text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-status-success/10">Duyệt</button>
+                                <button onclick="openModal('modal-reject-{{ $item->id }}')" class="flex-1 h-11 flex items-center justify-center rounded-xl bg-status-error text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-status-error/10">Từ chối</button>
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="py-16 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có yêu cầu nào</div>
+                @endforelse
+            </div>
 
                                         {{-- Modal Duyệt --}}
                                         <div id="modal-approve-{{ $item->id }}" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-ink-primary/60 backdrop-blur-sm animate-fade-in">

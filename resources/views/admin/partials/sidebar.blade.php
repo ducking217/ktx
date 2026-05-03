@@ -53,6 +53,12 @@
             <!-- Quản lý -->
             <div class="mb-2 mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60">Quản lý</div>
             <div class="space-y-0.5">
+                <a href="{{ route('admin.toanha.index') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.toanha.*') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
+                    <div class="flex items-center gap-3">
+                        <svg class="h-5 w-5 {{ request()->routeIs('admin.toanha.*') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>
+                        <span>Quản lý tòa nhà</span>
+                    </div>
+                </a>
                 <a href="{{ route('admin.phong.index') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.phong.index', 'admin.phong.chitiet') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
                     <div class="flex items-center gap-3">
                         <svg class="h-5 w-5 {{ request()->routeIs('admin.phong.index', 'admin.phong.chitiet') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>

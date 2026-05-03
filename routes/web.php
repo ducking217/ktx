@@ -50,6 +50,16 @@ Route::prefix('admin')
         
         Route::get('/trangchu', 'TrangchuController@index')->name('trangchu');
 
+        // Quản lý tòa nhà
+        Route::prefix('toa-nha')->controller('ToaNhaController')->group(function () {
+            Route::get('/', 'index')->name('toanha.index');
+            Route::get('/them', 'taoMoi')->name('toanha.tao');
+            Route::post('/them', 'luu')->name('toanha.luu');
+            Route::get('/{id}', 'chiTiet')->name('toanha.chitiet');
+            Route::put('/{id}', 'capNhat')->name('toanha.capnhat');
+            Route::delete('/{id}', 'xoa')->name('toanha.xoa');
+        });
+
         // Quản lý Phòng & Sơ đồ
         Route::controller('PhongController')->group(function () {
             Route::get('/quanlyphong', 'index')->name('phong.index');
@@ -175,6 +185,7 @@ Route::prefix('admin')
             Route::get('/{id}/sua', 'sua')->name('sua');
             Route::put('/{id}', 'capNhat')->name('capnhat');
             Route::delete('/{id}', 'xoa')->name('xoa');
+            Route::post('/{id}/restore', 'khoiPhuc')->name('restore');
         });
     });
 

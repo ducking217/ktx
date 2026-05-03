@@ -17,17 +17,18 @@ class BaoCaoService implements BaoCaoServiceInterface
 {
     public function layDuLieuTaiChinh(): array
     {
-        // 1. Doanh thu 12 tháng gần nhất
-        $doanhThuTheoThang = Hoadon::selectRaw('MONTH(updated_at) as thang, YEAR(updated_at) as nam, SUM(tongtien) as tong, COUNT(*) as so_luong')
+        // 1. Doanh thu 12 tháng gần nhất (dựa trên ngày thanh toán thực tế)
+        $doanhThuTheoThang = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, SUM(tongtien) as tong, COUNT(*) as so_luong')
             ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
-            ->where('updated_at', '>=', now()->subMonths(12))
+            ->whereNotNull('ngay_thanh_toan')
+            ->where('ngay_thanh_toan', '>=', now()->subMonths(12))
             ->groupBy('nam', 'thang')
             ->orderBy('nam')
             ->orderBy('thang')
             ->get();
 
         // 2. Tổng cọc đang giữ (Hóa đơn LOAI_DEPOSIT đã thanh toán)
-        $tongCocHienTai = (float) Hoadon::where('loai_hoadon', Hoadon::LOAI_DEPOSIT)
+        $tongCocHienTai = (float) Hoadon::where('loai_hoadon', 'deposit')
             ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
             ->sum('tongtien');
 
@@ -83,12 +84,13 @@ class BaoCaoService implements BaoCaoServiceInterface
         $quy = $filters['quy'] ?? null;
         $thang = $filters['thang'] ?? null;
 
-        $query = Hoadon::selectRaw('MONTH(updated_at) as thang, YEAR(updated_at) as nam, COUNT(*) as so_luong, SUM(tongtien) as tong')
+        $query = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, COUNT(*) as so_luong, SUM(tongtien) as tong')
             ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
-            ->whereYear('updated_at', $nam);
+            ->whereNotNull('ngay_thanh_toan')
+            ->whereYear('ngay_thanh_toan', $nam);
 
         if ($thang) {
-            $query->whereMonth('updated_at', $thang);
+            $query->whereMonth('ngay_thanh_toan', $thang);
         }
 
         if ($quy) {
@@ -100,7 +102,7 @@ class BaoCaoService implements BaoCaoServiceInterface
                 default => [],
             };
             if (!empty($months)) {
-                $query->whereIn(DB::raw('MONTH(updated_at)'), $months);
+                $query->whereIn(DB::raw('MONTH(ngay_thanh_toan)'), $months);
             }
         }
 

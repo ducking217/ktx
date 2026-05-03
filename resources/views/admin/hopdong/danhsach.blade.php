@@ -31,7 +31,8 @@
     </div>
 
     <article class="overflow-hidden rounded-2xl bg-white border border-ui-border shadow-sm">
-        <div class="overflow-x-auto">
+        {{-- Desktop View --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-sm text-ink-primary">
                 <thead class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-bold uppercase tracking-widest text-ink-secondary">
                     <tr>
@@ -125,6 +126,74 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- Mobile Card List --}}
+        <div class="md:hidden divide-y divide-ui-border">
+            @forelse ($hopdong as $item)
+                <div class="p-5 space-y-4">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="font-bold text-ink-primary font-display text-base">{{ $item->sinhvien->taikhoan->name ?? '-' }}</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/40">#{{ $item->id }} • {{ $item->sinhvien->masinhvien ?? '-' }}</div>
+                        </div>
+                        @php
+                            $badgeType = match ($item->trang_thai) {
+                                \App\Enums\ContractStatus::Active => 'success',
+                                \App\Enums\ContractStatus::Expired => 'warning',
+                                \App\Enums\ContractStatus::Terminated => 'danger',
+                                default => 'info',
+                            };
+                            $badgeClass = match ($badgeType) {
+                                'success' => 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20',
+                                'warning' => 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20',
+                                'danger' => 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-700/10',
+                                default => 'bg-ui-bg text-ink-secondary ring-1 ring-inset ring-ui-border'
+                            };
+                        @endphp
+                        <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider {{ $badgeClass }}">
+                            {{ $item->trang_thai->label() }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
+                        <div class="space-y-1">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Vị trí phòng</div>
+                            <div class="text-xs font-bold text-ink-primary">{{ $item->phong->tenphong ?? '-' }}</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Giá trị ký</div>
+                            <div class="text-xs font-bold text-ink-primary tabular-nums">{{ number_format($item->giaphong_luc_ky) }}đ</div>
+                        </div>
+                        <div class="space-y-1 col-span-2">
+                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Thời hạn lưu trú</div>
+                            <div class="flex items-center gap-2 text-[10px] font-bold">
+                                <span class="text-ink-primary">{{ $item->ngay_bat_dau }}</span>
+                                <svg class="h-3 w-3 text-ink-secondary/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                <span class="text-brand-emerald">{{ $item->ngay_ket_thuc }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="{{ route('admin.hopdong.pdf', $item->id) }}" class="flex-1 flex h-10 items-center justify-center rounded-xl bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-secondary ring-1 ring-ui-border">
+                            PDF
+                        </a>
+                        <button type="button" data-modal-target="modal-chi-tiet-{{ $item->id }}" data-modal-toggle="modal-chi-tiet-{{ $item->id }}" class="flex-1 h-10 rounded-xl bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-primary ring-1 ring-ui-border">Chi tiết</button>
+                        
+                        @if ($item->trang_thai === \App\Enums\ContractStatus::Active)
+                            <button type="button" data-modal-target="modal-gia-han-{{ $item->id }}" data-modal-toggle="modal-gia-han-{{ $item->id }}" class="flex-1 h-10 rounded-xl bg-ink-primary text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">Gia hạn</button>
+                        @endif
+
+                        @if ($item->trang_thai !== \App\Enums\ContractStatus::Terminated)
+                            <button type="button" data-modal-target="modal-thanh-ly-{{ $item->id }}" data-modal-toggle="modal-thanh-ly-{{ $item->id }}" class="flex-1 h-10 rounded-xl bg-rose-50 text-[10px] font-bold uppercase tracking-widest text-rose-600 ring-1 ring-rose-100">Thanh lý</button>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="py-20 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không tìm thấy hợp đồng</div>
+            @endforelse
+        </div>
+    </article>
         @if(method_exists($hopdong, 'links'))
             <div class="border-t border-ui-border px-6 py-4 bg-ui-bg/30">
                 {{ $hopdong->appends(request()->query())->links() }}
