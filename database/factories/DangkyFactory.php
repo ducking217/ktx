@@ -22,6 +22,7 @@ class DangkyFactory extends Factory
             'so_dien_thoai' => $this->faker->phoneNumber,
             'so_cccd' => $this->faker->numerify('############'),
             'lookup_token' => Str::random(32),
+            'token_expires_at' => now()->addDays(30),
             'loaidangky' => $this->faker->randomElement(RegistrationType::cases()),
             'trangthai' => $this->faker->randomElement(RegistrationStatus::cases()),
         ];

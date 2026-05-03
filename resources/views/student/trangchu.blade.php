@@ -6,26 +6,8 @@
     @php
         $isAlumni = auth()->user()->vaitro === \App\Enums\UserRole::CuuSinhVien;
         $tongTienCanDong = (int) $hoadonchuathanhtoan->sum('tongtien');
-        $ngayConLaiHopDong = null;
-
-        if (!empty($sinhvien?->ngay_het_han)) {
-            $ngayConLaiHopDong = now()->startOfDay()->diffInDays(
-                \Illuminate\Support\Carbon::parse($sinhvien->ngay_het_han)->startOfDay(),
-                false
-            );
-        }
-
         $tongThanhVien = (isset($thanhviencungphong) ? $thanhviencungphong->count() : 0) + ($sinhvien ? 1 : 0);
         $hoaDonGanNhat = $hoadonchuathanhtoan->take(3);
-        $trangThaiDon = $isAlumni ? 'Cựu sinh viên' : 'Đang cư trú';
-
-        if (!$isAlumni) {
-            if (empty($sinhvien?->phong_id)) {
-                $trangThaiDon = 'Chờ xếp phòng';
-            } elseif (is_null($ngayConLaiHopDong)) {
-                $trangThaiDon = 'Chờ ký Hợp đồng';
-            }
-        }
     @endphp
 
     <div class="space-y-10 animate-fade-up">
@@ -88,29 +70,8 @@
                 </a>
             </article>
 
-            {{-- Card 3: Trạng thái --}}
-            <article class="pdu-card group relative overflow-hidden !p-0">
-                <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-ink-primary/5 transition-transform duration-700 group-hover:scale-[2.5]"></div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-ui-bg text-ink-primary border border-ui-border group-hover:border-ink-primary/30 transition-colors">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        </div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-ink-secondary/30">Pháp lý</span>
-                    </div>
-                    <h3 class="font-display text-2xl font-black text-ink-primary tracking-tight mb-1 uppercase">{{ $trangThaiDon }}</h3>
-                    <div class="text-[10px] font-bold text-ink-secondary/50 uppercase tracking-widest">Năm học {{ date('Y') }}-{{ date('Y')+1 }}</div>
-                </div>
-                <div class="bg-ui-bg/50 px-6 py-3 border-t border-ui-border">
-                    <div class="flex items-center gap-2">
-                        <div class="flex-1 h-1 bg-ui-border rounded-full overflow-hidden">
-                            @php $percent = $ngayConLaiHopDong ? max(0, min(100, (180 - $ngayConLaiHopDong) / 180 * 100)) : 0; @endphp
-                            <div class="h-full bg-ink-primary" @style(["width: $percent%"])></div>
-                        </div>
-                        <span class="text-[9px] font-black uppercase text-ink-secondary/60 tabular-nums">{{ $ngayConLaiHopDong ?? 0 }} ngày còn lại</span>
-                    </div>
-                </div>
-            </article>
+            {{-- Card 3: Thời hạn Hợp đồng --}}
+            <x-countdown-hopdong :hopdong="$hopdongHienTai" :soNgayCon="$soNgayCon" />
         </section>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">

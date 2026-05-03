@@ -38,6 +38,7 @@ class User extends Authenticatable
         'vaitro',
         'gioitinh',
         'is_active',
+        'toa_nha_id',
     ];
 
     /**
@@ -60,7 +61,13 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
         'vaitro' => \App\Enums\UserRole::class,
+        'toa_nha_id' => 'integer',
     ];
+
+    public function toanha()
+    {
+        return $this->belongsTo(ToaNha::class, 'toa_nha_id');
+    }
 
     /**
      * Mối quan hệ 1-1 với bảng sinhvien

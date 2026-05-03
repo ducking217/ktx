@@ -84,9 +84,9 @@ class HopdongController extends Controller
 
     public function downloadPDF(int $id)
     {
-        $hopdong = \App\Models\Hopdong::with(['sinhvien', 'phong'])->find($id);
-        if (!$hopdong) {
-            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => 'Không tìm thấy hợp đồng.']);
+        $hopdong = \App\Models\Hopdong::with(['sinhvien.taikhoan', 'phong'])->find($id);
+        if (!$hopdong || !$hopdong->sinhvien) {
+            abort(404, 'Không tìm thấy dữ liệu hợp đồng');
         }
 
         $pdf = Pdf::loadView('pdf.hopdong', [

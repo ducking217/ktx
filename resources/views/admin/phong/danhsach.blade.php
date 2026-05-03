@@ -8,7 +8,7 @@
         </div>
 
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <form action="{{ route('admin.quanlyphong') }}" method="GET" class="flex flex-wrap items-center gap-2">
+            <form action="{{ route('admin.phong.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
                 <div class="relative group">
                     <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-secondary/40 group-focus-within:text-ink-primary transition-colors">
                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -32,12 +32,12 @@
 
     <div class="mb-8 flex items-center justify-center">
         <div class="inline-flex rounded-2xl bg-ui-card p-1.5 shadow-sm border border-ui-border">
-            <a href="{{ route('admin.quanlyphong', array_merge(request()->query(), ['view' => 'table'])) }}" 
+            <a href="{{ route('admin.phong.index', array_merge(request()->query(), ['view' => 'table'])) }}" 
                class="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-black uppercase tracking-widest transition-all {{ $viewMode === 'table' ? 'bg-ui-bg text-brand-emerald shadow-sm' : 'text-ink-secondary hover:text-ink-primary' }}">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
                 Danh sách
             </a>
-            <a href="{{ route('admin.quanlyphong', array_merge(request()->query(), ['view' => 'grid'])) }}" 
+            <a href="{{ route('admin.phong.index', array_merge(request()->query(), ['view' => 'grid'])) }}" 
                class="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-black uppercase tracking-widest transition-all {{ $viewMode === 'grid' ? 'bg-ui-bg text-brand-emerald shadow-sm' : 'text-ink-secondary hover:text-ink-primary' }}">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 Sơ đồ khối
@@ -100,13 +100,13 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('admin.chitietphong', ['id' => $phong->id]) }}" class="flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-ink-primary" title="Chi tiết">
+                                        <a href="{{ route('admin.phong.chitiet', ['id' => $phong->id]) }}" class="flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-ink-primary" title="Chi tiết">
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         </a>
                                         <button type="button" data-modal-target="modal-capnhatphong-{{ $phong->id }}" data-modal-toggle="modal-capnhatphong-{{ $phong->id }}" class="flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-ink-primary" title="Chỉnh sửa">
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         </button>
-                                    <form method="POST" action="{{ route('admin.xoaphong', ['id' => $phong->id]) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
+                                    <form method="POST" action="{{ route('admin.phong.xoa', ['id' => $phong->id]) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" @click="$dispatch('open-confirm', { message: 'Xóa phòng {{ $phong->tenphong }}?', action: () => showConfirm = true })" class="flex h-8 w-8 items-center justify-center rounded-lg border border-rose-100 bg-rose-50 text-rose-600 shadow-sm transition-colors hover:bg-rose-600 hover:text-white" title="Xóa">
@@ -175,13 +175,13 @@
                         </div>
 
                         <div class="flex items-center justify-end gap-2 border-t border-ui-border pt-4">
-                            <a href="{{ route('admin.chitietphong', ['id' => $phong->id]) }}" class="flex h-9 w-9 items-center justify-center rounded-xl border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-ink-primary" title="Chi tiết">
+                            <a href="{{ route('admin.phong.chitiet', ['id' => $phong->id]) }}" class="flex h-9 w-9 items-center justify-center rounded-xl border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-ink-primary" title="Chi tiết">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </a>
                             <button type="button" data-modal-target="modal-capnhatphong-{{ $phong->id }}" data-modal-toggle="modal-capnhatphong-{{ $phong->id }}" class="flex h-9 w-9 items-center justify-center rounded-xl border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-ink-primary" title="Chỉnh sửa">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
-                            <form method="POST" action="{{ route('admin.xoaphong', ['id' => $phong->id]) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
+                            <form method="POST" action="{{ route('admin.phong.xoa', ['id' => $phong->id]) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" @click="$dispatch('open-confirm', { message: 'Xóa phòng {{ $phong->tenphong }}?', action: () => showConfirm = true })" class="flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 bg-rose-50 text-rose-600 shadow-sm transition-colors hover:bg-rose-600 hover:text-white" title="Xóa">
@@ -212,7 +212,7 @@
 
     @push('modals')
         <x-modal id="modal-themphong" title="Kiến tạo phòng mới" subtitle="Nhập thông số cơ bản để khởi tạo thực thể phòng trong hệ thống.">
-            <form method="POST" action="{{ route('admin.themphong') }}" class="space-y-6">
+            <form method="POST" action="{{ route('admin.phong.luu') }}" class="space-y-6">
                 @csrf
                 <div class="grid grid-cols-2 gap-5">
                     <div>
@@ -260,7 +260,7 @@
 
         @foreach ($danhsachphong as $phong)
             <x-modal id="modal-capnhatphong-{{ $phong->id }}" title="Hiệu chỉnh tham số" subtitle="Cập nhật thông tin thực thể phòng {{ $phong->tenphong }}.">
-                <form method="POST" action="{{ route('admin.capnhatphong', ['id' => $phong->id]) }}" class="space-y-6">
+                <form method="POST" action="{{ route('admin.phong.capnhat', ['id' => $phong->id]) }}" class="space-y-6">
                     @csrf
                     <div class="grid grid-cols-2 gap-5">
                         <div>

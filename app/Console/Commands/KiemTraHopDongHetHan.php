@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class KiemTraHopDongHetHan extends Command
 {
@@ -33,6 +34,36 @@ class KiemTraHopDongHetHan extends Command
         $this->info('Đang kiểm tra hợp đồng hết hạn...');
 
         try {
+            $loginUrl = route('login');
+
+            $sap30Ngay = Hopdong::where('trang_thai', ContractStatus::Active->value)
+                ->whereBetween('ngay_ket_thuc', [now()->addDays(28), now()->addDays(30)])
+                ->with('sinhvien.taikhoan')
+                ->get();
+
+            foreach ($sap30Ngay as $hopdong) {
+                $email = $hopdong->sinhvien?->taikhoan?->email;
+                if (! $email) {
+                    continue;
+                }
+
+                Mail::to($email)->queue(new \App\Mail\CanhBaoHetHanHopDong($hopdong, 30, $loginUrl));
+            }
+
+            $sap7Ngay = Hopdong::where('trang_thai', ContractStatus::Active->value)
+                ->whereBetween('ngay_ket_thuc', [now()->addDays(5), now()->addDays(7)])
+                ->with('sinhvien.taikhoan')
+                ->get();
+
+            foreach ($sap7Ngay as $hopdong) {
+                $email = $hopdong->sinhvien?->taikhoan?->email;
+                if (! $email) {
+                    continue;
+                }
+
+                Mail::to($email)->queue(new \App\Mail\CanhBaoHetHanHopDong($hopdong, 7, $loginUrl));
+            }
+
             DB::transaction(function () {
                 $expiredContracts = Hopdong::where('trang_thai', ContractStatus::Active->value)
                     ->where('ngay_ket_thuc', '<', Carbon::today())
@@ -53,8 +84,6 @@ class KiemTraHopDongHetHan extends Command
 
                 Log::info("Đã tự động chuyển trạng thái {$count} hợp đồng sang Expired.", ['ids' => $ids]);
                 $this->info("Thành công: Đã cập nhật {$count} hợp đồng sang trạng thái Expired.");
-                
-                // TODO: Gửi Notification / Email nhắc nhở sinh viên và admin
             });
 
             return Command::SUCCESS;

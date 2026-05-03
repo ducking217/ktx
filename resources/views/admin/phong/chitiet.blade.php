@@ -4,7 +4,7 @@
     <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
             <div class="flex items-center gap-3 mb-2">
-                <a href="{{ route('admin.quanlyphong') }}" class="flex h-8 w-8 items-center justify-center rounded-lg bg-ui-bg text-ink-secondary hover:text-ink-primary ring-1 ring-ui-border transition-colors shadow-sm">
+                <a href="{{ route('admin.phong.index') }}" class="flex h-8 w-8 items-center justify-center rounded-lg bg-ui-bg text-ink-secondary hover:text-ink-primary ring-1 ring-ui-border transition-colors shadow-sm">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </a>
                 <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-ink-secondary/60">Hệ thống phòng nội trú</span>

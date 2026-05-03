@@ -44,6 +44,7 @@ class Hopdong extends Model
         'giaphong_luc_ky',
         'trang_thai',
         'ghichu',
+        'toa_nha_id',
     ];
     protected $casts = [
         'trang_thai' => ContractStatus::class,
@@ -95,5 +96,10 @@ class Hopdong extends Model
             'trang_thai' => $targetValue,
             'ghichu' => $note,
         ]);
+    }
+
+    public function toanha(): BelongsTo
+    {
+        return $this->belongsTo(ToaNha::class, 'toa_nha_id');
     }
 }

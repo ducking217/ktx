@@ -16,6 +16,7 @@ use App\Contracts\Admin\TaiChinhServiceInterface;
 use App\Contracts\Admin\BaoTriServiceInterface;
 use App\Contracts\Core\TruyVanPhongServiceInterface;
 use App\Contracts\Shared\NghiepVuPhongServiceInterface;
+use App\Contracts\Shared\GiaHanServiceInterface;
 use App\Contracts\Shared\KhoPhongServiceInterface;
 use App\Contracts\Shared\TaiSanPhongServiceInterface;
 use App\Contracts\Shared\VatTuPhongServiceInterface;
@@ -37,6 +38,7 @@ use App\Services\Admin\TaiChinhService;
 use App\Services\Admin\BaoTriService;
 use App\Services\Core\TruyVanPhongService;
 use App\Services\Shared\NghiepVuPhongService;
+use App\Services\Shared\GiaHanService;
 use App\Services\Shared\KhoPhongService;
 use App\Services\Shared\TaiSanPhongService;
 use App\Services\Shared\VatTuPhongService;
@@ -61,6 +63,7 @@ use App\Models\Sinhvien;
 use App\Models\Taisan;
 use App\Models\Thongbao;
 use App\Models\Vattu;
+use App\Models\YeuCauGiaHan;
 use App\Observers\BaohongObserver;
 use App\Observers\CauhinhObserver;
 use App\Observers\DanhgiaObserver;
@@ -74,6 +77,7 @@ use App\Observers\SinhvienObserver;
 use App\Observers\TaisanObserver;
 use App\Observers\ThongbaoObserver;
 use App\Observers\VattuObserver;
+use App\Observers\YeuCauGiaHanObserver;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use App\View\Components\Badge;
@@ -108,6 +112,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TaiChinhServiceInterface::class, TaiChinhService::class);
         $this->app->bind(BaoTriServiceInterface::class, BaoTriService::class);
         $this->app->bind(TienIchServiceInterface::class, TienIchService::class);
+        $this->app->bind(\App\Contracts\Shared\GiaHanServiceInterface::class, \App\Services\Shared\GiaHanService::class);
+        $this->app->bind(\App\Contracts\Admin\BaoCaoServiceInterface::class, \App\Services\Admin\BaoCaoService::class);
+        $this->app->bind(\App\Contracts\Admin\AccountServiceInterface::class, \App\Services\Admin\AccountService::class);
     }
 
     /**
@@ -128,6 +135,7 @@ class AppServiceProvider extends ServiceProvider
         Cauhinh::observe(CauhinhObserver::class);
         Baohong::observe(BaohongObserver::class);
         Thongbao::observe(ThongbaoObserver::class);
+        YeuCauGiaHan::observe(YeuCauGiaHanObserver::class);
 
         Blade::directive('badge', function ($expression) {
             return "<?php echo \App\View\Components\Badge::renderDirect($expression); ?>";

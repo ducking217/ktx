@@ -58,6 +58,16 @@ class DangkyController extends Controller
         $tokenTraCuu = $token ?: request()->query('token');
         $duLieu = $this->dangkyService->layDuLieuTraCuuKhach($tokenTraCuu);
 
+        if (!empty($duLieu['error_message'])) {
+            session()->flash('toast_loai', 'error');
+            session()->flash('toast_noidung', $duLieu['error_message']);
+
+            return view('landing.lookup', [
+                'token' => $duLieu['token'] ?? $tokenTraCuu,
+                'dangky' => null,
+            ]);
+        }
+
         return view('landing.lookup', [
             'token' => $duLieu['token'] ?? $tokenTraCuu,
             'dangky' => $duLieu['dangky'] ?? null,

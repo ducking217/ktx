@@ -82,5 +82,9 @@ class AuthServiceProvider extends ServiceProvider
                 \App\Enums\UserRole::AdminToaNha,
             ]);
         });
+
+        Gate::define('accounts.manage', function (User $user): bool {
+            return $user->vaitro === \App\Enums\UserRole::Admin;
+        });
     }
 }

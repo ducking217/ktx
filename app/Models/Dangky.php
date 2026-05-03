@@ -45,6 +45,7 @@ class Dangky extends Model
         'anh_the_path',
         'anh_cccd_path',
         'lookup_token',
+        'token_expires_at',
         'loaidangky',
         'trangthai',
         'ghichu',
@@ -55,6 +56,7 @@ class Dangky extends Model
         'trangthai' => \App\Enums\RegistrationStatus::class,
         'loaidangky' => \App\Enums\RegistrationType::class,
         'expires_at' => 'datetime',
+        'token_expires_at' => 'datetime',
     ];
 
     public function getHoTenAttribute($value)

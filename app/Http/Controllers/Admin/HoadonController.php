@@ -59,9 +59,9 @@ class HoadonController extends Controller
 
     public function downloadInvoicePDF(int $id)
     {
-        $hoadon = \App\Models\Hoadon::with(['phong', 'sinhvien'])->find($id);
-        if (!$hoadon) {
-            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => 'Không tìm thấy hóa đơn.']);
+        $hoadon = \App\Models\Hoadon::with(['phong', 'sinhvien.taikhoan'])->find($id);
+        if (!$hoadon || !$hoadon->sinhvien) {
+            abort(404, 'Không tìm thấy dữ liệu hóa đơn');
         }
 
         $pdf = Pdf::loadView('pdf.hoadon', [

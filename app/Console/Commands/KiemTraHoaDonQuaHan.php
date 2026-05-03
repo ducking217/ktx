@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class KiemTraHoaDonQuaHan extends Command
 {
@@ -33,7 +34,7 @@ class KiemTraHoaDonQuaHan extends Command
         $this->info('Đang kiểm tra hóa đơn quá hạn (trên 30 ngày)...');
 
         try {
-            DB::transaction(function () {
+            $ids = DB::transaction(function () {
                 $overdueInvoices = Hoadon::where('trangthaithanhtoan', InvoiceStatus::Pending->value)
                     ->where('ngayxuat', '<=', Carbon::today()->subDays(30))
                     ->lockForUpdate()
@@ -41,7 +42,7 @@ class KiemTraHoaDonQuaHan extends Command
 
                 if ($overdueInvoices->isEmpty()) {
                     $this->info('Không có hóa đơn nào quá hạn cần cập nhật.');
-                    return;
+                    return [];
                 }
 
                 $count = $overdueInvoices->count();
@@ -53,9 +54,23 @@ class KiemTraHoaDonQuaHan extends Command
 
                 Log::info("Đã tự động chuyển trạng thái {$count} hóa đơn sang Overdue.", ['ids' => $ids]);
                 $this->info("Thành công: Đã cập nhật {$count} hóa đơn sang trạng thái Overdue.");
-                
-                // TODO: Gửi Notification / Email nhắc nhở sinh viên thanh toán
+
+                return $ids;
             });
+
+            if (!empty($ids)) {
+                $loginUrl = route('login');
+                $hoaDons = Hoadon::with(['phong', 'sinhvien.taikhoan'])->whereIn('id', $ids)->get();
+
+                foreach ($hoaDons as $hoaDon) {
+                    $email = $hoaDon->sinhvien?->taikhoan?->email;
+                    if (! $email) {
+                        continue;
+                    }
+
+                    Mail::to($email)->queue(new \App\Mail\NhacNoHoaDon($hoaDon, $loginUrl));
+                }
+            }
 
             return Command::SUCCESS;
         } catch (\Exception $e) {

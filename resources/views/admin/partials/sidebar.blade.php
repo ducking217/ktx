@@ -40,14 +40,22 @@
                         </div>
                     </a>
                 @endif
+                @can('accounts.manage')
+                    <a href="{{ route('admin.accounts.index') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.accounts.*') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="h-5 w-5 {{ request()->routeIs('admin.accounts.*') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <span>Quản lý tài khoản</span>
+                        </div>
+                    </a>
+                @endcan
             </div>
 
             <!-- Quản lý -->
             <div class="mb-2 mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60">Quản lý</div>
             <div class="space-y-0.5">
-                <a href="{{ route('admin.quanlyphong') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.quanlyphong', 'admin.chitietphong') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
+                <a href="{{ route('admin.phong.index') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.phong.index', 'admin.phong.chitiet') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
                     <div class="flex items-center gap-3">
-                        <svg class="h-5 w-5 {{ request()->routeIs('admin.quanlyphong', 'admin.chitietphong') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>
+                        <svg class="h-5 w-5 {{ request()->routeIs('admin.phong.index', 'admin.phong.chitiet') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>
                         <span>Phòng & Tài sản</span>
                     </div>
                 </a>
@@ -78,6 +86,12 @@
                         <span>Hợp đồng</span>
                     </div>
                 </a>
+                <a href="{{ route('admin.giahan.index') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.giahan.*') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
+                    <div class="flex items-center gap-3">
+                        <svg class="h-5 w-5 {{ request()->routeIs('admin.giahan.*') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>Yêu cầu gia hạn</span>
+                    </div>
+                </a>
             </div>
 
             <!-- Tài chính -->
@@ -97,6 +111,12 @@
                     @if (!is_null($soCongNo) && $soCongNo > 0)
                         <span class="rounded-md bg-amber-500 px-2 py-0.5 text-[9px] font-black text-white shadow-sm">{{ $soCongNo }}</span>
                     @endif
+                </a>
+                <a href="{{ route('admin.baocao.taichinh') }}" class="group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-all {{ request()->routeIs('admin.baocao.taichinh') ? 'bg-ink-primary text-white' : 'text-ink-secondary hover:bg-ui-bg hover:text-ink-primary' }}">
+                    <div class="flex items-center gap-3">
+                        <svg class="h-5 w-5 {{ request()->routeIs('admin.baocao.taichinh') ? 'text-white' : 'text-ink-secondary/50 group-hover:text-ink-primary' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <span>Báo cáo tài chính</span>
+                    </div>
                 </a>
             </div>
 

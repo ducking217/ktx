@@ -23,7 +23,7 @@
                     <span class="text-[10px] font-bold text-emerald-600/40 uppercase italic">Trống</span>
                 </div>
                 <div class="mt-4 h-1 w-full overflow-hidden rounded-full bg-ui-bg">
-                    <div class="h-full bg-emerald-500" style="width: {{ ($campusStats['available']/384)*100 }}%"></div>
+                    <div class="h-full bg-emerald-500" @style(['width' => ($campusStats['available'] / 384 * 100) . '%'])></div>
                 </div>
             </article>
 
@@ -34,7 +34,7 @@
                     <span class="text-[10px] font-bold text-ink-primary/40 uppercase italic">Người</span>
                 </div>
                 <div class="mt-4 h-1 w-full overflow-hidden rounded-full bg-ui-bg">
-                    <div class="h-full bg-ink-primary" style="width: {{ ($campusStats['occupied']/384)*100 }}%"></div>
+                    <div class="h-full bg-ink-primary" @style(['width' => ($campusStats['occupied'] / 384 * 100) . '%'])></div>
                 </div>
             </article>
 
@@ -45,7 +45,7 @@
                     <span class="text-[10px] font-bold text-amber-600/40 uppercase italic">Hồ sơ</span>
                 </div>
                 <div class="mt-4 h-1 w-full overflow-hidden rounded-full bg-ui-bg">
-                    <div class="h-full bg-amber-500" style="width: {{ ($campusStats['pending']/384)*100 }}%"></div>
+                    <div class="h-full bg-amber-500" @style(['width' => ($campusStats['pending'] / 384 * 100) . '%'])></div>
                 </div>
             </article>
         </div>
@@ -94,7 +94,7 @@
                     </div>
 
                     <header class="mb-5">
-                        <a href="{{ route('admin.chitietphong', $phong->id) }}" class="group/title block">
+                        <a href="{{ route('admin.phong.chitiet', $phong->id) }}" class="group/title block">
                             <h3 class="text-lg font-bold text-ink-primary font-display uppercase tracking-tight group-hover/title:text-ink-primary/70 transition-colors">{{ $phong->tenphong }}</h3>
                         </a>
                         <div class="mt-1 flex items-center gap-2">
@@ -150,7 +150,7 @@
                     </div>
 
                     <footer class="mt-5 border-t border-ui-border pt-4">
-                        <a href="{{ route('admin.chitietphong', $phong->id) }}" class="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60 transition-colors hover:text-ink-primary">
+                        <a href="{{ route('admin.phong.chitiet', $phong->id) }}" class="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60 transition-colors hover:text-ink-primary">
                             Hồ sơ vận hành
                             <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </a>

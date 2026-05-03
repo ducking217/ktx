@@ -150,6 +150,8 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
             'hoadonchuathanhtoan' => collect(), 'hoadonChoXacNhan' => collect(),
             'lienhekhancap' => [['title' => 'Bảo vệ', 'phone' => '0900 111 222'], ['title' => 'Y tế', 'phone' => '0900 333 444']],
             'thongbao' => $this->layThongBaoChoSinhVien($sinhvien),
+            'hopdongHienTai' => null,
+            'soNgayCon' => null,
         ];
 
         if ($sinhvien && $sinhvien->phong_id) {
@@ -159,6 +161,15 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
             $data['hoadonchuathanhtoan'] = Hoadon::where('phong_id', $sinhvien->phong_id)->where('trangthaithanhtoan', InvoiceStatus::Pending->value)->get();
             $data['hoadonChoXacNhan'] = Hoadon::where('sinhvien_id', $sinhvien->id)->where('trangthaithanhtoan', InvoiceStatus::PendingConfirmation->value)->get();
             $data['taisanphong'] = Taisan::where('phong_id', $sinhvien->phong_id)->get();
+            
+            $data['hopdongHienTai'] = Hopdong::where('sinhvien_id', $sinhvien->id)
+                ->where('trang_thai', ContractStatus::Active->value)
+                ->with('phong')
+                ->first();
+            
+            if ($data['hopdongHienTai']) {
+                $data['soNgayCon'] = (int) now()->diffInDays($data['hopdongHienTai']->ngay_ket_thuc, false);
+            }
         }
 
         return $data;

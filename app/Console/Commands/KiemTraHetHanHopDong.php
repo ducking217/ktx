@@ -7,6 +7,7 @@ use App\Enums\ContractStatus;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class KiemTraHetHanHopDong extends Command
 {
@@ -33,6 +34,36 @@ class KiemTraHetHanHopDong extends Command
 
         $now = now()->toDateString();
 
+        $loginUrl = route('login');
+
+        $sap30Ngay = Hopdong::where('trang_thai', ContractStatus::Active->value)
+            ->whereBetween('ngay_ket_thuc', [now()->addDays(28), now()->addDays(30)])
+            ->with('sinhvien.taikhoan')
+            ->get();
+
+        foreach ($sap30Ngay as $hopdong) {
+            $email = $hopdong->sinhvien?->taikhoan?->email;
+            if (! $email) {
+                continue;
+            }
+
+            Mail::to($email)->queue(new \App\Mail\CanhBaoHetHanHopDong($hopdong, 30, $loginUrl));
+        }
+
+        $sap7Ngay = Hopdong::where('trang_thai', ContractStatus::Active->value)
+            ->whereBetween('ngay_ket_thuc', [now()->addDays(5), now()->addDays(7)])
+            ->with('sinhvien.taikhoan')
+            ->get();
+
+        foreach ($sap7Ngay as $hopdong) {
+            $email = $hopdong->sinhvien?->taikhoan?->email;
+            if (! $email) {
+                continue;
+            }
+
+            Mail::to($email)->queue(new \App\Mail\CanhBaoHetHanHopDong($hopdong, 7, $loginUrl));
+        }
+
         $hopdongs = Hopdong::where('trang_thai', ContractStatus::Active->value)
             ->whereDate('ngay_ket_thuc', '<', $now)
             ->get();
@@ -48,7 +79,6 @@ class KiemTraHetHanHopDong extends Command
                     'trang_thai' => ContractStatus::Expired->value,
                 ]);
 
-                // Ghi log hoặc gửi thông báo tại đây nếu cần
                 Log::info("Hợp đồng #{$hopdong->id} của SV {$hopdong->sinhvien_id} đã hết hạn.");
             });
 

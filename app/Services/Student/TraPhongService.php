@@ -16,6 +16,7 @@ use App\Contracts\Admin\HoanTienServiceInterface;
 use App\Services\Admin\HopdongService;
 use App\Services\Admin\HoadonService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TraPhongService implements TraPhongServiceInterface
 {

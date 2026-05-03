@@ -65,6 +65,7 @@ class Hoadon extends Model
         'trangthaithanhtoan',
         'ngayxuat',
         'calculation_details',
+        'toa_nha_id',
     ];
 
     protected $casts = [
@@ -96,5 +97,10 @@ class Hoadon extends Model
         }
 
         return false;
+    }
+
+    public function toanha(): BelongsTo
+    {
+        return $this->belongsTo(ToaNha::class, 'toa_nha_id');
     }
 }

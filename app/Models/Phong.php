@@ -22,6 +22,7 @@ class Phong extends Model
         'dango',
         'mota',
         'gioitinh',
+        'toa_nha_id',
     ];
 
     /**
@@ -91,5 +92,10 @@ class Phong extends Model
         }
 
         return $this->danhsachsinhvien()->count();
+    }
+
+    public function toanha()
+    {
+        return $this->belongsTo(ToaNha::class, 'toa_nha_id');
     }
 }

@@ -85,11 +85,23 @@
         <table class="content-table">
             <tr>
                 <td class="label">Họ và tên:</td>
-                <td>{{ $hopdong->sinhvien->hovaten }}</td>
+                <td>
+                    @isset($hopdong->sinhvien->taikhoan)
+                        {{ $hopdong->sinhvien->taikhoan->name }}
+                    @else
+                        ........
+                    @endisset
+                </td>
             </tr>
             <tr>
                 <td class="label">Mã sinh viên:</td>
-                <td>{{ $hopdong->sinhvien->masv }}</td>
+                <td>
+                    @isset($hopdong->sinhvien)
+                        {{ $hopdong->sinhvien->masinhvien ?? '........' }}
+                    @else
+                        ........
+                    @endisset
+                </td>
             </tr>
             <tr>
                 <td class="label">Ngày sinh:</td>
@@ -97,11 +109,23 @@
             </tr>
             <tr>
                 <td class="label">Số CMND/CCCD:</td>
-                <td>{{ $hopdong->sinhvien->cccd ?? '................' }}</td>
+                <td>
+                    @isset($hopdong->sinhvien)
+                        {{ $hopdong->sinhvien->so_cccd ?? '................' }}
+                    @else
+                        ................
+                    @endisset
+                </td>
             </tr>
             <tr>
                 <td class="label">Số điện thoại:</td>
-                <td>{{ $hopdong->sinhvien->sdt ?? '................' }}</td>
+                <td>
+                    @isset($hopdong->sinhvien)
+                        {{ $hopdong->sinhvien->sodienthoai ?? '................' }}
+                    @else
+                        ................
+                    @endisset
+                </td>
             </tr>
         </table>
 
@@ -110,19 +134,42 @@
         <table class="content-table">
             <tr>
                 <td class="label">Phòng:</td>
-                <td>{{ $hopdong->phong->tenphong }}</td>
+                <td>
+                    @isset($hopdong->phong)
+                        {{ $hopdong->phong->tenphong }}
+                    @else
+                        ........
+                    @endisset
+                </td>
             </tr>
             <tr>
                 <td class="label">Thời hạn thuê:</td>
-                <td>Từ ngày {{ date('d/m/Y', strtotime($hopdong->ngaybatdau)) }} đến hết ngày {{ date('d/m/Y', strtotime($hopdong->ngayketthuc)) }}</td>
+                <td>
+                    Từ ngày
+                    @if($hopdong->ngay_bat_dau)
+                        {{ date('d/m/Y', strtotime($hopdong->ngay_bat_dau)) }}
+                    @else
+                        ........
+                    @endif
+                    đến hết ngày
+                    @if($hopdong->ngay_ket_thuc)
+                        {{ date('d/m/Y', strtotime($hopdong->ngay_ket_thuc)) }}
+                    @else
+                        ........
+                    @endif
+                </td>
             </tr>
             <tr>
                 <td class="label">Giá thuê:</td>
-                <td>{{ number_format($hopdong->phong->giaphong) }} VNĐ/tháng</td>
-            </tr>
-            <tr>
-                <td class="label">Tiền đặt cọc:</td>
-                <td>{{ number_format($hopdong->tiencoc) }} VNĐ</td>
+                <td>
+                    @if(!is_null($hopdong->giaphong_luc_ky))
+                        {{ number_format($hopdong->giaphong_luc_ky) }} VNĐ/tháng
+                    @elseif(isset($hopdong->phong))
+                        {{ number_format($hopdong->phong->giaphong) }} VNĐ/tháng
+                    @else
+                        ........
+                    @endif
+                </td>
             </tr>
         </table>
 
@@ -144,7 +191,13 @@
         <div class="signature-box right">
             <p style="font-weight: bold;">ĐẠI DIỆN BÊN B</p>
             <br><br><br><br>
-            <p>{{ $hopdong->sinhvien->hovaten }}</p>
+            <p>
+                @isset($hopdong->sinhvien->taikhoan)
+                    {{ $hopdong->sinhvien->taikhoan->name }}
+                @else
+                    ........
+                @endisset
+            </p>
         </div>
         <div class="clear"></div>
     </div>

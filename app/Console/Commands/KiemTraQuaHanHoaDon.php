@@ -5,8 +5,10 @@ namespace App\Console\Commands;
 use App\Models\Hoadon;
 use App\Enums\InvoiceStatus;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class KiemTraQuaHanHoaDon extends Command
 {
@@ -31,17 +33,19 @@ class KiemTraQuaHanHoaDon extends Command
     {
         $this->info('Bắt đầu kiểm tra hóa đơn quá hạn...');
 
-        // Hóa đơn được coi là quá hạn nếu sau 30 ngày kể từ ngày xuất mà vẫn ở trạng thái Pending
-        $overdueDate = now()->subDays(30)->toDateString();
+        $overdueDate = Carbon::today()->subDays(30)->format('Y-m-d');
 
         $hoadons = Hoadon::where('trangthaithanhtoan', InvoiceStatus::Pending->value)
-            ->whereDate('created_at', '<=', $overdueDate)
+            ->where('ngayxuat', '<=', $overdueDate)
+            ->with(['phong', 'sinhvien.taikhoan'])
             ->get();
 
         if ($hoadons->isEmpty()) {
             $this->info('Không có hóa đơn nào quá hạn.');
             return Command::SUCCESS;
         }
+
+        $loginUrl = route('login');
 
         foreach ($hoadons as $hoadon) {
             DB::transaction(function () use ($hoadon) {
@@ -51,6 +55,11 @@ class KiemTraQuaHanHoaDon extends Command
 
                 Log::info("Hóa đơn #{$hoadon->id} của SV {$hoadon->sinhvien_id} đã chuyển sang trạng thái quá hạn.");
             });
+
+            $email = $hoadon->sinhvien?->taikhoan?->email;
+            if ($email) {
+                Mail::to($email)->queue(new \App\Mail\NhacNoHoaDon($hoadon, $loginUrl));
+            }
 
             $this->info("Đã chuyển trạng thái quá hạn cho hóa đơn #{$hoadon->id}");
         }

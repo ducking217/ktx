@@ -74,11 +74,28 @@
         <table class="info-table">
             <tr>
                 <td class="label">Sinh viên:</td>
-                <td>{{ $hoadon->sinhvien->hovaten }} ({{ $hoadon->sinhvien->masv }})</td>
+                <td>
+                    @isset($hoadon->sinhvien->taikhoan)
+                        {{ $hoadon->sinhvien->taikhoan->name }}
+                    @else
+                        ........
+                    @endisset
+                    @isset($hoadon->sinhvien)
+                        ({{ $hoadon->sinhvien->masinhvien ?? '........' }})
+                    @else
+                        (........)
+                    @endisset
+                </td>
             </tr>
             <tr>
                 <td class="label">Phòng:</td>
-                <td>{{ $hoadon->phong->tenphong }}</td>
+                <td>
+                    @isset($hoadon->phong)
+                        {{ $hoadon->phong->tenphong }}
+                    @else
+                        ........
+                    @endisset
+                </td>
             </tr>
             <tr>
                 <td class="label">Kỳ thanh toán:</td>

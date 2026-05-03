@@ -332,6 +332,7 @@ class DangkyService implements DangkyServiceInterface
                     'trangthai' => RegistrationStatus::Pending,
                     'loaidangky' => RegistrationType::Rental,
                     'lookup_token' => $lookupToken,
+                    'token_expires_at' => now()->addDays(30),
                 ]);
 
                 $this->guiEmailThongBao($data, $phong, $lookupToken);
@@ -444,15 +445,39 @@ class DangkyService implements DangkyServiceInterface
     public function layDuLieuTraCuuKhach(?string $token): array
     {
         $dangky = null;
+        $errorMessage = null;
         if ($token) {
-            $dangky = Dangky::with('phong')
+            $dangkyId = Dangky::query()
                 ->where('lookup_token', $token)
-                ->first();
+                ->whereNotNull('token_expires_at')
+                ->where('token_expires_at', '>', now())
+                ->value('id');
+
+            if (! $dangkyId) {
+                $exists = Dangky::query()->where('lookup_token', $token)->exists();
+                if ($exists) {
+                    $errorMessage = 'Link tra cứu đã hết hạn, vui lòng đăng ký lại';
+                }
+
+                $ip = null;
+                try {
+                    $ip = request()->ip();
+                } catch (\Throwable) {
+                }
+
+                Log::warning('Guest lookup failed', [
+                    'ip' => $ip,
+                    'token_partial' => substr((string) $token, 0, 8),
+                ]);
+            } else {
+                $dangky = Dangky::with('phong')->find($dangkyId);
+            }
         }
 
         return [
             'token' => $token,
             'dangky' => $dangky,
+            'error_message' => $errorMessage,
         ];
     }
 

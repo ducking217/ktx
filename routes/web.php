@@ -52,20 +52,26 @@ Route::prefix('admin')
 
         // Quản lý Phòng & Sơ đồ
         Route::controller('PhongController')->group(function () {
-            Route::get('/quanlyphong', 'index')->name('quanlyphong');
-            Route::get('/sodophong', 'map')->name('phong.map');
-            Route::post('/themphong', 'store')->name('themphong');
-            Route::post('/capnhatphong/{id}', 'update')->name('capnhatphong');
-            Route::post('/xoaphong/{id}', 'destroy')->name('xoaphong');
-            Route::get('/quanlyphong/{id}', 'show')->name('chitietphong');
-            
-            // Tài sản & Vật tư (Inventory)
-            Route::post('/quanlyphong/{id}/themtaisan', 'storeAsset')->name('themtaisan');
-            Route::post('/quanlyphong/{id}/capnhattaisan/{taisanId}', 'updateAsset')->name('capnhattaisan');
-            Route::post('/quanlyphong/{id}/xoataisan/{taisanId}', 'destroyAsset')->name('xoataisan');
-            Route::post('/quanlyphong/{id}/themvattu', 'storeSupply')->name('themvattu');
-            Route::post('/quanlyphong/{id}/capnhatvattu/{vattuId}', 'updateSupply')->name('capnhatvattu');
-            Route::post('/quanlyphong/{id}/xoavattu/{vattuId}', 'destroySupply')->name('xoavattu');
+            Route::get('/quanlyphong', 'index')->name('phong.index');
+            Route::get('/sodophong', 'soDo')->name('phong.map');
+            Route::post('/themphong', 'luu')->name('phong.luu');
+            Route::post('/capnhatphong/{id}', 'capNhat')->name('phong.capnhat');
+            Route::post('/xoaphong/{id}', 'xoa')->name('phong.xoa');
+            Route::get('/quanlyphong/{id}', 'chiTiet')->name('phong.chitiet');
+        });
+
+        // Quản lý Tài sản
+        Route::prefix('taisan')->controller('TaiSanController')->group(function () {
+            Route::post('/them/{id}', 'luu')->name('taisan.them');
+            Route::post('/cap-nhat/{id}/{taisanId}', 'capNhat')->name('taisan.capnhat');
+            Route::post('/xoa/{id}/{taisanId}', 'xoa')->name('taisan.xoa');
+        });
+
+        // Quản lý Vật tư
+        Route::prefix('vattu')->controller('VatTuController')->group(function () {
+            Route::post('/them/{id}', 'luu')->name('vattu.them');
+            Route::post('/cap-nhat/{id}/{vattuId}', 'capNhat')->name('vattu.capnhat');
+            Route::post('/xoa/{id}/{vattuId}', 'xoa')->name('vattu.xoa');
         });
 
         // Quản lý Sinh viên
@@ -147,6 +153,29 @@ Route::prefix('admin')
             Route::post('/hopdong/{id}/thanhly', 'destroy')->name('hopdong.thanhly');
             Route::get('/hopdong/{id}/pdf', 'downloadPDF')->name('hopdong.pdf');
         });
+
+        // Yêu cầu gia hạn hợp đồng
+        Route::controller('GiaHanController')->middleware('can:hopdong.manage')->group(function () {
+            Route::get('/gia-han', 'index')->name('giahan.index');
+            Route::post('/gia-han/{id}/duyet', 'duyet')->name('giahan.duyet');
+            Route::post('/gia-han/{id}/tu-choi', 'tuChoi')->name('giahan.tuchoi');
+        });
+
+        // Báo cáo & Thống kê
+        Route::prefix('bao-cao')->name('baocao.')->group(function () {
+            Route::get('/tai-chinh', [App\Http\Controllers\Admin\BaoCaoController::class, 'taiChinh'])->name('taichinh');
+            Route::get('/xuat-excel', [App\Http\Controllers\Admin\BaoCaoController::class, 'xuatExcel'])->name('xuat_excel');
+        });
+
+        // Quản lý tài khoản (Super Admin only)
+        Route::prefix('accounts')->name('accounts.')->middleware('can:accounts.manage')->controller(App\Http\Controllers\Admin\AccountController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/tao', 'taoMoi')->name('tao');
+            Route::post('/', 'luu')->name('luu');
+            Route::get('/{id}/sua', 'sua')->name('sua');
+            Route::put('/{id}', 'capNhat')->name('capnhat');
+            Route::delete('/{id}', 'xoa')->name('xoa');
+        });
     });
 
 // --------------------------------------------------------------------------
@@ -180,6 +209,13 @@ Route::prefix('student')
         // Hợp đồng
         Route::get('/hopdongcuatoi', 'HopdongController@index')->name('hopdongcuatoi');
 
+        // Gia hạn hợp đồng
+        Route::controller('GiaHanController')->group(function () {
+            Route::get('/gia-han', 'index')->name('giahan.index');
+            Route::get('/gia-han/tao', 'create')->name('giahan.tao');
+            Route::post('/gia-han', 'store')->name('giahan.store');
+        });
+
         // Bảo hỏng & Tài sản
         Route::get('/baohong', 'BaohongController@lietKeBaoHongSinhVien')->name('danhsachbaohong');
         Route::post('/baohong', 'BaohongController@luuBaoHong')->name('thembaohong');
@@ -198,6 +234,18 @@ Route::prefix('student')
                 auth()->user()->unreadNotifications->markAsRead();
                 return back()->with('success', 'Đã đánh dấu tất cả là đã đọc.');
             })->name('thongbao.markAllRead');
+        });
+    });
+
+Route::prefix('sinhvien')
+    ->middleware(['auth', 'kiemtravaitro:sinhvien'])
+    ->namespace('App\Http\Controllers\Student')
+    ->name('student.')
+    ->group(function () {
+        Route::controller('GiaHanController')->group(function () {
+            Route::get('/gia-han', 'index')->name('giahan.index_alt');
+            Route::get('/gia-han/tao', 'create')->name('giahan.tao_alt');
+            Route::post('/gia-han', 'store')->name('giahan.store_alt');
         });
     });
 

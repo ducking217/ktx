@@ -266,7 +266,7 @@ class HoadonService implements HoadonServiceInterface
         ];
     }
 
-    private function thongBaoPhong(int $phongId, Hoadon $hoadon): void
+    protected function thongBaoPhong(int $phongId, Hoadon $hoadon): void
     {
         $students = Sinhvien::where('phong_id', $phongId)->with('taikhoan')->get();
         foreach ($students as $s) {
