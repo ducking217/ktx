@@ -6,96 +6,188 @@
     <div class="mb-6 flex justify-end">
         <form method="GET" action="{{ route('student.danhsachphong') }}" class="relative group w-full md:w-72">
             <input name="q" value="{{ request('q') }}" type="text" placeholder="Tìm theo tên phòng..."
-                   class="pdu-input pl-10 py-2.5 text-sm shadow-sm" />
-            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-secondary/30">
+                   class="saas-input pl-10" />
+            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
             <button type="submit" class="hidden">Tìm</button>
         </form>
     </div>
 
-    <div class="animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        <article class="overflow-hidden rounded-[2rem] border border-ui-border bg-ui-card/50 backdrop-blur-xl shadow-sm transition-all hover:border-brand-emerald/10">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-ink-primary">
-                    <thead class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-bold uppercase tracking-widest text-ink-secondary">
-                        <tr>
-                            <th class="px-8 py-5">Thông tin phòng</th>
-                            <th class="px-8 py-5">Khu vực / Tòa</th>
-                            <th class="px-8 py-5 text-right">Đơn giá</th>
-                            <th class="px-8 py-5 text-center">Tình trạng</th>
-                            <th class="px-8 py-5 text-right">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-ui-border">
-                        @forelse ($danhsachphong as $phong)
-                            @php
-                                $soNguoiDangO = $soluongdango_theophong[$phong->id] ?? 0;
-                                $soChoConLai = $phong->succhuamax - $soNguoiDangO;
-                            @endphp
-                            <tr class="group transition-colors hover:bg-ui-bg/30">
-                                <td class="px-8 py-6">
-                                    <div class="font-display text-lg font-black text-ink-primary tracking-tight uppercase">{{ $phong->tenphong }}</div>
-                                    <div class="text-[9px] font-bold text-ink-secondary/40 uppercase tracking-widest mt-1 flex items-center gap-1.5">
-                                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                        {{ $phong->gioitinh === 'Nam' ? 'Dành cho Nam' : 'Dành cho Nữ' }}
-                                    </div>
-                                </td>
-                                <td class="px-8 py-6">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-ui-bg text-ink-secondary group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-ink-primary text-sm uppercase tracking-tight">Tòa {{ $phong->toa }}</div>
-                                            <div class="text-[9px] font-bold text-ink-secondary/40 uppercase tracking-widest mt-0.5">Tầng {{ $phong->tang }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-6 text-right">
-                                    <div class="font-display text-lg font-black text-ink-primary tabular-nums tracking-tight">{{ number_format($phong->giaphong) }}đ</div>
-                                    <div class="text-[9px] font-bold text-ink-secondary/40 uppercase tracking-widest">/ tháng</div>
-                                </td>
-                                <td class="px-8 py-6 text-center">
-                                    @php
-                                        $badgeClass = $soChoConLai <= 1 ? 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20' : ($soChoConLai <= 2 ? 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20' : 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20');
-                                    @endphp
-                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest {{ $badgeClass }}">
+    <div class="saas-card overflow-hidden border-dashed">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-900">
+                <thead class="bg-slate-50 border-b border-slate-100 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    <tr>
+                        <th class="px-6 py-4">Thông tin phòng</th>
+                        <th class="px-6 py-4">Khu vực / Tòa</th>
+                        <th class="px-6 py-4 text-right">Đơn giá / tháng</th>
+                        <th class="px-6 py-4 text-center">Tình trạng</th>
+                        <th class="px-6 py-4 text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse ($danhsachphong as $phong)
+                        @php
+                            $soNguoiDangO = (int) ($phong->so_giuong_da_o ?? ($soluongdango_theophong[$phong->id] ?? 0));
+                            $sucChua = (int) ($phong->loaiphong?->suc_chua ?? 0);
+                            $soChoConLai = (int) ($phong->so_giuong_trong ?? max($sucChua - $soNguoiDangO, 0));
+                            $gioiTinhHanChe = $phong->gioi_tinh_han_che?->value ?? null;
+                            $labelGioiTinh = match ($gioiTinhHanChe) {
+                                'male' => 'Dành cho Nam',
+                                'female' => 'Dành cho Nữ',
+                                default => 'Phù hợp mọi giới tính',
+                            };
+                            $badgeClass = $soChoConLai > 0 ? 'saas-badge-success' : 'saas-badge-error';
+                            $thietBiOnDinh = true;
+                            $vatTuPreview = $phong->vattus?->take(2) ?? collect();
+                            $taiSanPreview = $phong->taisans?->take(2) ?? collect();
+                        @endphp
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-bold text-slate-900 uppercase tracking-tight">{{ $phong->ten_phong }}</div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    {{ $labelGioiTinh }}
+                                </div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h10M7 12h10M7 17h10"/></svg>
+                                    {{ $phong->loaiphong?->ten_loai ?? 'N/A' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-xs font-bold text-slate-900 uppercase tracking-tight">{{ $phong->toanha?->ten_toa_nha ?? 'N/A' }}</div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Tầng {{ $phong->tang }}</div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="text-xs font-bold text-slate-900 tabular-nums">{{ number_format($phong->loaiphong?->don_gia ?? 0) }}đ</div>
+                            </td>
+                            <td class="px-6 py-4 text-center space-y-2">
+                                <div>
+                                    <span class="saas-badge {{ $badgeClass }}">
                                         {{ $soChoConLai }} giường trống
                                     </span>
-                                    <div class="text-[8px] font-bold text-ink-secondary/30 uppercase tracking-[0.2em] mt-1.5 tabular-nums">{{ $soNguoiDangO }}/{{ $phong->succhuamax }} Đang ở</div>
-                                </td>
-                                <td class="px-8 py-6 text-right">
-                                    <form method="POST" action="{{ route('student.dangkyphong') }}">
-                                        @csrf
-                                        <input type="hidden" name="phong_id" value="{{ $phong->id }}">
-                                        <button type="submit"
-                                                class="pdu-btn-primary px-6 py-2.5 text-[9px] font-black uppercase tracking-widest shadow-lg shadow-brand-emerald/10 transition-all hover:-translate-y-0.5 active:translate-y-0">
-                                            Gửi đăng ký
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-8 py-24 text-center">
-                                    <div class="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-ui-bg text-ink-secondary/20 mb-6">
-                                        <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                                    </div>
-                                    <h3 class="font-display text-xl font-black text-ink-primary uppercase tracking-tight">Không tìm thấy phòng</h3>
-                                    <p class="mt-2 text-xs font-medium text-ink-secondary/60 max-w-sm mx-auto">Hiện tại không có phòng nào trống phù hợp với yêu cầu của bạn.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </article>
-        
-        @if(method_exists($danhsachphong, 'links'))
-            <div class="mt-8">
-                {{ $danhsachphong->links() }}
-            </div>
-        @endif
+                                </div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest tabular-nums">
+                                    {{ $soNguoiDangO }}/{{ $sucChua }} Đang ở
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <form method="POST" action="{{ route('student.dangkyphong') }}" class="form-dangky inline-block">
+                                    @csrf
+                                    <input type="hidden" name="phong_id" value="{{ $phong->id }}">
+                                    <button type="submit"
+                                            class="saas-btn-primary h-9 px-4 disabled:opacity-50 disabled:cursor-not-allowed text-[10px]">
+                                        <span class="btn-content">Đặt phòng</span>
+                                        <span class="btn-loader hidden">
+                                            <svg class="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        </span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hiện tại không có phòng nào trống phù hợp với yêu cầu của bạn.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
+    
+    @if(method_exists($danhsachphong, 'links'))
+        <div class="mt-6">
+            {{ $danhsachphong->links() }}
+        </div>
+    @endif
+
+    @if(isset($danhsachphongsaptrong) && $danhsachphongsaptrong->count() > 0)
+        <div class="mt-10">
+            <div class="mb-4">
+                <h3 class="text-sm font-bold text-slate-900 tracking-tight">Phòng sắp có chỗ trống</h3>
+                <p class="text-xs font-medium text-slate-500 mt-1">Danh sách phòng hiện đang kín chỗ nhưng có hợp đồng sắp kết thúc trong 30 ngày tới.</p>
+            </div>
+
+            <div class="saas-card overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-900">
+                        <thead class="bg-slate-50 border-b border-slate-100 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <tr>
+                                <th class="px-6 py-4">Phòng</th>
+                                <th class="px-6 py-4">Tòa</th>
+                                <th class="px-6 py-4">Dự kiến trống</th>
+                                <th class="px-6 py-4 text-right">Vật tư / Tài sản</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach($danhsachphongsaptrong as $phong)
+                                @php
+                                    $sapTrongDate = $phong->ngay_trong_som_nhat instanceof \Illuminate\Support\Carbon
+                                        ? $phong->ngay_trong_som_nhat->format('d/m/Y')
+                                        : 'N/A';
+                                    $soGiuongSapTrong = (int) ($phong->so_giuong_sap_trong ?? 0);
+                                    $vatTuPreview = $phong->vattus?->take(2) ?? collect();
+                                    $taiSanPreview = $phong->taisans?->take(2) ?? collect();
+                                @endphp
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-bold text-slate-900 uppercase tracking-tight">{{ $phong->ten_phong }}</div>
+                                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{{ $phong->loaiphong?->ten_loai ?? 'N/A' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-xs font-bold text-slate-900 uppercase tracking-tight">{{ $phong->toanha?->ten_toa_nha ?? 'N/A' }}</div>
+                                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Tầng {{ $phong->tang }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 space-y-2">
+                                        <div>
+                                            <span class="saas-badge saas-badge-warning">
+                                                {{ $sapTrongDate }}
+                                            </span>
+                                        </div>
+                                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest tabular-nums">{{ $soGiuongSapTrong }} giường</div>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="space-y-1">
+                                            @foreach($vatTuPreview as $vt)
+                                                <div class="text-[10px] font-medium text-slate-600 truncate" title="{{ $vt->tenvattu }}">{{ $vt->tenvattu }} × {{ $vt->soluong }}</div>
+                                            @endforeach
+                                            @foreach($taiSanPreview as $ts)
+                                                <div class="text-[10px] font-medium text-slate-600 truncate" title="{{ $ts->tentaisan }}">{{ $ts->tentaisan }} × {{ $ts->soluong }}</div>
+                                            @endforeach
+                                        </div>
+                                        <div class="mt-2">
+                                            <a href="{{ route('public.chitietvattu', ['id' => $phong->id, 'back' => 'student']) }}" class="saas-btn-secondary h-7 px-3 text-[9px] inline-flex items-center gap-1.5">
+                                                Xem chi tiết
+                                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('.form-dangky');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const btn = this.querySelector('button[type="submit"]');
+                    const content = btn.querySelector('.btn-content');
+                    const loader = btn.querySelector('.btn-loader');
+                    
+                    btn.disabled = true;
+                    content.innerText = 'Đang gửi...';
+                    loader.classList.remove('hidden');
+                });
+            });
+        });
+    </script>
 @endsection

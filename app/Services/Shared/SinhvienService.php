@@ -4,7 +4,9 @@ namespace App\Services\Shared;
 
 use App\Contracts\Core\KiemToanServiceInterface;
 use App\Contracts\Shared\SinhvienServiceInterface;
+use App\Enums\BedStatus;
 use App\Enums\ContractStatus;
+use App\Models\Giuong;
 use App\Models\Hopdong;
 use App\Models\Phong;
 use App\Models\Sinhvien;
@@ -23,139 +25,154 @@ class SinhvienService implements SinhvienServiceInterface
     public function listStudents(Request $request): array
     {
         $tuKhoa = $request->query('q', '');
-        $students = Sinhvien::when($tuKhoa, fn($q) => $q->where('masinhvien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%'))
-            ->with(['taikhoan', 'phong'])
+
+        $students = Sinhvien::when(
+            $tuKhoa,
+            function ($q) use ($tuKhoa) {
+                $search = '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%';
+                $q->where(function ($sq) use ($search) {
+                    $sq->where('ma_sinh_vien', 'like', $search)
+                       ->orWhere('lop', 'like', $search)
+                       ->orWhereHas('user', fn($uq) => $uq->where('name', 'like', $search)
+                                                         ->orWhere('phone', 'like', $search));
+                });
+            }
+        )
+            ->with(['user', 'current_hopdong.giuong.phong.toanha'])
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
 
         return [
             'danhsachsinhvien' => $students,
-            'danhsachphong' => Phong::all(),
-            'tuKhoa' => $tuKhoa,
+            'tuKhoa'           => $tuKhoa,
         ];
     }
 
     public function getStudentProfile(int $id): array
     {
-        $sinhvien = Sinhvien::with([
-            'taikhoan',
-            'phong.toanha',
-            'dangkys' => fn($q) => $q->orderByDesc('created_at'),
-            'hopdongs' => fn($q) => $q->orderByDesc('ngay_bat_dau'),
-            'kyluats' => fn($q) => $q->orderByDesc('ngayvipham'),
-            'danhgias' => fn($q) => $q->orderByDesc('ngaydanhgia'),
-        ])->find($id);
+        $baseQuery = Sinhvien::with([
+            'user',
+            'current_hopdong.giuong.phong.toanha',
+            'hopdongs.giuong.phong',
+            'kyluats' => fn($q) => $q->orderByDesc('ngay_vi_pham'),
+            'danhgias' => fn($q) => $q->orderByDesc('created_at'),
+        ]);
+
+        $sinhvien = $baseQuery->find($id);
+        if (! $sinhvien) {
+            $sinhvien = $baseQuery->where('user_id', $id)->first();
+        }
 
         if (!$sinhvien) return $this->traVeLoi('Không tìm thấy sinh viên.');
 
-        // Lấy lịch sử hóa đơn của phòng mà sinh viên này đang ở
-        $hoadons = collect();
-        if ($sinhvien->phong_id) {
-            $hoadons = \App\Models\Hoadon::where('phong_id', $sinhvien->phong_id)
-                ->orderByDesc('nam')
-                ->orderByDesc('thang')
-                ->get();
-        }
+        // Lấy hóa đơn của tất cả các hợp đồng (không chỉ hợp đồng hiện tại)
+        $hopdongIds = $sinhvien->hopdongs->pluck('id');
+        $hoadons = \App\Models\Hoadon::whereIn('hopdong_id', $hopdongIds)
+            ->orderByDesc('created_at')
+            ->get();
 
         return [
             'sinhvien' => $sinhvien,
-            'hoadons' => $hoadons,
+            'hoadons'  => $hoadons,
         ];
     }
 
     public function updateStudent(int $id, array $data): array
     {
-        $sinhvien = Sinhvien::find($id);
+        $sinhvien = Sinhvien::with('user')->find($id);
         if (!$sinhvien) return $this->traVeLoi('Không tìm thấy sinh viên.');
 
-        $taiKhoan = $sinhvien->taikhoan;
-        if (!$taiKhoan) return $this->traVeLoi('Không tìm thấy tài khoản.');
+        $user = $sinhvien->user;
+        if (!$user) return $this->traVeLoi('Không tìm thấy tài khoản liên kết.');
 
-        DB::transaction(function () use ($taiKhoan, $sinhvien, $data) {
-            $taiKhoan->update(['name' => $data['name'], 'gioitinh' => $data['gioitinh']]);
-            $sinhvien->update(['masinhvien' => $data['masinhvien'], 'lop' => $data['lop'], 'sodienthoai' => $data['sodienthoai']]);
+        DB::transaction(function () use ($user, $sinhvien, $data) {
+            // Cập nhật thông tin trên bảng users
+            $user->update([
+                'name'   => $data['name']    ?? $user->name,
+                'gender' => $data['gender'] ?? $user->gender,
+                'phone'  => $data['phone']  ?? $user->phone,
+            ]);
+
+            // Cập nhật thông tin riêng của Sinhvien
+            $sinhvien->update([
+                'ma_sinh_vien' => $data['ma_sinh_vien'] ?? $sinhvien->ma_sinh_vien,
+                'lop'          => $data['lop']          ?? $sinhvien->lop,
+            ]);
         });
 
-        return $this->traVeThanhCong('Cập nhật thành công.');
+        return $this->traVeThanhCong('Cập nhật sinh viên thành công.');
     }
 
-    public function assignRoom(int $id, ?int $phongId): array
+    /**
+     * Admin thủ công xếp giường cho sinh viên (tìm giường trống trong phòng).
+     */
+    public function assignRoom(int $sinhvienId, ?int $phongId): array
     {
         try {
-            return DB::transaction(function () use ($id, $phongId) {
-                $sinhvien = Sinhvien::where('id', $id)->with('taikhoan')->lockForUpdate()->first();
+            return DB::transaction(function () use ($sinhvienId, $phongId) {
+                $sinhvien = Sinhvien::where('id', $sinhvienId)->lockForUpdate()->first();
                 if (!$sinhvien) throw new \Exception('Không tìm thấy sinh viên.');
 
-                $oldPhongId = $sinhvien->phong_id;
-
+                // ── Trường hợp: Rời phòng (phongId = null) ──────────────────
                 if ($phongId === null || $phongId === 0) {
-                    $this->terminateActiveContracts($sinhvien->id);
-                    $sinhvien->update(['phong_id' => null, 'ngay_vao' => null, 'ngay_het_han' => null]);
-                    
-                    if ($oldPhongId) {
-                        $this->capNhatDango($oldPhongId);
-                        $this->auditLog('Rời phòng', 'Sinhvien', $sinhvien->id, ['phong_id' => $oldPhongId], ['phong_id' => null]);
-                    }
-                    
+                    $this->terminateActiveContracts($sinhvienId);
                     return $this->traVeThanhCong('Rời phòng thành công.');
                 }
 
-                $phong = Phong::where('id', $phongId)->lockForUpdate()->first();
+                // ── Trường hợp: Xếp vào phòng mới ──────────────────────────
+                $phong = Phong::with('loaiphong')->where('id', $phongId)->lockForUpdate()->first();
                 if (!$phong) throw new \Exception('Phòng không tồn tại.');
-                if ((int)$oldPhongId === (int)$phong->id) return $this->traVeThanhCong('Đang ở đúng phòng.');
 
-                // [CONTRACT FLOW] Chấm dứt hợp đồng cũ
-                $this->terminateActiveContracts($sinhvien->id);
-
-                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->succhuamax) {
-                    throw new \Exception('Phòng đã đủ người.');
+                // Kiểm tra đã có hợp đồng active chưa
+                if (Hopdong::where('sinhvien_id', $sinhvien->id)
+                    ->where('trang_thai', ContractStatus::Active->value)
+                    ->exists()) {
+                    throw new \Exception('Sinh viên đang có hợp đồng hoạt động. Hãy thanh lý trước.');
                 }
 
-                if ($phong->gioitinh && $phong->gioitinh !== ($sinhvien->taikhoan->gioitinh->value ?? $sinhvien->taikhoan->gioitinh ?? null)) {
-                    throw new \Exception('Giới tính không phù hợp.');
+                // Kiểm tra giới tính phòng
+                $sinhvien->loadMissing('user');
+                $gioitinhSV = $sinhvien->user?->gender?->value;
+                if ($phong->gioi_tinh_han_che->value !== 'any' && $gioitinhSV !== $phong->gioi_tinh_han_che->value) {
+                    throw new \Exception('Giới tính sinh viên không phù hợp với phòng này.');
                 }
 
-                $ngayVao = now()->format('Y-m-d');
+                // Tìm giường trống trong phòng
+                $giuong = Giuong::where('phong_id', $phong->id)
+                    ->where('trang_thai', BedStatus::Available)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$giuong) throw new \Exception('Phòng đã đầy, không còn giường trống.');
+
+                $ngayVao    = now()->format('Y-m-d');
                 $ngayHetHan = now()->addMonths(5)->format('Y-m-d');
 
-                $sinhvien->update([
-                    'phong_id' => $phong->id,
-                    'ngay_vao' => $ngayVao,
-                    'ngay_het_han' => $ngayHetHan
-                ]);
-
-                // [CONTRACT FLOW] Tạo hợp đồng mới tự động khi chuyển phòng
+                // Tạo hợp đồng gắn với giường cụ thể
                 Hopdong::create([
-                    'sinhvien_id' => $sinhvien->id,
-                    'phong_id' => $phong->id,
-                    'ngay_bat_dau' => $ngayVao,
+                    'sinhvien_id'   => $sinhvien->id,
+                    'giuong_id'     => $giuong->id,
+                    'ngay_bat_dau'  => $ngayVao,
                     'ngay_ket_thuc' => $ngayHetHan,
-                    'giaphong_luc_ky' => (int) $phong->giaphong,
-                    'trang_thai' => ContractStatus::Active->value,
+                    'gia_thuc_te'   => $phong->loaiphong->gia_thang ?? 0,
+                    'trang_thai'    => ContractStatus::Active->value,
                 ]);
 
-                $this->capNhatDango($phong->id);
-                if ($oldPhongId) $this->capNhatDango($oldPhongId);
+                // Cập nhật trạng thái giường
+                $giuong->update(['trang_thai' => BedStatus::Occupied->value]);
 
-                $this->auditLog('Chuyển phòng', 'Sinhvien', $sinhvien->id, ['phong_id' => $oldPhongId], ['phong_id' => $phong->id]);
+                $this->kiemToanService->ghiNhatKy(
+                    'assign_room', 'Sinhvien', $sinhvien->id,
+                    [],
+                    ['phong_id' => $phong->id, 'giuong_id' => $giuong->id]
+                );
 
-                return $this->traVeThanhCong('Chuyển phòng và tạo hợp đồng mới thành công.');
+                return $this->traVeThanhCong("Xếp phòng thành công: {$phong->ten_phong} — Giường {$giuong->ma_giuong}.");
             });
         } catch (\Throwable $e) {
             return $this->traVeLoi($e->getMessage());
         }
-    }
-
-    private function capNhatDango(int $phongId): void
-    {
-        $count = Sinhvien::where('phong_id', $phongId)->count();
-        Phong::where('id', $phongId)->update(['dango' => $count]);
-    }
-
-    private function auditLog(string $action, string $model, int $id, array $old, array $new): void
-    {
-        $this->kiemToanService->ghiNhatKy($action, $model, $id, $old, $new);
     }
 
     public function removeFromRoom(int $id): array
@@ -166,8 +183,6 @@ class SinhvienService implements SinhvienServiceInterface
                 if (!$sinhvien) throw new \Exception('Không tìm thấy sinh viên.');
 
                 $this->terminateActiveContracts($sinhvien->id);
-                $sinhvien->update(['phong_id' => null, 'ngay_vao' => null, 'ngay_het_han' => null]);
-
                 return $this->traVeThanhCong('Rời phòng thành công.');
             });
         } catch (\Throwable $e) {
@@ -175,8 +190,19 @@ class SinhvienService implements SinhvienServiceInterface
         }
     }
 
-    private function terminateActiveContracts(int $sinhvienId)
+    // ─── Private Helpers ──────────────────────────────────────────────────────
+
+    private function terminateActiveContracts(int $sinhvienId): void
     {
-        Hopdong::where('sinhvien_id', $sinhvienId)->where('trang_thai', ContractStatus::Active)->update(['trang_thai' => ContractStatus::Terminated]);
+        $activeContracts = Hopdong::where('sinhvien_id', $sinhvienId)
+            ->where('trang_thai', ContractStatus::Active->value)
+            ->with('giuong')
+            ->get();
+
+        foreach ($activeContracts as $contract) {
+            $contract->update(['trang_thai' => ContractStatus::Terminated->value]);
+            // Giải phóng giường
+            $contract->giuong?->update(['trang_thai' => BedStatus::Available->value]);
+        }
     }
 }

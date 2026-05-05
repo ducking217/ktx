@@ -17,28 +17,36 @@ class DangkyController extends Controller
 
     public function create(Request $request): View|RedirectResponse
     {
-        $phongId = (int) $request->query('phong_id');
-        $giuongNo = $request->query('giuong_no') !== null ? (int) $request->query('giuong_no') : null;
-
-        if ($phongId <= 0) {
+        // Defensive validation - check if phong_id parameter exists
+        $phongIdParam = $request->query('phong_id');
+        if ($phongIdParam === null || !is_numeric($phongIdParam) || (int) $phongIdParam <= 0) {
             return redirect()->route('public.danhsachphong')
                 ->with('toast_loai', 'error')
-                ->with('toast_noidung', 'Vui long chon phong truoc khi dang ky.');
+                ->with('toast_noidung', 'Vui lòng chọn phòng trước khi đăng ký.');
         }
 
-        $duLieu = $this->dangkyService->layDuLieuFormDangKyKhach($phongId, $giuongNo);
-        if (($duLieu['success'] ?? false) === false) {
+        $phongId = (int) $phongIdParam;
+
+        try {
+            $duLieu = $this->dangkyService->layDuLieuFormDangKyKhach($phongId);
+            
+            if (($duLieu['success'] ?? false) === false) {
+                return redirect()->route('public.danhsachphong')
+                    ->with('toast_loai', 'error')
+                    ->with('toast_noidung', $duLieu['toast_noidung'] ?? 'Không tìm thấy phòng.');
+            }
+
+            $viewDangKy = view()->exists('landing.phong.dangky') ? 'landing.phong.dangky' : 'landing.dangky';
+
+            return view($viewDangKy, [
+                'phong' => $duLieu['phong'],
+            ]);
+        } catch (\Throwable $e) {
+            // Defensive error handling - catch any exceptions from service
             return redirect()->route('public.danhsachphong')
                 ->with('toast_loai', 'error')
-                ->with('toast_noidung', $duLieu['toast_noidung'] ?? 'Khong tim thay phong.');
+                ->with('toast_noidung', 'Đã xảy ra lỗi khi tải thông tin phòng. Vui lòng thử lại.');
         }
-
-        $viewDangKy = view()->exists('landing.phong.dangky') ? 'landing.phong.dangky' : 'landing.dangky';
-
-        return view($viewDangKy, [
-            'phong' => $duLieu['phong'],
-            'giuong_no' => $duLieu['giuong_no'] ?? null,
-        ]);
     }
 
     public function store(LuuDangkyRequest $request)

@@ -20,14 +20,15 @@ class QuanLyAccountTest extends TestCase
         // Setup: đăng nhập super_admin
         $superAdmin = User::factory()->superAdmin()->create();
         
+        $email = 'newadmin' . time() . '@example.com';
         $data = [
             'name' => 'New Admin',
-            'email' => 'newadmin@example.com',
+            'email' => $email,
             'password' => 'password123',
             'password_confirmation' => 'password123',
-            'vaitro' => UserRole::AdminTruong->value,
+            'vaitro' => UserRole::Admin->value,
             'is_active' => true,
-            'gioitinh' => 'Nam',
+            'gender' => \App\Enums\Gender::Male->value,
         ];
 
         // Action: POST /admin/accounts
@@ -36,13 +37,13 @@ class QuanLyAccountTest extends TestCase
 
         // Assert: DB có user với email đó
         $this->assertDatabaseHas('users', [
-            'email' => 'newadmin@example.com',
+            'email' => $email,
             'name' => 'New Admin',
-            'vaitro' => UserRole::AdminTruong->value,
+            'vaitro' => UserRole::Admin->value,
         ]);
 
         // Assert: password đã hash (assertNotEquals raw vs stored)
-        $user = User::where('email', 'newadmin@example.com')->first();
+        $user = User::where('email', $email)->first();
         $this->assertNotEquals('password123', $user->password);
         $this->assertTrue(Hash::check('password123', $user->password));
 

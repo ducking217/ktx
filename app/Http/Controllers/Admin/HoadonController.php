@@ -4,18 +4,27 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Contracts\Admin\HoadonServiceInterface;
+use App\Contracts\Admin\TaiChinhServiceInterface;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class HoadonController extends Controller
 {
     public function __construct(
-        private readonly HoadonServiceInterface $hoadonService
+        private readonly HoadonServiceInterface $hoadonService,
+        private readonly TaiChinhServiceInterface $taiChinhService
     ) {}
 
     public function lietKeHoaDonAdmin(Request $request)
     {
         $data = $this->hoadonService->lietKeHoaDonAdmin($request);
+        if (! $request->query->has('tab') && ! $request->query->has('trang_thai') && isset($data['activeTab'])) {
+            return redirect()
+                ->route('admin.quanlyhoadon', array_filter([
+                    'tab' => $data['activeTab'],
+                    'phong_id' => $request->query('phong_id'),
+                ], fn ($v) => $v !== null && $v !== ''));
+        }
         return view('admin.hoadon.danhsach', $data);
     }
 
@@ -41,6 +50,7 @@ class HoadonController extends Controller
             'thang' => ['required', 'numeric', 'min:1', 'max:12'],
             'nam' => ['required', 'numeric', 'min:2000', 'max:2100'],
             'hoa_don' => ['required', 'array'],
+            'hoa_don.*.phong_id' => ['required', 'numeric'],
             'hoa_don.*.chisodiencu' => ['nullable', 'numeric', 'min:0'],
             'hoa_don.*.chisodienmoi' => ['required', 'numeric', 'min:0'],
             'hoa_don.*.chisonuoccu' => ['nullable', 'numeric', 'min:0'],
@@ -57,10 +67,20 @@ class HoadonController extends Controller
         return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
     }
 
+    public function nhacNoHoaDon(int $id)
+    {
+        $result = $this->taiChinhService->nhacNo($id);
+
+        return redirect()->back()->with([
+            'toast_loai' => $result['toast_loai'],
+            'toast_noidung' => $result['toast_noidung'],
+        ]);
+    }
+
     public function downloadInvoicePDF(int $id)
     {
-        $hoadon = \App\Models\Hoadon::with(['phong', 'sinhvien.taikhoan'])->find($id);
-        if (!$hoadon || !$hoadon->sinhvien) {
+        $hoadon = \App\Models\Hoadon::with(['phong', 'hopdong.sinhvien.user', 'giao_dich_gan_nhat'])->find($id);
+        if (! $hoadon || ! $hoadon->hopdong?->sinhvien) {
             abort(404, 'Không tìm thấy dữ liệu hóa đơn');
         }
 
@@ -68,7 +88,7 @@ class HoadonController extends Controller
             'hoadon' => $hoadon,
         ]);
 
-        return $pdf->download("hoadon_{$hoadon->ma_hd}.pdf");
+        return $pdf->download("hoadon_{$hoadon->ma_hoa_don}.pdf");
     }
 
     public function giaoDienNhapHangLoat()

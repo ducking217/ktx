@@ -17,8 +17,8 @@ class BaoTriService implements BaoTriServiceInterface
     {
         $tuKhoa = $request->query('q', '');
         $data = Lichsubaotri::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('phong', fn($pq) => $pq->where('tenphong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
-        })->with(['phong', 'vattu'])->orderByDesc('ngaybaotri')->paginate(20);
+            $q->whereHas('phong', fn($pq) => $pq->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
+        })->with(['phong', 'vattu'])->orderByDesc('ngay_bao_tri')->paginate(20);
 
         return [
             'baotri' => $data,
@@ -58,7 +58,7 @@ class BaoTriService implements BaoTriServiceInterface
         try {
             $lichsu = Lichsubaotri::find($id);
             if (!$lichsu) return $this->traVeLoi('Không tìm thấy bản ghi.');
-            $lichsu->update(['trangthai' => 'Đã hoàn thành']);
+            $lichsu->update(['trang_thai' => 'done']);
             return $this->traVeThanhCong('Đã hoàn thành bảo trì.');
         } catch (\Throwable $e) {
             return $this->traVeLoi($e->getMessage());

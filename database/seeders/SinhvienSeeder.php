@@ -23,53 +23,63 @@ class SinhvienSeeder extends Seeder
         $sv5 = User::where('email', 'sv5@ktx.test')->first();
 
         if ($sv1) {
-            Sinhvien::create([
-                'user_id' => $sv1->id,
-                'masinhvien' => 'sv0001',
-                'lop' => 'ctk42',
-                'sodienthoai' => '0900000001',
-                'phong_id' => $phongdau?->id,
-            ]);
+            $sv1->update(['phone' => '0900000001']);
+            Sinhvien::updateOrCreate(
+                ['user_id' => $sv1->id],
+                [
+                    'ma_sinh_vien' => 'sv0001',
+                    'lop' => 'ctk42',
+                    'phong_id' => $phongdau?->id,
+                ]
+            );
         }
 
         if ($sv2) {
-            Sinhvien::create([
-                'user_id' => $sv2->id,
-                'masinhvien' => 'sv0002',
-                'lop' => 'ctk42',
-                'sodienthoai' => '0900000002',
-                'phong_id' => null,
-            ]);
+            $sv2->update(['phone' => '0900000002']);
+            Sinhvien::updateOrCreate(
+                ['user_id' => $sv2->id],
+                [
+                    'ma_sinh_vien' => 'sv0002',
+                    'lop' => 'ctk42',
+                    'phong_id' => null,
+                ]
+            );
         }
 
         if ($sv3) {
-            Sinhvien::create([
-                'user_id' => $sv3->id,
-                'masinhvien' => 'sv0003',
-                'lop' => 'ctk43',
-                'sodienthoai' => '0900000003',
-                'phong_id' => null,
-            ]);
+            $sv3->update(['phone' => '0900000003']);
+            Sinhvien::updateOrCreate(
+                ['user_id' => $sv3->id],
+                [
+                    'ma_sinh_vien' => 'sv0003',
+                    'lop' => 'ctk43',
+                    'phong_id' => null,
+                ]
+            );
         }
 
         if ($sv4) {
-            Sinhvien::create([
-                'user_id' => $sv4->id,
-                'masinhvien' => 'sv0004',
-                'lop' => 'ctk43',
-                'sodienthoai' => '0900000004',
-                'phong_id' => null,
-            ]);
+            $sv4->update(['phone' => '0900000004']);
+            Sinhvien::updateOrCreate(
+                ['user_id' => $sv4->id],
+                [
+                    'ma_sinh_vien' => 'sv0004',
+                    'lop' => 'ctk43',
+                    'phong_id' => null,
+                ]
+            );
         }
 
         if ($sv5) {
-            Sinhvien::create([
-                'user_id' => $sv5->id,
-                'masinhvien' => 'sv0005',
-                'lop' => 'ctk44',
-                'sodienthoai' => '0900000005',
-                'phong_id' => null,
-            ]);
+            $sv5->update(['phone' => '0900000005']);
+            Sinhvien::updateOrCreate(
+                ['user_id' => $sv5->id],
+                [
+                    'ma_sinh_vien' => 'sv0005',
+                    'lop' => 'ctk44',
+                    'phong_id' => null,
+                ]
+            );
         }
     }
 }

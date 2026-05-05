@@ -34,16 +34,16 @@ class PhongRepository implements PhongRepositoryInterface
     {
         return Phong::with($with)
             ->when($filters['q'] ?? null, function ($query, $q) {
-                return $query->where('tenphong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($q)) . '%');
+                return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($q)) . '%');
             })
             ->when($filters['tang'] ?? null, function ($query, $tang) {
                 return $query->where('tang', $tang);
             })
             ->when($filters['gioitinh'] ?? null, function ($query, $gioitinh) {
-                return $query->where('gioitinh', $gioitinh);
+                return $query->where('gioi_tinh_han_che', $gioitinh);
             })
             ->orderBy('tang')
-            ->orderBy('tenphong')
+            ->orderBy('ten_phong')
             ->get();
     }
 
@@ -52,31 +52,36 @@ class PhongRepository implements PhongRepositoryInterface
      */
     public function tongSucChua(): int
     {
-        return (int) Phong::sum('succhuamax');
+        return (int) \App\Models\LoaiPhong::sum('suc_chua');
     }
 
     /**
-     * Tổng số sinh viên đang ở (sum of dango — cached by SinhvienObserver).
+     * Tổng số sinh viên đang ở (Đếm số giường có trạng thái Occupied).
      */
     public function tongDangO(): int
     {
-        return (int) Phong::sum('dango');
+        return (int) \App\Models\Giuong::where('trang_thai', \App\Enums\BedStatus::Occupied->value)->count();
     }
 
     /**
-     * Số phòng còn chỗ (dango < succhuamax).
+     * Số phòng còn chỗ (Có ít nhất 1 giường Available).
      */
     public function demPhongConCho(): int
     {
-        return Phong::whereColumn('dango', '<', 'succhuamax')->count();
+        return Phong::whereHas('giuongs', function ($query) {
+            $query->where('trang_thai', \App\Enums\BedStatus::Available->value);
+        })->count();
     }
 
     /**
-     * Số phòng hoàn toàn trống (dango = 0).
+     * Số phòng hoàn toàn trống (Tất cả giường đều Available).
      */
     public function demPhongTrong(): int
     {
-        return Phong::where('dango', 0)->count();
+        // Một phòng trống nếu tất cả giường của nó đều available
+        return Phong::whereDoesntHave('giuongs', function ($query) {
+            $query->where('trang_thai', '!=', \App\Enums\BedStatus::Available->value);
+        })->count();
     }
 }
 

@@ -120,6 +120,49 @@ class GiaHanHopdongTest extends TestCase
         $this->assertEquals(1, YeuCauGiaHan::where('sinhvien_id', $sinhvien->id)->count());
     }
 
+    public function test_khong_cho_gui_yeu_cau_neu_ngay_ket_thuc_moi_khong_sau_ngay_ket_thuc_hien_tai()
+    {
+        [$user, $sinhvien, $hopdong] = $this->createStudentWithContract();
+
+        $response = $this->actingAs($user)->post(route('student.giahan.store'), [
+            'hopdong_id' => $hopdong->id,
+            'ngay_ket_thuc_moi' => $hopdong->ngay_ket_thuc->format('Y-m-d'),
+        ]);
+
+        $response->assertSessionHas('toast_loai', 'loi');
+        $this->assertDatabaseCount('yeu_cau_gia_han', 0);
+    }
+
+    public function test_khong_cho_gui_yeu_cau_neu_hopdong_thieu_ngay_ket_thuc()
+    {
+        $user = User::factory()->create([
+            'vaitro' => UserRole::SinhVien,
+        ]);
+
+        $sinhvien = Sinhvien::create([
+            'user_id' => $user->id,
+            'masinhvien' => 'SV' . $user->id,
+            'phong_id' => $this->phong->id,
+        ]);
+
+        $hopdong = Hopdong::create([
+            'sinhvien_id' => $sinhvien->id,
+            'phong_id' => $this->phong->id,
+            'ngay_bat_dau' => now()->subMonths(5),
+            'ngay_ket_thuc' => null,
+            'trang_thai' => ContractStatus::Active->value,
+            'giaphong_luc_ky' => $this->phong->giaphong,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('student.giahan.store'), [
+            'hopdong_id' => $hopdong->id,
+            'ngay_ket_thuc_moi' => now()->addMonths(6)->format('Y-m-d'),
+        ]);
+
+        $response->assertSessionHas('toast_loai', 'loi');
+        $this->assertDatabaseCount('yeu_cau_gia_han', 0);
+    }
+
     /**
      * 3. test_admin_duyet_gia_han_cap_nhat_hopdong
      */

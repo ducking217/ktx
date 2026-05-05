@@ -15,6 +15,7 @@ enum BedStatus: string
     case Available = 'available';
     case Pending   = 'pending';
     case Occupied  = 'occupied';
+    case Broken    = 'broken';
 
     public function label(): string
     {
@@ -22,6 +23,7 @@ enum BedStatus: string
             self::Available => 'Còn trống',
             self::Pending   => 'Đang có người đặt',
             self::Occupied  => 'Đã có người ở',
+            self::Broken    => 'Đang hỏng',
         };
     }
 
@@ -31,6 +33,7 @@ enum BedStatus: string
             self::Available => '#10B981',
             self::Pending   => '#F59E0B',
             self::Occupied  => '#EF4444',
+            self::Broken    => '#6B7280',
         };
     }
 
@@ -39,7 +42,8 @@ enum BedStatus: string
         return match ($this) {
             self::Available => 'badge-available',
             self::Pending   => 'badge-pending',
-            self::Occupied => 'badge-occupied',
+            self::Occupied  => 'badge-occupied',
+            self::Broken    => 'badge-broken',
         };
     }
 

@@ -23,12 +23,30 @@ class HopdongController extends Controller
     {
         $duLieu = $request->validate([
             'sinhvien_id' => ['required', 'integer', 'exists:sinhvien,id'],
-            'phong_id' => ['required', 'integer', 'exists:phong,id'],
+            'phong_id' => ['nullable', 'integer', 'exists:phong,id'],
+            'giuong_id' => ['nullable', 'integer', 'exists:giuong,id'],
             'ngay_bat_dau' => ['required', 'date'],
             'ngay_ket_thuc' => ['required', 'date', 'after:ngay_bat_dau'],
+        ], [
+            'phong_id.required_without' => 'Phải chọn phòng hoặc giường',
+            'giuong_id.required_without' => 'Phải chọn giường hoặc phòng',
         ]);
 
+        // Validate: Phải cung cấp ít nhất một trong hai: phong_id hoặc giuong_id
+        if (!$request->has('phong_id') && !$request->has('giuong_id')) {
+            return redirect()->back()
+                ->withErrors(['phong_id' => 'Phải chọn phòng hoặc giường để tạo hợp đồng'])
+                ->withInput();
+        }
+
         $ketQua = $this->hopdongService->taoHopDong($duLieu);
+
+        if (isset($ketQua['toast_loai'], $ketQua['toast_noidung'])) {
+            return redirect()->back()->with([
+                'toast_loai' => $ketQua['toast_loai'],
+                'toast_noidung' => $ketQua['toast_noidung'],
+            ]);
+        }
 
         return redirect()->back()->with([
             'toast_loai' => ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi',
@@ -63,8 +81,14 @@ class HopdongController extends Controller
         }
 
         $ketQua = $this->hopdongService->giaHanHopDong($id, $ngayMoi, $ngayCu);
-        $loai = ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi';
+        if (isset($ketQua['toast_loai'], $ketQua['toast_noidung'])) {
+            return redirect()->back()->with([
+                'toast_loai' => $ketQua['toast_loai'],
+                'toast_noidung' => $ketQua['toast_noidung'],
+            ]);
+        }
 
+        $loai = ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi';
         return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Khong the gia han hop dong.']);
     }
 
@@ -77,14 +101,20 @@ class HopdongController extends Controller
         $phiHuHai = (int) ($dulieu['phi_hu_hai'] ?? 0);
 
         $ketQua = $this->hopdongService->thanhLyHopDong($id, $phiHuHai);
-        $loai = ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi';
+        if (isset($ketQua['toast_loai'], $ketQua['toast_noidung'])) {
+            return redirect()->back()->with([
+                'toast_loai' => $ketQua['toast_loai'],
+                'toast_noidung' => $ketQua['toast_noidung'],
+            ]);
+        }
 
+        $loai = ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi';
         return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Khong the thanh ly hop dong.']);
     }
 
     public function downloadPDF(int $id)
     {
-        $hopdong = \App\Models\Hopdong::with(['sinhvien.taikhoan', 'phong'])->find($id);
+        $hopdong = \App\Models\Hopdong::with(['sinhvien.user', 'giuong.phong.loaiphong'])->find($id);
         if (!$hopdong || !$hopdong->sinhvien) {
             abort(404, 'Không tìm thấy dữ liệu hợp đồng');
         }
@@ -93,6 +123,6 @@ class HopdongController extends Controller
             'hopdong' => $hopdong,
         ]);
 
-        return $pdf->download("hopdong_{$hopdong->ma_hd}.pdf");
+        return $pdf->download('hopdong_' . ($hopdong->ma_hd ?? "HD-{$hopdong->id}") . '.pdf');
     }
 }

@@ -7,6 +7,7 @@ namespace App\Services\Admin;
 use App\Contracts\Admin\BaoCaoServiceInterface;
 use App\Enums\ContractStatus;
 use App\Enums\InvoiceStatus;
+use App\Enums\BedStatus;
 use App\Models\Hoadon;
 use App\Models\Hopdong;
 use App\Models\Phong;
@@ -18,8 +19,8 @@ class BaoCaoService implements BaoCaoServiceInterface
     public function layDuLieuTaiChinh(): array
     {
         // 1. Doanh thu 12 tháng gần nhất (dựa trên ngày thanh toán thực tế)
-        $doanhThuTheoThang = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, SUM(tongtien) as tong, COUNT(*) as so_luong')
-            ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
+        $doanhThuTheoThang = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, SUM(tong_tien) as tong, COUNT(*) as so_luong')
+            ->where('trang_thai', InvoiceStatus::Paid)
             ->whereNotNull('ngay_thanh_toan')
             ->where('ngay_thanh_toan', '>=', now()->subMonths(12))
             ->groupBy(DB::raw('YEAR(ngay_thanh_toan)'), DB::raw('MONTH(ngay_thanh_toan)'))
@@ -29,18 +30,20 @@ class BaoCaoService implements BaoCaoServiceInterface
 
         // 2. Tổng cọc đang giữ (Hóa đơn LOAI_DEPOSIT đã thanh toán)
         $tongCocHienTai = (float) Hoadon::where('loai_hoadon', 'deposit')
-            ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
-            ->sum('tongtien');
+            ->where('trang_thai', InvoiceStatus::Paid)
+            ->sum('tong_tien');
 
         // 3. Số phòng đang thuê vs tổng phòng
         $tongPhong = Phong::count();
-        $phongDangThue = Phong::where('dango', '>', 0)->count();
+        $phongDangThue = Phong::whereHas('giuongs', function ($query) {
+            $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+        })->count();
         $tyLeLapDay = $tongPhong > 0 ? round(($phongDangThue / $tongPhong) * 100, 1) : 0;
 
         // 4. Top 5 phòng doanh thu cao nhất
-        $topPhong = Hoadon::with('phong')
-            ->selectRaw('phong_id, SUM(tongtien) as tong')
-            ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
+        $topPhong = Hoadon::selectRaw('phong_id, SUM(tong_tien) as tong')
+            ->where('trang_thai', InvoiceStatus::Paid)
+            ->with('phong')
             ->groupBy('phong_id')
             ->orderByDesc('tong')
             ->limit(5)
@@ -49,17 +52,17 @@ class BaoCaoService implements BaoCaoServiceInterface
         // 5. Tăng trưởng doanh thu tháng này so với tháng trước
         $thangNay = now()->month;
         $namNay = now()->year;
-        $doanhThuThangNay = (float) Hoadon::where('trangthaithanhtoan', InvoiceStatus::Paid->value)
+        $doanhThuThangNay = (float) Hoadon::where('trang_thai', InvoiceStatus::Paid)
             ->whereMonth('ngay_thanh_toan', $thangNay)
             ->whereYear('ngay_thanh_toan', $namNay)
-            ->sum('tongtien');
+            ->sum('tong_tien');
 
         $thangTruoc = now()->subMonth()->month;
         $namTruoc = now()->subMonth()->year;
-        $doanhThuThangTruoc = (float) Hoadon::where('trangthaithanhtoan', InvoiceStatus::Paid->value)
+        $doanhThuThangTruoc = (float) Hoadon::where('trang_thai', InvoiceStatus::Paid)
             ->whereMonth('ngay_thanh_toan', $thangTruoc)
             ->whereYear('ngay_thanh_toan', $namTruoc)
-            ->sum('tongtien');
+            ->sum('tong_tien');
 
         $tangTruong = 0;
         if ($doanhThuThangTruoc > 0) {
@@ -84,8 +87,8 @@ class BaoCaoService implements BaoCaoServiceInterface
         $quy = $filters['quy'] ?? null;
         $thang = $filters['thang'] ?? null;
 
-        $query = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, COUNT(*) as so_luong, SUM(tongtien) as tong')
-            ->where('trangthaithanhtoan', InvoiceStatus::Paid->value)
+        $query = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, COUNT(*) as so_luong, SUM(tong_tien) as tong')
+            ->where('trang_thai', InvoiceStatus::Paid->value)
             ->whereNotNull('ngay_thanh_toan')
             ->whereYear('ngay_thanh_toan', $nam);
 

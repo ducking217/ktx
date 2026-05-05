@@ -34,11 +34,9 @@ class AccountService implements AccountServiceInterface
             });
         }
 
-        // Chỉ liệt kê các tài khoản thuộc nhóm Admin (hoặc tất cả ngoại trừ SinhVien nếu muốn)
+        // Chỉ liệt kê các tài khoản thuộc nhóm Admin
         $query->whereIn('vaitro', [
             UserRole::Admin->value,
-            UserRole::AdminTruong->value,
-            UserRole::AdminToaNha->value,
         ]);
 
         return [
@@ -55,7 +53,7 @@ class AccountService implements AccountServiceInterface
                 'password' => Hash::make($data['password']),
                 'vaitro' => $data['vaitro'],
                 'is_active' => $data['is_active'] ?? true,
-                'gioitinh' => $data['gioitinh'] ?? 'Nam',
+                'gender' => $data['gender'] ?? Gender::Male,
                 'toa_nha_id' => $data['toa_nha_id'] ?? null,
             ]);
 
@@ -90,6 +88,7 @@ class AccountService implements AccountServiceInterface
                 'vaitro' => $data['vaitro'],
                 'is_active' => $data['is_active'] ?? $user->is_active,
                 'toa_nha_id' => $data['toa_nha_id'] ?? $user->toa_nha_id,
+                'gender' => $data['gender'] ?? $user->gender,
             ];
 
             if (!empty($data['password'])) {

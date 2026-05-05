@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
+use App\Enums\BaohongStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -18,27 +16,43 @@ class Baohong extends Model
     protected $fillable = [
         'sinhvien_id',
         'phong_id',
-        'mota',
-        'anhminhhoa',
-        'trangthai',
-        'ngayhen',
-        'noidung',
-        'do_sinh_vien_gay_ra',
-        'phi_boi_thuong',
+        'giuong_id',
+        'taisan_id',
+        'mo_ta',
+        'hinh_anh_path',
+        'trang_thai',
+        'muc_do',
+        'chi_phi_du_kien',
+        'nguoi_chiu_phi',
     ];
 
     protected $casts = [
-        'do_sinh_vien_gay_ra' => 'boolean',
-        'trangthai' => \App\Enums\MaintenanceStatus::class,
+        'sinhvien_id' => 'integer',
+        'phong_id' => 'integer',
+        'giuong_id' => 'integer',
+        'taisan_id' => 'integer',
+        'trang_thai' => BaohongStatus::class,
+        'muc_do' => 'string',
+        'chi_phi_du_kien' => 'integer',
     ];
 
-    public function sinhvien(): BelongsTo
+    public function sinhvien()
     {
         return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
     }
 
-    public function phong(): BelongsTo
+    public function phong()
     {
         return $this->belongsTo(Phong::class, 'phong_id');
+    }
+
+    public function giuong()
+    {
+        return $this->belongsTo(Giuong::class, 'giuong_id');
+    }
+
+    public function taisan()
+    {
+        return $this->belongsTo(Taisan::class, 'taisan_id');
     }
 }

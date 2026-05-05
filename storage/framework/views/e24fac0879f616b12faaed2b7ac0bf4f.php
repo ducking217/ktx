@@ -1,0 +1,2 @@
+<a <?php echo e($attributes->merge(['class' => 'block w-full rounded-xl px-3 py-2 text-start text-sm font-bold text-ink-secondary/60 transition duration-150 hover:bg-ui-muted hover:text-ink-primary focus:bg-ui-muted focus:text-ink-primary focus:outline-none'])); ?>><?php echo e($slot); ?></a>
+<?php /**PATH D:\laragon\www\hethongquanlyktxv1\resources\views/components/dropdown-link.blade.php ENDPATH**/ ?>

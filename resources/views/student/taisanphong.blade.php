@@ -26,34 +26,6 @@
             <p class="mt-2 text-xs font-medium text-amber-700/70 max-w-sm mx-auto">Bạn chưa được xếp phòng hoặc thông tin phòng chưa được cập nhật. Vui lòng liên hệ BQL để biết thêm chi tiết.</p>
         </div>
     @else
-        <div class="animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <article class="overflow-hidden rounded-[2rem] border border-ui-border bg-ui-card/50 backdrop-blur-xl shadow-sm transition-all hover:border-brand-emerald/10">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-ink-primary">
-                        <thead class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-bold uppercase tracking-widest text-ink-secondary">
-                            <tr>
-                                <th class="px-8 py-5">Tên tài sản / Vật tư</th>
-                                <th class="px-8 py-5 text-center">Số lượng</th>
-                                <th class="px-8 py-5">Tình trạng thực tế</th>
-                                <th class="px-8 py-5 text-right">Ghi chú</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-ui-border">
-                            @forelse($taisan as $item)
-                                <tr class="group transition-colors hover:bg-ui-bg/30">
-                                    <td class="px-8 py-6">
-                                        <div class="flex items-center gap-4">
-                                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-ui-bg text-ink-secondary group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                            </div>
-                                            <div>
-                                                <div class="font-bold text-ink-primary text-sm uppercase tracking-tight">{{ $item->tentaisan }}</div>
-                                                <div class="text-[9px] font-bold text-ink-secondary/40 uppercase tracking-widest mt-0.5">Mã TS: #AS-{{ str_pad((string)$item->id, 4, '0', STR_PAD_LEFT) }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-6 text-center">
-                                        <div class="font-display text-lg font-black text-ink-primary tabular-nums tracking-tight">{{ $item->soluong }}</div>
                                         <div class="text-[8px] font-bold text-ink-secondary/30 uppercase tracking-widest mt-1">Đơn vị: Cái</div>
                                     </td>
                                     <td class="px-8 py-6">

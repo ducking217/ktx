@@ -15,7 +15,6 @@ class LuuDangkyRequest extends FormRequest
     {
         return [
             'phong_id' => ['required', 'exists:phong,id'],
-            'giuong_no' => ['nullable', 'integer'],
             'ho_ten' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150'],
             'so_dien_thoai' => ['required', 'string', 'regex:/^(0[3|5|7|8|9])[0-9]{8}$/', 'max:11'],
@@ -33,5 +32,4 @@ class LuuDangkyRequest extends FormRequest
         ];
     }
 }
-
 

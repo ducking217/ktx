@@ -16,12 +16,12 @@ class VatTuController extends Controller
     {
         $this->authorize('phong.manage');
         $duLieu = $request->validate([
-            'tenvattu' => ['required', 'string', 'max:100'],
-            'soluong' => ['required', 'integer', 'min:1'],
-            'tinhtrang' => ['required', 'string', 'max:100'],
-            'mota' => ['nullable', 'string', 'max:500'],
-            'ngaymua' => ['nullable', 'date'],
-            'thoigianbaohanh' => ['nullable', 'string', 'max:100'],
+            'ten_vat_tu' => ['required', 'string', 'max:100'],
+            'so_luong' => ['required', 'integer', 'min:1'],
+            'tinh_trang' => ['required', 'string', 'max:100'],
+            'mo_ta' => ['nullable', 'string', 'max:500'],
+            'ngay_mua' => ['nullable', 'date'],
+            'thoi_gian_bao_hanh' => ['nullable', 'string', 'max:100'],
         ]);
 
         $result = $this->vatTuPhongService->store($duLieu, $id);
@@ -36,12 +36,12 @@ class VatTuController extends Controller
     {
         $this->authorize('phong.manage');
         $duLieu = $request->validate([
-            'tenvattu' => ['required', 'string', 'max:100'],
-            'soluong' => ['required', 'integer', 'min:1'],
-            'tinhtrang' => ['required', 'string', 'max:100'],
-            'mota' => ['nullable', 'string', 'max:500'],
-            'ngaymua' => ['nullable', 'date'],
-            'thoigianbaohanh' => ['nullable', 'string', 'max:100'],
+            'ten_vat_tu' => ['required', 'string', 'max:100'],
+            'so_luong' => ['required', 'integer', 'min:1'],
+            'tinh_trang' => ['required', 'string', 'max:100'],
+            'mo_ta' => ['nullable', 'string', 'max:500'],
+            'ngay_mua' => ['nullable', 'date'],
+            'thoi_gian_bao_hanh' => ['nullable', 'string', 'max:100'],
         ]);
 
         $result = $this->vatTuPhongService->update($duLieu, $id, $vattuId);

@@ -18,30 +18,12 @@ class GiaHanController extends Controller
 
     public function index()
     {
-        $data = $this->giaHanService->lietKeYeuCauSinhVien();
-        if (isset($data['error'])) {
-            return redirect()->route('student.trangchu')->with(['toast_loai' => 'loi', 'toast_noidung' => $data['error']]);
-        }
-
-        return view('student.giahan.danhsach', $data);
+        return redirect()->route('student.hopdongcuatoi', ['tab' => 'gia-han']);
     }
 
     public function create()
     {
-        $sinhvien = auth()->user()->sinhvien;
-        if (! $sinhvien) {
-            return redirect()->route('student.trangchu')->with(['toast_loai' => 'loi', 'toast_noidung' => 'Không tìm thấy thông tin sinh viên.']);
-        }
-
-        $hopdong = $this->giaHanService->layHopdongHieuLuc($sinhvien->id);
-
-        if (! $hopdong) {
-            return redirect()->route('student.hopdongcuatoi')->with(['toast_loai' => 'loi', 'toast_noidung' => 'Bạn chưa có hợp đồng hiệu lực để gia hạn.']);
-        }
-
-        return view('student.giahan.tao', [
-            'hopdong' => $hopdong,
-        ]);
+        return redirect()->route('student.hopdongcuatoi', ['tab' => 'gia-han']);
     }
 
     public function store(Request $request)
@@ -58,10 +40,9 @@ class GiaHanController extends Controller
             $dulieu['ly_do'] ?? null
         );
 
-        return redirect()->route('student.giahan.index')->with([
+        return redirect()->route('student.hopdongcuatoi', ['tab' => 'gia-han'])->with([
             'toast_loai' => $result['toast_loai'],
             'toast_noidung' => $result['toast_noidung'],
         ]);
     }
 }
-

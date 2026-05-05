@@ -34,9 +34,9 @@ class HoadonObserver
     public function updated(Hoadon $hoadon): void
     {
         // Log nếu trạng thái thanh toán thay đổi
-        if ($hoadon->isDirty('trangthaithanhtoan')) {
-            $trangThaiCu = $hoadon->getOriginal('trangthaithanhtoan');
-            $trangThaiMoi = $hoadon->trangthaithanhtoan;
+        if ($hoadon->isDirty('trang_thai')) {
+            $trangThaiCu = $hoadon->getOriginal('trang_thai');
+            $trangThaiMoi = $hoadon->trang_thai;
 
             $this->kiemToanService->ghiNhatKyThayDoiTrangThaiThanhToanHoaDon(
                 $hoadon->id,

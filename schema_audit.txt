@@ -1,0 +1,18 @@
+Table 'cauhinh' has schema drift:
+  - In DB but MISSING in Migration: nhom, mo_ta
+Table 'toa_nha' has schema drift:
+  - In DB but MISSING in Migration: gioi_tinh, deleted_at
+Table 'phong' has schema drift:
+  - In Migration but MISSING in DB: gioitinh_han_che
+  - In DB but MISSING in Migration: gioi_tinh_han_che
+Table 'hopdong' has schema drift:
+  - In DB but MISSING in Migration: cot_hieu_luc
+Table 'chi_so_dien_nuoc' has schema drift:
+  - In DB but MISSING in Migration: thang, nam
+Table 'danhgia' has schema drift:
+  - In DB but MISSING in Migration: rating
+Table 'thongbao_user' has schema drift:
+  - In Migration but MISSING in DB: ngay_doc
+  - In DB but MISSING in Migration: doc_luc
+Table 'nhat_ky' has schema drift:
+  - In DB but MISSING in Migration: ip_address

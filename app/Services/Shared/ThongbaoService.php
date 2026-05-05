@@ -16,22 +16,22 @@ class ThongbaoService implements ThongbaoServiceInterface
         $loai = $yeuCau->query('loai', 'tatca');
 
         $query = Thongbao::where(function ($truyVan) {
-            $truyVan->where('doituong', 'sinhvien')
-                ->orWhere('doituong', 'tatca')
-                ->orWhereNull('doituong');
+            $truyVan->where('doi_tuong_nhan', 'sinhvien')
+                ->orWhere('doi_tuong_nhan', 'all')
+                ->orWhereNull('doi_tuong_nhan');
         });
 
         if ($loai === 'moi_nhat') {
-            $query->where('ngaydang', '>=', now()->subDays(7));
+            $query->where('created_at', '>=', now()->subDays(7));
         }
 
         return [
-            'thongbao' => $query->orderByDesc('ngaydang')->paginate(15),
+            'thongbao' => $query->orderByDesc('created_at')->paginate(15),
             'loai' => $loai,
             'thongKe' => [
                 'tong_so' => $query->count(),
-                'trong_thang' => (clone $query)->whereYear('ngaydang', now()->year)->whereMonth('ngaydang', now()->month)->count(),
-                'tuan_nay' => (clone $query)->where('ngaydang', '>=', now()->subDays(7))->count(),
+                'trong_thang' => (clone $query)->whereYear('created_at', now()->year)->whereMonth('created_at', now()->month)->count(),
+                'tuan_nay' => (clone $query)->where('created_at', '>=', now()->subDays(7))->count(),
             ],
         ];
     }
@@ -39,9 +39,9 @@ class ThongbaoService implements ThongbaoServiceInterface
     public function showForStudent(int $id): array
     {
         $query = Thongbao::where('id', $id)->where(function ($truyVan) {
-            $truyVan->where('doituong', 'sinhvien')
-                ->orWhere('doituong', 'tatca')
-                ->orWhereNull('doituong');
+            $truyVan->where('doi_tuong_nhan', 'sinhvien')
+                ->orWhere('doi_tuong_nhan', 'all')
+                ->orWhereNull('doi_tuong_nhan');
         });
 
         $thongbao = $query->first();
@@ -51,11 +51,11 @@ class ThongbaoService implements ThongbaoServiceInterface
 
         $thongbaoLienQuan = Thongbao::where('id', '<>', $id)
             ->where(function ($truyVan) {
-                $truyVan->where('doituong', 'sinhvien')
-                    ->orWhere('doituong', 'tatca')
-                    ->orWhereNull('doituong');
+                $truyVan->where('doi_tuong_nhan', 'sinhvien')
+                    ->orWhere('doi_tuong_nhan', 'all')
+                    ->orWhereNull('doi_tuong_nhan');
             })
-            ->orderByDesc('ngaydang')
+            ->orderByDesc('created_at')
             ->limit(5)
             ->get();
 
@@ -68,7 +68,7 @@ class ThongbaoService implements ThongbaoServiceInterface
     public function indexForAdmin(): array
     {
         return [
-            'thongbao' => Thongbao::orderByDesc('ngaydang')->paginate(20),
+            'thongbao' => Thongbao::orderByDesc('created_at')->paginate(20),
         ];
     }
 
@@ -77,10 +77,10 @@ class ThongbaoService implements ThongbaoServiceInterface
         try {
             $thongbao = new Thongbao();
             $thongbao->fill([
-                'tieude' => $duLieu['tieude'],
-                'noidung' => $duLieu['noidung'],
-                'doituong' => $duLieu['doituong'] ?? 'tatca',
-                'ngaydang' => $duLieu['ngaydang'] ?? now(),
+                'tieu_de' => $duLieu['tieu_de'],
+                'noi_dung' => $duLieu['noi_dung'],
+                'loai_thong_bao' => $duLieu['loai_thong_bao'] ?? 'general',
+                'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? 'all',
             ])->save();
 
             return $this->traVeThanhCong('Thao tac thanh cong.');
@@ -98,10 +98,10 @@ class ThongbaoService implements ThongbaoServiceInterface
             }
 
             $thongbao->fill([
-                'tieude' => $duLieu['tieude'],
-                'noidung' => $duLieu['noidung'],
-                'doituong' => $duLieu['doituong'] ?? 'tatca',
-                'ngaydang' => $duLieu['ngaydang'] ?? now(),
+                'tieu_de' => $duLieu['tieu_de'],
+                'noi_dung' => $duLieu['noi_dung'],
+                'loai_thong_bao' => $duLieu['loai_thong_bao'] ?? 'general',
+                'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? 'all',
             ])->save();
 
             return $this->traVeThanhCong('Thao tac thanh cong.');

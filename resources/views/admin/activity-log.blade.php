@@ -1,169 +1,175 @@
 <x-admin-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-bold leading-tight text-ink-primary">
-            {{ __('Nhật ký hoạt động hệ thống') }}
-        </h2>
-    </x-slot>
+    <x-slot:title>Nhật ký hoạt động</x-slot:title>
 
-    <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <!-- Filter Form -->
-            <div class="mb-6 rounded-3xl border border-ui-border bg-ui-card p-6 shadow-sm">
-                <form action="{{ route('admin.activity-log') }}" method="GET" class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
-                    <div>
-                        <label class="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Model</label>
-                        <select name="model" class="w-full rounded-2xl border-ui-border bg-ui-bg text-sm font-bold text-ink-primary focus:border-brand-emerald focus:ring-brand-emerald">
-                            <option value="">Tất cả Model</option>
-                            @foreach($models as $m)
-                                <option value="{{ $m }}" {{ request('model') == $m ? 'selected' : '' }}>{{ $m }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Người thực hiện</label>
-                        <select name="user_id" class="w-full rounded-2xl border-ui-border bg-ui-bg text-sm font-bold text-ink-primary focus:border-brand-emerald focus:ring-brand-emerald">
-                            <option value="">Tất cả Admin</option>
-                            @foreach($admins as $admin)
-                                <option value="{{ $admin->id }}" {{ request('user_id') == $admin->id ? 'selected' : '' }}>{{ $admin->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Hành động</label>
-                        <select name="action" class="w-full rounded-2xl border-ui-border bg-ui-bg text-sm font-bold text-ink-primary focus:border-brand-emerald focus:ring-brand-emerald">
-                            <option value="">Tất cả hành động</option>
-                            @foreach($actions as $act)
-                                <option value="{{ $act }}" {{ request('action') == $act ? 'selected' : '' }}>{{ $act }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Từ ngày</label>
-                        <input type="date" name="from" value="{{ request('from') }}" class="w-full rounded-2xl border-ui-border bg-ui-bg text-sm font-bold text-ink-primary focus:border-brand-emerald focus:ring-brand-emerald">
-                    </div>
-                    <div class="flex items-end gap-2">
-                        <div class="flex-1">
-                            <label class="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Đến ngày</label>
-                            <input type="date" name="to" value="{{ request('to') }}" class="w-full rounded-2xl border-ui-border bg-ui-bg text-sm font-bold text-ink-primary focus:border-brand-emerald focus:ring-brand-emerald">
-                        </div>
-                        <button type="submit" class="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-emerald text-white shadow-lg shadow-brand-emerald/20 transition-transform hover:scale-105 active:scale-95">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <div class="space-y-6">
+        <x-admin.page-header
+            title="Nhật ký hoạt động"
+            subtitle="Truy xuất nguồn gốc thao tác và kiểm soát biến động dữ liệu toàn cục."
+        />
 
-            <!-- Activity Table -->
-            <div class="overflow-hidden rounded-3xl border border-ui-border bg-ui-card shadow-sm">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="border-b border-ui-border bg-ui-bg/50">
-                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Thời gian</th>
-                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Người thực hiện</th>
-                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Model</th>
-                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50 text-center">Hành động</th>
-                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Tóm tắt thay đổi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-ui-border">
-                            @forelse($logs as $log)
-                                <tr class="group transition-colors hover:bg-ui-bg/30">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="font-bold text-ink-primary tabular-nums">{{ $log->created_at->format('d/m/Y') }}</div>
-                                        <div class="text-[10px] font-medium text-ink-secondary/40 tabular-nums">{{ $log->created_at->format('H:i:s') }}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <div class="h-8 w-8 rounded-full bg-ui-bg ring-1 ring-ui-border flex items-center justify-center text-xs font-black text-brand-emerald">
-                                                {{ substr($log->user->name ?? '?', 0, 1) }}
-                                            </div>
-                                            <div class="font-bold text-ink-primary">{{ $log->user->name ?? 'N/A' }}</div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="rounded-lg bg-ui-bg px-2.5 py-1 text-[11px] font-black text-ink-secondary/60 ring-1 ring-inset ring-ui-border">
-                                            {{ $log->ten_model }} #{{ $log->id_ban_ghi }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-center">
-                                        @php
-                                            $badgeClass = match(strtolower($log->hanh_dong)) {
-                                                'created', 'tạo mới', 'thêm mới' => 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20',
-                                                'updated', 'cập nhật', 'sửa' => 'bg-amber-500/10 text-amber-600 ring-amber-500/20',
-                                                'deleted', 'xóa' => 'bg-rose-500/10 text-rose-600 ring-rose-500/20',
-                                                default => 'bg-slate-500/10 text-slate-600 ring-slate-500/20'
-                                            };
-                                        @endphp
-                                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest ring-1 ring-inset {{ $badgeClass }}">
-                                            {{ $log->hanh_dong }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button type="button" data-modal-target="modal-log-{{ $log->id }}" data-modal-toggle="modal-log-{{ $log->id }}" class="flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-brand-emerald">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="py-20 text-center">
-                                        <div class="text-lg font-display font-black text-ink-secondary/20 uppercase italic tracking-widest">Không có dữ liệu nhật ký</div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+        {{-- Filter --}}
+        <div class="saas-card p-5 border-slate-200/60 shadow-sm">
+            <form action="{{ route('admin.activity-log') }}" method="GET" class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
+                <div>
+                    <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Thực thể</label>
+                    <select name="model" class="saas-input text-xs font-bold bg-white border-slate-200">
+                        <option value="">Tất cả</option>
+                        @foreach($models as $m)
+                            <option value="{{ $m }}" {{ request('model') == $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                @if($logs->hasPages())
-                    <div class="border-t border-ui-border bg-ui-bg/30 px-6 py-4">
-                        {{ $logs->links() }}
+                <div>
+                    <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Quản trị viên</label>
+                    <select name="user_id" class="saas-input text-xs font-bold bg-white border-slate-200">
+                        <option value="">Tất cả</option>
+                        @foreach($admins as $admin)
+                            <option value="{{ $admin->id }}" {{ request('user_id') == $admin->id ? 'selected' : '' }}>{{ $admin->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Loại hành động</label>
+                    <select name="action" class="saas-input text-xs font-bold bg-white border-slate-200">
+                        <option value="">Tất cả</option>
+                        @foreach($actions as $act)
+                            <option value="{{ $act }}" {{ request('action') == $act ? 'selected' : '' }}>{{ $act }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Từ ngày</label>
+                    <input type="date" name="from" value="{{ request('from') }}" class="saas-input text-xs font-bold tabular-nums bg-white border-slate-200">
+                </div>
+                <div class="flex items-end gap-2">
+                    <div class="flex-1">
+                        <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Đến ngày</label>
+                        <input type="date" name="to" value="{{ request('to') }}" class="saas-input text-xs font-bold tabular-nums bg-white border-slate-200">
                     </div>
-                @endif
-            </div>
+                    <button type="submit" class="saas-btn-primary h-9 w-9 flex-shrink-0 flex items-center justify-center shadow-sm shadow-blue-500/20">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" /></svg>
+                    </button>
+                </div>
+            </form>
         </div>
+
+        <x-admin.table-card>
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Người thực hiện</th>
+                    <th>Đối tượng</th>
+                    <th class="text-center">Hành động</th>
+                    <th class="text-right">Chi tiết</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($logs as $log)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="py-4 whitespace-nowrap">
+                            <div class="text-xs font-bold text-slate-900 tabular-nums group-hover:text-blue-600 transition-colors">{{ $log->created_at->format('d/m/Y') }}</div>
+                            <div class="text-[9px] font-bold text-slate-400 tabular-nums mt-0.5 uppercase tracking-widest">{{ $log->created_at->format('H:i:s') }}</div>
+                        </td>
+                        <td class="py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-7 w-7 rounded-lg bg-slate-900 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0">
+                                    {{ substr($log->user->name ?? '?', 0, 1) }}
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-slate-900">{{ $log->user->name ?? 'Hệ thống' }}</div>
+                                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Quản trị viên</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200/50 text-[9px] font-bold text-slate-600 uppercase tracking-tight">{{ $log->ten_model }}</span>
+                                <span class="text-[9px] font-bold text-slate-400 tabular-nums">#{{ $log->id_ban_ghi }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 text-center">
+                            @php
+                                $action = strtolower($log->hanh_dong);
+                                $badgeClass = match(true) {
+                                    str_contains($action, 'tạo') || str_contains($action, 'thêm') || str_contains($action, 'create') => 'saas-badge-success',
+                                    str_contains($action, 'cập nhật') || str_contains($action, 'sửa') || str_contains($action, 'update') => 'saas-badge-warning',
+                                    str_contains($action, 'xóa') || str_contains($action, 'delete') => 'saas-badge-error',
+                                    default => 'saas-badge-info'
+                                };
+                            @endphp
+                            <span class="saas-badge {{ $badgeClass }} text-[8px] font-bold px-2.5 py-0.5">{{ $log->hanh_dong }}</span>
+                        </td>
+                        <td class="py-4 text-right">
+                            <button type="button" data-modal-target="modal-log-{{ $log->id }}" data-modal-toggle="modal-log-{{ $log->id }}" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-lg transition-all" title="Xem chi tiết">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="py-16 text-center">
+                            <p class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Không tìm thấy dữ liệu nhật ký</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-admin.table-card>
+
+        @if($logs->hasPages())
+            <div class="py-4">
+                {{ $logs->links() }}
+            </div>
+        @endif
     </div>
 
     @push('modals')
         @foreach($logs as $log)
-            <x-modal id="modal-log-{{ $log->id }}" title="Chi tiết nhật ký hoạt động" subtitle="Thông tin đầy đủ về thay đổi dữ liệu của bản ghi #{{ $log->id }}.">
-                <div class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4 rounded-2xl bg-ui-bg/50 p-4 ring-1 ring-inset ring-ui-border">
+            <x-modal id="modal-log-{{ $log->id }}" title="Chi tiết thay đổi" subtitle="Biến động dữ liệu của bản ghi #{{ $log->id_ban_ghi }} — {{ $log->ten_model }}">
+                <div class="space-y-5">
+                    <div class="grid grid-cols-2 gap-3 rounded-xl bg-slate-50 p-4 border border-slate-100">
                         <div>
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Thời gian</div>
-                            <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Thời gian</div>
+                            <div class="text-xs font-bold text-slate-900 tabular-nums">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
                         </div>
                         <div>
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Người thực hiện</div>
-                            <div class="text-xs font-bold text-ink-primary">{{ $log->user->name ?? 'Hệ thống' }}</div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Người thực hiện</div>
+                            <div class="text-xs font-bold text-slate-900">{{ $log->user->name ?? 'Hệ thống' }}</div>
                         </div>
                         <div>
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Hành động</div>
-                            <div class="text-xs font-bold text-ink-primary uppercase">{{ $log->hanh_dong }}</div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Hành động</div>
+                            <div class="text-xs font-bold text-blue-600 uppercase">{{ $log->hanh_dong }}</div>
                         </div>
                         <div>
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Đối tượng</div>
-                            <div class="text-xs font-bold text-ink-primary">{{ $log->ten_model }} #{{ $log->id_ban_ghi }}</div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Đối tượng</div>
+                            <div class="text-xs font-bold text-slate-900">{{ $log->ten_model }} #{{ $log->id_ban_ghi }}</div>
                         </div>
                     </div>
 
                     @if($log->du_lieu_cu)
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black text-ink-primary uppercase tracking-widest">Dữ liệu trước thay đổi</label>
-                            <pre class="w-full bg-ui-bg border-ui-border rounded-xl px-4 py-3 text-[10px] text-ink-secondary overflow-x-auto custom-scrollbar font-mono">{{ json_encode($log->du_lieu_cu, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                            <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                Trước thay đổi
+                            </label>
+                            <div class="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                                <pre class="w-full text-[11px] text-slate-300 overflow-x-auto font-mono leading-relaxed">{{ json_encode($log->du_lieu_cu, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                            </div>
                         </div>
                     @endif
 
                     @if($log->du_lieu_moi)
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black text-brand-emerald uppercase tracking-widest">Dữ liệu sau thay đổi</label>
-                            <pre class="w-full bg-brand-emerald/5 border border-brand-emerald/10 rounded-xl px-4 py-3 text-[10px] text-brand-emerald overflow-x-auto custom-scrollbar font-mono">{{ json_encode($log->du_lieu_moi, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                            <label class="text-[9px] font-bold text-blue-500 uppercase tracking-widest flex items-center gap-1.5">
+                                <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                                Sau thay đổi
+                            </label>
+                            <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4">
+                                <pre class="w-full text-[11px] text-blue-900 overflow-x-auto font-mono leading-relaxed">{{ json_encode($log->du_lieu_moi, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                            </div>
                         </div>
                     @endif
 
-                    <div class="flex gap-3 pt-2">
-                        <button type="button" data-modal-hide="modal-log-{{ $log->id }}" class="w-full rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Đóng chi tiết</button>
-                    </div>
+                    <button type="button" data-modal-hide="modal-log-{{ $log->id }}" class="saas-btn-secondary w-full justify-center h-9 text-xs font-bold uppercase tracking-widest">Đóng</button>
                 </div>
             </x-modal>
         @endforeach

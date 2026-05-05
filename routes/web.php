@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +44,7 @@ Route::namespace('App\Http\Controllers\Guest')->group(function () {
 // 2. ADMIN ROUTES
 // --------------------------------------------------------------------------
 Route::prefix('admin')
-    ->middleware(['auth', 'kiemtravaitro:admin,admin_truong,admin_toanha'])
+    ->middleware(['auth', 'kiemtravaitro:admin'])
     ->namespace('App\Http\Controllers\Admin')
     ->name('admin.')
     ->group(function () {
@@ -66,14 +67,17 @@ Route::prefix('admin')
             Route::get('/sodophong', 'soDo')->name('phong.map');
             Route::post('/themphong', 'luu')->name('phong.luu');
             Route::post('/capnhatphong/{id}', 'capNhat')->name('phong.capnhat');
-            Route::post('/xoaphong/{id}', 'xoa')->name('phong.xoa');
+            Route::match(['post', 'delete'], '/xoaphong/{id}', 'xoa')->name('phong.xoa');
             Route::get('/quanlyphong/{id}', 'chiTiet')->name('phong.chitiet');
         });
 
         // Quản lý Tài sản
         Route::prefix('taisan')->controller('TaiSanController')->group(function () {
             Route::post('/them/{id}', 'luu')->name('taisan.them');
+            Route::post('/them-hang-loat/{id}', 'luuHangLoat')->name('taisan.them_hang_loat');
+            Route::post('/gan-hang-loat', 'ganHangLoat')->name('taisan.gan_hang_loat');
             Route::post('/cap-nhat/{id}/{taisanId}', 'capNhat')->name('taisan.capnhat');
+            Route::post('/cap-nhat-hang-loat/{id}', 'capNhatHangLoat')->name('taisan.capnhat_hang_loat');
             Route::post('/xoa/{id}/{taisanId}', 'xoa')->name('taisan.xoa');
         });
 
@@ -100,6 +104,8 @@ Route::prefix('admin')
             Route::post('/duyethoso/{id}', 'duyetHoSo')->name('duyethoso');
             Route::post('/xacnhanthanhtoan-dangky/{id}', 'xacNhanThanhToan')->name('dangky.xacnhanthanhtoan');
             Route::post('/tuchoidangky/{id}', 'tuChoiDangKy')->name('xulytuchoidangky');
+            Route::post('/duyetdangky/{id}/traphong', 'xuLyTraPhong')->middleware('can:hopdong.manage')->name('dangky.traphong.xuly');
+            Route::post('/duyetdangky/{id}/traphong/tuchoi', 'tuChoiTraPhong')->middleware('can:hopdong.manage')->name('dangky.traphong.tuchoi');
         });
 
         // Nhật ký hoạt động (Chỉ Super Admin)
@@ -112,13 +118,13 @@ Route::prefix('admin')
             Route::get('/dien-nuoc/nhap-hang-loat', 'giaoDienNhapHangLoat')->name('hoadon.nhap_hang_loat');
             Route::post('/dien-nuoc/luu-hang-loat', 'luuHangLoat')->name('hoadon.luu_hang_loat');
             Route::post('/nhap-hoadon-hang-loat', 'nhapHangLoat')->name('hoadon.bulk');
+            Route::post('/hoadon/{id}/nhac-no', 'nhacNoHoaDon')->whereNumber('id')->name('hoadon.nhacno');
             Route::post('/xacnhanthanhtoan/{id}', 'xacNhanThanhToan')->name('xacnhanthanhtoan');
             Route::get('/hoadon/{id}/pdf', 'downloadInvoicePDF')->name('hoadon.pdf');
         });
-        Route::controller('CongnoController')->group(function () {
-            Route::get('/baocaocongno', 'index')->name('baocaocongno');
-            Route::post('/guinhacnho/{phongId}', 'update')->name('guinhacnho');
-        });
+        Route::get('/baocaocongno', function () {
+            return redirect()->route('admin.quanlyhoadon', ['tab' => 'cong-no'], 301);
+        })->name('baocaocongno');
 
         // Quản lý Bảo hỏng & Bảo trì
         Route::get('/quanlybaohong', 'BaohongController@lietKeBaoHongAdmin')->name('quanlybaohong');
@@ -137,10 +143,10 @@ Route::prefix('admin')
             Route::get('/quanlykyluat', 'lietKeKyLuatAdmin')->name('quanlykyluat');
             Route::post('/them/kyluat', 'storeDiscipline')->name('themkyluat');
             Route::post('/capnhat/kyluat/{id}', 'updateDiscipline')->name('capnhatkyluat');
+            Route::delete('/xoa/kyluat/{id}', 'destroyDiscipline')->whereNumber('id')->name('xoakyluat');
         });
 
-        // Đánh giá & Phản hồi
-        Route::get('/quanlyphong/{id}/danhgia', 'DanhgiaController@listReviews')->name('phong.danhgia');
+        // Đánh giá & Phản hồi (Disabled)
 
         // Cấu hình & Thông báo
         Route::get('/quanlycauhinh', 'CauhinhController@index')->middleware('can:cauhinh.manage')->name('quanlycauhinh');
@@ -207,6 +213,7 @@ Route::prefix('student')
             Route::get('/hoadoncuaem', 'layHoaDonSinhVien')->name('hoadoncuaem');
             Route::get('/phongcuatoi/hoadon', 'layHoaDonSinhVien')->name('phongcuatoi.hoadon');
             Route::get('/phongcuatoi/hoadon/{id}', 'layChiTietHoaDonSinhVien')->name('phongcuatoi.hoadon.chitiet');
+            Route::post('/phongcuatoi/hoadon/{id}/yeu-cau-xac-nhan', 'yeuCauXacNhanThanhToan')->name('phongcuatoi.hoadon.yeu_cau_xac_nhan');
             Route::post('/hoadon/{id}/xac-nhan-loi', 'xacNhanViPham')->name('hoadon.confirm_penalty');
         });
 
@@ -215,7 +222,6 @@ Route::prefix('student')
         Route::controller('DangkyController')->group(function () {
             Route::post('/dangkyphong', 'luuDangKySinhVien')->name('dangkyphong');
             Route::post('/yeucautraphong', 'yeuCauTraPhong')->name('yeucautraphong');
-            Route::post('/yeucaudoiphong', 'yeuCauDoiPhong')->name('yeucaudoiphong');
         });
 
         // Hợp đồng
@@ -235,8 +241,9 @@ Route::prefix('student')
 
         // Kỷ luật & Đánh giá
         Route::get('/kyluatcuaem', 'KyluatController@lietKeKyLuatSinhVien')->name('kyluatcuaem');
-        Route::get('/danhgia', 'DanhgiaController@showReviewForm')->name('danhgia');
-        Route::post('/danhgia', 'DanhgiaController@storeReview')->name('themdanhgia');
+        Route::match(['get', 'post'], '/danhgia', function () {
+            return redirect()->route('student.phongcuatoi');
+        })->name('danhgia');
 
         // Thông báo
         Route::controller('ThongbaoController')->group(function () {
@@ -251,14 +258,15 @@ Route::prefix('student')
 
 Route::prefix('sinhvien')
     ->middleware(['auth', 'kiemtravaitro:sinhvien'])
-    ->namespace('App\Http\Controllers\Student')
-    ->name('student.')
     ->group(function () {
-        Route::controller('GiaHanController')->group(function () {
-            Route::get('/gia-han', 'index')->name('giahan.index_alt');
-            Route::get('/gia-han/tao', 'create')->name('giahan.tao_alt');
-            Route::post('/gia-han', 'store')->name('giahan.store_alt');
-        });
+        Route::any('{path?}', function (Request $request, ?string $path = null) {
+            $targetPath = '/student'.($path ? '/'.ltrim($path, '/') : '');
+            $targetUrl = $targetPath.($request->getQueryString() ? '?'.$request->getQueryString() : '');
+
+            $status = $request->isMethod('get') || $request->isMethod('head') ? 301 : 308;
+
+            return redirect()->to($targetUrl, $status);
+        })->where('path', '.*');
     });
 
 // --------------------------------------------------------------------------
@@ -272,7 +280,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/private-files/{path}', [FileController::class, 'showPrivateFile'])
     ->where('path', '.*')
-    ->middleware(['auth', 'kiemtravaitro:admin,admin_truong,admin_toanha'])
+    ->middleware(['auth'])
     ->name('private.file');
 
 // Trạm điều hướng trung gian

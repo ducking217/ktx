@@ -12,6 +12,7 @@ class KiemTraVaiTro
 {
     /**
      * Kiem tra vai tro dang nhap theo route middleware.
+     * Logic đơn giản: Chỉ chấp nhận 3 role: admin, sinhvien, guest
      */
     public function handle(Request $request, Closure $next, string $vaitrobatbuoc): Response
     {
@@ -23,28 +24,19 @@ class KiemTraVaiTro
         $nguoiDung = Auth::user();
         $vaitrohientai = $nguoiDung->vaitro ?? null;
 
+        // Parse danh sách vai trò yêu cầu (hỗ trợ nhiều vai trò cách nhau bởi dấu phẩy)
         $danhSachVaiTroBatBuoc = collect(explode(',', $vaitrobatbuoc))
             ->map(static fn (string $vaiTro): string => trim($vaiTro))
             ->filter()
             ->values();
 
-        // "admin" duoc hieu la toan bo nhom quan tri (admin truong, admin toa nha, le tan...)
-        if ($danhSachVaiTroBatBuoc->contains('admin')) {
-            $danhSachVaiTroBatBuoc = $danhSachVaiTroBatBuoc
-                ->merge([
-                    \App\Enums\UserRole::Admin->value,
-                    \App\Enums\UserRole::AdminTruong->value,
-                    \App\Enums\UserRole::AdminToaNha->value,
-                ])
-                ->unique()
-                ->values();
-        }
-
+        // Chuyển đổi vai trò hiện tại sang string để so sánh
         $vaitroValue = $vaitrohientai instanceof \App\Enums\UserRole 
             ? $vaitrohientai->value 
             : (string) $vaitrohientai;
 
-        $dungVaiTro = $danhSachVaiTroBatBuoc->map(fn($r) => (string)$r)->contains((string)$vaitroValue);
+        // Kiểm tra trực tiếp - không cần mapping phức tạp
+        $dungVaiTro = $danhSachVaiTroBatBuoc->contains($vaitroValue);
 
         if (! $dungVaiTro) {
             return redirect()

@@ -22,7 +22,7 @@ class SinhvienController extends Controller
     {
         $data = $this->sinhvienService->getStudentProfile($id);
         if (isset($data['error'])) {
-            return redirect()->route('admin.quanlysinhvien')->with(['toast_loai' => 'loi', 'toast_noidung' => $data['error']]);
+            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => $data['error']]);
         }
         return view('admin.sinhvien.chitiet', $data);
     }
@@ -32,10 +32,10 @@ class SinhvienController extends Controller
         $this->authorize('sinhvien.manage');
         $dulieu = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'masinhvien' => ['required', 'string', 'max:20'],
+            'ma_sinh_vien' => ['required', 'string', 'max:20'],
             'lop' => ['required', 'string', 'max:50'],
-            'sodienthoai' => ['required', 'string', 'max:15'],
-            'gioitinh' => ['required', 'in:Nam,Nữ'],
+            'phone' => ['required', 'string', 'max:20'], // PII encryption will handle this in service if needed
+            'gender' => ['required', 'in:male,female,other'],
         ]);
 
         $result = $this->sinhvienService->updateStudent($id, $dulieu);

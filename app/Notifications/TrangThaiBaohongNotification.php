@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
+use App\Enums\BaohongStatus;
 use App\Models\Baohong;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,18 +31,15 @@ final class TrangThaiBaohongNotification extends Notification implements ShouldQ
 
     public function toDatabase(object $notifiable): array
     {
-        $icon = match ($this->trangThaiMoi) {
-            'Đang sửa' => 'wrench',
-            'Đã xong'  => 'check-circle',
-            'Đã hẹn'   => 'calendar',
-            default    => 'tool',
+        $statusValue = $this->baohong->trang_thai instanceof BaohongStatus ? $this->baohong->trang_thai->value : null;
+        $icon = match ($statusValue) {
+            BaohongStatus::Processing->value => 'wrench',
+            BaohongStatus::Done->value => 'check-circle',
+            BaohongStatus::Rejected->value => 'x-circle',
+            default => 'tool',
         };
 
-        $body = "Yêu cầu sửa chữa tại phòng {$this->baohong->phong?->tenphong} đã chuyển sang: **{$this->trangThaiMoi}**.";
-
-        if ($this->baohong->do_sinh_vien_gay_ra && $this->baohong->phi_boi_thuong) {
-            $body .= ' Phí bồi thường ' . number_format((int) $this->baohong->phi_boi_thuong, 0, ',', '.') . 'đ đã được cộng vào hóa đơn của bạn.';
-        }
+        $body = "Yêu cầu báo hỏng tại phòng {$this->baohong->phong?->ten_phong} đã chuyển sang: **{$this->trangThaiMoi}**.";
 
         return [
             'type'       => 'baohong_capnhat',
@@ -57,18 +55,9 @@ final class TrangThaiBaohongNotification extends Notification implements ShouldQ
     public function toMail(object $notifiable): MailMessage
     {
         $mail = (new MailMessage)
-            ->subject("🔧 Cập nhật sửa chữa – {$this->trangThaiMoi}")
+            ->subject("Cập nhật báo hỏng – {$this->trangThaiMoi}")
             ->greeting('Xin chào ' . ($notifiable->name ?? 'Sinh viên') . ',')
             ->line("Yêu cầu báo hỏng của bạn đã được cập nhật: **{$this->trangThaiMoi}**.");
-
-        if ($this->baohong->noidung) {
-            $mail->line('Ghi chú của Ban quản lý: ' . $this->baohong->noidung);
-        }
-
-        if ($this->baohong->do_sinh_vien_gay_ra && $this->baohong->phi_boi_thuong) {
-            $mail->line('⚠️ Hư hỏng được xác định do sinh viên gây ra. Phí bồi thường **'
-                . number_format((int) $this->baohong->phi_boi_thuong, 0, ',', '.') . 'đ** đã được cộng vào hóa đơn.');
-        }
 
         return $mail->action('Xem chi tiết', route('student.danhsachbaohong'));
     }

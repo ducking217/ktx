@@ -38,29 +38,23 @@ class KiemTraHopDongHetHan extends Command
 
             $sap30Ngay = Hopdong::where('trang_thai', ContractStatus::Active->value)
                 ->whereBetween('ngay_ket_thuc', [now()->addDays(28), now()->addDays(30)])
-                ->with('sinhvien.taikhoan')
+                ->with('sinhvien.user')
                 ->get();
 
             foreach ($sap30Ngay as $hopdong) {
-                $email = $hopdong->sinhvien?->taikhoan?->email;
-                if (! $email) {
-                    continue;
-                }
-
+                $email = $hopdong->sinhvien?->user?->email;
+                if (! $email) continue;
                 Mail::to($email)->queue(new \App\Mail\CanhBaoHetHanHopDong($hopdong, 30, $loginUrl));
             }
 
             $sap7Ngay = Hopdong::where('trang_thai', ContractStatus::Active->value)
                 ->whereBetween('ngay_ket_thuc', [now()->addDays(5), now()->addDays(7)])
-                ->with('sinhvien.taikhoan')
+                ->with('sinhvien.user')
                 ->get();
 
             foreach ($sap7Ngay as $hopdong) {
-                $email = $hopdong->sinhvien?->taikhoan?->email;
-                if (! $email) {
-                    continue;
-                }
-
+                $email = $hopdong->sinhvien?->user?->email;
+                if (! $email) continue;
                 Mail::to($email)->queue(new \App\Mail\CanhBaoHetHanHopDong($hopdong, 7, $loginUrl));
             }
 

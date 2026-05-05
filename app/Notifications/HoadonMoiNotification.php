@@ -32,37 +32,45 @@ final class HoadonMoiNotification extends Notification implements ShouldQueue
      */
     public function toDatabase(object $notifiable): array
     {
+        $chiTiet = is_array($this->hoadon->chi_tiet ?? null) 
+            ? $this->hoadon->chi_tiet 
+            : json_decode($this->hoadon->chi_tiet ?? '', true);
+        
         $loai = match ($this->hoadon->loai_hoadon) {
             Hoadon::LOAI_DEPOSIT => 'Phí thế chân',
             Hoadon::LOAI_PENALTY => 'Phí bồi thường thiết bị',
-            default              => "Hóa đơn tháng {$this->hoadon->thang}/{$this->hoadon->nam}",
+            default              => "Hóa đơn tháng " . ($chiTiet['thang'] ?? 'N/A') . "/" . ($chiTiet['nam'] ?? 'N/A'),
         };
 
         return [
             'type'       => 'hoadon_moi',
             'icon'       => 'receipt',
             'title'      => "Hóa đơn mới: {$loai}",
-            'body'       => 'Số tiền: ' . number_format((int) $this->hoadon->tongtien, 0, ',', '.') . 'đ. Vui lòng thanh toán đúng hạn.',
+            'body'       => 'Số tiền: ' . number_format((int) $this->hoadon->tong_tien, 0, ',', '.') . 'đ. Vui lòng thanh toán đúng hạn.',
             'action_url' => route('student.hoadoncuaem'),
             'hoadon_id'  => $this->hoadon->id,
-            'tongtien'   => $this->hoadon->tongtien,
+            'tong_tien'   => $this->hoadon->tong_tien,
             'loai'       => $this->hoadon->loai_hoadon,
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
+        $chiTiet = is_array($this->hoadon->chi_tiet ?? null) 
+            ? $this->hoadon->chi_tiet 
+            : json_decode($this->hoadon->chi_tiet ?? '', true);
+
         $loai = match ($this->hoadon->loai_hoadon) {
             Hoadon::LOAI_DEPOSIT => 'Phí thế chân',
             Hoadon::LOAI_PENALTY => 'Phí bồi thường thiết bị',
-            default              => "Hóa đơn tháng {$this->hoadon->thang}/{$this->hoadon->nam}",
+            default              => "Hóa đơn tháng " . ($chiTiet['thang'] ?? 'N/A') . "/" . ($chiTiet['nam'] ?? 'N/A'),
         };
 
         return (new MailMessage)
             ->subject("📄 [{$loai}] Thông báo hóa đơn mới – KTX")
             ->greeting('Xin chào ' . ($notifiable->name ?? 'Sinh viên') . ',')
             ->line("Bạn có hóa đơn mới: **{$loai}**")
-            ->line('Số tiền: **' . number_format((int) $this->hoadon->tongtien, 0, ',', '.') . 'đ**')
+            ->line('Số tiền: **' . number_format((int) $this->hoadon->tong_tien, 0, ',', '.') . 'đ**')
             ->action('Xem chi tiết hóa đơn', route('student.hoadoncuaem'))
             ->line('Vui lòng thanh toán đúng hạn để tránh phát sinh phí trễ hạn.');
     }

@@ -35,8 +35,8 @@ class KiemTraHoaDonQuaHan extends Command
 
         try {
             $ids = DB::transaction(function () {
-                $overdueInvoices = Hoadon::where('trangthaithanhtoan', InvoiceStatus::Pending->value)
-                    ->where('ngayxuat', '<=', Carbon::today()->subDays(30))
+                $overdueInvoices = Hoadon::where('trang_thai', InvoiceStatus::Unpaid->value)
+                    ->where('ngay_het_han', '<', Carbon::today())
                     ->lockForUpdate()
                     ->get();
 
@@ -48,9 +48,7 @@ class KiemTraHoaDonQuaHan extends Command
                 $count = $overdueInvoices->count();
                 $ids = $overdueInvoices->pluck('id')->toArray();
 
-                Hoadon::whereIn('id', $ids)->update([
-                    'trangthaithanhtoan' => InvoiceStatus::Overdue->value,
-                ]);
+                Hoadon::whereIn('id', $ids)->update(['trang_thai' => InvoiceStatus::Overdue->value]);
 
                 Log::info("Đã tự động chuyển trạng thái {$count} hóa đơn sang Overdue.", ['ids' => $ids]);
                 $this->info("Thành công: Đã cập nhật {$count} hóa đơn sang trạng thái Overdue.");
@@ -60,14 +58,11 @@ class KiemTraHoaDonQuaHan extends Command
 
             if (!empty($ids)) {
                 $loginUrl = route('login');
-                $hoaDons = Hoadon::with(['phong', 'sinhvien.taikhoan'])->whereIn('id', $ids)->get();
+                $hoaDons  = Hoadon::with(['hopdong.sinhvien.user'])->whereIn('id', $ids)->get();
 
                 foreach ($hoaDons as $hoaDon) {
-                    $email = $hoaDon->sinhvien?->taikhoan?->email;
-                    if (! $email) {
-                        continue;
-                    }
-
+                    $email = $hoaDon->hopdong?->sinhvien?->user?->email;
+                    if (!$email) continue;
                     Mail::to($email)->queue(new \App\Mail\NhacNoHoaDon($hoaDon, $loginUrl));
                 }
             }

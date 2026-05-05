@@ -13,6 +13,7 @@ use App\Models\Sinhvien;
 use App\Models\YeuCauGiaHan;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -90,6 +91,21 @@ class GiaHanService implements GiaHanServiceInterface
                     return $this->traVeLoi('Chỉ có thể gia hạn hợp đồng đang hiệu lực.');
                 }
 
+                if (! $hopdong->ngay_ket_thuc) {
+                    return $this->traVeLoi('Dữ liệu hợp đồng không hợp lệ (thiếu ngày kết thúc hiện tại).');
+                }
+
+                try {
+                    $ngayKetThucMoiParsed = Carbon::parse($ngayKetThucMoi)->startOfDay();
+                } catch (\Throwable) {
+                    return $this->traVeLoi('Ngày kết thúc mới không hợp lệ.');
+                }
+
+                $ngayKetThucHienTai = $hopdong->ngay_ket_thuc->copy()->startOfDay();
+                if ($ngayKetThucMoiParsed->lessThanOrEqualTo($ngayKetThucHienTai)) {
+                    return $this->traVeLoi('Ngày gia hạn phải sau ngày kết thúc hiện tại.');
+                }
+
                 $dangCho = YeuCauGiaHan::where('hopdong_id', $hopdong->id)
                     ->where('sinhvien_id', $sinhvien->id)
                     ->where('trang_thai', ExtensionStatus::Pending->value)
@@ -102,7 +118,7 @@ class GiaHanService implements GiaHanServiceInterface
                 YeuCauGiaHan::create([
                     'hopdong_id' => $hopdong->id,
                     'sinhvien_id' => $sinhvien->id,
-                    'ngay_ket_thuc_moi' => $ngayKetThucMoi,
+                    'ngay_ket_thuc_moi' => $ngayKetThucMoiParsed->toDateString(),
                     'ly_do' => $lyDo,
                     'trang_thai' => ExtensionStatus::Pending->value,
                 ]);
@@ -140,11 +156,7 @@ class GiaHanService implements GiaHanServiceInterface
                     'ngay_ket_thuc' => $yeuCau->ngay_ket_thuc_moi->format('Y-m-d'),
                 ]);
 
-                // Cập nhật ngày hết hạn của sinh viên để đồng bộ
-                $yeuCau->sinhvien->update([
-                    'ngay_het_han' => $yeuCau->ngay_ket_thuc_moi->format('Y-m-d'),
-                ]);
-
+                
                 $yeuCau->update([
                     'trang_thai' => ExtensionStatus::Approved->value,
                     'ghi_chu_admin' => $ghiChuAdmin,
@@ -212,4 +224,3 @@ class GiaHanService implements GiaHanServiceInterface
         }
     }
 }
-

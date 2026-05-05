@@ -172,16 +172,18 @@
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="room-container">
                 @forelse($phongList as $phong)
                     @php
-                        $conTrong = $phong->succhuamax - $phong->dango;
+                        $sucChua = $phong->loaiphong->suc_chua ?? 0;
+                        $dangO = $phong->dango_count ?? 0;
+                        $conTrong = max(0, $sucChua - $dangO);
                         $isAvailable = $conTrong > 0;
-                        $percentage = ($phong->dango / $phong->succhuamax) * 100;
+                        $percentage = $sucChua > 0 ? ($dangO / $sucChua) * 100 : 0;
                     @endphp
-                    <div class="room-card bg-white p-5 border border-ui-border hover:border-ink-primary transition-colors duration-300 flex flex-col group shadow-sm hover:shadow-md" data-gender="{{ $phong->gioitinh }}" data-available="{{ $isAvailable ? 'available' : 'full' }}" style="display:none;">
+                    <div class="room-card bg-white p-5 border border-ui-border hover:border-ink-primary transition-colors duration-300 flex flex-col group shadow-sm hover:shadow-md" data-gender="{{ $phong->gioi_tinh_han_che?->label() ?? 'all' }}" data-available="{{ $isAvailable ? 'available' : 'full' }}" style="display:none;">
                         
                         <div class="flex justify-between items-start mb-5">
                             <div>
-                                <h3 class="text-base font-display font-bold text-ink-primary mb-0.5">{{ $phong->tenphong }}</h3>
-                                <p class="text-[10px] font-bold text-ink-secondary uppercase tracking-wider">Tầng {{ $phong->tang }} · {{ $phong->gioitinh }}</p>
+                                <h3 class="text-base font-display font-bold text-ink-primary mb-0.5">{{ $phong->ten_phong }}</h3>
+                                <p class="text-[10px] font-bold text-ink-secondary uppercase tracking-wider">Tầng {{ $phong->tang }} · {{ $phong->gioi_tinh_han_che?->label() ?? 'N/A' }}</p>
                             </div>
                             <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border {{ $isAvailable ? 'border-brand-emerald text-brand-emerald bg-brand-emerald/5' : 'border-red-500 text-red-600 bg-red-500/5' }}">
                                 {{ $isAvailable ? 'Còn '.$conTrong : 'Kín chỗ' }}
@@ -190,7 +192,7 @@
 
                         <div class="mb-6">
                             <div class="flex items-baseline gap-1">
-                                <span class="text-xl font-display font-bold text-ink-primary tracking-tight">{{ number_format($phong->giaphong, 0, ',', '.') }}</span>
+                                <span class="text-xl font-display font-bold text-ink-primary tracking-tight">{{ number_format($phong->loaiphong->gia_thang ?? 0, 0, ',', '.') }}</span>
                                 <span class="text-xs font-bold text-ink-secondary">đ/tháng</span>
                             </div>
                         </div>
@@ -199,8 +201,8 @@
                             <!-- Progress Bar Minimal -->
                             <div>
                                 <div class="flex justify-between text-[10px] font-bold text-ink-secondary mb-1.5">
-                                    <span>Sức chứa: {{ $phong->succhuamax }}</span>
-                                    <span class="{{ $isAvailable ? 'text-ink-primary' : 'text-red-500' }}">Đang ở: {{ $phong->dango }}</span>
+                                    <span>Sức chứa: {{ $sucChua }}</span>
+                                    <span class="{{ $isAvailable ? 'text-ink-primary' : 'text-red-500' }}">Đang ở: {{ $dangO }}</span>
                                 </div>
                                 <div class="w-full bg-ui-bg h-1 rounded-full overflow-hidden">
                                      
@@ -208,16 +210,12 @@
                                  </div>
                             </div>
                             
-                            <div class="flex flex-wrap gap-1.5">
-                                <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-ui-bg text-ink-primary text-[10px] font-bold uppercase tracking-widest border border-ui-border">
-                                    <svg class="w-3 h-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                    Máy lạnh
-                                </span>
-                                <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-ui-bg text-ink-primary text-[10px] font-bold uppercase tracking-widest border border-ui-border">
-                                    <svg class="w-3 h-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                                    Giường tầng
-                                </span>
-                            </div>
+                            <a href="{{ route('public.chitietvattu', $phong->id) }}" class="inline-flex items-center justify-center gap-2 px-3 py-2 bg-ui-bg text-ink-primary text-[10px] font-bold uppercase tracking-widest border border-ui-border hover:bg-ui-muted transition-colors">
+                                <svg class="w-4 h-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 0 0-2-2h-2.5M4 19V7a2 2 0 0 1 2-2h2.5M8 21h8M12 17v4M7 13h10M7 9h10"/>
+                                </svg>
+                                Xem chi tiết vật tư
+                            </a>
                         </div>
 
                         <div class="mt-5 pt-4 border-t border-ui-border">
@@ -468,61 +466,8 @@
 
     {{-- Footer rendered by layout --}}
 
-    {{-- Chatbot Minimal --}}
-    <div class="fixed bottom-8 right-8 z-50">
-        <button id="chat-toggle" type="button" class="flex h-14 w-14 items-center justify-center bg-ink-primary text-white transition-colors hover:bg-brand-emerald group shadow-sm border border-ui-border" aria-label="Mở chat hỗ trợ">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-            <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                <span class="relative inline-flex h-3 w-3 bg-brand-emerald border border-white"></span>
-            </span>
-        </button>
-        <div id="chat-box" class="absolute bottom-16 right-0 w-[320px] origin-bottom-right scale-0 opacity-0 transition-all duration-200 ease-out border border-ui-border bg-white shadow-xl">
-            <div class="bg-ink-primary px-5 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-white/10 flex items-center justify-center rounded-lg">
-                        <svg class="w-5 h-5 text-brand-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                    </div>
-                    <div>
-                        <span class="font-black text-white text-[10px] uppercase tracking-widest block leading-none mb-1">Trợ lý KTX</span>
-                        <span class="text-[8px] text-brand-emerald uppercase font-black tracking-widest animate-pulse">Online</span>
-                    </div>
-                </div>
-            </div>
-            <div class="p-5 h-64 bg-ui-bg flex flex-col justify-end gap-3 overflow-y-auto">
-                <div class="bg-white border border-ui-border p-3 text-sm text-ink-primary self-start max-w-[85%] leading-relaxed">
-                    Xin chào 👋<br>Bạn cần hỗ trợ vấn đề gì?
-                </div>
-                <div class="flex gap-2 self-start max-w-[85%] flex-wrap">
-                    <button class="text-xs font-medium border border-ui-border bg-white text-ink-primary px-3 py-1.5 hover:border-ink-primary transition-colors">Bảng giá</button>
-                    <button class="text-xs font-medium border border-ui-border bg-white text-ink-primary px-3 py-1.5 hover:border-ink-primary transition-colors">Đăng ký</button>
-                </div>
-            </div>
-            <div class="p-3 bg-white border-t border-ui-border">
-                <div class="relative">
-                    <input type="text" placeholder="Nhập câu hỏi..." class="w-full bg-ui-bg border border-ui-border py-2.5 pl-3 pr-10 text-sm focus:ring-0 focus:border-ink-primary rounded-none transition-colors">
-                    <button class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-ink-primary text-white flex items-center justify-center hover:bg-brand-emerald transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Chatbot toggle
-        const toggle = document.getElementById('chat-toggle');
-        const box = document.getElementById('chat-box');
-        if (toggle && box) {
-            toggle.addEventListener('click', function () {
-                const hidden = box.classList.contains('scale-0');
-                box.classList.toggle('scale-0', !hidden);
-                box.classList.toggle('opacity-0', !hidden);
-                box.classList.toggle('scale-100', hidden);
-                box.classList.toggle('opacity-100', hidden);
-            });
-        }
-
         // Navbar scroll
         const header = document.getElementById('site-header');
         if (header) {

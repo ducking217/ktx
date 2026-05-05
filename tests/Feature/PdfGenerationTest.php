@@ -42,13 +42,14 @@ class PdfGenerationTest extends TestCase
         $user = User::factory()->sinhvien()->create();
         $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'phong_id' => $phong->id
         ]);
 
         // Setup: tạo Hopdong với đầy đủ relations
+        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
         $hopdong = Hopdong::factory()->create([
             'sinhvien_id' => $sinhvien->id,
-            'phong_id' => $phong->id
+            'phong_id' => $phong->id,
+            'giuong_id' => $giuong->id,
         ]);
 
         // Action: GET /admin/hopdong/{id}/pdf
@@ -83,14 +84,19 @@ class PdfGenerationTest extends TestCase
         $user = User::factory()->sinhvien()->create();
         $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'phong_id' => $phong->id
         ]);
 
         // Setup: tạo Hoadon với đầy đủ relations
-        $hoadon = Hoadon::factory()->create([
+        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        $hopdong = Hopdong::factory()->create([
             'sinhvien_id' => $sinhvien->id,
             'phong_id' => $phong->id,
-            'toa_nha_id' => $toaNha->id
+            'giuong_id' => $giuong->id,
+        ]);
+
+        $hoadon = Hoadon::factory()->create([
+            'hopdong_id' => $hopdong->id,
+            'phong_id' => $phong->id,
         ]);
 
         // Action: GET /admin/hoadon/{id}/pdf

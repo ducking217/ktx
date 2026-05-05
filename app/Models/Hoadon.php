@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
+use App\Enums\InvoiceStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 class Hoadon extends Model
 {
@@ -15,94 +14,81 @@ class Hoadon extends Model
 
     protected $table = 'hoadon';
 
-    // Phân loại hóa đơn
-    public const LOAI_MONTHLY = 'monthly';   // Hóa đơn tháng thường
-    public const LOAI_DEPOSIT = 'deposit';   // Phí thế chân
-    public const LOAI_PENALTY  = 'penalty';   // Phí bồi thường lỗi thiết bị
-    public const LOAI_REFUND   = 'refund';    // Hoàn tiền cọc
-    
-    public static function trangThaiQuaHan(): string
-    {
-        return \App\Enums\InvoiceStatus::Overdue->value;
-    }
-
-    public static function trangThaiChuaThanhToan(): string
-    {
-        return \App\Enums\InvoiceStatus::Pending->value;
-    }
-
-
-    private const ALLOWED_TRANSITIONS = [
-        'pending_confirmation' => [
-            'pending',
-        ],
-        'pending' => [
-            'paid',
-            'overdue',
-        ],
-        'overdue' => [
-            'paid',
-        ],
-        'paid' => [],
-    ];
+    public const LOAI_DEPOSIT = 'deposit';
+    public const LOAI_PENALTY = 'extra';
 
     protected $fillable = [
+        'hopdong_id',
         'phong_id',
-        'sinhvien_id',
+        'ma_hoa_don',
         'loai_hoadon',
-        'thang',
-        'nam',
-        'chisodiencu',
-        'chisodienmoi',
-        'chisonuoccu',
-        'chisonuocmoi',
-        'tongtien',
-        'tienphong',
-        'tiendien',
-        'tiennuoc',
-        'phidichvu',
-        'tienphat',
-        'trangthaithanhtoan',
+        'tien_phong',
+        'tien_dien',
+        'tien_nuoc',
+        'phi_dich_vu',
+        'tong_tien',
+        'trang_thai',
+        'ngay_het_han',
         'ngay_thanh_toan',
-        'ngayxuat',
-        'calculation_details',
-        'toa_nha_id',
+        'ghi_chu',
     ];
 
     protected $casts = [
-        'trangthaithanhtoan' => \App\Enums\InvoiceStatus::class,
-        'ngay_thanh_toan' => 'datetime',
-        'calculation_details' => 'array',
+        'hopdong_id' => 'integer',
+        'phong_id' => 'integer',
+        'tien_phong' => 'integer',
+        'tien_dien' => 'integer',
+        'tien_nuoc' => 'integer',
+        'phi_dich_vu' => 'integer',
+        'tong_tien' => 'integer',
+        'trang_thai' => InvoiceStatus::class,
+        'ngay_het_han' => 'date',
+        'ngay_thanh_toan' => 'date',
     ];
 
-    public function getMaHdAttribute(): string
+    public function hopdong()
     {
-        return 'HD' . str_pad((string)$this->id, 6, '0', STR_PAD_LEFT);
+        return $this->belongsTo(Hopdong::class, 'hopdong_id');
     }
 
-    public function phong(): BelongsTo
+    public function phong()
     {
         return $this->belongsTo(Phong::class, 'phong_id');
     }
 
-    public function sinhvien(): BelongsTo
+    public function thanh_toans()
     {
-        return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
+        return $this->hasMany(ThanhToan::class, 'hoadon_id');
     }
 
+    public function giao_dich_gan_nhat()
+    {
+        return $this->hasOne(ThanhToan::class, 'hoadon_id')->latestOfMany('ngay_giao_dich');
+    }
+
+    public function getLoaiHoadonLabelAttribute(): string
+    {
+        return match ((string) $this->loai_hoadon) {
+            'monthly' => 'Tiền thuê tháng',
+            'deposit' => 'Tiền cọc',
+            'refund' => 'Hoàn cọc',
+            'extra' => 'Phát sinh',
+            default => 'Phát sinh',
+        };
+    }
+
+    /**
+     * Chuyển đổi trạng thái hóa đơn.
+     */
     public function transitionTo(string $newStatus): bool
     {
-        $currentStatus = $this->trangthaithanhtoan->value ?? $this->trangthaithanhtoan;
-        
-        if (isset(self::ALLOWED_TRANSITIONS[$currentStatus]) && in_array($newStatus, self::ALLOWED_TRANSITIONS[$currentStatus])) {
-            return $this->update(['trangthaithanhtoan' => $newStatus]);
+        $data = ['trang_thai' => $newStatus];
+
+        // Nếu chuyển sang paid thì bắt buộc có ngày thanh toán để khớp DB check constraint.
+        if ($newStatus === InvoiceStatus::Paid->value && $this->ngay_thanh_toan === null) {
+            $data['ngay_thanh_toan'] = Carbon::now();
         }
 
-        return false;
-    }
-
-    public function toanha(): BelongsTo
-    {
-        return $this->belongsTo(ToaNha::class, 'toa_nha_id');
+        return $this->update($data);
     }
 }

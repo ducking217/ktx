@@ -65,5 +65,44 @@ const initModalAnimations = () => {
     });
 };
 
+const initLegacyModalBridge = () => {
+    document.addEventListener(
+        'click',
+        (event) => {
+            const hideTrigger = event.target.closest('[data-modal-hide]');
+            if (hideTrigger) {
+                const modalId = hideTrigger.getAttribute('data-modal-hide');
+                const modal = modalId ? document.getElementById(modalId) : null;
+                // Only bridge to Alpine for modals that use x-data (Alpine-based <x-modal>).
+                if (modal && (modal.hasAttribute('x-data') || modal.querySelector('[x-data]'))) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    window.dispatchEvent(new CustomEvent('close-modal', { detail: modalId }));
+                }
+                return;
+            }
+
+            const openTrigger = event.target.closest('[data-modal-toggle], [data-modal-target]');
+            if (!openTrigger) {
+                return;
+            }
+
+            const modalId = openTrigger.getAttribute('data-modal-toggle') || openTrigger.getAttribute('data-modal-target');
+            const modal = modalId ? document.getElementById(modalId) : null;
+
+            // Only bridge to Alpine for modals that use x-data (Alpine-based <x-modal>).
+            // Native Flowbite modals should be handled by Flowbite's own listener.
+            if (modal && (modal.hasAttribute('x-data') || modal.querySelector('[x-data]'))) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                window.dispatchEvent(new CustomEvent('open-modal', { detail: modalId }));
+            }
+            // Otherwise: let Flowbite handle it natively
+        },
+        true,
+    );
+};
+
 initSubmitLoadingStates();
+initLegacyModalBridge();
 initModalAnimations();

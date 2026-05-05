@@ -6,18 +6,16 @@ namespace App\Services\Admin;
 
 use App\Enums\BedStatus;
 use App\Enums\ContractStatus;
-use App\Events\GiuongStatusChanged;
 use App\Contracts\Admin\HopdongServiceInterface;
 use App\Contracts\Admin\HoanTienServiceInterface;
+use App\Models\Giuong;
 use App\Models\Hopdong;
-use App\Models\Phong;
 use App\Models\Sinhvien;
 use App\Traits\HoTroNghiepVu;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 
 class HopdongService implements HopdongServiceInterface
 {
@@ -29,13 +27,17 @@ class HopdongService implements HopdongServiceInterface
 
     public function lietKeHopDongAdmin(Request $request): array
     {
-        $tuKhoa = $request->query('q', '');
+        $tuKhoa  = $request->query('q', '');
         $trangThai = $request->query('trangthai', 'Tất cả');
-        $contracts = Hopdong::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
-        })->when($trangThai !== 'Tất cả', function ($q) use ($trangThai) {
-            $q->where('trang_thai', $trangThai);
-        })->with(['sinhvien.taikhoan', 'phong'])->orderByDesc('created_at')->paginate(20);
+
+        $contracts = Hopdong::with(['sinhvien.user', 'giuong.phong.toanha'])
+            ->when($tuKhoa, function ($q) use ($tuKhoa) {
+                $q->whereHas('sinhvien', fn($sq) => $sq->where('ma_sinh_vien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%')
+                    ->orWhereHas('user', fn($uq) => $uq->where('name', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%')));
+            })
+            ->when($trangThai !== 'Tất cả', fn($q) => $q->where('trang_thai', $trangThai))
+            ->orderByDesc('created_at')
+            ->paginate(20);
 
         return ['hopdong' => $contracts, 'tuKhoa' => $tuKhoa, 'trangThai' => $trangThai];
     }
@@ -44,77 +46,172 @@ class HopdongService implements HopdongServiceInterface
     {
         $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
         if (!$sinhvien) return ['hopdong' => collect()];
-        return ['hopdong' => Hopdong::where('sinhvien_id', $sinhvien->id)->with('phong')->orderByDesc('created_at')->get()];
+
+        return [
+            'hopdong' => Hopdong::where('sinhvien_id', $sinhvien->id)
+                ->with(['giuong.phong.toanha'])
+                ->orderByDesc('created_at')
+                ->get()
+        ];
     }
 
     public function layChiTietHopDong(int $id): array
     {
-        $hopdong = Hopdong::with(['sinhvien.taikhoan', 'phong'])->find($id);
-        return $hopdong ? ['hopdong' => $hopdong] : $this->traVeLoi('Không tìm thấy hợp đồng.');
+        $hopdong = Hopdong::with(['sinhvien.user', 'giuong.phong.toanha'])->find($id);
+        return $hopdong
+            ? ['hopdong' => $hopdong]
+            : $this->traVeLoi('Không tìm thấy hợp đồng.');
     }
 
+    /**
+     * Tạo hợp đồng thủ công (Admin chủ động xếp giường cho sinh viên).
+     * Smart Auto-Assign: Ưu tiên giuong_id, fallback phong_id.
+     */
     public function taoHopDong(array $data): array
     {
         try {
             return DB::transaction(function () use ($data) {
-                $sinhvien = Sinhvien::where('id', (int)$data['sinhvien_id'])->lockForUpdate()->first();
-                $phong = Phong::where('id', (int)$data['phong_id'])->lockForUpdate()->first();
-                if (!$sinhvien || !$phong) return ['success' => false, 'message' => 'Thiếu dữ liệu.'];
+                $sinhvien = Sinhvien::where('id', (int) $data['sinhvien_id'])->lockForUpdate()->first();
+                if (!$sinhvien) {
+                    return $this->traVeLoi('Sinh viên không tồn tại.');
+                }
 
-                $check = $this->validateNewContract($sinhvien, $phong);
+                // Smart Auto-Assign Logic: Ưu tiên giuong_id
+                $giuong = null;
+                $phong_id = null;
+
+                // Case 1: Có giuong_id -> Validate và suy ra phong_id
+                if (isset($data['giuong_id'])) {
+                    $giuong = Giuong::where('id', (int) $data['giuong_id'])->lockForUpdate()->first();
+                    if (!$giuong) {
+                        return $this->traVeLoi('Giường không tồn tại.');
+                    }
+
+                    $phong_id = $giuong->phong_id;
+
+                    // Validation: Nếu cũng có phong_id, kiểm tra mapping nghiêm ngặt
+                    if (isset($data['phong_id']) && (int) $data['phong_id'] !== $phong_id) {
+                        return $this->traVeLoi('Giường không thuộc phòng đã chọn');
+                    }
+                }
+                
+                // Case 2: Chỉ có phong_id -> Auto-assign giường trống đầu tiên
+                elseif (isset($data['phong_id'])) {
+                    $phong_id = (int) $data['phong_id'];
+                    
+                    $giuong = Giuong::where('phong_id', $phong_id)
+                        ->where('trang_thai', BedStatus::Available->value)
+                        ->lockForUpdate()
+                        ->first();
+                        
+                    if (!$giuong) {
+                        return $this->traVeLoi('Phòng không có giường trống.');
+                    }
+                }
+                
+                else {
+                    return $this->traVeLoi('Phải cung cấp ít nhất giuong_id hoặc phong_id.');
+                }
+
+                $check = $this->validateNewContract($sinhvien, $giuong);
                 if (!$check['success']) return $check;
 
-                $contract = Hopdong::create(['sinhvien_id' => $sinhvien->id, 'phong_id' => $phong->id, 'ngay_bat_dau' => $data['ngay_bat_dau'], 'ngay_ket_thuc' => $data['ngay_ket_thuc'], 'giaphong_luc_ky' => (int)$phong->giaphong, 'trang_thai' => ContractStatus::Active->value]);
-                $sinhvien->update(['phong_id' => $phong->id, 'ngay_vao' => $data['ngay_bat_dau'], 'ngay_het_han' => $data['ngay_ket_thuc']]);
-                return ['success' => true, 'message' => 'Thành công.', 'contract' => $contract];
-            });
-        } catch (\Throwable $e) { return ['success' => false, 'message' => $e->getMessage()]; }
-    }
+                // Giá thực tế = giá của Loại phòng tại thời điểm ký
+                $giaThucTe = $giuong->phong->loaiphong->gia_thang ?? 0;
 
-    private function validateNewContract($sinhvien, $phong)
-    {
-        if ($sinhvien->phong_id) return ['success' => false, 'message' => 'Đã có phòng.'];
-        if (Hopdong::where('sinhvien_id', $sinhvien->id)->where('trang_thai', ContractStatus::Active->value)->exists()) return ['success' => false, 'message' => 'Đang có hợp đồng.'];
-        if ($phong->dango >= $phong->succhuamax) return ['success' => false, 'message' => 'Phòng đầy.'];
-        if ($phong->gioitinh && $phong->gioitinh !== ($sinhvien->taikhoan->gioitinh ?? null)) return ['success' => false, 'message' => 'Giới tính không hợp.'];
-        return ['success' => true];
+                $contract = Hopdong::create([
+                    'sinhvien_id'  => $sinhvien->id,
+                    'phong_id'     => $phong_id,        // ← ĐẢM BẢO CẢ HAI ID
+                    'giuong_id'    => $giuong->id,
+                    'ngay_bat_dau' => $data['ngay_bat_dau'],
+                    'ngay_ket_thuc' => $data['ngay_ket_thuc'],
+                    'gia_thuc_te'  => $giaThucTe,
+                    'trang_thai'   => ContractStatus::Active->value,
+                ]);
+
+                // Cập nhật trạng thái giường → đã có người ở (cùng transaction)
+                $giuong->update(['trang_thai' => BedStatus::Occupied->value]);
+
+                return $this->traVeThanhCong('Tạo hợp đồng thành công.', ['contract' => $contract]);
+            });
+        } catch (\Throwable $e) {
+            return $this->traVeLoi($e->getMessage());
+        }
     }
 
     public function giaHanHopDong(int $contractId, string $newEndDate, string $currentEndDate): array
     {
-        $hopdong = Hopdong::find($contractId);
-        if (!$hopdong) return ['success' => false, 'message' => 'Không tìm thấy.'];
-        if (strtotime($newEndDate) <= strtotime($currentEndDate)) return ['success' => false, 'message' => 'Ngày mới không hợp lệ.'];
+        try {
+            return DB::transaction(function () use ($contractId, $newEndDate, $currentEndDate) {
+                $hopdong = Hopdong::lockForUpdate()->find($contractId);
+                if (!$hopdong) return $this->traVeLoi('Không tìm thấy hợp đồng.');
 
-        $phong = $hopdong->phong; $sinhvien = $hopdong->sinhvien;
-        if ($phong->fresh()->dango >= (int)$phong->succhuamax) return ['success' => false, 'message' => 'Phòng đầy.'];
+                if ($hopdong->trang_thai !== ContractStatus::Active->value) {
+                    return $this->traVeLoi('Chỉ có thể gia hạn hợp đồng đang hoạt động.');
+                }
 
-        $hopdong->update(['ngay_ket_thuc' => $newEndDate]);
-        if ($sinhvien?->phong_id === $phong->id) $sinhvien->update(['ngay_het_han' => $newEndDate]);
-        return ['success' => true, 'message' => 'Gia hạn thành công.'];
+                if (strtotime($newEndDate) <= strtotime($currentEndDate)) {
+                    return $this->traVeLoi('Ngày gia hạn phải sau ngày hết hạn hiện tại.');
+                }
+
+                $oldEndDate = $hopdong->ngay_ket_thuc;
+                 $hopdong->update(['ngay_ket_thuc' => $newEndDate]);
+                 
+                 // Sử dụng KiemToanService
+                 app(\App\Contracts\Core\KiemToanServiceInterface::class)->ghiNhatKyGiaHanHopDong(
+                     $hopdong->id, 
+                     (string)$oldEndDate, 
+                     $newEndDate
+                 );
+
+                return $this->traVeThanhCong('Gia hạn hợp đồng thành công.');
+            });
+        } catch (\Throwable $e) {
+            return $this->traVeLoi($e->getMessage());
+        }
     }
 
     public function thanhLyHopDong(int $contractId, int $phiHuHai = 0): array
     {
         return DB::transaction(function () use ($contractId, $phiHuHai) {
-                $hopdong = Hopdong::find($contractId);
-                if (!$hopdong || $hopdong->trang_thai === ContractStatus::Terminated) {
-                    return ['success' => false, 'message' => 'Lỗi.'];
-                }
-                
-                $sinhvien = $hopdong->sinhvien;
-                if (!$hopdong->transitionTo(ContractStatus::Terminated)) throw new \Exception('Không thể chuyển đổi trạng thái hợp đồng.');
-                
-                if ($sinhvien) {
-                    $pid = $sinhvien->phong_id;
-                    $sinhvien->update(['phong_id' => null, 'ngay_vao' => null, 'ngay_het_han' => null]);
-                    if ($pid) Event::dispatch(new GiuongStatusChanged((int)$pid, null, BedStatus::Available, BedStatus::Occupied, 'Thanh lý'));
-                }
+            $hopdong = Hopdong::with('giuong')->lockForUpdate()->find($contractId);
 
-                // Kích hoạt tính toán Hoàn tiền / Thu thêm sau khi thanh lý
-                $this->hoanTienService->xuLyHoanTien($hopdong, $phiHuHai);
+            if (!$hopdong || $hopdong->trang_thai === ContractStatus::Terminated) {
+                return $this->traVeLoi('Hợp đồng không hợp lệ hoặc đã được thanh lý.');
+            }
 
-                return ['success' => true, 'message' => 'Thành công.'];
-            });
+            if (!$hopdong->transitionTo(ContractStatus::Terminated->value)) {
+                throw new \Exception('Không thể chuyển đổi trạng thái hợp đồng.');
+            }
+
+            // Giải phóng giường
+            if ($hopdong->giuong) {
+                $hopdong->giuong->update(['trang_thai' => BedStatus::Available]);
+            }
+
+            // Kích hoạt tính toán hoàn tiền
+            $this->hoanTienService->xuLyHoanTien($hopdong, $phiHuHai);
+
+            return $this->traVeThanhCong('Thanh lý hợp đồng thành công.');
+        });
+    }
+
+    // ─── Private Helpers ──────────────────────────────────────────────────────
+
+    private function validateNewContract(Sinhvien $sinhvien, Giuong $giuong): array
+    {
+        // Kiểm tra sinh viên đã có hợp đồng active chưa
+        if (Hopdong::where('sinhvien_id', $sinhvien->id)
+            ->where('trang_thai', ContractStatus::Active->value)
+            ->exists()) {
+            return $this->traVeLoi('Sinh viên đang có hợp đồng hoạt động.');
+        }
+
+        // Kiểm tra giường có trống không
+        if ($giuong->trang_thai !== BedStatus::Available) {
+            return $this->traVeLoi('Giường này hiện không trống.');
+        }
+
+        return ['success' => true];
     }
 }

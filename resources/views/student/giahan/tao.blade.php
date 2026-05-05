@@ -3,87 +3,96 @@
 @section('student_page_title', 'Yêu cầu gia hạn')
 
 @section('noidung')
-    <div class="max-w-3xl mx-auto space-y-8 animate-fade-up">
+    <div class="max-w-4xl mx-auto space-y-8">
+        {{-- Page Header --}}
         <header class="flex items-center justify-between">
             <div>
-                <h2 class="text-xl font-black text-ink-primary uppercase tracking-tight">Gia hạn hợp đồng</h2>
-                <p class="text-[10px] font-bold text-ink-secondary/50 uppercase tracking-widest mt-1">Năm học {{ date('Y') }}-{{ date('Y')+1 }}</p>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight uppercase">Gia hạn lưu trú</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Đăng ký tiếp tục cư trú tại Ký túc xá PDU</p>
             </div>
-            <a href="{{ route('student.giahan.index') }}" class="pdu-btn-ghost !px-4">
-                <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <a href="{{ route('student.giahan.index') }}" class="saas-btn-secondary h-10 px-4 text-[10px] font-bold uppercase tracking-widest gap-2">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 Quay lại
             </a>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-            {{-- Thông tin hợp đồng hiện tại --}}
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+            {{-- Current Contract Context --}}
             <aside class="md:col-span-4 space-y-6">
-                <div class="pdu-card !p-6 bg-ui-bg/30 border-dashed">
-                    <h3 class="text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em] mb-4">Hợp đồng hiện tại</h3>
+                <article class="saas-card p-6 bg-slate-50/50 border-dashed">
+                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Thông tin hiện tại</h3>
                     
-                    <div class="space-y-4">
+                    <div class="space-y-5">
                         <div>
-                            <span class="text-[9px] font-black uppercase text-ink-secondary/50 block tracking-widest">Mã hợp đồng</span>
-                            <span class="font-display font-black text-ink-primary tracking-tight">{{ $hopdong->ma_hd }}</span>
+                            <label class="text-[9px] font-bold uppercase text-slate-400 block tracking-widest mb-1">Mã hợp đồng</label>
+                            <span class="text-sm font-bold text-slate-900 tracking-tight tabular-nums">{{ $hopdong->ma_hd }}</span>
                         </div>
                         <div>
-                            <span class="text-[9px] font-black uppercase text-ink-secondary/50 block tracking-widest">Phòng</span>
-                            <span class="font-bold text-ink-primary tracking-tight">{{ $hopdong->phong->tenphong }}</span>
+                            <label class="text-[9px] font-bold uppercase text-slate-400 block tracking-widest mb-1">Vị trí phòng</label>
+                            <span class="text-sm font-bold text-slate-900 tracking-tight">{{ $hopdong->phong->tenphong }}</span>
                         </div>
                         <div>
-                            <span class="text-[9px] font-black uppercase text-ink-secondary/50 block tracking-widest">Ngày kết thúc</span>
-                            <span class="font-bold text-ink-primary tabular-nums tracking-tight">{{ $hopdong->ngay_ket_thuc?->format('d/m/Y') ?? 'Chưa xác định' }}</span>
+                            <label class="text-[9px] font-bold uppercase text-slate-400 block tracking-widest mb-1">Ngày kết thúc cũ</label>
+                            <span class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $hopdong->ngay_ket_thuc?->format('d/m/Y') ?? 'Chưa xác định' }}</span>
                         </div>
                     </div>
-                </div>
+                </article>
 
-                <div class="p-6 rounded-2xl bg-brand-emerald/5 border border-brand-emerald/10">
-                    <div class="flex gap-3 text-brand-emerald">
-                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <p class="text-[11px] font-medium leading-relaxed">
-                            Yêu cầu của bạn sẽ được Ban quản lý KTX xem xét trong vòng 24-48h làm việc. Kết quả sẽ được thông báo qua Email.
-                        </p>
-                    </div>
+                <div class="saas-card p-6 bg-blue-50 border-blue-100 flex gap-4">
+                    <svg class="h-5 w-5 shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <p class="text-[11px] font-medium leading-relaxed text-blue-700">
+                        Yêu cầu sẽ được Ban quản lý xem xét trong 24-48h. Kết quả phê duyệt sẽ được gửi qua email sinh viên.
+                    </p>
                 </div>
             </aside>
 
-            {{-- Form đăng ký --}}
+            {{-- Extension Form --}}
             <main class="md:col-span-8">
-                <article class="pdu-card shadow-xl shadow-ink-primary/5">
-                    <form action="{{ route('student.giahan.store') }}" method="POST" class="space-y-6">
+                <article class="saas-card p-8">
+                    <form action="{{ route('student.giahan.store') }}" method="POST" class="space-y-8">
                         @csrf
                         <input type="hidden" name="hopdong_id" value="{{ $hopdong->id }}">
 
-                        <div class="space-y-2">
-                            <label for="ngay_ket_thuc_moi" class="text-[10px] font-black text-ink-primary uppercase tracking-widest">Ngày kết thúc mới <span class="text-status-error">*</span></label>
+                        <div class="space-y-3">
+                            <label for="ngay_ket_thuc_moi" class="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Thời hạn gia hạn mong muốn <span class="text-rose-500">*</span></label>
                             <div class="relative group">
+                                @php
+                                    $ngayKetThuc = $hopdong->ngay_ket_thuc;
+                                    if (is_string($ngayKetThuc)) {
+                                        $ngayKetThuc = \Illuminate\Support\Carbon::parse($ngayKetThuc);
+                                    }
+                                    $ngayMacDinh = optional($ngayKetThuc)?->copy()->addMonths(5) ?? now()->addMonths(5);
+                                @endphp
                                 <input type="date" 
                                        name="ngay_ket_thuc_moi" 
                                        id="ngay_ket_thuc_moi"
-                                       value="{{ old('ngay_ket_thuc_moi', $hopdong->ngay_ket_thuc->addMonths(5)->format('Y-m-d')) }}"
-                                       class="w-full bg-ui-bg border-ui-border rounded-xl px-4 py-3.5 font-bold text-ink-primary focus:ring-2 focus:ring-brand-emerald/20 focus:border-brand-emerald transition-all"
+                                       value="{{ old('ngay_ket_thuc_moi', $ngayMacDinh->format('Y-m-d')) }}"
+                                       class="saas-input h-12 pr-12 font-bold tabular-nums"
                                        required>
-                                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-ink-secondary/30 group-focus-within:text-brand-emerald transition-colors">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300 group-focus-within:text-blue-500 transition-colors">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 </div>
                             </div>
-                            <p class="text-[9px] font-bold text-ink-secondary/40 uppercase tracking-widest">Gợi ý: Mặc định gia hạn thêm 5 tháng</p>
+                            <div class="flex items-center gap-2">
+                                <span class="h-1 w-1 rounded-full bg-slate-200"></span>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gợi ý: Mặc định gia hạn thêm 01 học kỳ (5 tháng)</p>
+                            </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <label for="ly_do" class="text-[10px] font-black text-ink-primary uppercase tracking-widest">Lý do gia hạn</label>
+                        <div class="space-y-3">
+                            <label for="ly_do" class="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Lý do gia hạn</label>
                             <textarea name="ly_do" 
                                       id="ly_do" 
-                                      rows="4" 
+                                      rows="5" 
                                       placeholder="Ví dụ: Tiếp tục học tập tại trường kỳ tiếp theo..."
-                                      class="w-full bg-ui-bg border-ui-border rounded-xl px-4 py-3.5 font-medium text-ink-primary placeholder:text-ink-secondary/30 focus:ring-2 focus:ring-brand-emerald/20 focus:border-brand-emerald transition-all resize-none">{{ old('ly_do') }}</textarea>
+                                      class="saas-input p-4 text-sm font-medium resize-none">{{ old('ly_do') }}</textarea>
                         </div>
 
-                        <div class="pt-4 flex items-center justify-end gap-4 border-t border-ui-border">
-                            <button type="reset" class="pdu-btn-ghost">Hủy</button>
-                            <button type="submit" class="pdu-btn-primary !px-8 h-12 shadow-lg shadow-brand-emerald/20">
-                                Gửi yêu cầu gia hạn
-                                <svg class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <div class="pt-8 flex items-center justify-end gap-4 border-t border-slate-50">
+                            <button type="reset" class="saas-btn-secondary h-11 px-6 text-[10px] font-bold uppercase tracking-widest">Hủy bỏ</button>
+                            <button type="submit" class="saas-btn-primary h-11 px-8 text-[10px] uppercase font-bold tracking-widest gap-2">
+                                Gửi yêu cầu phê duyệt
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                             </button>
                         </div>
                     </form>

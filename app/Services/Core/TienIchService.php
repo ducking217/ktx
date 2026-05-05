@@ -26,7 +26,7 @@ class TienIchService implements TienIchServiceInterface
     public function danhSachThongBao(string $target = 'all'): array
     {
         return Thongbao::when($target !== 'all', fn ($q) => $q->where('doituong', $target))
-            ->orderByDesc('ngaydang')
+            ->orderByDesc('created_at')
             ->get()
             ->toArray();
     }
@@ -37,7 +37,6 @@ class TienIchService implements TienIchServiceInterface
             'tieude' => $data['tieude'],
             'noidung' => $data['noidung'],
             'doituong' => $data['doituong'] ?? 'sinhvien',
-            'ngaydang' => now(),
             'phong_id' => $data['phong_id'] ?? null,
             'sinhvien_id' => $data['sinhvien_id'] ?? null,
         ]);
@@ -46,7 +45,10 @@ class TienIchService implements TienIchServiceInterface
     public function danhSachLienHe(Request $request): array
     {
         $tuKhoa = trim((string) $request->query('q', ''));
-        $trangThai = (string) $request->query('trang_thai', 'tatca');
+        $trangThai = (string) $request->query('status', $request->query('trang_thai', 'Tất cả'));
+        if ($trangThai === 'tatca') {
+            $trangThai = 'Tất cả';
+        }
 
         $query = Lienhe::query()
             ->when($tuKhoa !== '', function ($q) use ($tuKhoa) {
@@ -56,7 +58,7 @@ class TienIchService implements TienIchServiceInterface
                         ->orWhere('noi_dung', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%');
                 });
             })
-            ->when($trangThai !== 'tatca', fn ($q) => $q->where('trang_thai', $trangThai))
+            ->when($trangThai !== 'Tất cả', fn ($q) => $q->where('trang_thai', $trangThai))
             ->orderByDesc('created_at');
 
         $lienhe = $query->paginate(20)->withQueryString();
@@ -70,6 +72,7 @@ class TienIchService implements TienIchServiceInterface
             'danhsachlienhe' => $lienhe,
             'tuKhoa' => $tuKhoa,
             'trangThai' => $trangThai,
+            'status' => $trangThai,
             'thongKe' => $thongKe,
         ];
     }

@@ -19,33 +19,40 @@ class DanhgiaService implements DanhgiaServiceInterface
         if (!$phong) return ['error' => 'Không tìm thấy phòng.'];
 
         $reviews = Danhgia::where('phong_id', $phongId)
-            ->with('sinhvien.taikhoan')
-            ->orderByDesc('ngaydanhgia')
+            ->with('sinhvien.user')
+            ->orderByDesc('created_at')
             ->paginate(10);
 
         return [
             'phong' => $phong,
             'danhsachdanhgia' => $reviews,
-            'diemTrungBinh' => round(Danhgia::where('phong_id', $phongId)->avg('diem') ?? 0, 1),
+            'diemTrungBinh' => round(Danhgia::where('phong_id', $phongId)->avg('rating') ?? 0, 1),
         ];
     }
 
     public function storeReview(array $data): array
     {
         try {
-            $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
-            if (!$sinhvien || !$sinhvien->phong_id) return $this->traVeLoi('Bạn chưa có phòng để đánh giá.');
+            $sinhvien = Sinhvien::where('user_id', Auth::id())
+                ->with('current_hopdong.giuong.phong')
+                ->first();
 
-            if ($this->hasReviewedThisMonth($sinhvien)) {
+            $hopdong = $sinhvien?->current_hopdong;
+            $phong = $sinhvien?->phong_hien_tai()
+                ?? ($hopdong?->phong_id ? Phong::find($hopdong->phong_id) : null);
+            if (!$sinhvien || !$phong) {
+                return $this->traVeLoi('Bạn chưa có phòng để đánh giá.');
+            }
+
+            if ($this->hasReviewedThisMonth($sinhvien, $phong->id)) {
                 return $this->traVeLoi('Bạn đã đánh giá phòng trong tháng này rồi.');
             }
 
             Danhgia::create([
                 'sinhvien_id' => $sinhvien->id,
-                'phong_id' => $sinhvien->phong_id,
-                'diem' => $data['diem'],
-                'noidung' => $data['noidung'] ?? null,
-                'ngaydanhgia' => now()->format('Y-m-d'),
+                'phong_id' => $phong->id,
+                'rating' => $data['diem'],
+                'binh_luan' => $data['noidung'] ?? null,
             ]);
 
             return $this->traVeThanhCong('Cảm ơn bạn đã đánh giá phòng!');
@@ -56,21 +63,29 @@ class DanhgiaService implements DanhgiaServiceInterface
 
     public function getReviewFormContext(): array
     {
-        $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
-        if (!$sinhvien || !$sinhvien->phong_id) return ['error' => 'Bạn chưa có phòng để đánh giá.'];
+        $sinhvien = Sinhvien::where('user_id', Auth::id())
+            ->with('current_hopdong.giuong.phong')
+            ->first();
+
+        $hopdong = $sinhvien?->current_hopdong;
+        $phong = $sinhvien?->phong_hien_tai()
+            ?? ($hopdong?->phong_id ? Phong::find($hopdong->phong_id) : null);
+        if (!$sinhvien || !$phong) {
+            return ['error' => 'Bạn chưa có phòng để đánh giá.'];
+        }
 
         return [
-            'phong' => Phong::find($sinhvien->phong_id),
-            'daDanhGia' => $this->hasReviewedThisMonth($sinhvien),
+            'phong' => $phong,
+            'daDanhGia' => $this->hasReviewedThisMonth($sinhvien, $phong->id),
         ];
     }
 
-    private function hasReviewedThisMonth($sinhvien): bool
+    private function hasReviewedThisMonth(Sinhvien $sinhvien, int $phongId): bool
     {
         return Danhgia::where('sinhvien_id', $sinhvien->id)
-            ->where('phong_id', $sinhvien->phong_id)
-            ->whereYear('ngaydanhgia', now()->year)
-            ->whereMonth('ngaydanhgia', now()->month)
+            ->where('phong_id', $phongId)
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
             ->exists();
     }
 }

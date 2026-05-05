@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\Gender;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class CapNhatPhongRequest extends FormRequest
 {
@@ -14,28 +16,23 @@ class CapNhatPhongRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tenphong' => ['required'],
-            'tang' => ['required', 'numeric', 'min:1'],
-            'giaphong' => ['required', 'numeric', 'min:0'],
-            'succhuamax' => ['required', 'integer', 'min:1'],
-            'mota' => ['nullable'],
-            'gioitinh' => ['required', 'in:Nam,Nữ'],
+            'toa_nha_id' => ['required', 'exists:toa_nha,id'],
+            'loai_phong_id' => ['required', 'exists:loai_phong,id'],
+            'ten_phong' => ['required', 'string', 'max:255'],
+            'tang' => ['required', 'integer', 'min:1'],
+            'gioi_tinh_han_che' => ['required', new Enum(Gender::class)],
+            'mo_ta' => ['nullable', 'string'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'tenphong.required' => 'Tên phòng không được để trống.',
+            'toa_nha_id.required' => 'Vui lòng chọn tòa nhà.',
+            'loai_phong_id.required' => 'Vui lòng chọn loại phòng.',
+            'ten_phong.required' => 'Tên phòng không được để trống.',
             'tang.required' => 'Tầng không được để trống.',
-            'giaphong.required' => 'Giá phòng không được để trống.',
-            'giaphong.numeric' => 'Giá phòng phải là số.',
-            'succhuamax.required' => 'Sức chứa tối đa không được để trống.',
-            'succhuamax.numeric' => 'Sức chứa tối đa phải là số.',
-            'succhuamax.min' => 'Sức chứa tối đa phải lớn hơn hoặc bằng 1.',
-            'gioitinh.required' => 'Giới tính không được để trống.',
+            'gioi_tinh_han_che.required' => 'Giới tính không được để trống.',
         ];
     }
 }
-
-

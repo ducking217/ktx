@@ -17,17 +17,17 @@ class KyluatService implements KyluatServiceInterface
     {
         $tuKhoa = $request->query('q', '');
         $data = Kyluat::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
-        })->with(['sinhvien.taikhoan', 'sinhvien.phong'])->orderByDesc('ngayvipham')->paginate(20);
+            $q->whereHas('sinhvien', fn($sq) => $sq->where('ma_sinh_vien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
+        })->with(['sinhvien.user', 'sinhvien.current_hopdong.giuong.phong'])->orderByDesc('ngay_vi_pham')->paginate(20);
 
-        return ['kyluat' => $data, 'tuKhoa' => $tuKhoa, 'sinhviens' => Sinhvien::with('taikhoan')->get()];
+        return ['kyluat' => $data, 'tuKhoa' => $tuKhoa, 'sinhviens' => Sinhvien::with('user')->get()];
     }
 
     public function listKyluatStudent(): array
     {
         $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
         if (!$sinhvien) return ['kyluat' => collect()];
-        return ['kyluat' => Kyluat::where('sinhvien_id', $sinhvien->id)->orderByDesc('ngayvipham')->get()];
+        return ['kyluat' => Kyluat::where('sinhvien_id', $sinhvien->id)->orderByDesc('ngay_vi_pham')->get()];
     }
 
     public function saveKyluat(array $data, ?int $id = null): array

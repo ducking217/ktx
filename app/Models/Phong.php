@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Gender;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -14,88 +14,78 @@ class Phong extends Model
     protected $table = 'phong';
 
     protected $fillable = [
-        'tenphong',
-        'tang',
-        'giaphong',
-        'soluongtoida',
-        'succhuamax',
-        'dango',
-        'mota',
-        'gioitinh',
         'toa_nha_id',
+        'loai_phong_id',
+        'ten_phong',
+        'tang',
+        'gioi_tinh_han_che',
+        'trang_thai',
     ];
 
-    /**
-     * Đồng bộ hóa soluongtoida và succhuamax
-     * Ưu tiên sử dụng succhuamax làm nguồn chính
-     */
-    public function getSoluongtoidaAttribute(): int
-    {
-        return (int) ($this->attributes['succhuamax'] ?? ($this->attributes['soluongtoida'] ?? 0));
-    }
-
-    public function setSoluongtoidaAttribute($value): void
-    {
-        $this->attributes['soluongtoida'] = $value;
-        $this->attributes['succhuamax'] = $value;
-    }
-
-    public function getSucchuamaxAttribute(): int
-    {
-        return (int) ($this->attributes['succhuamax'] ?? ($this->attributes['soluongtoida'] ?? 0));
-    }
-
-    public function setSucchuamaxAttribute($value): void
-    {
-        $this->attributes['succhuamax'] = $value;
-        $this->attributes['soluongtoida'] = $value;
-    }
-
-    public function danhsachsinhvien(): HasMany
-    {
-        return $this->hasMany(Sinhvien::class, 'phong_id');
-    }
-
-    public function danhsachhoadon(): HasMany
-    {
-        return $this->hasMany(Hoadon::class, 'phong_id');
-    }
-
-    public function danhsachdangky(): HasMany
-    {
-        return $this->hasMany(Dangky::class, 'phong_id');
-    }
-
-    public function danhsachtaisan(): HasMany
-    {
-        return $this->hasMany(Taisan::class, 'phong_id');
-    }
-
-    public function danhsachvattu(): HasMany
-    {
-        return $this->hasMany(Vattu::class, 'phong_id');
-    }
-
-    public function danhsachhopdong(): HasMany
-    {
-        return $this->hasMany(Hopdong::class, 'phong_id');
-    }
-
-    public function getSoNguoiDangOAttribute(): int
-    {
-        if (array_key_exists('danhsachsinhvien_count', $this->attributes)) {
-            return (int) $this->attributes['danhsachsinhvien_count'];
-        }
-
-        if ($this->relationLoaded('danhsachsinhvien')) {
-            return $this->danhsachsinhvien->count();
-        }
-
-        return $this->danhsachsinhvien()->count();
-    }
+    protected $casts = [
+        'toa_nha_id' => 'integer',
+        'loai_phong_id' => 'integer',
+        'tang' => 'integer',
+        'gioi_tinh_han_che' => Gender::class,
+    ];
 
     public function toanha()
     {
         return $this->belongsTo(ToaNha::class, 'toa_nha_id');
+    }
+
+    public function loaiphong()
+    {
+        return $this->belongsTo(LoaiPhong::class, 'loai_phong_id');
+    }
+
+    public function giuongs()
+    {
+        return $this->hasMany(Giuong::class, 'phong_id');
+    }
+
+    public function taisans()
+    {
+        return $this->hasMany(Taisan::class, 'phong_id');
+    }
+
+    public function vattus()
+    {
+        return $this->hasMany(Vattu::class, 'phong_id');
+    }
+
+    public function baohongs()
+    {
+        return $this->hasMany(Baohong::class, 'phong_id');
+    }
+
+    public function getTenphongAttribute()
+    {
+        return $this->attributes['ten_phong'] ?? 'N/A';
+    }
+
+    public function getToaAttribute()
+    {
+        return $this->toanha?->ten_toa_nha ?? 'N/A';
+    }
+
+    public function getGiaphongAttribute()
+    {
+        return $this->loaiphong?->gia_thang ?? 0;
+    }
+
+    public function getGioitinhAttribute()
+    {
+        return $this->gioi_tinh_han_che?->label() ?? 'N/A';
+    }
+
+    public function getSucchuamaxAttribute()
+    {
+        return $this->loaiphong?->suc_chua ?? 0;
+    }
+
+    public function getDangoAttribute()
+    {
+        return $this->giuongs()->where('trang_thai', \App\Enums\BedStatus::Occupied)->count();
     }
 }

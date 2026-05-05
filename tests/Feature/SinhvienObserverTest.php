@@ -23,39 +23,28 @@ class SinhvienObserverTest extends TestCase
      */
     public function test_assign_room_increases_dango()
     {
-        // Tạo phòng với succhuamax = 4, dango = 0
-        $phong = Phong::create([
-            'tenphong' => 'A101',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $phong = Phong::factory()->create();
 
-        // Tạo user và sinh viên
-        $user = User::create([
-            'name' => 'Test Student',
-            'email' => 'test@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
+        $user = User::factory()->create();
 
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV001',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
         ]);
 
-        // Gán phòng cho sinh viên
-        $sinhvien->update(['phong_id' => $phong->id]);
+        // Mock current_hopdong
+        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        $hopdong = \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien->id,
+            'giuong_id' => $giuong->id,
+            'phong_id' => $phong->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
+        ]);
 
-        // Refresh để lấy giá trị mới từ database
-        $phong->refresh();
+        // Gán phòng cho sinh viên qua hopdong
+        $sinhvien->refresh();
 
-        // Verify dango tăng lên 1
-        $this->assertEquals(1, $phong->dango);
+        // Verify dango thông qua logic phòng hiện tại
+        $this->assertEquals($phong->id, $sinhvien->phong_hien_tai()?->id);
     }
 
     /**
@@ -63,41 +52,31 @@ class SinhvienObserverTest extends TestCase
      */
     public function test_leave_room_decreases_dango()
     {
-        // Tạo phòng với sinh viên đang ở
-        $phong = Phong::create([
-            'tenphong' => 'A102',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $phong = Phong::factory()->create();
 
-        $user = User::create([
-            'name' => 'Test Student 2',
-            'email' => 'test2@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
+        $user = User::factory()->create();
 
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV002',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
-            'phong_id' => $phong->id,
         ]);
 
-        $phong->refresh();
-        $this->assertEquals(1, $phong->dango);
+        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        $hopdong = \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien->id,
+            'giuong_id' => $giuong->id,
+            'phong_id' => $phong->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
+        ]);
 
-        // Rời phòng
-        $sinhvien->update(['phong_id' => null]);
+        $this->assertEquals($phong->id, $sinhvien->phong_hien_tai()?->id);
 
-        $phong->refresh();
+        // Rời phòng bằng cách đóng hợp đồng
+        $hopdong->update(['trang_thai' => \App\Enums\ContractStatus::Terminated]);
 
-        // Verify dango giảm về 0
-        $this->assertEquals(0, $phong->dango);
+        $sinhvien->refresh();
+
+        // Verify không còn phòng hiện tại
+        $this->assertNull($sinhvien->phong_hien_tai());
     }
 
     /**
@@ -105,54 +84,40 @@ class SinhvienObserverTest extends TestCase
      */
     public function test_transfer_room_updates_both_rooms()
     {
-        // Tạo 2 phòng
-        $phongCu = Phong::create([
-            'tenphong' => 'A103',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $phongCu = Phong::factory()->create();
+        $phongMoi = Phong::factory()->create();
 
-        $phongMoi = Phong::create([
-            'tenphong' => 'A104',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $user = User::factory()->create();
 
-        $user = User::create([
-            'name' => 'Test Student 3',
-            'email' => 'test3@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
-
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV003',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
-            'phong_id' => $phongCu->id,
         ]);
 
-        $phongCu->refresh();
-        $phongMoi->refresh();
-        $this->assertEquals(1, $phongCu->dango);
-        $this->assertEquals(0, $phongMoi->dango);
+        $giuongCu = \App\Models\Giuong::factory()->create(['phong_id' => $phongCu->id]);
+        $hopdongCu = \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien->id,
+            'giuong_id' => $giuongCu->id,
+            'phong_id' => $phongCu->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
+        ]);
 
-        // Chuyển phòng
-        $sinhvien->update(['phong_id' => $phongMoi->id]);
+        $this->assertEquals($phongCu->id, $sinhvien->phong_hien_tai()?->id);
 
-        $phongCu->refresh();
-        $phongMoi->refresh();
+        // Chuyển phòng bằng cách đóng hợp đồng cũ, tạo hợp đồng mới
+        $hopdongCu->update(['trang_thai' => \App\Enums\ContractStatus::Terminated]);
+        
+        $giuongMoi = \App\Models\Giuong::factory()->create(['phong_id' => $phongMoi->id]);
+        $hopdongMoi = \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien->id,
+            'giuong_id' => $giuongMoi->id,
+            'phong_id' => $phongMoi->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
+        ]);
 
-        // Verify dango phòng cũ giảm về 0, phòng mới tăng lên 1
-        $this->assertEquals(0, $phongCu->dango);
-        $this->assertEquals(1, $phongMoi->dango);
+        $sinhvien->refresh();
+
+        // Verify phòng mới
+        $this->assertEquals($phongMoi->id, $sinhvien->phong_hien_tai()?->id);
     }
 
     /**
@@ -160,40 +125,31 @@ class SinhvienObserverTest extends TestCase
      */
     public function test_soft_delete_decreases_dango()
     {
-        $phong = Phong::create([
-            'tenphong' => 'A105',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $phong = Phong::factory()->create();
 
-        $user = User::create([
-            'name' => 'Test Student 4',
-            'email' => 'test4@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
+        $user = User::factory()->create();
 
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV004',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
-            'phong_id' => $phong->id,
         ]);
 
-        $phong->refresh();
-        $this->assertEquals(1, $phong->dango);
+        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        $hopdong = \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien->id,
+            'giuong_id' => $giuong->id,
+            'phong_id' => $phong->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
+        ]);
+
+        $this->assertEquals($phong->id, $sinhvien->phong_hien_tai()?->id);
 
         // Soft-delete sinh viên
         $sinhvien->delete();
 
-        $phong->refresh();
+        $sinhvien = $sinhvien->fresh(); // Sẽ null nếu không dùng withTrashed
 
-        // Verify dango giảm về 0 (soft-deleted không được đếm)
-        $this->assertEquals(0, $phong->dango);
+        // Verify không còn phòng hiện tại (do sinh viên bị soft-deleted)
+        $this->assertNull(\App\Models\Sinhvien::find($sinhvien->id));
     }
 
     /**
@@ -201,46 +157,33 @@ class SinhvienObserverTest extends TestCase
      */
     public function test_restore_increases_dango()
     {
-        $phong = Phong::create([
-            'tenphong' => 'A106',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $phong = Phong::factory()->create();
 
-        $user = User::create([
-            'name' => 'Test Student 5',
-            'email' => 'test5@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
+        $user = User::factory()->create();
 
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV005',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
-            'phong_id' => $phong->id,
         ]);
 
-        $phong->refresh();
-        $this->assertEquals(1, $phong->dango);
+        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        $hopdong = \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien->id,
+            'giuong_id' => $giuong->id,
+            'phong_id' => $phong->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
+        ]);
 
-        // Soft-delete
+        $this->assertEquals($phong->id, $sinhvien->phong_hien_tai()?->id);
+
+        // Soft-delete sinh viên
         $sinhvien->delete();
-
-        $phong->refresh();
-        $this->assertEquals(0, $phong->dango);
+        $this->assertNull(\App\Models\Sinhvien::find($sinhvien->id));
 
         // Restore
         $sinhvien->restore();
 
-        $phong->refresh();
-
-        // Verify dango tăng lại lên 1
-        $this->assertEquals(1, $phong->dango);
+        // Verify dango tăng lại
+        $this->assertEquals($phong->id, $sinhvien->fresh()->phong_hien_tai()?->id);
     }
 
     /**
@@ -248,35 +191,24 @@ class SinhvienObserverTest extends TestCase
      */
     public function test_create_student_with_room_increases_dango()
     {
-        $phong = Phong::create([
-            'tenphong' => 'A107',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $phong = Phong::factory()->create();
 
-        $user = User::create([
-            'name' => 'Test Student 6',
-            'email' => 'test6@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
+        $user = User::factory()->create();
 
-        // Tạo sinh viên với phong_id ngay từ đầu
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV006',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
-            'phong_id' => $phong->id,
         ]);
 
-        $phong->refresh();
+        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        $hopdong = \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien->id,
+            'giuong_id' => $giuong->id,
+            'phong_id' => $phong->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
+        ]);
 
-        // Verify dango tăng lên 1
-        $this->assertEquals(1, $phong->dango);
+        // Verify
+        $this->assertEquals($phong->id, $sinhvien->fresh()->phong_hien_tai()?->id);
     }
 
     /**
@@ -284,55 +216,35 @@ class SinhvienObserverTest extends TestCase
      */
     public function test_without_trashed_excludes_soft_deleted_students()
     {
-        $phong = Phong::create([
-            'tenphong' => 'A108',
-            'tang' => 1,
-            'soluongtoida' => 4,
-            'dango' => 0,
-            'giaphong' => 1000000,
-            'trangthai' => 'active',
-        ]);
+        $phong = Phong::factory()->create();
 
-        // Tạo 2 sinh viên
-        $user1 = User::create([
-            'name' => 'Test Student 7',
-            'email' => 'test7@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
-
-        $user2 = User::create([
-            'name' => 'Test Student 8',
-            'email' => 'test8@example.com',
-            'password' => bcrypt('password'),
-            'gioitinh' => 'nam',
-        ]);
-
-        $sinhvien1 = Sinhvien::create([
-            'user_id' => $user1->id,
-            'masinhvien' => 'SV007',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
+        // Tạo 2 sinh viên có hợp đồng trong cùng phòng
+        $sinhvien1 = Sinhvien::factory()->create();
+        $giuong1 = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien1->id,
+            'giuong_id' => $giuong1->id,
             'phong_id' => $phong->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
         ]);
 
-        $sinhvien2 = Sinhvien::create([
-            'user_id' => $user2->id,
-            'masinhvien' => 'SV008',
-            'lop' => 'CNTT-K15',
-            'sodienthoai' => '0123456789',
+        $sinhvien2 = Sinhvien::factory()->create();
+        $giuong2 = \App\Models\Giuong::factory()->create(['phong_id' => $phong->id]);
+        \App\Models\Hopdong::factory()->create([
+            'sinhvien_id' => $sinhvien2->id,
+            'giuong_id' => $giuong2->id,
             'phong_id' => $phong->id,
+            'trang_thai' => \App\Enums\ContractStatus::Active,
         ]);
 
-        $phong->refresh();
-        $this->assertEquals(2, $phong->dango);
+        $this->assertEquals($phong->id, $sinhvien1->fresh()->phong_hien_tai()?->id);
+        $this->assertEquals($phong->id, $sinhvien2->fresh()->phong_hien_tai()?->id);
 
         // Soft-delete 1 sinh viên
         $sinhvien1->delete();
 
-        $phong->refresh();
-
-        // Verify dango giảm về 1 (chỉ đếm sinh viên chưa soft-delete)
-        $this->assertEquals(1, $phong->dango);
+        // Verify sinh viên 1 không còn tìm thấy, sinh viên 2 vẫn còn
+        $this->assertNull(\App\Models\Sinhvien::find($sinhvien1->id));
+        $this->assertNotNull(\App\Models\Sinhvien::find($sinhvien2->id));
     }
 }

@@ -1,0 +1,260 @@
+<?php if (isset($component)) { $__componentOriginal61b7c119be9b054fc3033ecd71de14c0 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal61b7c119be9b054fc3033ecd71de14c0 = $attributes; } ?>
+<?php $component = App\View\Components\LandingLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('landing-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(App\View\Components\LandingLayout::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+     <?php $__env->slot('title', null, []); ?> Đăng ký cư trú KTX <?php $__env->endSlot(); ?>
+
+    <div class="pt-36 pb-24 min-h-screen bg-ui-bg relative overflow-hidden">
+        <!-- Minimal Dot Grid -->
+        <div class="absolute inset-0 opacity-100 bg-[radial-gradient(oklch(var(--ui-border-lch))_1.5px,transparent_1.5px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none"></div>
+        
+        <div class="max-w-[1200px] mx-auto px-6 relative z-10">
+            
+            
+            <nav class="mb-16">
+                <div class="relative mx-auto max-w-xl">
+                    <div class="absolute left-0 top-4 h-[1px] w-full bg-ui-border" aria-hidden="true">
+                        <div class="absolute h-full w-[50%] bg-ink-primary"></div>
+                    </div>
+                    
+                    <ul class="relative flex justify-between">
+                        <li class="flex flex-col items-center">
+                            <div class="flex h-8 w-8 items-center justify-center bg-ink-primary text-white border border-ink-primary">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <span class="mt-3 text-[10px] font-bold uppercase tracking-widest text-ink-secondary">Bước 1</span>
+                            <span class="mt-1 text-xs font-bold text-ink-primary">Chọn phòng</span>
+                        </li>
+                        <li class="flex flex-col items-center">
+                            <div class="flex h-8 w-8 items-center justify-center bg-ink-primary text-white border border-ink-primary ring-4 ring-ui-border/50">
+                                <span class="text-sm font-display font-bold">2</span>
+                            </div>
+                            <span class="mt-3 text-[10px] font-bold uppercase tracking-widest text-ink-primary">Bước 2</span>
+                            <span class="mt-1 text-xs font-bold text-ink-primary">Thông tin cá nhân</span>
+                        </li>
+                        <li class="flex flex-col items-center">
+                            <div class="flex h-8 w-8 items-center justify-center bg-white text-ink-secondary border border-ui-border">
+                                <span class="text-sm font-display font-bold">3</span>
+                            </div>
+                            <span class="mt-3 text-[10px] font-bold uppercase tracking-widest text-ink-secondary">Bước 3</span>
+                            <span class="mt-1 text-xs font-bold text-ink-secondary">Hoàn tất</span>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="grid gap-12 lg:grid-cols-12">
+                
+                <div class="lg:col-span-7">
+                    <section class="bg-white border border-ui-border p-8 lg:p-10 shadow-sm">
+                        <header class="mb-10 border-b border-ui-border pb-6">
+                            <h1 class="text-3xl font-display font-bold text-ink-primary tracking-tight mb-2 uppercase">Thông tin đăng ký.</h1>
+                            <p class="text-sm text-ink-secondary/60 leading-relaxed max-w-prose">Vui lòng cung cấp chính xác các thông tin cá nhân và tài liệu cần thiết để khởi tạo hồ sơ cư trú của bạn.</p>
+                        </header>
+                        
+                        <form action="<?php echo e(route('guest.dangky.store')); ?>" method="POST" enctype="multipart/form-data" class="space-y-8">
+                            <?php echo csrf_field(); ?>
+                            <input type="hidden" name="phong_id" value="<?php echo e($phong->id); ?>">
+
+                            <div class="grid gap-6 sm:grid-cols-2">
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mb-2 block">Họ và tên</label>
+                                    <input type="text" name="ho_ten" required value="<?php echo e(old('ho_ten')); ?>"
+                                           class="w-full bg-white border border-ui-border text-ink-primary rounded-none focus:ring-0 focus:border-ink-primary p-3 transition-colors" placeholder="NGUYEN VAN A">
+                                    <?php $__errorArgs = ['ho_ten'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="mt-2 text-[10px] font-bold text-red-500"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mb-2 block">Số CCCD / Định danh</label>
+                                    <input type="text" name="so_cccd" required value="<?php echo e(old('so_cccd')); ?>"
+                                           class="w-full bg-white border border-ui-border text-ink-primary rounded-none focus:ring-0 focus:border-ink-primary p-3 transition-colors" placeholder="012345678912">
+                                    <?php $__errorArgs = ['so_cccd'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="mt-2 text-[10px] font-bold text-red-500"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-6 sm:grid-cols-2">
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mb-2 block">Địa chỉ Email</label>
+                                    <input type="email" name="email" required value="<?php echo e(old('email')); ?>"
+                                           class="w-full bg-white border border-ui-border text-ink-primary rounded-none focus:ring-0 focus:border-ink-primary p-3 transition-colors" placeholder="example@email.com">
+                                    <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="mt-2 text-[10px] font-bold text-red-500"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mb-2 block">Số điện thoại</label>
+                                    <input type="text" name="so_dien_thoai" required value="<?php echo e(old('so_dien_thoai')); ?>"
+                                           class="w-full bg-white border border-ui-border text-ink-primary rounded-none focus:ring-0 focus:border-ink-primary p-3 transition-colors" placeholder="0912345678">
+                                    <?php $__errorArgs = ['so_dien_thoai'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="mt-2 text-[10px] font-bold text-red-500"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-ui-border">
+                                <div class="bg-ui-bg border border-ui-border p-6">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
+                                        <h3 class="text-sm font-bold text-ink-primary uppercase tracking-wide">Tài liệu đính kèm</h3>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary bg-white px-2 py-1 border border-ui-border">JPG, PNG</span>
+                                    </div>
+                                    <div class="grid gap-6 sm:grid-cols-2">
+                                        <div class="space-y-3">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[10px] font-bold uppercase tracking-widest text-ink-primary">Ảnh thẻ (3x4)</span>
+                                            </div>
+                                            <div class="relative">
+                                                <input type="file" name="anh_the" class="block w-full text-xs text-ink-secondary file:mr-3 file:py-2 file:px-4 file:border-0 file:border-r file:border-ui-border file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-white file:text-ink-primary hover:file:bg-ui-bg transition-colors cursor-pointer border border-ui-border bg-white">
+                                                <?php $__errorArgs = ['anh_the'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="mt-2 text-[10px] font-bold text-red-500"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[10px] font-bold uppercase tracking-widest text-ink-primary">Mặt trước CCCD</span>
+                                            </div>
+                                            <div class="relative">
+                                                <input type="file" name="anh_cccd" class="block w-full text-xs text-ink-secondary file:mr-3 file:py-2 file:px-4 file:border-0 file:border-r file:border-ui-border file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-white file:text-ink-primary hover:file:bg-ui-bg transition-colors cursor-pointer border border-ui-border bg-white">
+                                                <?php $__errorArgs = ['anh_cccd'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="mt-2 text-[10px] font-bold text-red-500"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6">
+                                <button type="submit" class="w-full bg-ink-primary text-white hover:bg-brand-emerald py-4 text-sm font-bold tracking-wide transition-colors uppercase">
+                                    Gửi đơn đăng ký lưu trú
+                                </button>
+                                <div class="mt-4 flex items-start gap-3 p-4 border border-ui-border bg-white">
+                                    <span class="text-ink-primary mt-0.5">ℹ</span>
+                                    <p class="text-[11px] text-ink-secondary leading-relaxed">
+                                        Bằng cách hoàn tất thủ tục này, bạn xác nhận rằng các thông tin cung cấp là hoàn toàn chính xác và đồng ý tuân thủ Nội quy của Ký túc xá.
+                                    </p>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+
+                
+                <div class="lg:col-span-5">
+                    <aside class="sticky top-28 space-y-6">
+                        <div class="bg-white border border-ui-border overflow-hidden shadow-sm">
+                            <div class="bg-ink-primary p-6 md:p-8 text-white border-b border-ink-primary">
+                                <h2 class="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-2">Chi tiết đặt chỗ</h2>
+                                <div class="flex items-end justify-between">
+                                    <h3 class="text-2xl font-display font-bold tracking-tight">Phòng <?php echo e($phong->tenphong); ?></h3>
+                                    <span class="mb-1 text-[10px] font-bold uppercase tracking-widest text-white/50 border border-white/20 px-2 py-0.5">ID: #<?php echo e($phong->id); ?></span>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6 md:p-8 space-y-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="h-10 w-10 flex items-center justify-center bg-ui-bg border border-ui-border text-ink-primary">
+                                        <span class="text-sm opacity-50">📍</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary">Vị trí đơn vị</div>
+                                        <div class="text-sm font-bold text-ink-primary mt-0.5">Tòa <?php echo e(strtoupper(substr($phong->tenphong, 0, 1))); ?> — Tầng <?php echo e($phong->tang); ?></div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4">
+                                    <div class="h-10 w-10 flex items-center justify-center bg-ui-bg border border-ui-border text-ink-primary">
+                                        <span class="text-sm opacity-50">👤</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary">Phân loại giới tính</div>
+                                        <div class="text-sm font-bold text-ink-primary mt-0.5"><?php echo e($phong->gioitinh); ?></div>
+                                    </div>
+                                </div>
+
+                                <div class="h-px bg-ui-border"></div>
+
+                                <div class="flex items-center justify-between py-2">
+                                    <div>
+                                        <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary">Vị trí giường</div>
+                                        <div class="mt-1 text-sm font-bold text-ink-primary">Số <?php echo e($giuong_no ?? 'Chưa xác định'); ?></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary">Đơn giá tháng</div>
+                                        <div class="mt-1 text-xl font-display font-bold text-brand-emerald"><?php echo e(number_format($phong->giaphong, 0, ',', '.')); ?>đ</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-ui-border p-5 flex gap-4">
+                            <div class="h-8 w-8 shrink-0 flex items-center justify-center bg-brand-emerald text-white">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-ink-primary uppercase tracking-widest mb-1">Cơ chế Soft Lock</h4>
+                                <p class="text-[11px] text-ink-secondary leading-relaxed">Vị trí giường này sẽ được tạm giữ cho bạn trong 24 giờ kể từ khi gửi đơn. Vui lòng hoàn tất thủ tục xét duyệt sớm.</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="<?php echo e(route('public.danhsachphong')); ?>" class="inline-flex items-center gap-2 py-2 text-[11px] font-bold uppercase tracking-widest text-ink-secondary transition-colors hover:text-ink-primary border-b border-transparent hover:border-ink-primary pb-0.5">
+                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                Quay lại chọn phòng khác
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal61b7c119be9b054fc3033ecd71de14c0)): ?>
+<?php $attributes = $__attributesOriginal61b7c119be9b054fc3033ecd71de14c0; ?>
+<?php unset($__attributesOriginal61b7c119be9b054fc3033ecd71de14c0); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal61b7c119be9b054fc3033ecd71de14c0)): ?>
+<?php $component = $__componentOriginal61b7c119be9b054fc3033ecd71de14c0; ?>
+<?php unset($__componentOriginal61b7c119be9b054fc3033ecd71de14c0); ?>
+<?php endif; ?>
+<?php /**PATH D:\laragon\www\hethongquanlyktxv1\resources\views/landing/dangky.blade.php ENDPATH**/ ?>

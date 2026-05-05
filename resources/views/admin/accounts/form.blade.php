@@ -66,7 +66,7 @@
                     <div class="space-y-4">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-ink-secondary">Vai trò người dùng</label>
-                            <select name="vaitro" class="pdu-input w-full bg-white" required>
+                            <select name="vaitro" class="pdu-input w-full bg-ui-card" required>
                                 @foreach(\App\Enums\UserRole::cases() as $role)
                                     @if($role->isAdminGroup())
                                         <option value="{{ $role->value }}" @selected(old('vaitro', $user->vaitro->value ?? '') == $role->value)>
@@ -86,7 +86,7 @@
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="hidden" name="is_active" value="0">
                                 <input type="checkbox" name="is_active" value="1" class="sr-only peer" @checked(old('is_active', $user->is_active ?? true))>
-                                <div class="w-11 h-6 bg-ui-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-emerald"></div>
+                                <div class="w-11 h-6 bg-ui-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-ui-card after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-ui-card after:border-ui-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-emerald"></div>
                             </label>
                         </div>
                     </div>

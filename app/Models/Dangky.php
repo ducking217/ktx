@@ -4,10 +4,8 @@ namespace App\Models;
 
 use App\Enums\RegistrationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Hash;
 
 class Dangky extends Model
 {
@@ -15,175 +13,87 @@ class Dangky extends Model
 
     protected $table = 'dangky';
 
-
-
-    private const ALLOWED_TRANSITIONS = [
-        'pending' => [
-            'approved_pending_payment',
-            'approved',
-            'rejected',
-        ],
-        'approved_pending_payment' => [
-            'completed',
-            'rejected',
-        ],
-        'approved' => [
-            'completed',
-        ],
-        'completed' => [],
-        'rejected' => [],
-    ];
-
     protected $fillable = [
-        'sinhvien_id',
-        'phong_id',
-        'giuong_no',
+        'user_id',
         'ho_ten',
         'email',
-        'so_dien_thoai',
-        'so_cccd',
+        'phone_encrypted',
+        'id_card_encrypted',
+        'gender',
+        'dob',
         'anh_the_path',
         'anh_cccd_path',
+        'toa_nha_id',
+        'loai_phong_id',
+        'phong_id',
+        'trang_thai',
+        'ghi_chu',
         'lookup_token',
         'token_expires_at',
-        'loaidangky',
-        'trangthai',
-        'ghichu',
-        'expires_at',
+    ];
+
+    protected $hidden = [
+        'phone_encrypted',
+        'id_card_encrypted',
     ];
 
     protected $casts = [
-        'trangthai' => \App\Enums\RegistrationStatus::class,
-        'loaidangky' => \App\Enums\RegistrationType::class,
-        'expires_at' => 'datetime',
+        'user_id' => 'integer',
+        'toa_nha_id' => 'integer',
+        'loai_phong_id' => 'integer',
+        'phong_id' => 'integer',
+        'dob' => 'date',
         'token_expires_at' => 'datetime',
+        'trang_thai' => RegistrationStatus::class,
     ];
 
-    public function getHoTenAttribute($value)
+    public function user()
     {
-        if (empty($value)) return $value;
-        try {
-            return decrypt($value);
-        } catch (\Exception $e) {
-            return $value;
-        }
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function getEmailAttribute($value)
+    public function toanha()
     {
-        if (empty($value)) return $value;
-        try {
-            return decrypt($value);
-        } catch (\Exception $e) {
-            return $value;
-        }
+        return $this->belongsTo(ToaNha::class, 'toa_nha_id');
     }
 
-    public function getSoDienThoaiAttribute($value)
+    public function loaiphong()
     {
-        if (empty($value)) return $value;
-        try {
-            return decrypt($value);
-        } catch (\Exception $e) {
-            return $value;
-        }
+        return $this->belongsTo(LoaiPhong::class, 'loai_phong_id');
     }
 
-    public function getSoCccdAttribute($value)
-    {
-        if (empty($value)) return $value;
-        try {
-            return decrypt($value);
-        } catch (\Exception $e) {
-            return $value;
-        }
-    }
-
-    public function setHoTenAttribute($value)
-    {
-        $this->attributes['ho_ten'] = !empty($value) ? encrypt($value) : $value;
-    }
-
-    public function setEmailAttribute($value)
-    {
-        $this->attributes['email'] = !empty($value) ? encrypt($value) : $value;
-    }
-
-    public function setSoDienThoaiAttribute($value)
-    {
-        $this->attributes['so_dien_thoai'] = !empty($value) ? encrypt($value) : $value;
-    }
-
-    public function setSoCccdAttribute($value)
-    {
-        $this->attributes['so_cccd'] = !empty($value) ? encrypt($value) : $value;
-    }
-
-    protected $hidden = [
-        'so_dien_thoai',
-        'so_cccd',
-        'so_dien_thoai_blind_index',
-        'so_cccd_blind_index',
-    ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($model) {
-            if ($model->isDirty('so_dien_thoai') && !empty($model->so_dien_thoai)) {
-                $normalized = self::normalizePhoneNumber($model->so_dien_thoai);
-                $model->so_dien_thoai_blind_index = hash('sha256', $normalized);
-            }
-            if ($model->isDirty('so_cccd') && !empty($model->so_cccd)) {
-                $normalized = self::normalizeCccd($model->so_cccd);
-                $model->so_cccd_blind_index = hash('sha256', $normalized);
-            }
-        });
-    }
-
-    private static function normalizePhoneNumber(string $phone): string
-    {
-        return preg_replace('/[^0-9]/', '', $phone);
-    }
-
-    private static function normalizeCccd(string $cccd): string
-    {
-        return preg_replace('/[^0-9]/', '', $cccd);
-    }
-
-    public function sinhvien(): BelongsTo
-    {
-        return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
-    }
-
-    public function transitionTo(string $newStatus): bool
-    {
-        $currentStatus = $this->trangthai->value ?? $this->trangthai;
-        
-        if (isset(self::ALLOWED_TRANSITIONS[$currentStatus]) && in_array($newStatus, self::ALLOWED_TRANSITIONS[$currentStatus])) {
-            return $this->update(['trangthai' => $newStatus]);
-        }
-
-        return false;
-    }
-
-    public function phong(): BelongsTo
+    public function phong()
     {
         return $this->belongsTo(Phong::class, 'phong_id');
     }
 
-    public function scopeFindBySoDienThoai($query, $soDienThoai)
+    public function getSoDienThoaiAttribute()
     {
-        $normalized = self::normalizePhoneNumber($soDienThoai);
-        return $query->where('so_dien_thoai_blind_index', hash('sha256', $normalized));
+        try {
+            return $this->phone_encrypted ? decrypt($this->phone_encrypted) : null;
+        } catch (\Exception $e) {
+            return $this->phone_encrypted;
+        }
     }
 
-    public function scopeFindBySoCccd($query, $soCccd)
+    public function getCccdAttribute()
     {
-        $normalized = self::normalizeCccd($soCccd);
-        return $query->where('so_cccd_blind_index', hash('sha256', $normalized));
+        try {
+            return $this->id_card_encrypted ? decrypt($this->id_card_encrypted) : null;
+        } catch (\Exception $e) {
+            return $this->id_card_encrypted;
+        }
     }
 
-
+    /**
+     * Chuyển đổi trạng thái đơn đăng ký.
+     */
+    public function transitionTo(string $newStatus, ?string $reason = null): bool
+    {
+        $data = ['trang_thai' => $newStatus];
+        if ($reason) {
+            $data['ghi_chu'] = $reason;
+        }
+        return $this->update($data);
+    }
 }

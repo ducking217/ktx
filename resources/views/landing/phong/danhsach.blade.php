@@ -33,6 +33,10 @@
                         $conTrong = max(0, $phong->succhuamax - $phong->dango);
                         $isAvailable = $conTrong > 0;
                         $pct = $phong->succhuamax > 0 ? min(100, ($phong->dango / $phong->succhuamax) * 100) : 0;
+                        $sapTrongDate = $phong->ngay_trong_som_nhat instanceof \Illuminate\Support\Carbon
+                            ? $phong->ngay_trong_som_nhat->format('d/m')
+                            : null;
+                        $soGiuongSapTrong = (int) ($phong->so_giuong_sap_trong ?? 0);
                     @endphp
                     <div class="room-card bg-white p-5 border border-ui-border hover:border-ink-primary transition-colors duration-300 flex flex-col group shadow-sm hover:shadow-md"
                          data-gender="{{ $phong->gioitinh }}"
@@ -48,6 +52,13 @@
                                 {{ $isAvailable ? 'Còn '.$conTrong : 'Kín chỗ' }}
                             </span>
                         </div>
+                        @if(!$isAvailable && $sapTrongDate && $soGiuongSapTrong > 0)
+                            <div class="mb-5">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border border-amber-500/40 bg-amber-50 text-amber-700">
+                                    Sắp trống {{ $sapTrongDate }} ({{ $soGiuongSapTrong }} giường)
+                                </span>
+                            </div>
+                        @endif
 
                         <div class="mb-6">
                             <div class="flex items-baseline gap-1">
@@ -66,13 +77,44 @@
                                     <div class="h-full transition-all duration-500 ease-out {{ $isAvailable ? 'bg-brand-emerald' : 'bg-red-500' }}" @style(["width: $pct%"])></div>
                                 </div>
                             </div>
+                            @php
+                                $vatTuPreview = $phong->vattus?->take(2) ?? collect();
+                                $taiSanPreview = $phong->taisans?->take(1) ?? collect();
+                                $tongVatTu = $phong->vattus?->count() ?? 0;
+                                $tongTaiSan = $phong->taisans?->count() ?? 0;
+                                $tongMucVatTuTaiSan = $tongVatTu + $tongTaiSan;
+                                $soMucDangHien = $vatTuPreview->count() + $taiSanPreview->count();
+                                $soMucConLai = max(0, $tongMucVatTuTaiSan - $soMucDangHien);
+                            @endphp
                             <div class="flex flex-wrap gap-1.5">
-                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-ui-bg text-ink-primary text-[10px] font-medium border border-ui-border"><span class="text-[10px] opacity-50">❄️</span> Máy lạnh</span>
-                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-ui-bg text-ink-primary text-[10px] font-medium border border-ui-border"><span class="text-[10px] opacity-50">🛏️</span> Giường tầng</span>
+                                @if($tongMucVatTuTaiSan > 0)
+                                    @foreach($vatTuPreview as $vt)
+                                        <span class="inline-flex items-center gap-1.5 px-1.5 py-0.5 bg-ui-bg text-ink-primary text-[10px] font-medium border border-ui-border truncate max-w-full" title="{{ $vt->tenvattu }}">
+                                            {{ $vt->tenvattu }} <span class="opacity-60">× {{ $vt->soluong }}</span>
+                                        </span>
+                                    @endforeach
+                                    @foreach($taiSanPreview as $ts)
+                                        <span class="inline-flex items-center gap-1.5 px-1.5 py-0.5 bg-ui-bg text-ink-primary text-[10px] font-medium border border-ui-border truncate max-w-full" title="{{ $ts->tentaisan }}">
+                                            {{ $ts->tentaisan }} <span class="opacity-60">× {{ $ts->soluong }}</span>
+                                        </span>
+                                    @endforeach
+                                    @if($soMucConLai > 0)
+                                        <span class="inline-flex items-center px-1.5 py-0.5 bg-ui-card text-ink-secondary text-[10px] font-bold border border-ui-border">
+                                            +{{ $soMucConLai }}
+                                        </span>
+                                    @endif
+                                @else
+                                    <span class="inline-flex items-center px-1.5 py-0.5 bg-ui-bg text-ink-secondary text-[10px] font-medium border border-ui-border">
+                                        Chưa cập nhật vật tư
+                                    </span>
+                                @endif
                             </div>
                         </div>
 
                         <div class="mt-5 pt-4 border-t border-ui-border">
+                            <a href="{{ route('public.chitietvattu', $phong->id) }}" class="w-full mb-2 bg-ui-bg text-ink-primary hover:bg-ui-border py-2.5 text-[11px] font-bold tracking-wide transition-colors flex items-center justify-center gap-2 uppercase border border-ui-border">
+                                Xem vật tư
+                            </a>
                             @if($isAvailable)
                                 <a href="{{ route('guest.dangky.create', ['phong_id' => $phong->id]) }}" class="w-full bg-ink-primary text-white hover:bg-brand-emerald py-2.5 text-[11px] font-bold tracking-wide transition-colors flex items-center justify-center gap-2 group-hover:gap-3 uppercase">
                                     Đăng ký <span class="transition-all">→</span>

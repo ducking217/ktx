@@ -1,95 +1,116 @@
 <x-admin-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-bold leading-tight text-ink-primary">
-            {{ __('Nhập chỉ số điện nước hàng loạt') }}
-        </h2>
-    </x-slot>
+    <x-slot:title>Kiến trúc Nhập Chỉ số Hạ tầng Định kỳ</x-slot:title>
 
-    <div class="py-12" x-data="{ 
-        thang: {{ $thangHienTai }}, 
-        nam: {{ $namHienTai }},
-        rooms: {{ $danhsachphong->toJson() }},
-        isValid(room) {
-            return room.chisodienmoi >= room.chisodien_cuoi && room.chisonuocmoi >= room.chisonuoc_cuoi;
-        }
-    }">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <form action="{{ route('admin.hoadon.luu_hang_loat') }}" method="POST" class="space-y-6">
+    <div class="space-y-10 pb-20">
+        <x-admin.page-header
+            title="Batch Utility Measurement"
+            subtitle="Hệ thống kê khai chỉ số hạ tầng tập trung, tối ưu hóa quy trình kết xuất hóa đơn đa điểm cho toàn thể đơn vị cư trú."
+        >
+            <a href="{{ route('admin.quanlyhoadon') }}" class="saas-btn-secondary h-12 px-6 text-[10px] font-black uppercase tracking-[0.15em] border-slate-200">
+                <svg class="h-4 w-4 mr-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Quay lại
+            </a>
+        </x-admin.page-header>
+
+        <div x-data="{ 
+            thang: {{ $thangHienTai }}, 
+            nam: {{ $namHienTai }},
+            rooms: {{ $danhsachphong->toJson() }},
+            isValid(room) {
+                return room.chisodienmoi >= room.chisodien_cuoi && room.chisonuocmoi >= room.chisonuoc_cuoi;
+            }
+        }">
+            <form action="{{ route('admin.hoadon.luu_hang_loat') }}" method="POST" class="space-y-10">
                 @csrf
-                
-                <!-- Bộ lọc Kỳ hóa đơn -->
-                <div class="rounded-3xl border border-ui-border bg-ui-card p-6 shadow-sm">
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                <div class="saas-card overflow-hidden shadow-2xl shadow-slate-200/40 border-slate-200/60 max-w-4xl">
+                    <div class="bg-slate-50/50 border-b border-slate-200/60 px-10 py-5">
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-900 flex items-center gap-2.5">
+                            <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                            Fiscal Period Context
+                        </h3>
+                    </div>
+                    <div class="p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label class="mb-2 block text-[11px] font-black uppercase tracking-widest text-ink-secondary/50">Tháng</label>
-                            <select name="thang" x-model="thang" class="w-full rounded-2xl border-ui-border bg-ui-bg font-bold text-ink-primary focus:border-brand-emerald focus:ring-brand-emerald">
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Kỳ quyết toán (Audit Month)</label>
+                            <select name="thang" x-model="thang" class="saas-input h-12 font-black tabular-nums bg-slate-50/30 border-slate-200/80 focus:bg-white transition-all">
                                 @for($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}">Tháng {{ $i }}</option>
+                                    <option value="{{ $i }}">Period Month {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
                                 @endfor
                             </select>
                         </div>
                         <div>
-                            <label class="mb-2 block text-[11px] font-black uppercase tracking-widest text-ink-secondary/50">Năm</label>
-                            <select name="nam" x-model="nam" class="w-full rounded-2xl border-ui-border bg-ui-bg font-bold text-ink-primary focus:border-brand-emerald focus:ring-brand-emerald">
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Chu kỳ vận hành (Year)</label>
+                            <select name="nam" x-model="nam" class="saas-input h-12 font-black tabular-nums bg-slate-50/30 border-slate-200/80 focus:bg-white transition-all">
                                 @for($i = now()->year - 1; $i <= now()->year + 1; $i++)
-                                    <option value="{{ $i }}">{{ $i }}</option>
+                                    <option value="{{ $i }}">Fiscal Year {{ $i }}</option>
                                 @endfor
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bảng nhập liệu -->
-                <div class="overflow-hidden rounded-3xl border border-ui-border bg-ui-card shadow-sm">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-ui-border bg-ui-bg/50">
-                                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Phòng</th>
-                                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Điện (Cũ -> Mới)</th>
-                                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-ink-secondary/50">Nước (Cũ -> Mới)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-ui-border">
-                                <template x-for="(room, index) in rooms" :key="room.id">
-                                    <tr class="group transition-colors hover:bg-ui-bg/30">
-                                        <td class="px-6 py-4">
-                                            <div class="font-bold text-ink-primary" x-text="room.tenphong"></div>
-                                            <input type="hidden" :name="`hoa_don[${room.id}][phong_id]`" :value="room.id">
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <input type="number" :name="`hoa_don[${room.id}][chisodiencu]`" x-model.number="room.chisodien_cuoi" readonly class="w-24 rounded-xl border-none bg-ui-bg/50 text-center text-xs font-bold text-ink-secondary/40 focus:ring-0">
-                                                <svg class="h-4 w-4 text-ink-secondary/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                                                <input type="number" :name="`hoa_don[${room.id}][chisodienmoi]`" x-model.number="room.chisodienmoi" required min="0" 
-                                                    :class="room.chisodienmoi < room.chisodien_cuoi ? 'border-rose-500 ring-rose-500' : 'border-ui-border focus:border-brand-emerald focus:ring-brand-emerald'"
-                                                    class="w-24 rounded-xl bg-ui-bg text-center text-sm font-black text-ink-primary transition-all">
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <input type="number" :name="`hoa_don[${room.id}][chisonuoccu]`" x-model.number="room.chisonuoc_cuoi" readonly class="w-24 rounded-xl border-none bg-ui-bg/50 text-center text-xs font-bold text-ink-secondary/40 focus:ring-0">
-                                                <svg class="h-4 w-4 text-ink-secondary/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                                                <input type="number" :name="`hoa_don[${room.id}][chisonuocmoi]`" x-model.number="room.chisonuocmoi" required min="0"
-                                                    :class="room.chisonuocmoi < room.chisonuoc_cuoi ? 'border-rose-500 ring-rose-500' : 'border-ui-border focus:border-brand-emerald focus:ring-brand-emerald'"
-                                                    class="w-24 rounded-xl bg-ui-bg text-center text-sm font-black text-ink-primary transition-all">
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <x-admin.table-card>
+                    <thead>
+                        <tr>
+                            <th>Managed Unit Asset</th>
+                            <th class="text-center">Grid Power Indices (Prev → Latest)</th>
+                            <th class="text-center">Water Supply Indices (Prev → Latest)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="room in rooms" :key="room.id">
+                            <tr class="hover:bg-slate-50/50 transition-colors group">
+                                <td class="py-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 border border-slate-200/60 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all">
+                                            <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                        </div>
+                                        <div class="text-[13px] font-black text-slate-900" x-text="room.ten_phong"></div>
+                                    </div>
+                                    <input type="hidden" :name="`hoa_don[${room.id}][phong_id]`" :value="room.id">
+                                </td>
+                                <td class="py-6">
+                                    <div class="flex items-center justify-center gap-4 bg-white p-2 rounded-2xl border border-slate-200/60 shadow-sm max-w-[300px] mx-auto">
+                                        <input type="number" :name="`hoa_don[${room.id}][chisodiencu]`" x-model.number="room.chisodien_cuoi" readonly class="w-20 bg-transparent border-none text-center text-[12px] font-black text-slate-300 tabular-nums focus:ring-0">
+                                        <div class="h-6 w-px bg-slate-100"></div>
+                                        <svg class="h-4 w-4 text-slate-200 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                        <input type="number" :name="`hoa_don[${room.id}][chisodienmoi]`" x-model.number="room.chisodienmoi" required min="0"
+                                            :class="room.chisodienmoi < room.chisodien_cuoi ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-blue-50/30 text-blue-600 border-blue-200/60'"
+                                            class="w-24 h-10 rounded-xl border text-center text-[14px] font-black transition-all tabular-nums outline-none focus:ring-4 focus:ring-blue-500/10">
+                                    </div>
+                                </td>
+                                <td class="py-6">
+                                    <div class="flex items-center justify-center gap-4 bg-white p-2 rounded-2xl border border-slate-200/60 shadow-sm max-w-[300px] mx-auto">
+                                        <input type="number" :name="`hoa_don[${room.id}][chisonuoccu]`" x-model.number="room.chisonuoc_cuoi" readonly class="w-20 bg-transparent border-none text-center text-[12px] font-black text-slate-300 tabular-nums focus:ring-0">
+                                        <div class="h-6 w-px bg-slate-100"></div>
+                                        <svg class="h-4 w-4 text-slate-200 group-hover:text-cyan-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                        <input type="number" :name="`hoa_don[${room.id}][chisonuocmoi]`" x-model.number="room.chisonuocmoi" required min="0"
+                                            :class="room.chisonuocmoi < room.chisonuoc_cuoi ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-cyan-50/30 text-cyan-600 border-cyan-200/60'"
+                                            class="w-24 h-10 rounded-xl border text-center text-[14px] font-black transition-all tabular-nums outline-none focus:ring-4 focus:ring-cyan-500/10">
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </x-admin.table-card>
 
-                <!-- Nút Submit -->
-                <div class="flex justify-end gap-4">
-                    <a href="{{ route('admin.quanlyhoadon') }}" class="rounded-2xl border border-ui-border bg-ui-card px-8 py-3 text-sm font-bold text-ink-secondary transition-all hover:bg-ui-bg">Hủy bỏ</a>
-                    <button type="submit" 
-                        class="rounded-2xl bg-brand-emerald px-10 py-3 text-sm font-bold text-white shadow-lg shadow-brand-emerald/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
-                        :disabled="!rooms.every(r => isValid(r))">
-                        Lưu {{ count($danhsachphong) }} hóa đơn
-                    </button>
+                <div class="flex items-center justify-between pt-10 border-t border-slate-100">
+                    <div class="flex items-center gap-3 text-slate-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-[11px] font-bold uppercase tracking-tight italic">
+                            Xác thực dữ liệu: Đảm bảo chỉ số cuối kỳ ≥ chỉ số đầu kỳ để hệ thống tính toán giá trị thực thi.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('admin.quanlyhoadon') }}" class="saas-btn-secondary h-12 px-8 text-[10px] font-black uppercase tracking-widest border-slate-200">Hủy bỏ</a>
+                        <button type="submit"
+                            class="saas-btn-primary h-12 px-10 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 disabled:opacity-40 disabled:cursor-not-allowed group"
+                            :disabled="!rooms.every(r => isValid(r))">
+                            <svg class="h-4 w-4 mr-2.5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                            Commit {{ count($danhsachphong) }} Audit Results
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

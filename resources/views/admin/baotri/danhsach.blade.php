@@ -1,189 +1,207 @@
 <x-admin-layout>
-    <x-slot:title>Lịch trình bảo trì định kỳ</x-slot:title>
+    <x-slot:title>Điều hành Bảo trì Hạ tầng định kỳ</x-slot:title>
 
-    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-xl font-bold text-ink-primary font-display uppercase tracking-tight">Kế hoạch bảo trì</h1>
-            <p class="text-xs font-medium text-ink-secondary/60">Điều phối hoạt động bảo dưỡng hạ tầng.</p>
-        </div>
-
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <button type="button" data-modal-target="modal-thembaotri" data-modal-toggle="modal-thembaotri" class="rounded-xl bg-ink-primary px-4 py-2 text-[10px] font-bold text-white shadow-sm transition-all hover:bg-ink-primary/90 active:scale-[0.98]">
-                Lập lịch mới
+    <div class="space-y-10 pb-20">
+        <x-admin.page-header
+            title="Kế hoạch bảo trì"
+            subtitle="Hệ thống điều phối, giám sát và quản trị vòng đời bảo dưỡng hạ tầng kỹ thuật."
+        >
+            <button type="button" data-modal-target="modal-thembaotri" data-modal-toggle="modal-thembaotri" class="saas-btn-primary h-12 px-8 shadow-lg shadow-blue-500/20 group">
+                <svg class="h-4.5 w-4.5 mr-2.5 group-hover:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                Lập lịch vận hành mới
             </button>
-        </div>
-    </div>
+        </x-admin.page-header>
 
-    <article class="overflow-hidden rounded-2xl bg-white border border-ui-border shadow-sm">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-ink-primary">
-                <thead class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-bold uppercase tracking-widest text-ink-secondary">
-                    <tr>
-                        <th class="px-6 py-4 font-bold">Đối tượng (Phòng)</th>
-                        <th class="px-6 py-4 font-bold">Nội dung công việc</th>
-                        <th class="px-6 py-4 font-bold">Ngày thực hiện</th>
-                        <th class="px-6 py-4 font-bold">Kỹ thuật viên</th>
-                        <th class="px-6 py-4 font-bold text-center">Trạng thái</th>
-                        <th class="px-6 py-4 font-bold text-right">Điều phối</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-ui-border">
-                    @forelse ($baotri as $item)
-                        <tr class="group transition-colors hover:bg-ui-bg/50">
-                            <td class="px-6 py-5">
-                                <div class="flex items-center gap-2 font-bold text-ink-primary">
-                                    <div class="h-8 w-8 flex items-center justify-center rounded-lg bg-ui-bg text-ink-secondary/60 ring-1 ring-ui-border">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                    </div>
-                                    {{ $item->phong->tenphong ?? 'Tất cả' }}
+        <x-admin.table-card>
+            <thead>
+                <tr>
+                    <th>Target Asset</th>
+                    <th>Nội dung công tác</th>
+                    <th>Scheduled Date</th>
+                    <th>Field Technician</th>
+                    <th class="text-center">Operational Status</th>
+                    <th class="text-right">Management Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($baotri as $item)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="py-6">
+                            <div class="flex items-center gap-2.5 font-black text-blue-600 text-[13px] tracking-tight group-hover:translate-x-1 transition-transform">
+                                <div class="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
+                                {{ $item->phong->ten_phong ?? 'Toàn hệ thống' }}
+                            </div>
+                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 ml-4">Infrastructure Asset</div>
+                        </td>
+                        <td class="py-6 max-w-xs">
+                            <div class="text-[13px] font-bold leading-relaxed text-slate-600 italic border-l-2 border-slate-100 pl-4">"{{ $item->noidung }}"</div>
+                        </td>
+                        <td class="py-6">
+                            <div class="text-[13px] font-black text-slate-900 tabular-nums tracking-tight">{{ date('d/m/Y', strtotime($item->ngaybaotri)) }}</div>
+                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mt-1.5">Fiscal Period</div>
+                        </td>
+                        <td class="py-6">
+                            <div class="flex items-center gap-3">
+                                <div class="h-9 w-9 rounded-2xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-sm shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 </div>
-                            </td>
-                            <td class="px-6 py-5 max-w-xs">
-                                <div class="text-sm font-medium leading-relaxed text-ink-secondary line-clamp-2 italic">"{{ $item->noidung }}"</div>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="text-sm font-bold text-ink-primary tabular-nums">{{ date('d/m/Y', strtotime($item->ngaybaotri)) }}</div>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="flex items-center gap-2">
-                                    <div class="h-6 w-6 rounded-full bg-ui-bg border border-ui-border flex items-center justify-center text-[10px]">🛠️</div>
-                                    <span class="text-sm font-bold text-ink-primary">{{ $item->nguoithuchien }}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-5 text-center">
-                                @php
-                                    $badgeClass = $item->trangthai === 'Đã hoàn thành' 
-                                        ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20' 
-                                        : 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20';
-                                @endphp
-                                <span class="inline-flex items-center rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider {{ $badgeClass }}">
-                                    {{ $item->trangthai }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-5 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button type="button" data-modal-target="modal-suabaotri-{{ $item->id }}" data-modal-toggle="modal-suabaotri-{{ $item->id }}" class="flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-ink-primary" title="Chỉnh sửa lịch">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    </button>
+                                <span class="text-[13px] font-black text-slate-700 uppercase tracking-tight">{{ $item->nguoithuchien }}</span>
+                            </div>
+                        </td>
+                        <td class="py-6 text-center">
+                            @php
+                                $statusClass = $item->trangthai === 'Đã hoàn thành' ? 'saas-badge-success' : 'saas-badge-warning';
+                            @endphp
+                            <span class="saas-badge {{ $statusClass }} border-none shadow-sm font-black px-4 py-1.5">
+                                {{ $item->trangthai }}
+                            </span>
+                        </td>
+                        <td class="py-6 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button type="button" data-modal-target="modal-suabaotri-{{ $item->id }}" data-modal-toggle="modal-suabaotri-{{ $item->id }}" class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all" title="Cập nhật kế hoạch">
+                                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00-2 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </button>
 
-                                    @if ($item->trangthai !== 'Đã hoàn thành')
-                                        <form method="POST" action="{{ route('admin.hoanthanhbaotri', $item->id) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
-                                            @csrf
-                                            <button type="button" @click="$dispatch('open-confirm', { message: 'Xác nhận công tác bảo trì này đã hoàn tất?', action: () => showConfirm = true })" class="flex h-8 items-center justify-center rounded-lg border border-brand-emerald/20 bg-emerald-50 px-3 text-[10px] font-bold uppercase tracking-widest text-emerald-600 shadow-sm transition-colors hover:bg-emerald-600 hover:text-white">Hoàn tất</button>
-                                        </form>
-                                    @endif
-
-                                    <form method="POST" action="{{ route('admin.xoabaotri', $item->id) }}" x-data="{ showConfirm: false }" @confirmed="$el.submit()">
+                                @if ($item->trangthai !== 'Đã hoàn thành')
+                                    <form method="POST" action="{{ route('admin.hoanthanhbaotri', $item->id) }}" x-data="{ showConfirm: false }" x-on:confirmed="$el.requestSubmit()" class="inline">
                                         @csrf
-                                        <button type="button" @click="$dispatch('open-confirm', { message: 'Bạn có chắc chắn muốn hủy lịch bảo trì này?', action: () => showConfirm = true })" class="flex h-8 w-8 items-center justify-center rounded-lg border border-rose-100 bg-rose-50 text-rose-600 shadow-sm transition-colors hover:bg-rose-600 hover:text-white" title="Hủy lịch">
-                                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        </button>
+                                        <button type="button" @click="showConfirm = true" class="h-9 px-5 rounded-xl bg-emerald-900 text-white text-[10px] font-black uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg shadow-emerald-900/20">Hoàn tất</button>
+                                        <x-confirmation-modal message="Xác nhận đối soát và nghiệm thu công tác bảo trì này?" />
                                     </form>
+                                @endif
+
+                                <form method="POST" action="{{ route('admin.xoabaotri', $item->id) }}" x-data="{ showConfirm: false }" x-on:confirmed="$el.requestSubmit()" class="inline">
+                                    @csrf
+                                    <button type="button" @click="showConfirm = true" class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all" title="Hủy bỏ kế hoạch">
+                                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                    <x-confirmation-modal type="danger" message="Hệ thống sẽ gỡ bỏ kế hoạch bảo trì này vĩnh viễn. Bạn chắc chắn?" />
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-40 text-center">
+                            <div class="flex flex-col items-center gap-6">
+                                <div class="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-200 border border-slate-100 border-dashed">
+                                    <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-24 text-center">
-                                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ui-bg text-ink-secondary/50 mb-3">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                </div>
-                                <div class="text-sm font-bold text-ink-primary">Trống lịch trình bảo trì</div>
-                                <div class="text-[11px] text-ink-secondary mt-1">Chưa có kế hoạch bảo trì nào được thiết lập trong thời gian tới.</div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                                <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Maintenance Schedule is Clear</h4>
+                                <p class="text-[11px] text-slate-400 font-medium max-w-xs">Chưa có kế hoạch bảo trì nào được thiết lập trong giai đoạn này.</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-admin.table-card>
+
         @if(method_exists($baotri, 'links'))
-            <div class="border-t border-ui-border px-6 py-4 bg-ui-bg/30">
+            <div class="py-12">
                 {{ $baotri->appends(request()->query())->links() }}
             </div>
         @endif
-    </article>
+    </div>
 
     @push('modals')
-        <x-modal id="modal-thembaotri" title="Thiết lập lịch trình" subtitle="Lên kế hoạch bảo trì mới cho hạ tầng hoặc thiết bị.">
-            <form method="POST" action="{{ route('admin.thembaotri') }}" class="space-y-6">
+        <x-modal id="modal-thembaotri" title="Thiết lập Lịch trình vận hành" subtitle="Khởi tạo kế hoạch bảo dưỡng kỹ thuật định kỳ cho hạ tầng.">
+            <form method="POST" action="{{ route('admin.thembaotri') }}" class="space-y-8 p-2">
                 @csrf
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Phòng chỉ định (Tùy chọn)</label>
-                    <select name="phong_id" class="linear-select mt-1.5 font-bold">
-                        <option value="">-- Tất cả các phòng --</option>
-                        @foreach ($phongs as $phong)
-                            <option value="{{ $phong->id }}">{{ $phong->tenphong }}</option>
-                        @endforeach
-                    </select>
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Target Infrastructure Asset</label>
+                    <div class="relative group">
+                        <select name="phong_id" class="saas-input h-12 px-5 font-black uppercase tracking-tight appearance-none bg-white">
+                            <option value="">-- Toàn bộ hệ thống kỹ thuật --</option>
+                            @foreach ($phongs as $phong)
+                                <option value="{{ $phong->id }}">{{ $phong->ten_phong }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Nội dung bảo trì</label>
-                    <textarea name="noidung" required rows="3" class="linear-textarea mt-1.5" placeholder="Mô tả công việc cần thực hiện..."></textarea>
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Nội dung công tác bảo dưỡng</label>
+                    <textarea name="noidung" required rows="4" class="saas-input p-5 font-bold min-h-[120px] leading-relaxed resize-none" placeholder="Chi tiết các hạng mục cần đối soát và khắc phục..."></textarea>
                 </div>
 
-                <div class="grid grid-cols-2 gap-5">
+                <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Ngày thực hiện</label>
-                        <input name="ngaybaotri" required type="date" value="{{ date('Y-m-d') }}" class="linear-input mt-1.5 font-bold tabular-nums" />
+                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Ngày thực thi</label>
+                        <input name="ngaybaotri" required type="date" value="{{ date('Y-m-d') }}" class="saas-input h-12 px-5 font-black tabular-nums bg-white" />
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Kỹ thuật viên phụ trách</label>
-                        <input name="nguoithuchien" required type="text" class="linear-input mt-1.5 font-bold" placeholder="Tên nhân viên..." />
+                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Technician In-Charge</label>
+                        <input name="nguoithuchien" required type="text" class="saas-input h-12 px-5 font-black uppercase tracking-tight" placeholder="Assignee name..." />
                     </div>
                 </div>
 
-                <div class="flex gap-3 pt-4">
-                    <button type="button" data-modal-hide="modal-thembaotri" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Hủy bỏ</button>
-                    <button type="submit" class="flex-[2] rounded-xl bg-ink-primary py-3 text-sm font-bold text-white shadow-lg shadow-ink-primary/20 transition-all hover:bg-brand-emerald">Xác nhận lịch trình</button>
+                <div class="flex gap-4 pt-8 border-t border-slate-100">
+                    <button type="button" data-modal-hide="modal-thembaotri" class="saas-btn-secondary h-12 flex-1 justify-center text-[11px] font-black uppercase tracking-widest">Hủy bỏ</button>
+                    <button type="submit" class="saas-btn-primary h-12 flex-[2] justify-center text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20">Xác nhận lịch trình</button>
                 </div>
             </form>
         </x-modal>
 
         @foreach ($baotri as $item)
-            <x-modal id="modal-suabaotri-{{ $item->id }}" title="Hiệu chỉnh lịch trình" subtitle="Cập nhật thông tin kế hoạch bảo trì #{{ $item->id }}.">
-                <form method="POST" action="{{ route('admin.suabaotri', $item->id) }}" class="space-y-6">
+            <x-modal id="modal-suabaotri-{{ $item->id }}" title="Hiệu chỉnh Kế hoạch #{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}" subtitle="Cập nhật tham số và điều phối lại công tác bảo trì hạ tầng.">
+                <form method="POST" action="{{ route('admin.suabaotri', $item->id) }}" class="space-y-8 p-2">
                     @csrf
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Vị trí thực hiện</label>
-                        <select name="phong_id" class="linear-select mt-1.5 font-bold">
-                            <option value="">-- Tất cả các phòng --</option>
-                            @foreach ($phongs as $phong)
-                                <option value="{{ $phong->id }}" {{ $item->phong_id == $phong->id ? 'selected' : '' }}>{{ $phong->tenphong }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Nội dung công việc</label>
-                        <textarea name="noidung" required rows="3" class="linear-textarea mt-1.5">{{ $item->noidung }}</textarea>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-5">
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Ngày bảo trì</label>
-                            <input name="ngaybaotri" required type="date" value="{{ $item->ngaybaotri }}" class="linear-input mt-1.5 font-bold tabular-nums" />
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Người thực hiện</label>
-                            <input name="nguoithuchien" required type="text" value="{{ $item->nguoithuchien }}" class="linear-input mt-1.5 font-bold" />
+                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Vị trí vận hành</label>
+                        <div class="relative group">
+                            <select name="phong_id" class="saas-input h-12 px-5 font-black uppercase tracking-tight appearance-none bg-white">
+                                <option value="">-- Toàn bộ hệ thống kỹ thuật --</option>
+                                @foreach ($phongs as $phong)
+                                    <option value="{{ $phong->id }}" {{ $item->phong_id == $phong->id ? 'selected' : '' }}>{{ $phong->ten_phong }}</option>
+                                @endforeach
+                            </select>
+                            <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
                         </div>
                     </div>
 
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Trạng thái vận hành</label>
-                        <select name="trangthai" class="linear-select mt-1.5 font-bold">
-                            <option value="Chưa thực hiện" {{ $item->trangthai === 'Chưa thực hiện' ? 'selected' : '' }}>Chưa thực hiện</option>
-                            <option value="Đã hoàn thành" {{ $item->trangthai === 'Đã hoàn thành' ? 'selected' : '' }}>Đã hoàn thành</option>
-                        </select>
+                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Nội dung công việc</label>
+                        <textarea name="noidung" required rows="4" class="saas-input p-5 font-bold min-h-[120px] leading-relaxed resize-none">{{ $item->noidung }}</textarea>
                     </div>
 
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" data-modal-hide="modal-suabaotri-{{ $item->id }}" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Hủy bỏ</button>
-                        <button type="submit" class="flex-[2] rounded-xl bg-ink-primary py-3 text-sm font-bold text-white shadow-lg shadow-ink-primary/20 transition-all hover:bg-brand-emerald">Lưu thay đổi</button>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Ngày bảo trì</label>
+                            <input name="ngaybaotri" required type="date" value="{{ $item->ngaybaotri }}" class="saas-input h-12 px-5 font-black tabular-nums bg-white" />
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Field Technician</label>
+                            <input name="nguoithuchien" required type="text" value="{{ $item->nguoithuchien }}" class="saas-input h-12 px-5 font-black uppercase tracking-tight" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Trạng thái vận hành</label>
+                        <div class="relative">
+                            <select name="trangthai" class="saas-input h-12 px-5 font-black uppercase tracking-tight appearance-none bg-white">
+                                <option value="Chưa thực hiện" {{ $item->trangthai === 'Chưa thực hiện' ? 'selected' : '' }}>Chưa thực hiện</option>
+                                <option value="Đã hoàn thành" {{ $item->trangthai === 'Đã hoàn thành' ? 'selected' : '' }}>Đã hoàn thành</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 pt-8 border-t border-slate-100">
+                        <button type="button" data-modal-hide="modal-suabaotri-{{ $item->id }}" class="saas-btn-secondary h-12 flex-1 justify-center text-[11px] font-black uppercase tracking-widest">Hủy bỏ</button>
+                        <button type="submit" class="saas-btn-primary h-12 flex-[2] justify-center text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20">Lưu thay đổi</button>
                     </div>
                 </form>
             </x-modal>
+        @endforeach
+    @endpush
+</x-admin-layout>
         @endforeach
     @endpush
 </x-admin-layout>

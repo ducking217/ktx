@@ -9,11 +9,15 @@ class TaiSanPhongService implements TaiSanPhongServiceInterface
 {
     public function store(array $data, int $phongId): array
     {
+        $tenTaiSan = $data['ten_tai_san'] ?? $data['tentaisan'] ?? null;
+        $soLuong = $data['so_luong'] ?? $data['soluong'] ?? null;
+        $tinhTrang = $data['tinh_trang'] ?? $data['tinhtrang'] ?? null;
+
         Taisan::create([
             'phong_id' => $phongId,
-            'tentaisan' => $data['tentaisan'],
-            'soluong' => $data['soluong'],
-            'tinhtrang' => $data['tinhtrang'],
+            'ten_tai_san' => $tenTaiSan,
+            'so_luong' => $soLuong,
+            'tinh_trang' => $tinhTrang,
         ]);
 
         return ['success' => true, 'message' => 'Them tai san thanh cong.'];
@@ -26,7 +30,11 @@ class TaiSanPhongService implements TaiSanPhongServiceInterface
             return ['success' => false, 'message' => 'Khong tim thay tai san can cap nhat.'];
         }
 
-        $taisan->update($data);
+        $taisan->update([
+            'ten_tai_san' => $data['ten_tai_san'] ?? $taisan->ten_tai_san,
+            'so_luong' => $data['so_luong'] ?? $taisan->so_luong,
+            'tinh_trang' => $data['tinh_trang'] ?? $taisan->tinh_trang,
+        ]);
 
         return ['success' => true, 'message' => 'Cap nhat tai san thanh cong.'];
     }
@@ -43,4 +51,3 @@ class TaiSanPhongService implements TaiSanPhongServiceInterface
         return ['success' => true, 'message' => 'Xoa tai san thanh cong.'];
     }
 }
-

@@ -15,13 +15,10 @@ class SinhvienFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'masinhvien' => $this->faker->unique()->numerify('SV######'),
+            'ma_sinh_vien' => $this->faker->unique()->numerify('SV######'),
             'lop' => 'CNTT' . $this->faker->numberBetween(1, 4),
-            'sodienthoai' => encrypt($this->faker->phoneNumber),
-            'so_cccd' => encrypt($this->faker->numerify('############')),
-            'phong_id' => Phong::factory(),
-            'ngay_vao' => now(),
-            'ngay_het_han' => now()->addMonths(6),
+            'khoa' => 'CNTT',
+            'ngay_nhap_hoc' => now(),
         ];
     }
 }

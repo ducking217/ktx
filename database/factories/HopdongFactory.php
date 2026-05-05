@@ -17,9 +17,11 @@ class HopdongFactory extends Factory
         return [
             'sinhvien_id' => Sinhvien::factory(),
             'phong_id' => Phong::factory(),
+            'giuong_id' => \App\Models\Giuong::factory(),
             'ngay_bat_dau' => now(),
             'ngay_ket_thuc' => now()->addMonths(6),
-            'giaphong_luc_ky' => 1500000,
+            'gia_thuc_te' => 1500000,
+            'tien_coc' => 1000000,
             'trang_thai' => ContractStatus::Active,
         ];
     }

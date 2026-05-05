@@ -7,22 +7,21 @@
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
     <h2>Thong bao duyet dang ky phong</h2>
 
-    <p>Chao {{ $sinhvien->taikhoan?->name ?? 'ban' }},</p>
+    <p>Chao {{ $userName ?? 'ban' }},</p>
     <p>Don dang ky phong cua ban da duoc duyet.</p>
 
-    <p><strong>Thong tin hop dong</strong></p>
-    <ul>
-        <li>Phong: {{ $phong->tenphong }}</li>
-        <li>Ngay bat dau: {{ $hopdong->ngay_bat_dau }}</li>
-        <li>Ngay ket thuc: {{ $hopdong->ngay_ket_thuc }}</li>
-        <li>Gia phong luc ky: {{ number_format($hopdong->giaphong_luc_ky, 0, ',', '.') }} VND</li>
-    </ul>
+    <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #d0e7ff;">
+        <h4 style="margin-top: 0; color: #00A86B;">Yeu cau thanh toan</h4>
+        <p>He thong da tao hoa don <strong>Tien coc</strong> va <strong>Tien phong thang nay</strong>.</p>
+        <p>Vui long dang nhap vao he thong de xem chi tiet hoa don va thuc hien thanh toan de hoan tat thu tuc nhan phong.</p>
+    </div>
 
-    <p><strong>Hoa don dau tien</strong></p>
+    <p><strong>Thong tin cho o</strong></p>
     <ul>
-        <li>Ky thanh toan: thang {{ $hoadon->thang }}/{{ $hoadon->nam }}</li>
-        <li>Tong tien: {{ number_format($hoadon->tongtien, 0, ',', '.') }} VND</li>
-        <li>Trang thai: {{ $hoadon->trangthaithanhtoan }}</li>
+        <li>Phong: {{ $tenPhong }}</li>
+        <li>Giuong: {{ $maGiuong }}</li>
+        <li>Ngay bat dau: {{ $ngayBatDau }}</li>
+        <li>Ngay ket thuc: {{ $ngayKetThuc }}</li>
     </ul>
 
     <p>Ban vui long dang nhap he thong de xem chi tiet hop dong va hoa don.</p>

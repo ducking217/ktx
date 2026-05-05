@@ -1,203 +1,154 @@
 <x-admin-layout>
-    <x-slot name="title">Quản lý gia hạn</x-slot>
+    <x-slot:title>Quản lý Gia hạn cư trú</x-slot:title>
 
-    <div class="space-y-8 animate-fade-up">
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h2 class="text-2xl font-black text-ink-primary uppercase tracking-tight">Yêu cầu gia hạn</h2>
-                <p class="text-[10px] font-bold text-ink-secondary/50 uppercase tracking-widest mt-1">Danh sách sinh viên gửi yêu cầu kéo dài thời gian lưu trú</p>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <form action="{{ route('admin.giahan.index') }}" method="GET" class="flex items-center gap-2">
-                    <select name="status" onchange="this.form.submit()" class="bg-ui-card border-ui-border rounded-xl text-[10px] font-black uppercase tracking-widest px-4 py-2 focus:ring-2 focus:ring-brand-emerald/20 transition-all">
-                        <option value="Tất cả" {{ $status === 'Tất cả' ? 'selected' : '' }}>Tất cả trạng thái</option>
+    <div class="space-y-8">
+        <x-admin.page-header
+            title="Yêu cầu gia hạn"
+            subtitle="Thẩm định nguyện vọng kéo dài thời gian lưu trú và cập nhật chu kỳ hợp đồng mới."
+        >
+            <form action="{{ route('admin.giahan.index') }}" method="GET" class="flex items-center gap-3">
+                <label class="sr-only" for="extension-status">Bộ lọc trạng thái</label>
+                <div class="relative group">
+                    <select id="extension-status" name="status" onchange="this.form.submit()" class="saas-input !h-11 !pr-10 font-bold uppercase tracking-widest text-[10px] min-w-[200px] shadow-sm">
+                        <option value="Tất cả" {{ $status === 'Tất cả' ? 'selected' : '' }}>Mọi trạng thái</option>
                         @foreach(\App\Enums\ExtensionStatus::cases() as $case)
                             <option value="{{ $case->value }}" {{ $status === $case->value ? 'selected' : '' }}>{{ $case->label() }}</option>
                         @endforeach
                     </select>
-                </form>
-            </div>
-        </header>
-
-        <article class="pdu-card !p-0 overflow-hidden shadow-xl shadow-ink-primary/5">
-            <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">
-                            <th class="px-6 py-4">Sinh viên</th>
-                            <th class="px-6 py-4">Hợp đồng</th>
-                            <th class="px-6 py-4">Ngày hết hạn cũ</th>
-                            <th class="px-6 py-4">Ngày mong muốn</th>
-                            <th class="px-6 py-4">Lý do</th>
-                            <th class="px-6 py-4">Trạng thái</th>
-                            <th class="px-6 py-4 text-right">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-ui-border">
-                        @forelse ($yeuCauGiaHan as $item)
-                            <tr class="group hover:bg-ui-bg/30 transition-colors">
-                                <td class="px-6 py-5">
-                                    <div class="font-bold text-ink-primary tracking-tight">{{ $item->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
-                                    <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-widest">{{ $item->sinhvien?->masinhvien ?? 'N/A' }}</div>
-                                </td>
-                                <td class="px-6 py-5">
-                                    <div class="font-display font-black text-ink-primary tracking-tight">{{ $item->hopdong?->ma_hd ?? 'N/A' }}</div>
-                                    <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-widest">{{ $item->hopdong?->phong?->tenphong ?? 'N/A' }}</div>
-                                </td>
-                                <td class="px-6 py-5 font-medium text-ink-secondary tabular-nums tracking-tight">
-                                    {{ $item->hopdong?->ngay_ket_thuc?->format('d/m/Y') ?? 'N/A' }}
-                                </td>
-                                <td class="px-6 py-5 font-bold text-brand-emerald tabular-nums tracking-tight">
-                                    {{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'N/A' }}
-                                </td>
-                                <td class="px-6 py-5">
-                                    <p class="text-xs text-ink-secondary/70 max-w-xs truncate" title="{{ $item->ly_do }}">
-                                        {{ $item->ly_do ?: '—' }}
-                                    </p>
-                                </td>
-                                <td class="px-6 py-5">
-                                    <span @class([
-                                        'inline-flex items-center rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-widest ring-1',
-                                        'bg-status-warning/10 text-status-warning ring-status-warning/20' => $item->trang_thai->value === 'pending',
-                                        'bg-status-success/10 text-status-success ring-status-success/20' => $item->trang_thai->value === 'approved',
-                                        'bg-status-error/10 text-status-error ring-status-error/20' => $item->trang_thai->value === 'rejected',
-                                    ])>
-                                        {{ $item->trang_thai->label() }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-5 text-right">
-                                    @if($item->trang_thai->value === 'pending')
-                                        <div class="flex items-center justify-end gap-2">
-                                            <button onclick="openModal('modal-approve-{{ $item->id }}')" class="pdu-btn-ghost !text-status-success !bg-status-success/5 hover:!bg-status-success/10 !px-3 !py-1.5 text-[9px] uppercase tracking-widest">Duyệt</button>
-                                            <button onclick="openModal('modal-reject-{{ $item->id }}')" class="pdu-btn-ghost !text-status-error !bg-status-error/5 hover:!bg-status-error/10 !px-3 !py-1.5 text-[9px] uppercase tracking-widest">Từ chối</button>
-                                        </div>
-                                    @else
-                                        <span class="text-[9px] font-black text-ink-secondary/30 uppercase tracking-widest">Đã xử lý</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="py-32 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có yêu cầu nào</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- Mobile Card List --}}
-            <div class="md:hidden divide-y divide-ui-border">
-                @forelse ($yeuCauGiaHan as $item)
-                    <div class="p-5 space-y-4">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <div class="font-bold text-ink-primary tracking-tight">{{ $item->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
-                                <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-widest">{{ $item->sinhvien?->masinhvien ?? 'N/A' }}</div>
-                            </div>
-                            <span @class([
-                                'inline-flex items-center rounded-lg px-2 py-0.5 text-[8px] font-black uppercase tracking-widest ring-1',
-                                'bg-status-warning/10 text-status-warning ring-status-warning/20' => $item->trang_thai->value === 'pending',
-                                'bg-status-success/10 text-status-success ring-status-success/20' => $item->trang_thai->value === 'approved',
-                                'bg-status-error/10 text-status-error ring-status-error/20' => $item->trang_thai->value === 'rejected',
-                            ])>
-                                {{ $item->trang_thai->label() }}
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
-                            <div class="space-y-1">
-                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Phòng cư trú</div>
-                                <div class="text-xs font-bold text-ink-primary">{{ $item->hopdong?->phong?->tenphong ?? 'N/A' }}</div>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Hợp đồng</div>
-                                <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $item->hopdong?->ma_hd ?? 'N/A' }}</div>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Hết hạn cũ</div>
-                                <div class="text-xs font-bold text-ink-secondary tabular-nums tracking-tight">{{ $item->hopdong?->ngay_ket_thuc?->format('d/m/Y') ?? 'N/A' }}</div>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest text-brand-emerald">Gia hạn đến</div>
-                                <div class="text-xs font-bold text-brand-emerald tabular-nums tracking-tight">{{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'N/A' }}</div>
-                            </div>
-                        </div>
-
-                        @if($item->trang_thai->value === 'pending')
-                            <div class="flex items-center gap-2">
-                                <button onclick="openModal('modal-approve-{{ $item->id }}')" class="flex-1 h-11 flex items-center justify-center rounded-xl bg-status-success text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-status-success/10">Duyệt</button>
-                                <button onclick="openModal('modal-reject-{{ $item->id }}')" class="flex-1 h-11 flex items-center justify-center rounded-xl bg-status-error text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-status-error/10">Từ chối</button>
-                            </div>
-                        @endif
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
-                @empty
-                    <div class="py-16 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có yêu cầu nào</div>
-                @endforelse
-            </div>
-
-            @if($yeuCauGiaHan->hasPages())
-                <div class="px-6 py-4 bg-ui-bg/30 border-t border-ui-border">
-                    {{ $yeuCauGiaHan->links() }}
                 </div>
-            @endif
-        </article>
+            </form>
+        </x-admin.page-header>
+
+        <x-admin.table-card>
+            <thead>
+                <tr>
+                    <th>Cư dân / Định danh</th>
+                    <th>Hợp đồng hiện tại</th>
+                    <th class="text-center">Chu kỳ cũ</th>
+                    <th class="text-center">Đề xuất gia hạn</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-right">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($yeuCauGiaHan as $item)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="py-5">
+                            <div class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{{ $item->sinhvien?->user?->name ?? $item->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">{{ $item->sinhvien?->ma_sinh_vien ?? $item->sinhvien?->masinhvien ?? 'N/A' }}</div>
+                        </td>
+                        <td class="py-5">
+                            <div class="text-xs font-bold text-slate-900 tabular-nums tracking-tight">{{ $item->hopdong ? 'REF-' . $item->hopdong->id : 'N/A' }}</div>
+                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1.5">
+                                <span class="h-1 w-1 rounded-full bg-blue-500"></span>
+                                {{ $item->hopdong?->phong?->ten_phong ?? 'N/A' }}
+                            </div>
+                        </td>
+                        <td class="py-5 text-center">
+                            <div class="text-xs font-bold text-slate-500 tabular-nums tracking-tight">
+                                {{ $item->hopdong?->ngay_ket_thuc?->format('d/m/Y') ?? 'N/A' }}
+                            </div>
+                        </td>
+                        <td class="py-5 text-center">
+                            <div class="text-xs font-bold text-emerald-600 tabular-nums tracking-tight bg-emerald-50 px-2.5 py-1 rounded-lg inline-block">
+                                {{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'N/A' }}
+                            </div>
+                        </td>
+                        <td class="py-5 text-center">
+                            @php
+                                $statusEnumExt = $item->trang_thai;
+                                $statusBadgeExt = match($statusEnumExt->value) {
+                                    'pending' => 'saas-badge-warning',
+                                    'approved' => 'saas-badge-success',
+                                    'rejected' => 'saas-badge-error',
+                                    default => 'saas-badge-info',
+                                };
+                            @endphp
+                            <span class="saas-badge {{ $statusBadgeExt }}">
+                                {{ $statusEnumExt->label() }}
+                            </span>
+                        </td>
+                        <td class="py-5 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                @if($item->trang_thai->value === 'pending')
+                                    <button type="button" data-modal-target="modal-approve-{{ $item->id }}" data-modal-toggle="modal-approve-{{ $item->id }}" class="p-2 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors" title="Chấp thuận gia hạn">
+                                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    </button>
+                                    <button type="button" data-modal-target="modal-reject-{{ $item->id }}" data-modal-toggle="modal-reject-{{ $item->id }}" class="p-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors" title="Từ chối yêu cầu">
+                                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                @else
+                                    <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-2">Xử lý xong</span>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-24 text-center">
+                            <div class="flex flex-col items-center gap-4 text-slate-200">
+                                <svg class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Không tìm thấy yêu cầu gia hạn</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-admin.table-card>
+
+        @if($yeuCauGiaHan->hasPages())
+            <div class="mt-8">
+                {{ $yeuCauGiaHan->links() }}
+            </div>
+        @endif
     </div>
 
     @push('modals')
         @foreach ($yeuCauGiaHan as $item)
             {{-- Modal Duyệt --}}
-            <div id="modal-approve-{{ $item->id }}" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-ink-primary/60 backdrop-blur-sm animate-fade-in">
-                <div class="bg-ui-card w-full max-w-md rounded-2xl p-8 shadow-2xl animate-pop-in">
-                    <h3 class="font-display text-xl font-black text-ink-primary uppercase tracking-tight mb-2">Duyệt gia hạn</h3>
-                    <p class="text-xs text-ink-secondary/60 mb-6">Bạn đang duyệt gia hạn cho sinh viên <strong>{{ $item->sinhvien?->taikhoan?->name ?? 'N/A' }}</strong> đến ngày <strong class="tabular-nums tracking-tight">{{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'N/A' }}</strong>.</p>
-                    
-                    <form action="{{ route('admin.giahan.duyet', $item->id) }}" method="POST" class="space-y-4 text-left">
-                        @csrf
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-ink-primary uppercase tracking-widest">Ghi chú cho sinh viên</label>
-                            <textarea name="ghi_chu_admin" rows="3" class="w-full bg-ui-bg border-ui-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-emerald/20 transition-all resize-none" placeholder="Ví dụ: Đã duyệt gia hạn cho học kỳ tiếp theo..."></textarea>
+            <x-modal id="modal-approve-{{ $item->id }}" title="Phê duyệt gia hạn" subtitle="Xác nhận kéo dài thời hạn lưu trú cho cư dân theo đề xuất mới.">
+                <div class="p-6 rounded-2xl bg-blue-50/50 border border-blue-100 mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="h-12 w-12 rounded-xl bg-white border border-blue-100 flex items-center justify-center shadow-sm">
+                            <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </div>
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-ui-border">
-                            <button type="button" onclick="closeModal('modal-approve-{{ $item->id }}')" class="pdu-btn-ghost">Hủy</button>
-                            <button type="submit" class="pdu-btn-primary !bg-status-success !border-status-success shadow-lg shadow-status-success/20">Xác nhận duyệt</button>
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hạn cư trú mới</div>
+                            <div class="text-lg font-bold text-slate-900 tabular-nums">{{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'N/A' }}</div>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <form action="{{ route('admin.giahan.duyet', $item->id) }}" method="POST" class="space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label for="ghi_chu_admin_approve_{{ $item->id }}" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Phản hồi cho cư dân</label>
+                        <textarea id="ghi_chu_admin_approve_{{ $item->id }}" name="ghi_chu_admin" rows="4" class="saas-input !h-auto !py-4 resize-none" placeholder="Ví dụ: Đã phê duyệt gia hạn. Vui lòng hoàn tất nghĩa vụ tài chính trước ngày ghi nhận..."></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" data-modal-hide="modal-approve-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
+                        <button type="submit" class="saas-btn-primary flex-1 h-12 shadow-lg shadow-emerald-500/20 !bg-emerald-600 hover:!bg-emerald-700">Xác nhận phê duyệt</button>
+                    </div>
+                </form>
+            </x-modal>
 
             {{-- Modal Từ chối --}}
-            <div id="modal-reject-{{ $item->id }}" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-ink-primary/60 backdrop-blur-sm animate-fade-in">
-                <div class="bg-ui-card w-full max-w-md rounded-2xl p-8 shadow-2xl animate-pop-in">
-                    <h3 class="font-display text-xl font-black text-status-error uppercase tracking-tight mb-2">Từ chối gia hạn</h3>
-                    <p class="text-xs text-ink-secondary/60 mb-6">Vui lòng nhập lý do từ chối yêu cầu của <strong>{{ $item->sinhvien?->taikhoan?->name ?? 'N/A' }}</strong>.</p>
-                    
-                    <form action="{{ route('admin.giahan.tuchoi', $item->id) }}" method="POST" class="space-y-4 text-left">
-                        @csrf
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-ink-primary uppercase tracking-widest">Lý do từ chối <span class="text-status-error">*</span></label>
-                            <textarea name="ghi_chu_admin" rows="3" required class="w-full bg-ui-bg border-ui-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-status-error/20 transition-all resize-none" placeholder="Ví dụ: Sinh viên vi phạm kỷ luật, không đủ điều kiện gia hạn..."></textarea>
-                        </div>
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-ui-border">
-                            <button type="button" onclick="closeModal('modal-reject-{{ $item->id }}')" class="pdu-btn-ghost">Hủy</button>
-                            <button type="submit" class="pdu-btn-primary !bg-status-error !border-status-error shadow-lg shadow-status-error/20">Từ chối ngay</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <x-modal id="modal-reject-{{ $item->id }}" title="Từ chối gia hạn" subtitle="Yêu cầu cung cấp lý do cụ thể khi không chấp thuận gia hạn cư trú cho sinh viên.">
+                <form action="{{ route('admin.giahan.tuchoi', $item->id) }}" method="POST" class="space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label for="ghi_chu_admin_reject_{{ $item->id }}" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Lý do từ chối <span class="text-rose-500">*</span></label>
+                        <textarea id="ghi_chu_admin_reject_{{ $item->id }}" name="ghi_chu_admin" rows="4" required class="saas-input !h-auto !py-4 border-rose-100 focus:border-rose-500 resize-none" placeholder="Vui lòng nêu rõ lý do không gia hạn (Vi phạm kỷ luật, không thuộc đối tượng ưu tiên...)"></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" data-modal-hide="modal-reject-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Quay lại</button>
+                        <button type="submit" class="saas-btn-primary flex-1 h-12 shadow-lg shadow-rose-500/20 !bg-rose-600 hover:!bg-rose-700">Xác nhận từ chối</button>
+                    </div>
+                </form>
+            </x-modal>
         @endforeach
     @endpush
-
-    <script>
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById(id).classList.add('flex');
-            document.body.classList.add('overflow-hidden');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            document.getElementById(id).classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
-        }
-    </script>
 </x-admin-layout>

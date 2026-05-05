@@ -1,0 +1,698 @@
+-- ============================================================
+-- HỆ THỐNG QUẢN LÝ KÝ TÚC XÁ — Database Schema
+-- Thiết kế: Kiến trúc sư hệ thống
+-- Version: 2.0 (cải tiến từ v1)
+-- Engine: MySQL 8.0+ / MariaDB 10.6+
+-- Charset: utf8mb4_unicode_ci
+-- Actors chuẩn hệ thống: guest (khách), sinhvien, admin
+-- ============================================================
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET FOREIGN_KEY_CHECKS = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+SET NAMES utf8mb4;
+
+-- ============================================================
+-- 1. TOA_NHA — Tòa nhà (root của FK chain)
+-- ============================================================
+CREATE TABLE `toa_nha` (
+  `id`           bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ten_toa_nha`  varchar(100)    NOT NULL,
+  `ma_toa_nha`   varchar(20)     NOT NULL COMMENT 'Mã viết tắt: TOA_A, TOA_B...',
+  `gioi_tinh`    enum('male','female','any') NOT NULL DEFAULT 'any' COMMENT 'Giới tính được phép ở',
+  `dia_chi`      varchar(255)    DEFAULT NULL,
+  `mo_ta`        text            DEFAULT NULL,
+  `created_at`   timestamp       NULL DEFAULT NULL,
+  `updated_at`   timestamp       NULL DEFAULT NULL,
+  `deleted_at`   timestamp       NULL DEFAULT NULL COMMENT 'SoftDelete — KHÔNG xóa cứng',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `toa_nha_ma_unique` (`ma_toa_nha`),
+  UNIQUE KEY `toa_nha_ten_unique` (`ten_toa_nha`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Tòa nhà trong khuôn viên KTX';
+
+-- ============================================================
+-- 2. LOAI_PHONG — Loại phòng (chuẩn hóa giá & tiện nghi)
+-- ============================================================
+CREATE TABLE `loai_phong` (
+  `id`        bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ten_loai`  varchar(100)    NOT NULL,
+  `suc_chua`  tinyint UNSIGNED NOT NULL COMMENT 'Số giường tối đa',
+  `gia_thang` bigint UNSIGNED NOT NULL COMMENT 'Giá niêm yết (VNĐ/tháng)',
+  `tien_nghi` json            DEFAULT NULL COMMENT 'Mảng tiện nghi: ["wifi","dieu_hoa"]',
+  `created_at` timestamp      NULL DEFAULT NULL,
+  `updated_at` timestamp      NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `loai_phong_ten_unique` (`ten_loai`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Phân loại phòng theo tiêu chuẩn & giá';
+
+-- ============================================================
+-- 3. PHONG — Phòng ở
+-- ============================================================
+CREATE TABLE `phong` (
+  `id`                bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `toa_nha_id`        bigint UNSIGNED NOT NULL,
+  `loai_phong_id`     bigint UNSIGNED NOT NULL,
+  `ten_phong`         varchar(50)     NOT NULL,
+  `tang`              tinyint UNSIGNED NOT NULL DEFAULT 1,
+  `gioi_tinh_han_che` enum('male','female','any') NOT NULL DEFAULT 'any',
+  `trang_thai`        enum('active','maintenance','inactive') NOT NULL DEFAULT 'active',
+  `created_at`        timestamp       NULL DEFAULT NULL,
+  `updated_at`        timestamp       NULL DEFAULT NULL,
+  `deleted_at`        timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `phong_toa_ten_unique` (`toa_nha_id`, `ten_phong`),
+  KEY `phong_loai_phong_id_foreign` (`loai_phong_id`),
+  KEY `phong_trang_thai_index` (`trang_thai`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Phòng ở trong từng tòa nhà';
+
+-- ============================================================
+-- 4. GIUONG — Giường (đơn vị nhỏ nhất, gắn với hợp đồng)
+-- ============================================================
+CREATE TABLE `giuong` (
+  `id`         bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `phong_id`   bigint UNSIGNED NOT NULL,
+  `ma_giuong`  varchar(50)     NOT NULL COMMENT 'Ví dụ: A101-G1',
+  `trang_thai` enum('available','occupied','maintenance') NOT NULL DEFAULT 'available',
+  `created_at` timestamp       NULL DEFAULT NULL,
+  `updated_at` timestamp       NULL DEFAULT NULL,
+  `deleted_at` timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `giuong_ma_unique` (`ma_giuong`),
+  KEY `giuong_phong_id_foreign` (`phong_id`),
+  KEY `giuong_trang_thai_index` (`trang_thai`),
+  KEY `giuong_phong_trang_thai_index` (`phong_id`, `trang_thai`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Giường trong từng phòng — đơn vị gắn hợp đồng';
+
+-- ============================================================
+-- 5. USERS — Tài khoản hệ thống (admin + sinh viên)
+-- ============================================================
+CREATE TABLE `users` (
+  `id`                  bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name`                varchar(255)    NOT NULL,
+  `email`               varchar(255)    NOT NULL,
+  `email_verified_at`   timestamp       NULL DEFAULT NULL,
+  `password`            varchar(255)    NOT NULL,
+  `vaitro`              enum('guest','sinhvien','admin') NOT NULL DEFAULT 'sinhvien',
+  `is_active`           tinyint(1)      NOT NULL DEFAULT 1,
+  `phone`               text            DEFAULT NULL COMMENT 'Encrypted (AES-256)',
+  `phone_blind_index`   varchar(64)     DEFAULT NULL COMMENT 'SHA-256 blind index để tìm kiếm',
+  `id_card`             text            DEFAULT NULL COMMENT 'CCCD Encrypted',
+  `id_card_blind_index` varchar(64)     DEFAULT NULL COMMENT 'SHA-256 blind index',
+  `gender`              enum('male','female','other') DEFAULT NULL,
+  `dob`                 date            DEFAULT NULL,
+  `address`             text            DEFAULT NULL,
+  `remember_token`      varchar(100)    DEFAULT NULL,
+  `created_at`          timestamp       NULL DEFAULT NULL,
+  `updated_at`          timestamp       NULL DEFAULT NULL,
+  `deleted_at`          timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`),
+  KEY `users_phone_blind_index` (`phone_blind_index`),
+  KEY `users_id_card_blind_index` (`id_card_blind_index`),
+  KEY `users_vaitro_index` (`vaitro`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Tài khoản hệ thống — chỉ 3 vai trò: guest/sinhvien/admin';
+
+-- ============================================================
+-- 6. SINHVIEN — Hồ sơ sinh viên (extends users)
+-- ============================================================
+CREATE TABLE `sinhvien` (
+  `id`            bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`       bigint UNSIGNED NOT NULL,
+  `ma_sinh_vien`  varchar(20)     NOT NULL,
+  `lop`           varchar(50)     DEFAULT NULL,
+  `khoa`          varchar(100)    DEFAULT NULL,
+  `ngay_nhap_hoc` date            DEFAULT NULL,
+  `created_at`    timestamp       NULL DEFAULT NULL,
+  `updated_at`    timestamp       NULL DEFAULT NULL,
+  `deleted_at`    timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sinhvien_user_id_unique` (`user_id`),
+  UNIQUE KEY `sinhvien_ma_unique` (`ma_sinh_vien`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Hồ sơ sinh viên — 1-1 với users';
+
+-- ============================================================
+-- 7. DANGKY — Đơn đăng ký phòng (Guest flow)
+-- ============================================================
+CREATE TABLE `dangky` (
+  `id`               bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`          bigint UNSIGNED DEFAULT NULL COMMENT 'NULL nếu chưa có tài khoản',
+  `toa_nha_id`       bigint UNSIGNED NOT NULL,
+  `loai_phong_id`    bigint UNSIGNED NOT NULL,
+  `phong_id`         bigint UNSIGNED DEFAULT NULL COMMENT 'Được assign sau khi duyệt',
+  `ho_ten`           varchar(255)    DEFAULT NULL COMMENT 'Tên khi chưa có tài khoản',
+  `email`            varchar(255)    DEFAULT NULL,
+  `phone_encrypted`  text            DEFAULT NULL COMMENT 'SĐT mã hóa cho Guest',
+  `id_card_encrypted` text           DEFAULT NULL COMMENT 'CCCD mã hóa cho Guest',
+  `gender`           enum('male','female','other') DEFAULT NULL,
+  `dob`              date            DEFAULT NULL,
+  `trang_thai`       enum('pending','approved','rejected','paid','cancelled')
+                     NOT NULL DEFAULT 'pending',
+  `lookup_token`     varchar(64)     NOT NULL COMMENT 'Token tra cứu cho Guest',
+  `token_expires_at` timestamp       NULL DEFAULT NULL COMMENT 'Hết hạn sau 30 ngày',
+  `ghi_chu`          text            DEFAULT NULL,
+  `created_at`       timestamp       NULL DEFAULT NULL,
+  `updated_at`       timestamp       NULL DEFAULT NULL,
+  `deleted_at`       timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `dangky_lookup_token_unique` (`lookup_token`),
+  KEY `dangky_user_id_foreign` (`user_id`),
+  KEY `dangky_toa_nha_id_foreign` (`toa_nha_id`),
+  KEY `dangky_loai_phong_id_foreign` (`loai_phong_id`),
+  KEY `dangky_phong_id_foreign` (`phong_id`),
+  KEY `dangky_trang_thai_index` (`trang_thai`),
+  KEY `dangky_status_created_index` (`trang_thai`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Đơn đăng ký phòng — hỗ trợ cả Guest chưa có tài khoản';
+
+-- ============================================================
+-- 8. HOPDONG — Hợp đồng thuê phòng
+-- FIX: thêm phong_id (redundant nhưng cần cho query performance)
+-- FIX: thêm tien_coc (tiền cọc gắn với hợp đồng)
+-- ============================================================
+CREATE TABLE `hopdong` (
+  `id`           bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sinhvien_id`  bigint UNSIGNED NOT NULL,
+  `phong_id`     bigint UNSIGNED NOT NULL COMMENT 'Denormalized từ giuong — tối ưu query',
+  `giuong_id`    bigint UNSIGNED NOT NULL,
+  `ngay_bat_dau` date            NOT NULL,
+  `ngay_ket_thuc` date           NOT NULL,
+  `gia_thuc_te`  bigint UNSIGNED NOT NULL COMMENT 'Giá tại thời điểm ký (không đổi theo loai_phong)',
+  `tien_coc`     bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Tiền cọc đặt cọc',
+  `trang_thai`   enum('active','expired','terminated') NOT NULL DEFAULT 'active',
+  `cot_hieu_luc` tinyint GENERATED ALWAYS AS (
+                   CASE WHEN `trang_thai` = 'active' THEN 1 ELSE NULL END
+                 ) STORED COMMENT 'Cột kỹ thuật để unique hợp đồng active',
+  `ghi_chu`      text            DEFAULT NULL,
+  `created_at`   timestamp       NULL DEFAULT NULL,
+  `updated_at`   timestamp       NULL DEFAULT NULL,
+  `deleted_at`   timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `hopdong_sinhvien_id_foreign` (`sinhvien_id`),
+  KEY `hopdong_phong_id_foreign` (`phong_id`),
+  KEY `hopdong_giuong_id_foreign` (`giuong_id`),
+  KEY `hopdong_trang_thai_index` (`trang_thai`),
+  KEY `hopdong_ngay_ket_thuc_index` (`ngay_ket_thuc`),
+  KEY `hopdong_sv_status_index` (`sinhvien_id`, `trang_thai`),
+  KEY `hopdong_giuong_status_index` (`giuong_id`, `trang_thai`),
+  UNIQUE KEY `hopdong_mot_active_moi_sinhvien_unique` (`sinhvien_id`, `cot_hieu_luc`),
+  UNIQUE KEY `hopdong_mot_active_moi_giuong_unique` (`giuong_id`, `cot_hieu_luc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Hợp đồng thuê phòng — lưu giá tại thời điểm ký';
+
+-- ============================================================
+-- 9. CHI_SO_DIEN_NUOC — Chỉ số điện nước theo tháng
+-- ============================================================
+CREATE TABLE `chi_so_dien_nuoc` (
+  `id`          bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `phong_id`    bigint UNSIGNED NOT NULL,
+  `loai`        enum('dien','nuoc') NOT NULL,
+  `chi_so_cu`   int UNSIGNED    NOT NULL DEFAULT 0,
+  `chi_so_moi`  int UNSIGNED    NOT NULL DEFAULT 0,
+  `thang`       tinyint UNSIGNED NOT NULL,
+  `nam`         smallint UNSIGNED NOT NULL,
+  `created_at`  timestamp       NULL DEFAULT NULL,
+  `updated_at`  timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `chi_so_phong_loai_ky_unique` (`phong_id`, `loai`, `thang`, `nam`),
+  KEY `chi_so_ky_index` (`thang`, `nam`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Chỉ số điện nước — unique theo phòng/loại/tháng/năm';
+
+-- ============================================================
+-- 10. HOADON — Hóa đơn
+-- FIX: tách chi_tiet JSON thành cột riêng để aggregate được
+-- FIX: thêm ngay_thanh_toan riêng biệt với updated_at
+-- ============================================================
+CREATE TABLE `hoadon` (
+  `id`           bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `hopdong_id`   bigint UNSIGNED DEFAULT NULL COMMENT 'NULL nếu HĐ đã xóa',
+  `phong_id`     bigint UNSIGNED DEFAULT NULL,
+  `ma_hoa_don`   varchar(50)     NOT NULL,
+  `loai_hoadon`  enum('monthly','deposit','refund','extra') NOT NULL DEFAULT 'monthly',
+  `tien_phong`   bigint UNSIGNED NOT NULL DEFAULT 0,
+  `tien_dien`    bigint UNSIGNED NOT NULL DEFAULT 0,
+  `tien_nuoc`    bigint UNSIGNED NOT NULL DEFAULT 0,
+  `phi_dich_vu`  bigint UNSIGNED NOT NULL DEFAULT 0,
+  `tong_tien`    bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Sum của 4 cột trên',
+  `trang_thai`   enum('unpaid','paid','overdue','cancelled') NOT NULL DEFAULT 'unpaid',
+  `ngay_het_han` date            DEFAULT NULL COMMENT 'Hạn thanh toán',
+  `ngay_thanh_toan` date         DEFAULT NULL COMMENT 'Ngày thực tế thanh toán — dùng cho báo cáo',
+  `ghi_chu`      text            DEFAULT NULL,
+  `created_at`   timestamp       NULL DEFAULT NULL,
+  `updated_at`   timestamp       NULL DEFAULT NULL,
+  `deleted_at`   timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `hoadon_ma_unique` (`ma_hoa_don`),
+  KEY `hoadon_hopdong_id_foreign` (`hopdong_id`),
+  KEY `hoadon_phong_id_foreign` (`phong_id`),
+  KEY `hoadon_trang_thai_index` (`trang_thai`),
+  KEY `hoadon_ngay_thanh_toan_index` (`ngay_thanh_toan`),
+  KEY `hoadon_ky_index` (`ngay_het_han`),
+  KEY `hoadon_status_due_index` (`trang_thai`, `ngay_het_han`),
+  KEY `hoadon_hopdong_status_index` (`hopdong_id`, `trang_thai`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Hóa đơn — chi tiết tách cột để GROUP BY aggregate';
+
+-- ============================================================
+-- 11. THANH_TOAN — Lịch sử giao dịch thanh toán
+-- ============================================================
+CREATE TABLE `thanh_toan` (
+  `id`              bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `hoadon_id`       bigint UNSIGNED NOT NULL,
+  `phuong_thuc`     enum('cash','transfer','online','other') NOT NULL DEFAULT 'cash',
+  `ma_giao_dich`    varchar(100)    DEFAULT NULL COMMENT 'Mã GD ngân hàng nếu chuyển khoản',
+  `so_tien`         bigint UNSIGNED NOT NULL,
+  `ngay_giao_dich`  timestamp       NOT NULL,
+  `nguoi_xac_nhan`  bigint UNSIGNED DEFAULT NULL COMMENT 'user_id admin xác nhận',
+  `ghi_chu`         text            DEFAULT NULL,
+  `created_at`      timestamp       NULL DEFAULT NULL,
+  `updated_at`      timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `thanh_toan_hoadon_id_foreign` (`hoadon_id`),
+  KEY `thanh_toan_nguoi_xac_nhan_foreign` (`nguoi_xac_nhan`),
+  KEY `thanh_toan_hoadon_time_index` (`hoadon_id`, `ngay_giao_dich`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Lịch sử giao dịch — mỗi thanh toán là 1 record riêng';
+
+-- ============================================================
+-- 12. YEU_CAU_GIA_HAN — Yêu cầu gia hạn hợp đồng
+-- ============================================================
+CREATE TABLE `yeu_cau_gia_han` (
+  `id`                bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `hopdong_id`        bigint UNSIGNED NOT NULL,
+  `sinhvien_id`       bigint UNSIGNED NOT NULL,
+  `ngay_ket_thuc_moi` date            NOT NULL,
+  `ly_do`             text            DEFAULT NULL,
+  `trang_thai`        enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `ghi_chu_admin`     text            DEFAULT NULL,
+  `created_at`        timestamp       NULL DEFAULT NULL,
+  `updated_at`        timestamp       NULL DEFAULT NULL,
+  `deleted_at`        timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `gia_han_hopdong_id_foreign` (`hopdong_id`),
+  KEY `gia_han_sinhvien_id_foreign` (`sinhvien_id`),
+  KEY `gia_han_trang_thai_index` (`trang_thai`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Yêu cầu gia hạn HĐ từ sinh viên — Admin duyệt/từ chối';
+
+-- ============================================================
+-- 13. BAOHONG — Báo hỏng tài sản / thiết bị
+-- ============================================================
+CREATE TABLE `baohong` (
+  `id`              bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sinhvien_id`     bigint UNSIGNED NOT NULL,
+  `phong_id`        bigint UNSIGNED NOT NULL,
+  `giuong_id`       bigint UNSIGNED DEFAULT NULL,
+  `mo_ta`           text            NOT NULL,
+  `hinh_anh_path`   varchar(255)    DEFAULT NULL,
+  `trang_thai`      enum('pending','processing','done','rejected') NOT NULL DEFAULT 'pending',
+  `muc_do`          enum('low','medium','high') NOT NULL DEFAULT 'low',
+  `chi_phi_du_kien` bigint UNSIGNED NOT NULL DEFAULT 0,
+  `nguoi_chiu_phi`  enum('ktx','sinhvien') NOT NULL DEFAULT 'ktx',
+  `created_at`      timestamp       NULL DEFAULT NULL,
+  `updated_at`      timestamp       NULL DEFAULT NULL,
+  `deleted_at`      timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `baohong_sinhvien_id_foreign` (`sinhvien_id`),
+  KEY `baohong_phong_id_foreign` (`phong_id`),
+  KEY `baohong_giuong_id_foreign` (`giuong_id`),
+  KEY `baohong_trang_thai_index` (`trang_thai`),
+  KEY `baohong_status_created_index` (`trang_thai`, `created_at`),
+  KEY `baohong_phong_status_created_index` (`phong_id`, `trang_thai`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Báo hỏng thiết bị phòng — theo dõi xử lý';
+
+-- ============================================================
+-- 14. TAISAN — Tài sản trong phòng
+-- ============================================================
+CREATE TABLE `taisan` (
+  `id`          bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `phong_id`    bigint UNSIGNED NOT NULL,
+  `ten_tai_san` varchar(100)    NOT NULL,
+  `ma_tai_san`  varchar(50)     DEFAULT NULL,
+  `so_luong`    tinyint UNSIGNED NOT NULL DEFAULT 1,
+  `tinh_trang`  enum('good','damaged','lost','disposed') NOT NULL DEFAULT 'good',
+  `created_at`  timestamp       NULL DEFAULT NULL,
+  `updated_at`  timestamp       NULL DEFAULT NULL,
+  `deleted_at`  timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `taisan_ma_unique` (`ma_tai_san`),
+  KEY `taisan_phong_id_foreign` (`phong_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Tài sản bàn giao trong phòng';
+
+-- ============================================================
+-- 15. VATTU — Vật tư / thiết bị chung
+-- FIX: chuẩn hóa naming về snake_case
+-- ============================================================
+CREATE TABLE `vattu` (
+  `id`               bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `phong_id`         bigint UNSIGNED NOT NULL,
+  `ten_vat_tu`       varchar(100)    NOT NULL,
+  `so_luong`         int             NOT NULL DEFAULT 1,
+  `tinh_trang`       varchar(100)    DEFAULT NULL,
+  `mo_ta`            text            DEFAULT NULL,
+  `ngay_mua`         date            DEFAULT NULL,
+  `thoi_gian_bao_hanh` varchar(50)   DEFAULT NULL,
+  `created_at`       timestamp       NULL DEFAULT NULL,
+  `updated_at`       timestamp       NULL DEFAULT NULL,
+  `deleted_at`       timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `vattu_phong_id_foreign` (`phong_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Vật tư thiết bị — FIX naming snake_case từ v1';
+
+-- ============================================================
+-- 16. LICH_SU_BAO_TRI — Lịch sử bảo trì
+-- FIX: chuẩn hóa naming về snake_case
+-- ============================================================
+CREATE TABLE `lich_su_bao_tri` (
+  `id`              bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `phong_id`        bigint UNSIGNED NOT NULL,
+  `vattu_id`        bigint UNSIGNED DEFAULT NULL,
+  `ngay_bao_tri`    date            NOT NULL,
+  `noi_dung`        text            DEFAULT NULL,
+  `chi_phi`         decimal(15,2)   NOT NULL DEFAULT 0.00,
+  `don_vi_thuc_hien` varchar(100)   DEFAULT NULL,
+  `nguoi_thuc_hien` varchar(100)    DEFAULT NULL,
+  `trang_thai`      enum('planned','in_progress','done','cancelled') DEFAULT 'planned',
+  `created_at`      timestamp       NULL DEFAULT NULL,
+  `updated_at`      timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bao_tri_phong_id_foreign` (`phong_id`),
+  KEY `bao_tri_vattu_id_foreign` (`vattu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Lịch sử bảo trì — FIX naming snake_case từ v1';
+
+-- ============================================================
+-- 17. KYLUAT — Kỷ luật sinh viên
+-- ============================================================
+CREATE TABLE `kyluat` (
+  `id`               bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sinhvien_id`      bigint UNSIGNED NOT NULL,
+  `tieu_de`          varchar(255)    NOT NULL,
+  `noi_dung`         text            NOT NULL,
+  `muc_do`           enum('low','medium','high','critical') NOT NULL DEFAULT 'low',
+  `ngay_vi_pham`     date            NOT NULL,
+  `hinh_thuc_xu_ly`  varchar(255)    DEFAULT NULL,
+  `created_at`       timestamp       NULL DEFAULT NULL,
+  `updated_at`       timestamp       NULL DEFAULT NULL,
+  `deleted_at`       timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `kyluat_sinhvien_id_foreign` (`sinhvien_id`),
+  KEY `kyluat_muc_do_index` (`muc_do`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Kỷ luật sinh viên';
+
+-- ============================================================
+-- 18. DANHGIA — Đánh giá phòng từ sinh viên
+-- ============================================================
+CREATE TABLE `danhgia` (
+  `id`          bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sinhvien_id` bigint UNSIGNED NOT NULL,
+  `phong_id`    bigint UNSIGNED NOT NULL,
+  `rating`      tinyint UNSIGNED NOT NULL DEFAULT 5 COMMENT '1-5 sao',
+  `binh_luan`   text            DEFAULT NULL,
+  `created_at`  timestamp       NULL DEFAULT NULL,
+  `updated_at`  timestamp       NULL DEFAULT NULL,
+  `deleted_at`  timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `danhgia_sinhvien_id_foreign` (`sinhvien_id`),
+  KEY `danhgia_phong_id_foreign` (`phong_id`),
+  KEY `danhgia_phong_created_index` (`phong_id`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Đánh giá phòng từ sinh viên đã từng ở';
+
+-- ============================================================
+-- 19. THONGBAO — Thông báo hệ thống
+-- ============================================================
+CREATE TABLE `thongbao` (
+  `id`              bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `tieu_de`         varchar(255)    NOT NULL,
+  `noi_dung`        text            NOT NULL,
+  `loai_thong_bao`  enum('general','payment','contract','discipline','maintenance')
+                    NOT NULL DEFAULT 'general',
+  `doi_tuong_nhan`  enum('all','guest','sinhvien','admin') NOT NULL DEFAULT 'all',
+  `created_at`      timestamp       NULL DEFAULT NULL,
+  `updated_at`      timestamp       NULL DEFAULT NULL,
+  `deleted_at`      timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `thongbao_loai_index` (`loai_thong_bao`),
+  KEY `thongbao_target_created_index` (`doi_tuong_nhan`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Thông báo hệ thống — gửi theo nhóm hoặc cá nhân';
+
+-- ============================================================
+-- 20. THONGBAO_USER — Pivot: ai nhận, đã đọc chưa
+-- FIX: thêm bảng này để track delivery & read status
+-- ============================================================
+CREATE TABLE `thongbao_user` (
+  `id`           bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `thongbao_id`  bigint UNSIGNED NOT NULL,
+  `user_id`      bigint UNSIGNED NOT NULL,
+  `da_doc`       tinyint(1)      NOT NULL DEFAULT 0,
+  `doc_luc`      timestamp       NULL DEFAULT NULL,
+  `created_at`   timestamp       NULL DEFAULT NULL,
+  `updated_at`   timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `thongbao_user_unique` (`thongbao_id`, `user_id`),
+  KEY `thongbao_user_user_id_foreign` (`user_id`),
+  KEY `thongbao_user_da_doc_index` (`da_doc`),
+  KEY `thongbao_user_user_doc_created_index` (`user_id`, `da_doc`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Pivot thông báo — user: track delivery & đã đọc';
+
+-- ============================================================
+-- 21. LIENHE — Liên hệ / phản hồi từ ngoài
+-- ============================================================
+CREATE TABLE `lienhe` (
+  `id`             bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ho_ten`         varchar(255)    NOT NULL,
+  `email`          varchar(255)    NOT NULL,
+  `noi_dung`       text            NOT NULL,
+  `trang_thai`     enum('chua_xu_ly','dang_xu_ly','da_xu_ly') NOT NULL DEFAULT 'chua_xu_ly',
+  `ghi_chu_admin`  text            DEFAULT NULL,
+  `created_at`     timestamp       NULL DEFAULT NULL,
+  `updated_at`     timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `lienhe_trang_thai_index` (`trang_thai`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Form liên hệ từ website — admin xử lý';
+
+-- ============================================================
+-- 22. CAUHINH — Cấu hình hệ thống (key-value)
+-- FIX: thêm nhom để load theo nhóm, tránh load cả bảng
+-- ============================================================
+CREATE TABLE `cauhinh` (
+  `id`         bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ten`        varchar(100)    NOT NULL COMMENT 'Key: phi_dich_vu, don_gia_dien...',
+  `giatri`     text            DEFAULT NULL COMMENT 'Value dạng string',
+  `nhom`       enum('pricing','system','contact') NOT NULL DEFAULT 'system'
+               COMMENT 'Nhóm để cache theo nhóm',
+  `mo_ta`      varchar(255)    DEFAULT NULL COMMENT 'Mô tả human-readable',
+  `created_at` timestamp       NULL DEFAULT NULL,
+  `updated_at` timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cauhinh_ten_unique` (`ten`),
+  KEY `cauhinh_nhom_index` (`nhom`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Cấu hình hệ thống — cache theo nhóm';
+
+-- ============================================================
+-- 23. NHAT_KY — Audit log (mọi thao tác quan trọng)
+-- ============================================================
+CREATE TABLE `nhat_ky` (
+  `id`          bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`     bigint UNSIGNED DEFAULT NULL COMMENT 'NULL nếu system/scheduler',
+  `hanh_dong`   enum('create','update','delete','restore','login','logout')
+                NOT NULL,
+  `ten_model`   varchar(100)    NOT NULL COMMENT 'Tên Model: Hopdong, Hoadon...',
+  `id_ban_ghi`  bigint UNSIGNED NOT NULL,
+  `du_lieu_cu`  json            DEFAULT NULL,
+  `du_lieu_moi` json            DEFAULT NULL,
+  `ip_address`  varchar(45)     DEFAULT NULL,
+  `created_at`  timestamp       NULL DEFAULT NULL,
+  `updated_at`  timestamp       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `nhat_ky_user_id_foreign` (`user_id`),
+  KEY `nhat_ky_ten_model_index` (`ten_model`),
+  KEY `nhat_ky_created_at_index` (`created_at`),
+  KEY `nhat_ky_user_created_index` (`user_id`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Audit trail — mọi thao tác có thể truy vết';
+
+-- ============================================================
+-- FOREIGN KEY CONSTRAINTS
+-- ============================================================
+
+-- toa_nha (root, không có FK ra ngoài)
+
+-- loai_phong (root, không có FK ra ngoài)
+
+-- phong
+ALTER TABLE `phong`
+  ADD CONSTRAINT `phong_toa_nha_id_fk`
+    FOREIGN KEY (`toa_nha_id`) REFERENCES `toa_nha` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `phong_loai_phong_id_fk`
+    FOREIGN KEY (`loai_phong_id`) REFERENCES `loai_phong` (`id`) ON DELETE RESTRICT;
+
+-- giuong
+ALTER TABLE `giuong`
+  ADD CONSTRAINT `giuong_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE CASCADE;
+
+-- Business CHECK constraints (MySQL 8.0.16+ / MariaDB 10.6+)
+ALTER TABLE `hopdong`
+  ADD CONSTRAINT `hopdong_ngay_hop_le_chk`
+    CHECK (`ngay_ket_thuc` >= `ngay_bat_dau`);
+
+ALTER TABLE `chi_so_dien_nuoc`
+  ADD CONSTRAINT `chi_so_hop_le_chk`
+    CHECK (`chi_so_moi` >= `chi_so_cu` AND `thang` BETWEEN 1 AND 12);
+
+ALTER TABLE `thanh_toan`
+  ADD CONSTRAINT `thanh_toan_so_tien_duong_chk`
+    CHECK (`so_tien` > 0);
+
+ALTER TABLE `danhgia`
+  ADD CONSTRAINT `danhgia_rating_hop_le_chk`
+    CHECK (`rating` BETWEEN 1 AND 5);
+
+ALTER TABLE `hoadon`
+  ADD CONSTRAINT `hoadon_tong_tien_hop_le_chk`
+    CHECK (`tong_tien` = (`tien_phong` + `tien_dien` + `tien_nuoc` + `phi_dich_vu`)),
+  ADD CONSTRAINT `hoadon_ngay_thanh_toan_chk`
+    CHECK ((`trang_thai` <> 'paid') OR (`ngay_thanh_toan` IS NOT NULL));
+
+-- sinhvien
+ALTER TABLE `sinhvien`
+  ADD CONSTRAINT `sinhvien_user_id_fk`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+-- dangky
+ALTER TABLE `dangky`
+  ADD CONSTRAINT `dangky_user_id_fk`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `dangky_toa_nha_id_fk`
+    FOREIGN KEY (`toa_nha_id`) REFERENCES `toa_nha` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `dangky_loai_phong_id_fk`
+    FOREIGN KEY (`loai_phong_id`) REFERENCES `loai_phong` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `dangky_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE SET NULL;
+
+-- hopdong
+ALTER TABLE `hopdong`
+  ADD CONSTRAINT `hopdong_sinhvien_id_fk`
+    FOREIGN KEY (`sinhvien_id`) REFERENCES `sinhvien` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `hopdong_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `hopdong_giuong_id_fk`
+    FOREIGN KEY (`giuong_id`) REFERENCES `giuong` (`id`) ON DELETE RESTRICT;
+
+-- chi_so_dien_nuoc
+ALTER TABLE `chi_so_dien_nuoc`
+  ADD CONSTRAINT `chi_so_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE CASCADE;
+
+-- hoadon
+ALTER TABLE `hoadon`
+  ADD CONSTRAINT `hoadon_hopdong_id_fk`
+    FOREIGN KEY (`hopdong_id`) REFERENCES `hopdong` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `hoadon_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE SET NULL;
+
+-- thanh_toan
+ALTER TABLE `thanh_toan`
+  ADD CONSTRAINT `thanh_toan_hoadon_id_fk`
+    FOREIGN KEY (`hoadon_id`) REFERENCES `hoadon` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `thanh_toan_nguoi_xac_nhan_fk`
+    FOREIGN KEY (`nguoi_xac_nhan`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+-- yeu_cau_gia_han
+ALTER TABLE `yeu_cau_gia_han`
+  ADD CONSTRAINT `gia_han_hopdong_id_fk`
+    FOREIGN KEY (`hopdong_id`) REFERENCES `hopdong` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `gia_han_sinhvien_id_fk`
+    FOREIGN KEY (`sinhvien_id`) REFERENCES `sinhvien` (`id`) ON DELETE CASCADE;
+
+-- baohong
+ALTER TABLE `baohong`
+  ADD CONSTRAINT `baohong_sinhvien_id_fk`
+    FOREIGN KEY (`sinhvien_id`) REFERENCES `sinhvien` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `baohong_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `baohong_giuong_id_fk`
+    FOREIGN KEY (`giuong_id`) REFERENCES `giuong` (`id`) ON DELETE SET NULL;
+
+-- taisan
+ALTER TABLE `taisan`
+  ADD CONSTRAINT `taisan_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE CASCADE;
+
+-- vattu
+ALTER TABLE `vattu`
+  ADD CONSTRAINT `vattu_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE CASCADE;
+
+-- lich_su_bao_tri
+ALTER TABLE `lich_su_bao_tri`
+  ADD CONSTRAINT `bao_tri_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bao_tri_vattu_id_fk`
+    FOREIGN KEY (`vattu_id`) REFERENCES `vattu` (`id`) ON DELETE SET NULL;
+
+-- kyluat
+ALTER TABLE `kyluat`
+  ADD CONSTRAINT `kyluat_sinhvien_id_fk`
+    FOREIGN KEY (`sinhvien_id`) REFERENCES `sinhvien` (`id`) ON DELETE CASCADE;
+
+-- danhgia
+ALTER TABLE `danhgia`
+  ADD CONSTRAINT `danhgia_sinhvien_id_fk`
+    FOREIGN KEY (`sinhvien_id`) REFERENCES `sinhvien` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `danhgia_phong_id_fk`
+    FOREIGN KEY (`phong_id`) REFERENCES `phong` (`id`) ON DELETE CASCADE;
+
+-- thongbao_user
+ALTER TABLE `thongbao_user`
+  ADD CONSTRAINT `thongbao_user_thongbao_id_fk`
+    FOREIGN KEY (`thongbao_id`) REFERENCES `thongbao` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `thongbao_user_user_id_fk`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+-- nhat_ky
+ALTER TABLE `nhat_ky`
+  ADD CONSTRAINT `nhat_ky_user_id_fk`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+-- ============================================================
+-- SEED DATA — Cấu hình mặc định
+-- ============================================================
+
+INSERT INTO `cauhinh` (`ten`, `giatri`, `nhom`, `mo_ta`, `created_at`, `updated_at`) VALUES
+('don_gia_dien',   '3500',                     'pricing', 'Đơn giá điện (VNĐ/kWh)',          NOW(), NOW()),
+('don_gia_nuoc',   '15000',                    'pricing', 'Đơn giá nước (VNĐ/m³)',            NOW(), NOW()),
+('phi_dich_vu',    '50000',                    'pricing', 'Phí dịch vụ hàng tháng (VNĐ)',     NOW(), NOW()),
+('phi_the_chan',   '1000000',                  'pricing', 'Tiền cọc thẻ chân (VNĐ)',          NOW(), NOW()),
+('ten_ktx',        'Ký túc xá Đại học',        'system',  'Tên hiển thị của KTX',             NOW(), NOW()),
+('so_ngay_canh_bao_hopdong', '30',             'system',  'Cảnh báo HĐ sắp hết hạn (ngày)',  NOW(), NOW()),
+('so_ngay_qua_han_hoadon',   '7',              'system',  'Số ngày quá hạn mới chuyển overdue', NOW(), NOW()),
+('email_lien_he',  'ktx@example.edu.vn',       'contact', 'Email liên hệ KTX',                NOW(), NOW()),
+('sdt_lien_he',    '024.3456.7890',            'contact', 'Số điện thoại liên hệ',            NOW(), NOW()),
+('dia_chi_ktx',    'Số 1, Đường Đại học',      'contact', 'Địa chỉ KTX',                      NOW(), NOW());
+
+-- Admin mặc định (password: Admin@123)
+INSERT INTO `users` (`name`, `email`, `password`, `vaitro`, `is_active`, `created_at`, `updated_at`) VALUES
+('System Admin', 'admin@ktx.local',
+ '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'admin', 1, NOW(), NOW());
+
+SET FOREIGN_KEY_CHECKS = 1;
+COMMIT;

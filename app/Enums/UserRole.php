@@ -4,26 +4,32 @@ namespace App\Enums;
 
 enum UserRole: string
 {
-    case Admin       = 'admin';
-    case AdminTruong = 'admin_truong';
-    case AdminToaNha = 'admin_toanha';
-    case SinhVien    = 'sinhvien';
-    case CuuSinhVien = 'cuu_sinhvien';
+    case Admin    = 'admin';
+    case SinhVien = 'sinhvien';
+    case Guest    = 'guest';
 
     public function label(): string
     {
         return match($this) {
-            self::Admin       => 'Quản trị viên hệ thống',
-            self::AdminTruong => 'Quản trị viên trường',
-            self::AdminToaNha => 'Quản lý tòa nhà',
-            self::SinhVien    => 'Sinh viên',
-            self::CuuSinhVien => 'Cựu sinh viên',
+            self::Admin    => 'Quản trị viên',
+            self::SinhVien => 'Sinh viên',
+            self::Guest    => 'Khách',
         };
     }
 
     public function isAdminGroup(): bool
     {
-        return in_array($this, [self::Admin, self::AdminTruong, self::AdminToaNha]);
+        return $this === self::Admin;
+    }
+
+    public function isSinhVien(): bool
+    {
+        return $this === self::SinhVien;
+    }
+
+    public function isGuest(): bool
+    {
+        return $this === self::Guest;
     }
 
     public static function values(): array

@@ -23,11 +23,10 @@ class LuuAccountRequest extends FormRequest
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'vaitro' => ['required', Rule::in([
                 UserRole::Admin->value,
-                UserRole::AdminTruong->value,
-                UserRole::AdminToaNha->value,
             ])],
             'is_active' => ['nullable', 'boolean'],
-            'toa_nha_id' => ['nullable', 'exists:toa_nhas,id'],
+            'toa_nha_id' => ['nullable', 'exists:toa_nha,id'],
+            'gender' => ['nullable', 'in:male,female,other'],
         ];
     }
 }

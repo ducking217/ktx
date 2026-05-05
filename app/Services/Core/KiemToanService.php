@@ -3,7 +3,7 @@
 namespace App\Services\Core;
 
 use App\Contracts\Core\KiemToanServiceInterface;
-use App\Models\TblLog;
+use App\Models\NhatKy;
 use Illuminate\Support\Facades\Auth;
 
 class KiemToanService implements KiemToanServiceInterface
@@ -13,13 +13,14 @@ class KiemToanService implements KiemToanServiceInterface
      */
     public function ghiNhatKy(string $hanhDong, string $tenModel, int $idBanGhi, ?array $duLieuCu = null, ?array $duLieuMoi = null): void
     {
-        TblLog::create([
+        NhatKy::create([
             'user_id' => Auth::id(),
             'hanh_dong' => $hanhDong, // create/update/delete
             'ten_model' => $tenModel,
             'id_ban_ghi' => $idBanGhi,
             'du_lieu_cu' => $duLieuCu,
             'du_lieu_moi' => $duLieuMoi,
+            'ip_address' => request()->ip(),
         ]);
     }
 
@@ -46,8 +47,8 @@ class KiemToanService implements KiemToanServiceInterface
             'update',
             'Hoadon',
             $hoadonId,
-            ['trangthaithanhtoan' => $trangThaiCu],
-            ['trangthaithanhtoan' => $trangThaiMoi]
+            ['trang_thai' => $trangThaiCu],
+            ['trang_thai' => $trangThaiMoi]
         );
     }
 
@@ -56,12 +57,14 @@ class KiemToanService implements KiemToanServiceInterface
      */
     public function ghiNhatKyDoiPhong(int $sinhvienId, int $phongCu, int $phongMoi): void
     {
+        // Trong v2, việc đổi phòng được quản lý qua Hopdong -> Giuong -> Phong.
+        // Log này hiện tại chỉ mang tính tham khảo hoặc cần refactor sâu hơn để ghi nhận chuyển giường.
         $this->ghiNhatKy(
-            'update',
+            'change_room_context',
             'Sinhvien',
             $sinhvienId,
-            ['phong_id' => $phongCu],
-            ['phong_id' => $phongMoi]
+            ['context' => 'Chuyển từ phòng ID ' . $phongCu],
+            ['context' => 'Sang phòng ID ' . $phongMoi]
         );
     }
 

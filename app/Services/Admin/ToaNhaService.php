@@ -11,12 +11,17 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ToaNhaService implements ToaNhaServiceInterface
 {
+    public function __construct(
+        private readonly \App\Contracts\Shared\NghiepVuPhongServiceInterface $nghiepVuPhongService
+    ) {}
+
     /**
      * @inheritDoc
      */
     public function danhSach(): Collection
     {
-        return ToaNha::withCount('danhsachphong')
+        return ToaNha::withCount('phongs')
+            ->withMax('phongs', 'tang')
             ->orderBy('ten_toa_nha')
             ->get();
     }
@@ -51,9 +56,21 @@ class ToaNhaService implements ToaNhaServiceInterface
      */
     public function xoa(ToaNha $toaNha): void
     {
-        // Kiểm tra số lượng phòng trước khi xóa
-        if ($toaNha->danhsachphong()->count() > 0) {
-            throw new Exception('Không thể xóa: Tòa nhà còn phòng đang hoạt động');
+        // Thử xóa toàn bộ các phòng trống trong tòa nhà trước
+        $phongs = $toaNha->phongs;
+        foreach ($phongs as $phong) {
+            $result = $this->nghiepVuPhongService->xoaPhong($phong->id);
+            if (!($result['success'] ?? false)) {
+                throw new Exception("Tòa nhà có phòng không thể xóa ({$phong->ten_phong}): " . $result['message']);
+            }
+        }
+
+        // Vì Phòng sử dụng SoftDeletes, chúng ta phải xóa cứng (forceDelete) 
+        // để không bị lỗi Foreign Key constraint khi xóa Tòa Nhà.
+        $phongsWithTrashed = $toaNha->phongs()->withTrashed()->get();
+        foreach ($phongsWithTrashed as $phong) {
+            $phong->giuongs()->withTrashed()->forceDelete();
+            $phong->forceDelete();
         }
 
         $toaNha->delete();

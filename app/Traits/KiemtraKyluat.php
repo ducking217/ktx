@@ -25,11 +25,11 @@ trait KiemtraKyluat
 
     private function laLoiTrongSauThang(Kyluat $kyluat, Carbon $mocSauThang): bool
     {
-        if (! $kyluat->ngayvipham) {
+        if (! $kyluat->ngay_vi_pham) {
             return false;
         }
 
-        $ngayViPham = $kyluat->ngayvipham instanceof Carbon ? $kyluat->ngayvipham : Carbon::parse($kyluat->ngayvipham);
+        $ngayViPham = $kyluat->ngay_vi_pham instanceof Carbon ? $kyluat->ngay_vi_pham : Carbon::parse($kyluat->ngay_vi_pham);
 
         return $ngayViPham->greaterThanOrEqualTo($mocSauThang);
     }
@@ -118,10 +118,10 @@ trait KiemtraKyluat
     private function dinhDangDanhSachLoi(Collection $loiConHieuLuc): array
     {
         return $loiConHieuLuc->map(function (Kyluat $kyluat, int $index) {
-            $ngay = $kyluat->ngayvipham ? Carbon::parse($kyluat->ngayvipham)->format('d/m/Y') : 'Khong ro ngay';
-            $mucDoRaw = $kyluat->mucdo;
+            $ngay = $kyluat->ngay_vi_pham ? Carbon::parse($kyluat->ngay_vi_pham)->format('d/m/Y') : 'Khong ro ngay';
+            $mucDoRaw = $kyluat->muc_do;
             $mucDo = $mucDoRaw instanceof \App\Enums\DisciplineLevel ? $mucDoRaw->label() : trim((string) ($mucDoRaw ?? 'Khong ro muc do'));
-            $noiDung = trim((string) ($kyluat->noidung ?? 'Khong co noi dung'));
+            $noiDung = trim((string) ($kyluat->noi_dung ?? 'Khong co noi dung'));
 
             return '#'.($index + 1).' ['.$ngay.'] '.$mucDo.': '.$noiDung;
         })->all();

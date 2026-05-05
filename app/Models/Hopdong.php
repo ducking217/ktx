@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\ContractStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Hopdong extends Model
@@ -14,94 +13,85 @@ class Hopdong extends Model
 
     protected $table = 'hopdong';
 
-    public static function trangThaiDangHieuLuc(): string
-    {
-        return \App\Enums\ContractStatus::Active->value;
-    }
-
-    public static function trangThaiDaThanhLy(): string
-    {
-        return \App\Enums\ContractStatus::Terminated->value;
-    }
-
-
-    private const ALLOWED_TRANSITIONS = [
-        'active' => [
-            'expired',
-            'terminated',
-        ],
-        'expired' => [
-            'terminated',
-        ],
-        'terminated' => [],
-    ];
-
     protected $fillable = [
         'sinhvien_id',
         'phong_id',
+        'giuong_id',
         'ngay_bat_dau',
         'ngay_ket_thuc',
-        'giaphong_luc_ky',
+        'gia_thuc_te',
+        'tien_coc',
         'trang_thai',
-        'ghichu',
-        'toa_nha_id',
+        'ghi_chu',
     ];
+
     protected $casts = [
-        'trang_thai' => ContractStatus::class,
+        'sinhvien_id' => 'integer',
+        'phong_id' => 'integer',
+        'giuong_id' => 'integer',
         'ngay_bat_dau' => 'date',
         'ngay_ket_thuc' => 'date',
+        'gia_thuc_te' => 'integer',
+        'tien_coc' => 'integer',
+        'trang_thai' => ContractStatus::class,
     ];
 
-    public function getMaHdAttribute(): string
+    public function getMaHdAttribute(): ?string
     {
-        return 'CONTRACT' . str_pad((string)$this->id, 6, '0', STR_PAD_LEFT);
+        if (!$this->id) {
+            return null;
+        }
+
+        return 'HD-' . str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
     }
 
-    public function sinhvien(): BelongsTo
+    public function sinhvien()
     {
         return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
     }
 
-    public function phong(): BelongsTo
+    public function giuong()
     {
-        return $this->belongsTo(Phong::class, 'phong_id');
+        return $this->belongsTo(Giuong::class, 'giuong_id');
     }
 
-    public function canTransitionTo(string|ContractStatus $targetState): bool
+    public function hoadons()
     {
-        $currentState = $this->trang_thai instanceof ContractStatus 
-            ? $this->trang_thai->value 
-            : $this->trang_thai;
-
-        $targetValue = $targetState instanceof ContractStatus 
-            ? $targetState->value 
-            : $targetState;
-
-        if (! array_key_exists($currentState, self::ALLOWED_TRANSITIONS)) {
-            return false;
-        }
-
-        return in_array($targetValue, self::ALLOWED_TRANSITIONS[$currentState], true);
+        return $this->hasMany(Hoadon::class, 'hopdong_id');
     }
 
-    public function transitionTo(string|ContractStatus $targetState, ?string $note = null): bool
+    // ─── Compatibility Helpers ────────────────────────────────────────────────
+
+    /**
+     * Truy xuất Phong thông qua Giuong.
+     * @deprecated Dùng ->giuong->phong thay thế.
+     */
+    public function getPhongAttribute(): ?Phong
     {
-        $targetValue = $targetState instanceof ContractStatus 
-            ? $targetState->value 
-            : $targetState;
-
-        if (! $this->canTransitionTo($targetValue)) {
-            return false;
-        }
-
-        return $this->update([
-            'trang_thai' => $targetValue,
-            'ghichu' => $note,
-        ]);
+        return $this->relationLoaded('giuong') ? $this->giuong?->phong : $this->giuong?->phong;
     }
 
-    public function toanha(): BelongsTo
+    /**
+     * Alias để Eager Load: with('phong') → đổi thành with('giuong.phong').
+     * Dùng cho các chỗ cũ eager-load 'phong' trực tiếp trên hopdong.
+     */
+    public function phong()
     {
-        return $this->belongsTo(ToaNha::class, 'toa_nha_id');
+        return $this->hasOneThrough(
+            Phong::class,
+            Giuong::class,
+            'id',        // giuong.id
+            'id',        // phong.id
+            'giuong_id', // hopdong.giuong_id
+            'phong_id'   // giuong.phong_id
+        );
+    }
+
+    /**
+     * Chuyển đổi trạng thái hợp đồng.
+     */
+    public function transitionTo(string $newStatus): bool
+    {
+        return $this->update(['trang_thai' => $newStatus]);
     }
 }

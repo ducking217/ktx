@@ -19,16 +19,16 @@ class KyLuatSeeder extends Seeder
         if ($sinhVien) {
             Kyluat::create([
                 'sinhvien_id' => $sinhVien->id,
-                'noidung' => 'Sử dụng thiết bị điện công suất lớn trái quy định (Bếp điện)',
-                'ngayvipham' => now()->subDays(5),
-                'mucdo' => DisciplineLevel::Medium->value,
+                'noi_dung' => 'Sử dụng thiết bị điện công suất lớn trái quy định (Bếp điện)',
+                'ngay_vi_pham' => now()->subDays(5),
+                'muc_do' => DisciplineLevel::Medium->value,
             ]);
 
             Kyluat::create([
                 'sinhvien_id' => $sinhVien->id,
-                'noidung' => 'Về muộn sau 23h không có lý do chính đáng',
-                'ngayvipham' => now()->subDays(2),
-                'mucdo' => DisciplineLevel::Low->value,
+                'noi_dung' => 'Về muộn sau 23h không có lý do chính đáng',
+                'ngay_vi_pham' => now()->subDays(2),
+                'muc_do' => DisciplineLevel::Low->value,
             ]);
         }
     }

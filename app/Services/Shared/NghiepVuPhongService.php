@@ -14,14 +14,28 @@ class NghiepVuPhongService implements NghiepVuPhongServiceInterface
 
     public function luuPhong(array $data): array
     {
-        try {
-            $data['dango'] = 0;
-            Phong::create($data);
-            return ['success' => true, 'message' => 'Thêm phòng thành công.'];
-        } catch (\Throwable $e) {
-            Log::error("Store room failed: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()];
-        }
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            try {
+                // 1. Tạo phòng
+                $phong = Phong::create($data);
+
+                // 2. Tự động tạo giường dựa trên sức chứa của Loại phòng
+                $loaiPhong = $phong->loaiphong;
+                if ($loaiPhong) {
+                    for ($i = 1; $i <= $loaiPhong->suc_chua; $i++) {
+                        $phong->giuongs()->create([
+                            'ma_giuong' => $phong->ten_phong . '-G' . $i,
+                            'trang_thai' => \App\Enums\BedStatus::Available,
+                        ]);
+                    }
+                }
+
+                return ['success' => true, 'message' => 'Thêm phòng và khởi tạo ' . ($loaiPhong->suc_chua ?? 0) . ' giường thành công.'];
+            } catch (\Throwable $e) {
+                Log::error("Store room failed: " . $e->getMessage());
+                return ['success' => false, 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()];
+            }
+        });
     }
 
     public function capNhatPhong(int $id, array $data): array
@@ -40,33 +54,41 @@ class NghiepVuPhongService implements NghiepVuPhongServiceInterface
 
     public function xoaPhong(int $id): array
     {
-        try {
-            $phong = Phong::find($id);
-            if (!$phong) return ['success' => false, 'message' => 'Không tìm thấy phòng.'];
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+            try {
+                $phong = Phong::with('giuongs')->lockForUpdate()->find($id);
+                if (!$phong) return ['success' => false, 'message' => 'Không tìm thấy phòng.'];
 
-            if ($blockMessage = $this->kiemTraRanhBuocXoa($phong)) {
-                return ['success' => false, 'message' => $blockMessage];
+                if ($blockMessage = $this->kiemTraRanhBuocXoa($phong)) {
+                    return ['success' => false, 'message' => $blockMessage];
+                }
+
+                $phong->delete();
+                return ['success' => true, 'message' => 'Xóa phòng thành công.'];
+            } catch (\Throwable $e) {
+                Log::error("Delete room failed: " . $e->getMessage());
+                return ['success' => false, 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()];
             }
-
-            $phong->delete();
-            return ['success' => true, 'message' => 'Xóa phòng thành công.'];
-        } catch (\Throwable $e) {
-            Log::error("Delete room failed: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()];
-        }
+        });
     }
 
     private function kiemTraRanhBuocXoa(Phong $phong): ?string
     {
-        if ($phong->dango > 0) {
-            return 'Phòng vẫn còn sinh viên đang ở.';
+        // 1. Kiểm tra xem có giường nào đang có người ở không
+        $hasOccupiedBed = $phong->giuongs()->where('trang_thai', \App\Enums\BedStatus::Occupied)->exists();
+        if ($hasOccupiedBed) {
+            return 'Phòng vẫn còn giường đang có sinh viên cư trú.';
         }
-        if ($phong->danhsachhopdong()->where('trang_thai', Hopdong::trangThaiDangHieuLuc())->exists()) {
-            return 'Phòng còn hợp đồng đang hiệu lực.';
+
+        // 2. Kiểm tra xem có hợp đồng nào đang hiệu lực không
+        $hasActiveContract = \App\Models\Hopdong::where('phong_id', $phong->id)
+            ->where('trang_thai', \App\Enums\ContractStatus::Active)
+            ->exists();
+
+        if ($hasActiveContract) {
+            return 'Phòng còn hợp đồng cư trú đang hiệu lực.';
         }
-        if ($phong->danhsachhopdong()->exists() || $phong->danhsachhoadon()->exists()) {
-            return 'Phòng đã có dữ liệu lịch sử, không thể xóa vật lý.';
-        }
+
         return null;
     }
 }

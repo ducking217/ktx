@@ -9,6 +9,7 @@ enum RegistrationStatus: string
     case Approved = 'approved';
     case Completed = 'completed';
     case Rejected = 'rejected';
+    case Cancelled = 'cancelled';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum RegistrationStatus: string
             self::Approved => 'Đã duyệt',
             self::Completed => 'Hoàn tất',
             self::Rejected => 'Từ chối',
+            self::Cancelled => 'Đã hủy',
         };
     }
 

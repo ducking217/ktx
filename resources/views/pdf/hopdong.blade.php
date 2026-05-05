@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Hợp đồng {{ $hopdong->ma_hd }}</title>
+    <title>Hợp đồng {{ $hopdong->ma_hd ?? ('HD-' . str_pad((string) ($hopdong->id ?? 0), 6, '0', STR_PAD_LEFT)) }}</title>
     <style>
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -67,12 +67,25 @@
     </style>
 </head>
 <body>
+    @php
+        $maHopDong = $hopdong->ma_hd ?? ('HD-' . str_pad((string) ($hopdong->id ?? 0), 6, '0', STR_PAD_LEFT));
+        $sinhvien = $hopdong->sinhvien;
+        $user = $sinhvien?->user;
+
+        $ngaySinh = $user?->dob;
+        $ngaySinhHienThi = $ngaySinh?->format('d/m/Y') ?? '........';
+
+        $soGiayTo = $user?->id_card ?? '................';
+        $soDienThoai = $user?->phone ?? '................';
+        $diaChi = $user?->address ?? null;
+    @endphp
+
     <div class="header">
         <h2>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h2>
         <h3>Độc lập - Tự do - Hạnh phúc</h3>
         <hr style="width: 30%; margin: 10px auto;">
         <h1>HỢP ĐỒNG THUÊ CHỖ Ở NỘI TRÚ</h1>
-        <p>Số: {{ $hopdong->ma_hd }}</p>
+        <p>Số: {{ $maHopDong }}</p>
     </div>
 
     <div class="terms">
@@ -86,47 +99,33 @@
             <tr>
                 <td class="label">Họ và tên:</td>
                 <td>
-                    @isset($hopdong->sinhvien->taikhoan)
-                        {{ $hopdong->sinhvien->taikhoan->name }}
-                    @else
-                        ........
-                    @endisset
+                    {{ $user?->name ?? '........' }}
                 </td>
             </tr>
             <tr>
                 <td class="label">Mã sinh viên:</td>
                 <td>
-                    @isset($hopdong->sinhvien)
-                        {{ $hopdong->sinhvien->masinhvien ?? '........' }}
-                    @else
-                        ........
-                    @endisset
+                    {{ $sinhvien?->ma_sinh_vien ?? '........' }}
                 </td>
             </tr>
             <tr>
                 <td class="label">Ngày sinh:</td>
-                <td>{{ $hopdong->sinhvien->ngaysinh ? date('d/m/Y', strtotime($hopdong->sinhvien->ngaysinh)) : '........' }}</td>
+                <td>{{ $ngaySinhHienThi }}</td>
             </tr>
             <tr>
                 <td class="label">Số CMND/CCCD:</td>
-                <td>
-                    @isset($hopdong->sinhvien)
-                        {{ $hopdong->sinhvien->so_cccd ?? '................' }}
-                    @else
-                        ................
-                    @endisset
-                </td>
+                <td>{{ $soGiayTo }}</td>
             </tr>
             <tr>
                 <td class="label">Số điện thoại:</td>
-                <td>
-                    @isset($hopdong->sinhvien)
-                        {{ $hopdong->sinhvien->sodienthoai ?? '................' }}
-                    @else
-                        ................
-                    @endisset
-                </td>
+                <td>{{ $soDienThoai }}</td>
             </tr>
+            @if(is_string($diaChi) && trim($diaChi) !== '')
+                <tr>
+                    <td class="label">Địa chỉ:</td>
+                    <td>{{ $diaChi }}</td>
+                </tr>
+            @endif
         </table>
 
         <div class="section-title">ĐIỀU 1: NỘI DUNG HỢP ĐỒNG</div>
@@ -135,11 +134,7 @@
             <tr>
                 <td class="label">Phòng:</td>
                 <td>
-                    @isset($hopdong->phong)
-                        {{ $hopdong->phong->tenphong }}
-                    @else
-                        ........
-                    @endisset
+                    {{ $hopdong->phong?->ten_phong ?? $hopdong->phong?->tenphong ?? '........' }}
                 </td>
             </tr>
             <tr>
@@ -162,10 +157,10 @@
             <tr>
                 <td class="label">Giá thuê:</td>
                 <td>
-                    @if(!is_null($hopdong->giaphong_luc_ky))
-                        {{ number_format($hopdong->giaphong_luc_ky) }} VNĐ/tháng
-                    @elseif(isset($hopdong->phong))
-                        {{ number_format($hopdong->phong->giaphong) }} VNĐ/tháng
+                    @if(!is_null($hopdong->gia_thuc_te))
+                        {{ number_format((int) $hopdong->gia_thuc_te) }} VNĐ/tháng
+                    @elseif($hopdong->phong)
+                        {{ number_format((int) $hopdong->phong->giaphong) }} VNĐ/tháng
                     @else
                         ........
                     @endif
@@ -191,13 +186,7 @@
         <div class="signature-box right">
             <p style="font-weight: bold;">ĐẠI DIỆN BÊN B</p>
             <br><br><br><br>
-            <p>
-                @isset($hopdong->sinhvien->taikhoan)
-                    {{ $hopdong->sinhvien->taikhoan->name }}
-                @else
-                    ........
-                @endisset
-            </p>
+            <p>{{ $user?->name ?? '........' }}</p>
         </div>
         <div class="clear"></div>
     </div>

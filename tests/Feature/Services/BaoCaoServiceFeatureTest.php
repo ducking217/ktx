@@ -30,27 +30,27 @@ class BaoCaoServiceFeatureTest extends TestCase
      */
     public function test_tinh_doanh_thu_theo_thang_chinh_xac(): void
     {
-        $toaNha = ToaNha::factory()->create();
-        $phong = Phong::factory()->create(['toa_nha_id' => $toaNha->id]);
+        $phong = Phong::factory()->create();
 
         // Seed: tạo 3 Hoadon paid trong tháng 1/2026 (tổng 9tr)
+        // Lưu ý: tổng_tiền phải bằng sum các thành phần để pass check constraint
+        $tienMoiHoadon = 3000000;
         Hoadon::factory()->count(3)->create([
             'phong_id' => $phong->id,
-            'tongtien' => 3000000,
-            'trangthaithanhtoan' => InvoiceStatus::Paid,
+            'tien_phong' => $tienMoiHoadon,
+            'tien_dien' => 0,
+            'tien_nuoc' => 0,
+            'phi_dich_vu' => 0,
+            'tong_tien' => $tienMoiHoadon,
+            'trang_thai' => InvoiceStatus::Paid,
             'ngay_thanh_toan' => Carbon::parse('2026-01-10'),
-            'thang' => 1,
-            'nam' => 2026
         ]);
 
-        // Seed: tạo 2 Hoadon pending trong tháng 1/2026 (không tính)
+        // Seed: tạo 2 Hoadon unpaid trong tháng 1/2026 (không tính)
         Hoadon::factory()->count(2)->create([
             'phong_id' => $phong->id,
-            'tongtien' => 3000000,
-            'trangthaithanhtoan' => InvoiceStatus::Pending,
+            'trang_thai' => InvoiceStatus::Unpaid,
             'ngay_thanh_toan' => null,
-            'thang' => 1,
-            'nam' => 2026
         ]);
 
         $data = $this->baoCaoService->layDuLieuTaiChinh();
@@ -61,7 +61,6 @@ class BaoCaoServiceFeatureTest extends TestCase
         $this->assertNotNull($thang1);
         $this->assertEquals(9000000, (float) $thang1->tong);
         
-        // Do query lấy 12 tháng gần nhất, nếu chỉ seed tháng 1 thì count doanh thu các tháng khác nên là 0 hoặc không tồn tại
         $this->assertCount(1, $doanhThu);
     }
 
@@ -70,19 +69,23 @@ class BaoCaoServiceFeatureTest extends TestCase
      */
     public function test_ty_le_lap_day_tinh_theo_so_phong_co_sinhvien(): void
     {
-        $toaNha = ToaNha::factory()->create();
+        // 7 phòng có người (Giuong có trạng thái Occupied)
+        for ($i = 0; $i < 7; $i++) {
+            $phong = Phong::factory()->create();
+            \App\Models\Giuong::factory()->create([
+                'phong_id' => $phong->id,
+                'trang_thai' => \App\Enums\BedStatus::Occupied
+            ]);
+        }
         
-        // Seed: tạo 10 Phong
-        // 7 phòng có người (dango > 0)
-        Phong::factory()->count(7)->create([
-            'toa_nha_id' => $toaNha->id,
-            'dango' => 1
-        ]);
-        // 3 phòng trống
-        Phong::factory()->count(3)->create([
-            'toa_nha_id' => $toaNha->id,
-            'dango' => 0
-        ]);
+        // 3 phòng trống (Giuong có trạng thái Available)
+        for ($i = 0; $i < 3; $i++) {
+            $phong = Phong::factory()->create();
+            \App\Models\Giuong::factory()->create([
+                'phong_id' => $phong->id,
+                'trang_thai' => \App\Enums\BedStatus::Available
+            ]);
+        }
 
         $data = $this->baoCaoService->layDuLieuTaiChinh();
         
@@ -95,35 +98,33 @@ class BaoCaoServiceFeatureTest extends TestCase
      */
     public function test_chi_tinh_hoa_don_da_thanh_toan(): void
     {
-        $toaNha = ToaNha::factory()->create();
-        $phong = Phong::factory()->create(['toa_nha_id' => $toaNha->id]);
+        $phong = Phong::factory()->create();
 
         // 1 Hoadon paid (5tr) - tính vào doanh thu tháng này
+        $tienPaid = 5000000;
         Hoadon::factory()->create([
             'phong_id' => $phong->id,
-            'tongtien' => 5000000,
-            'trangthaithanhtoan' => InvoiceStatus::Paid,
-            'thang' => 1,
-            'nam' => 2026,
+            'tien_phong' => $tienPaid,
+            'tien_dien' => 0,
+            'tien_nuoc' => 0,
+            'phi_dich_vu' => 0,
+            'tong_tien' => $tienPaid,
+            'trang_thai' => InvoiceStatus::Paid,
             'ngay_thanh_toan' => Carbon::parse('2026-01-10')
         ]);
 
-        // 1 Hoadon pending (3tr) - không tính
+        // 1 Hoadon unpaid (3tr) - không tính
         Hoadon::factory()->create([
             'phong_id' => $phong->id,
-            'tongtien' => 3000000,
-            'trangthaithanhtoan' => InvoiceStatus::Pending,
-            'thang' => 1,
-            'nam' => 2026
+            'trang_thai' => InvoiceStatus::Unpaid,
+            'ngay_thanh_toan' => null,
         ]);
 
         // 1 Hoadon overdue (2tr) - không tính
         Hoadon::factory()->create([
             'phong_id' => $phong->id,
-            'tongtien' => 2000000,
-            'trangthaithanhtoan' => InvoiceStatus::Overdue,
-            'thang' => 1,
-            'nam' => 2026
+            'trang_thai' => InvoiceStatus::Overdue,
+            'ngay_thanh_toan' => null,
         ]);
 
         $data = $this->baoCaoService->layDuLieuTaiChinh();
@@ -137,40 +138,61 @@ class BaoCaoServiceFeatureTest extends TestCase
      */
     public function test_top_phong_sap_xep_giam_dan(): void
     {
-        $toaNha = ToaNha::factory()->create();
-        
-        $phongA = Phong::factory()->create(['toa_nha_id' => $toaNha->id, 'tenphong' => 'A']);
-        $phongB = Phong::factory()->create(['toa_nha_id' => $toaNha->id, 'tenphong' => 'B']);
-        $phongC = Phong::factory()->create(['toa_nha_id' => $toaNha->id, 'tenphong' => 'C']);
+        $phongA = Phong::factory()->create(['ten_phong' => 'A']);
+        $phongB = Phong::factory()->create(['ten_phong' => 'B']);
+        $phongC = Phong::factory()->create(['ten_phong' => 'C']);
 
         // phong A = 10tr
+        $tienA = 10000000;
         Hoadon::factory()->create([
             'phong_id' => $phongA->id,
-            'tongtien' => 10000000,
-            'trangthaithanhtoan' => InvoiceStatus::Paid
+            'tien_phong' => $tienA,
+            'tien_dien' => 0,
+            'tien_nuoc' => 0,
+            'phi_dich_vu' => 0,
+            'tong_tien' => $tienA,
+            'trang_thai' => InvoiceStatus::Paid,
+            'ngay_thanh_toan' => Carbon::parse('2026-01-10'),
         ]);
 
         // phong B = 5tr
+        $tienB = 5000000;
         Hoadon::factory()->create([
             'phong_id' => $phongB->id,
-            'tongtien' => 5000000,
-            'trangthaithanhtoan' => InvoiceStatus::Paid
+            'tien_phong' => $tienB,
+            'tien_dien' => 0,
+            'tien_nuoc' => 0,
+            'phi_dich_vu' => 0,
+            'tong_tien' => $tienB,
+            'trang_thai' => InvoiceStatus::Paid,
+            'ngay_thanh_toan' => Carbon::parse('2026-01-10'),
         ]);
 
         // phong C = 8tr
+        $tienC = 8000000;
         Hoadon::factory()->create([
             'phong_id' => $phongC->id,
-            'tongtien' => 8000000,
-            'trangthaithanhtoan' => InvoiceStatus::Paid
+            'tien_phong' => $tienC,
+            'tien_dien' => 0,
+            'tien_nuoc' => 0,
+            'phi_dich_vu' => 0,
+            'tong_tien' => $tienC,
+            'trang_thai' => InvoiceStatus::Paid,
+            'ngay_thanh_toan' => Carbon::parse('2026-01-10'),
         ]);
 
         $data = $this->baoCaoService->layDuLieuTaiChinh();
         $topPhong = $data['topPhong'];
 
         // Assert: thứ tự trả về là A (10tr), C (8tr), B (5tr)
+        // Lưu ý: Trong BaoCaoService v2, topPhong trả về list objects có {phong_id, tong}
+        $this->assertCount(3, $topPhong);
         $this->assertEquals($phongA->id, $topPhong[0]->phong_id);
+        $this->assertEquals(10000000, (float) $topPhong[0]->tong);
         $this->assertEquals($phongC->id, $topPhong[1]->phong_id);
+        $this->assertEquals(8000000, (float) $topPhong[1]->tong);
         $this->assertEquals($phongB->id, $topPhong[2]->phong_id);
+        $this->assertEquals(5000000, (float) $topPhong[2]->tong);
     }
 
     protected function tearDown(): void

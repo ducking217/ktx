@@ -16,8 +16,8 @@ class CapNhatKyLuatRequest extends FormRequest
     {
         return [
             'noidung' => ['required', 'string'],
-            'ngayvipham' => ['required', 'date'],
-            'mucdo' => ['required', 'string', 'in:' . implode(',', DisciplineLevel::values())],
+            'ngay_vi_pham' => ['required', 'date'],
+            'muc_do' => ['required', 'string', 'in:' . implode(',', DisciplineLevel::values())],
         ];
     }
 }

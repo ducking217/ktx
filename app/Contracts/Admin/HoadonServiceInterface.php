@@ -49,6 +49,11 @@ interface HoadonServiceInterface
     public function layChiTietHoaDonSinhVien(int $id): array;
 
     /**
+     * Sinh viên gửi yêu cầu xác nhận thanh toán hóa đơn (chuyển khoản).
+     */
+    public function yeuCauXacNhanThanhToanSinhVien(int $id, array $data): array;
+
+    /**
      * Xác nhận thanh toán hóa đơn.
      */
     public function xacNhanThanhToan(int $id): array;

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Cauhinh;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -16,9 +17,14 @@ class PaymentRequestMail extends Mailable
     /**
      * Create a new message instance.
      */
+    public int $soTien;
+
     public function __construct(public \App\Models\Dangky $dangky)
     {
-        //
+        $raw = (int) (Cauhinh::query()
+            ->where('ten', 'phi_the_chan')
+            ->value('giatri') ?? 1000000);
+        $this->soTien = max(1000000, $raw);
     }
 
     /**

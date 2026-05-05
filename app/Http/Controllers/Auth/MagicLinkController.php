@@ -25,7 +25,12 @@ class MagicLinkController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('student.dashboard')
-            ->with(['toast_loai' => 'thanhcong', 'toast_noidung' => 'Chào mừng bạn quay trở lại!']);
+        $request->session()->put('magic_login', true);
+
+        return redirect()->route('profile.edit')
+            ->with([
+                'toast_loai' => 'thanhcong',
+                'toast_noidung' => 'Đăng nhập thành công. Vui lòng đặt mật khẩu để lần sau đăng nhập nhanh hơn.',
+            ]);
     }
 }

@@ -55,6 +55,7 @@ use App\Services\Admin\ToaNhaService;
 use App\Models\Baohong;
 use App\Models\Cauhinh;
 use App\Models\Danhgia;
+use App\Models\Dangky;
 use App\Models\Hopdong;
 use App\Models\Hoadon;
 use App\Models\Kyluat;
@@ -81,8 +82,10 @@ use App\Observers\ThongbaoObserver;
 use App\Observers\VattuObserver;
 use App\Observers\YeuCauGiaHanObserver;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use App\View\Components\Badge;
+use App\Enums\RegistrationStatus;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -111,6 +114,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ThongbaoServiceInterface::class, ThongbaoService::class);
         $this->app->bind(TrangChuServiceInterface::class, TrangChuService::class);
         $this->app->bind(KyluatServiceInterface::class, KyluatService::class);
+        $this->app->bind(TaiChinhServiceInterface::class, TaiChinhService::class);
         $this->app->bind(TaiChinhServiceInterface::class, TaiChinhService::class);
         $this->app->bind(BaoTriServiceInterface::class, BaoTriService::class);
         $this->app->bind(TienIchServiceInterface::class, TienIchService::class);
@@ -142,6 +146,20 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('badge', function ($expression) {
             return "<?php echo \App\View\Components\Badge::renderDirect($expression); ?>";
+        });
+
+        View::composer(['admin.partials.navbar', 'admin.partials.sidebar'], function ($view) {
+            $dangkyChoXuLy = Dangky::where('trang_thai', RegistrationStatus::Pending->value)->count();
+            $soYeuCauTraPhongMoi = Dangky::where('trang_thai', RegistrationStatus::Pending->value)
+                ->where('ghi_chu', 'TRA_PHONG')
+                ->count();
+            $lienHeChoXuLy = Lienhe::where('trang_thai', Lienhe::TRANG_THAI_CHUA_XU_LY)->count();
+
+            $view->with([
+                'dangkychoxuly' => $dangkyChoXuLy,
+                'soYeuCauTraPhongMoi' => $soYeuCauTraPhongMoi,
+                'lienhechoxuly' => $lienHeChoXuLy,
+            ]);
         });
     }
 }

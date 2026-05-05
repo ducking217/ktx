@@ -23,71 +23,54 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('dangky.review', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('hopdong.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('hoadon.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('cauhinh.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
             ]);
         });
 
         Gate::define('kyluat.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('phong.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('toanha.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('baohong.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('sinhvien.manage', function (User $user): bool {
             return $user->hasAnyRole([
                 \App\Enums\UserRole::Admin,
-                \App\Enums\UserRole::AdminTruong,
-                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 

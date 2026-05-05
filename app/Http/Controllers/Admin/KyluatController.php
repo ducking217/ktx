@@ -19,7 +19,7 @@ class KyluatController extends Controller
         return view('admin.kyluat.danhsach', [
             ...$data,
             'selectedSinhvien' => $request->query('sinhvien_id', ''),
-            'selectedMucDo' => $request->query('mucdo', ''),
+            'selectedMucDo' => $request->query('muc_do', ''),
         ]);
     }
 
@@ -33,9 +33,11 @@ class KyluatController extends Controller
     {
         $duLieu = $request->validate([
             'sinhvien_id' => \App\Rules\CommonRules::sinhvienId(),
-            'noidung' => ['required', 'string'],
-            'ngayvipham' => ['required', 'date'],
-            'mucdo' => ['required', 'string', 'in:' . implode(',', DisciplineLevel::values())],
+            'tieu_de' => ['required', 'string', 'max:255'],
+            'noi_dung' => ['required', 'string'],
+            'ngay_vi_pham' => ['required', 'date'],
+            'muc_do' => ['required', 'string', 'in:' . implode(',', DisciplineLevel::values())],
+            'hinh_thuc_xu_ly' => ['nullable', 'string', 'max:255'],
         ]);
 
         $result = $this->kyLuatService->saveKyluat($duLieu);
@@ -46,12 +48,21 @@ class KyluatController extends Controller
     public function updateDiscipline(Request $request, int $id)
     {
         $duLieu = $request->validate([
-            'noidung' => ['required', 'string'],
-            'ngayvipham' => ['required', 'date'],
-            'mucdo' => ['required', 'string', 'in:' . implode(',', DisciplineLevel::values())],
+            'tieu_de' => ['required', 'string', 'max:255'],
+            'noi_dung' => ['required', 'string'],
+            'ngay_vi_pham' => ['required', 'date'],
+            'muc_do' => ['required', 'string', 'in:' . implode(',', DisciplineLevel::values())],
+            'hinh_thuc_xu_ly' => ['nullable', 'string', 'max:255'],
         ]);
 
         $result = $this->kyLuatService->saveKyluat($duLieu, $id);
+        $type = $result['toast_loai'] ?? ($result['success'] ? 'thanhcong' : 'loi');
+        return redirect()->back()->with(['toast_loai' => $type, 'toast_noidung' => $result['toast_noidung'] ?? $result['message']]);
+    }
+
+    public function destroyDiscipline(int $id)
+    {
+        $result = $this->kyLuatService->deleteKyluat($id);
         $type = $result['toast_loai'] ?? ($result['success'] ? 'thanhcong' : 'loi');
         return redirect()->back()->with(['toast_loai' => $type, 'toast_noidung' => $result['toast_noidung'] ?? $result['message']]);
     }

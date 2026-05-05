@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\TblLog;
+use App\Models\NhatKy;
 use App\Models\User;
 use App\Enums\UserRole;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class ActivityLogController extends Controller
             abort(403, 'Bạn không có quyền truy cập trang này.');
         }
 
-        $query = TblLog::query()->with('user');
+        $query = NhatKy::query()->with('user');
 
         // Filter theo model
         if ($request->filled('model')) {
@@ -46,9 +46,9 @@ class ActivityLogController extends Controller
         $logs = $query->orderByDesc('created_at')->paginate(50)->withQueryString();
 
         // Lấy danh sách để fill vào filter dropdowns
-        $models = TblLog::distinct()->pluck('ten_model');
-        $admins = User::whereIn('vaitro', [UserRole::Admin, UserRole::AdminTruong, UserRole::AdminToaNha])->get();
-        $actions = TblLog::distinct()->pluck('hanh_dong');
+        $models = NhatKy::distinct()->pluck('ten_model');
+        $admins = User::whereIn('vaitro', [UserRole::Admin])->get();
+        $actions = NhatKy::distinct()->pluck('hanh_dong');
 
         return view('admin.activity-log', compact('logs', 'models', 'admins', 'actions'));
     }

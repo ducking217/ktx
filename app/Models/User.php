@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Gender;
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,53 +16,37 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
-
-    /**
-     * Chuyển sinh viên sang trạng thái Cựu sinh viên (Read-only access)
-     */
-    public function moveToExStudent(): bool
-    {
-        return $this->update([
-            'vaitro' => \App\Enums\UserRole::CuuSinhVien,
-            'is_active' => true // Still active to allow login
-        ]);
-    }
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
         'vaitro',
-        'gioitinh',
         'is_active',
         'toa_nha_id',
+        'phone',
+        'phone_blind_index',
+        'id_card',
+        'id_card_blind_index',
+        'gender',
+        'dob',
+        'address',
+        'ethnicity',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
+        'phone',
+        'id_card',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_active' => 'boolean',
-        'vaitro' => \App\Enums\UserRole::class,
+        'vaitro' => UserRole::class,
+        'gender' => Gender::class,
+        'dob' => 'date',
         'toa_nha_id' => 'integer',
     ];
 
@@ -70,39 +55,69 @@ class User extends Authenticatable
         return $this->belongsTo(ToaNha::class, 'toa_nha_id');
     }
 
-    /**
-     * Mối quan hệ 1-1 với bảng sinhvien
-     */
     public function sinhvien()
     {
         return $this->hasOne(Sinhvien::class, 'user_id');
     }
 
-    public function hasAnyRole(array $roles): bool
+    public function admin_profile()
     {
-        $currentRole = $this->vaitro instanceof \App\Enums\UserRole 
-            ? $this->vaitro->value 
-            : (string) $this->vaitro;
-
-        return collect($roles)->map(fn($role) => $role instanceof \App\Enums\UserRole ? $role->value : (string)$role)
-            ->contains($currentRole);
+        return $this->hasOne(Admin::class, 'user_id');
     }
 
-    public function isAdminGroup(): bool
+    public function isAdmin(): bool
     {
-        $role = $this->vaitro;
-        if ($role instanceof \App\Enums\UserRole) {
-            return $role->isAdminGroup();
-        }
-        
-        return in_array((string)$role, ['admin', 'admin_truong', 'admin_toanha'], true);
+        return $this->vaitro === UserRole::Admin;
     }
 
     /**
-     * Vô hiệu hóa tài khoản sinh viên khi offboarding.
+     * Kiểm tra xem user có thuộc nhóm quản trị (để quyết định Layout hiển thị)
      */
-    public function deactivate(): bool
+    public function isAdminGroup(): bool
     {
-        return $this->update(['is_active' => false]);
+        return $this->vaitro?->isAdminGroup() ?? false;
+    }
+
+    /**
+     * Kiểm tra xem user có là sinh viên
+     */
+    public function isStudent(): bool
+    {
+        return $this->vaitro === UserRole::SinhVien;
+    }
+
+    /**
+     * Kiểm tra xem user có là sinh viên (alias cho isStudent)
+     */
+    public function isSinhVien(): bool
+    {
+        return $this->isStudent();
+    }
+
+    /**
+     * Kiểm tra xem user có là khách
+     */
+    public function isGuest(): bool
+    {
+        return $this->vaitro === UserRole::Guest;
+    }
+
+    /**
+     * Lấy label của vai trò hiện tại
+     */
+    public function getRoleLabel(): string
+    {
+        return $this->vaitro?->label() ?? 'Không xác định';
+    }
+
+    /**
+     * Kiểm tra xem user có bất kỳ vai trò nào trong danh sách
+     */
+    public function hasAnyRole(array $roles): bool
+    {
+        $vaitroValue = $this->vaitro instanceof UserRole ? $this->vaitro->value : $this->vaitro;
+        
+        return collect($roles)->map(fn($r) => $r instanceof UserRole ? $r->value : $r)
+            ->contains($vaitroValue);
     }
 }

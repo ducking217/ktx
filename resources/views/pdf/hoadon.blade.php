@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Hóa đơn {{ $hoadon->ma_hd }}</title>
+    <title>Hóa đơn {{ $hoadon->ma_hoa_don ?? $hoadon->id }}</title>
     <style>
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -67,44 +67,61 @@
 <body>
     <div class="header">
         <h1>Hóa đơn thanh toán</h1>
-        <p>Mã hóa đơn: {{ $hoadon->ma_hd }}</p>
+        <p>Mã hóa đơn: {{ $hoadon->ma_hoa_don ?? $hoadon->id }}</p>
     </div>
+
+    @php
+        $tenSinhVien = $hoadon->hopdong?->sinhvien?->user?->name ?? '........';
+        $maSinhVien = $hoadon->hopdong?->sinhvien?->ma_sinh_vien ?? '........';
+        $tenPhong = $hoadon->phong?->ten_phong ?? $hoadon->hopdong?->giuong?->phong?->ten_phong ?? '........';
+        $giaoDichChoXacNhan = $hoadon->trang_thai === \App\Enums\InvoiceStatus::PendingConfirmation
+            ? $hoadon->giao_dich_gan_nhat
+            : null;
+        $ky = null;
+        if (is_string($hoadon->ghi_chu) && preg_match('/Ky\s+(\d{1,2}\/\d{4})/u', $hoadon->ghi_chu, $m)) {
+            $ky = $m[1];
+        }
+        $kyHienThi = $ky
+            ?? ($hoadon->ngay_thanh_toan?->format('m/Y') ?? $hoadon->created_at?->format('m/Y'))
+            ?? '........';
+    @endphp
 
     <div class="info-section">
         <table class="info-table">
             <tr>
                 <td class="label">Sinh viên:</td>
                 <td>
-                    @isset($hoadon->sinhvien->taikhoan)
-                        {{ $hoadon->sinhvien->taikhoan->name }}
-                    @else
-                        ........
-                    @endisset
-                    @isset($hoadon->sinhvien)
-                        ({{ $hoadon->sinhvien->masinhvien ?? '........' }})
-                    @else
-                        (........)
-                    @endisset
+                    {{ $tenSinhVien }} ({{ $maSinhVien }})
                 </td>
             </tr>
             <tr>
                 <td class="label">Phòng:</td>
                 <td>
-                    @isset($hoadon->phong)
-                        {{ $hoadon->phong->tenphong }}
-                    @else
-                        ........
-                    @endisset
+                    {{ $tenPhong }}
                 </td>
             </tr>
             <tr>
                 <td class="label">Kỳ thanh toán:</td>
-                <td>Tháng {{ $hoadon->thang }}/{{ $hoadon->nam }}</td>
+                <td>{{ $kyHienThi }}</td>
             </tr>
             <tr>
                 <td class="label">Ngày phát hành:</td>
                 <td>{{ $hoadon->created_at->format('d/m/Y') }}</td>
             </tr>
+            @if($giaoDichChoXacNhan)
+            <tr>
+                <td class="label">Mã giao dịch:</td>
+                <td>{{ $giaoDichChoXacNhan->ma_giao_dich ?? '........' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Ghi chú chuyển khoản:</td>
+                <td>{{ $giaoDichChoXacNhan->ghi_chu ?? '........' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Ngày giao dịch:</td>
+                <td>{{ $giaoDichChoXacNhan->ngay_giao_dich?->format('d/m/Y H:i') ?? '........' }}</td>
+            </tr>
+            @endif
         </table>
     </div>
 
@@ -118,33 +135,27 @@
         <tbody>
             <tr>
                 <td>Tiền phòng</td>
-                <td>{{ number_format($hoadon->tienphong) }}</td>
+                <td>{{ number_format((int) $hoadon->tien_phong) }}</td>
             </tr>
             <tr>
                 <td>Tiền điện</td>
-                <td>{{ number_format($hoadon->tiendien) }}</td>
+                <td>{{ number_format((int) $hoadon->tien_dien) }}</td>
             </tr>
             <tr>
                 <td>Tiền nước</td>
-                <td>{{ number_format($hoadon->tiennuoc) }}</td>
+                <td>{{ number_format((int) $hoadon->tien_nuoc) }}</td>
             </tr>
-            @if($hoadon->phidichvu > 0)
+            @if((int) $hoadon->phi_dich_vu > 0)
             <tr>
                 <td>Tiền dịch vụ</td>
-                <td>{{ number_format($hoadon->phidichvu) }}</td>
-            </tr>
-            @endif
-            @if($hoadon->tienphat > 0)
-            <tr>
-                <td>Tiền phạt/Bồi thường</td>
-                <td>{{ number_format($hoadon->tienphat) }}</td>
+                <td>{{ number_format((int) $hoadon->phi_dich_vu) }}</td>
             </tr>
             @endif
         </tbody>
     </table>
 
     <div class="total-section">
-        Tổng cộng: {{ number_format($hoadon->tongtien) }} VNĐ
+        Tổng cộng: {{ number_format((int) $hoadon->tong_tien) }} VNĐ
     </div>
 
     <div class="footer">

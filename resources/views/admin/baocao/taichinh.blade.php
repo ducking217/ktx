@@ -1,222 +1,261 @@
 <x-admin-layout>
-    <x-slot name="title">Báo cáo tài chính</x-slot>
+    <x-slot:title>Phân tích Tài chính & Vận hành Hệ thống</x-slot:title>
 
-    <div class="space-y-8 animate-fade-up">
-        {{-- Header & Export --}}
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h2 class="text-2xl font-black text-ink-primary uppercase tracking-tight">Tổng quan tài chính</h2>
-                <p class="text-[10px] font-bold text-ink-secondary/50 uppercase tracking-widest mt-1">Dữ liệu cập nhật theo thời gian thực</p>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <form action="{{ route('admin.baocao.xuat_excel') }}" method="GET" class="flex items-center gap-2">
-                    <select name="nam" class="bg-ui-card border-ui-border rounded-xl text-[10px] font-black uppercase tracking-widest px-4 py-2 focus:ring-2 focus:ring-brand-emerald/20 transition-all">
+    <div class="space-y-10 pb-20">
+        <x-admin.page-header
+            title="Fiscal Intelligence"
+            subtitle="Phân tích định lượng luồng tiền, biến động doanh thu và hiệu suất tài sản lưu trú."
+        >
+            <form action="{{ route('admin.baocao.xuat_excel') }}" method="GET" class="flex items-center gap-3">
+                <div class="relative group">
+                    <select name="nam" class="saas-input h-11 px-5 pr-10 text-[11px] font-black uppercase tracking-[0.2em] bg-white border-slate-200 focus:ring-slate-900/5 appearance-none cursor-pointer">
                         @for($i = date('Y'); $i >= date('Y') - 2; $i--)
-                            <option value="{{ $i }}">{{ $i }}</option>
+                            <option value="{{ $i }}">{{ $i }} Fiscal Year</option>
                         @endfor
                     </select>
-                    <button type="submit" class="pdu-btn-primary shadow-lg shadow-brand-emerald/20 !px-6 h-10">
-                        <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Xuất Excel
-                    </button>
-                </form>
+                    <div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+                <button type="submit" class="saas-btn-primary h-11 px-8 shadow-lg shadow-blue-500/20 group">
+                    <svg class="h-4.5 w-4.5 mr-2.5 group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Export Datasets
+                </button>
+            </form>
+        </x-admin.page-header>
+
+        {{-- Analytical Metric Bento --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="saas-card p-8 border-l-[6px] border-emerald-500 bg-emerald-50/5 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 group">
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Net Revenue (Month)
+                </div>
+                <div class="flex items-end justify-between">
+                    <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($doanhThuThangNay) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnd</span></div>
+                    <div @class([
+                        'text-[10px] font-black px-2.5 py-1.5 rounded-xl shadow-sm border',
+                        'bg-emerald-50 text-emerald-600 border-emerald-100' => $tangTruong >= 0,
+                        'bg-rose-50 text-rose-600 border-rose-100' => $tangTruong < 0,
+                    ])>
+                        {{ $tangTruong >= 0 ? '↑' : '↓' }} {{ abs($tangTruong) }}%
+                    </div>
+                </div>
+                <div class="mt-4 h-1 w-8 bg-emerald-100 group-hover:w-16 transition-all duration-500"></div>
             </div>
-        </header>
 
-        {{-- Metric Cards --}}
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <article class="pdu-card group relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-brand-emerald/5 transition-transform duration-700 group-hover:scale-150"></div>
-                <div class="relative z-10">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-ink-secondary/40">Doanh thu tháng này</span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <h3 class="text-2xl font-black text-ink-primary tracking-tight">{{ number_format($doanhThuThangNay) }}đ</h3>
-                        <span @class([
-                            'text-[10px] font-bold px-1.5 py-0.5 rounded-md',
-                            'bg-status-success/10 text-status-success' => $tangTruong >= 0,
-                            'bg-status-error/10 text-status-error' => $tangTruong < 0,
-                        ])>
-                            {{ $tangTruong >= 0 ? '+' : '' }}{{ $tangTruong }}%
-                        </span>
-                    </div>
+            <div class="saas-card p-8 border-l-[6px] border-blue-600 bg-blue-50/5 hover:shadow-2xl hover:shadow-blue-600/10 transition-all duration-500 group">
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                    Managed Deposits
                 </div>
-            </article>
-
-            <article class="pdu-card group relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-brand-jade/5 transition-transform duration-700 group-hover:scale-150"></div>
-                <div class="relative z-10">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-ink-secondary/40">Tổng tiền cọc</span>
-                    <div class="mt-2">
-                        <h3 class="text-2xl font-black text-ink-primary tracking-tight">{{ number_format($tongCocHienTai) }}đ</h3>
-                        <p class="text-[9px] font-bold text-ink-secondary/30 uppercase mt-1 tracking-widest">Ký quỹ sinh viên</p>
-                    </div>
+                <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($tongCocHienTai) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnd</span></div>
+                <div class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mt-3 bg-blue-50/50 w-fit px-2 py-0.5 rounded-lg border border-blue-100/50">
+                    Ký quỹ an sinh cư dân
                 </div>
-            </article>
+            </div>
 
-            <article class="pdu-card group relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-status-info/5 transition-transform duration-700 group-hover:scale-150"></div>
-                <div class="relative z-10">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-ink-secondary/40">Tỷ lệ lấp đầy</span>
-                    <div class="mt-2">
-                        <h3 class="text-2xl font-black text-ink-primary tracking-tight">{{ $tyLeLapDay }}%</h3>
-                        <p class="text-[9px] font-bold text-ink-secondary/30 uppercase mt-1 tracking-widest">{{ $phongDangThue }}/{{ $tongPhong }} phòng đang ở</p>
-                    </div>
+            <div class="saas-card p-8 border-l-[6px] border-amber-500 bg-amber-50/5 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 group">
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                    Occupancy Rate
                 </div>
-            </article>
-
-            <article class="pdu-card group relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-ink-primary/5 transition-transform duration-700 group-hover:scale-150"></div>
-                <div class="relative z-10">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-ink-secondary/40">Tổng doanh thu 12T</span>
-                    <div class="mt-2">
-                        <h3 class="text-2xl font-black text-ink-primary tracking-tight">{{ number_format($doanhThuTheoThang->sum('tong')) }}đ</h3>
-                        <p class="text-[9px] font-bold text-ink-secondary/30 uppercase mt-1 tracking-widest">{{ $doanhThuTheoThang->sum('so_luong') }} giao dịch</p>
-                    </div>
+                <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ $tyLeLapDay }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">%</span></div>
+                <div class="text-[10px] font-black text-amber-600 uppercase tracking-widest mt-3 flex items-center gap-1.5">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    {{ $phongDangThue }}/{{ $tongPhong }} active units
                 </div>
-            </article>
-        </section>
+            </div>
 
-        {{-- Chart & Top Rooms --}}
+            <div class="saas-card p-8 border-l-[6px] border-slate-900 bg-slate-900/5 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 group">
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-slate-900"></span>
+                    Fiscal Year Total
+                </div>
+                <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($doanhThuTheoThang->sum('tong')) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnd</span></div>
+                <div class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">
+                    Verified through {{ $doanhThuTheoThang->sum('so_luong') }} TX events
+                </div>
+            </div>
+        </div>
+
+        {{-- Visualization & Leaderboards --}}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <article class="lg:col-span-8 pdu-card">
-                <div class="mb-8 flex items-center justify-between">
-                    <h3 class="text-[11px] font-black text-ink-primary uppercase tracking-widest">Biểu đồ doanh thu 12 tháng</h3>
-                    <div class="flex items-center gap-2">
-                        <span class="flex items-center gap-1.5 text-[9px] font-bold text-ink-secondary/40 uppercase">
-                            <span class="h-2 w-2 rounded-full bg-brand-emerald"></span> Doanh thu
-                        </span>
+            <div class="lg:col-span-8 saas-card p-10 border-slate-200/60 shadow-xl shadow-slate-200/5">
+                <div class="flex items-center justify-between mb-12">
+                    <div>
+                        <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em]">Revenue Stream Analysis</h3>
+                        <p class="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-tight">Biểu đồ đối soát biến động dòng tiền 12 chu kỳ gần nhất</p>
+                    </div>
+                    <div class="flex items-center gap-5">
+                        <div class="flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)]"></span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Gross Revenue (VND)</span>
+                        </div>
                     </div>
                 </div>
-                <div class="h-[350px] w-full">
-                    <canvas id="revenueChart"></canvas>
+                <div class="h-[380px]">
+                    <canvas id="revenueChart" data-revenue='@json($doanhThuTheoThang)'></canvas>
                 </div>
-            </article>
+            </div>
 
-            <article class="lg:col-span-4 pdu-card">
-                <h3 class="text-[11px] font-black text-ink-primary uppercase tracking-widest mb-6">Top 5 phòng cao điểm</h3>
-                <div class="space-y-6">
+            <div class="lg:col-span-4 saas-card p-10 border-slate-200/60 shadow-xl shadow-slate-200/5">
+                <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em] mb-10 flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Top Performing Assets
+                </h3>
+                <div class="space-y-8">
                     @foreach($topPhong as $phong)
-                        <div class="flex items-center justify-between group">
-                            <div class="flex items-center gap-4">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-ui-bg border border-ui-border group-hover:border-brand-emerald/30 transition-colors">
-                                    <span class="text-xs font-black text-ink-primary">{{ $loop->iteration }}</span>
+                        <div class="flex items-center justify-between group cursor-pointer transition-transform hover:translate-x-1">
+                            <div class="flex items-center gap-5">
+                                <div class="h-11 w-11 rounded-2xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-[11px] font-black text-slate-400 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 group-hover:rotate-6 transition-all shadow-sm">
+                                    {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-ink-primary uppercase tracking-tight">{{ $phong->phong->tenphong }}</div>
-                                    <div class="text-[9px] font-bold text-ink-secondary/40 uppercase tracking-widest">Tòa {{ $phong->phong->tang }}</div>
+                                    <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors leading-none">{{ $phong->phong?->ten_phong ?? 'N/A' }}</div>
+                                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                                        <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                        Tầng {{ $phong->phong?->tang ?? '0' }} Infrastructure
+                                    </div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-sm font-black text-ink-primary tabular-nums tracking-tight">{{ number_format((float)$phong->tong) }}đ</div>
-                                <div class="text-[8px] font-bold text-brand-emerald uppercase tracking-widest">Doanh thu</div>
+                                <div class="text-[15px] font-black text-slate-900 tabular-nums tracking-tighter leading-none">{{ number_format((float)$phong->tong) }}</div>
+                                <div class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.15em] mt-2">Revenue Lead</div>
                             </div>
                         </div>
                     @endforeach
                 </div>
-            </article>
+            </div>
         </div>
 
-        {{-- Detailed Table --}}
-        <article class="pdu-card !p-0 overflow-hidden shadow-xl shadow-ink-primary/5">
-            <div class="px-8 py-6 border-b border-ui-border bg-ui-bg/30">
-                <h2 class="text-[11px] font-black text-ink-primary uppercase tracking-widest">Chi tiết doanh thu theo kỳ</h2>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">
-                            <th class="px-8 py-4">Kỳ báo cáo</th>
-                            <th class="px-8 py-4">Số hóa đơn</th>
-                            <th class="px-8 py-4">Tổng doanh thu</th>
-                            <th class="px-8 py-4">Trung bình/HĐ</th>
-                            <th class="px-8 py-4 text-right">Xu hướng</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-ui-border">
-                        @foreach($doanhThuTheoThang as $row)
-                            <tr class="group hover:bg-ui-bg/30 transition-colors">
-                                <td class="px-8 py-5">
-                                    <span class="font-display font-black text-ink-primary uppercase tracking-tight text-base">T{{ $row->thang }}/{{ $row->nam }}</span>
-                                </td>
-                                <td class="px-8 py-5 font-bold text-ink-secondary tabular-nums tracking-tight">{{ $row->so_luong }}</td>
-                                <td class="px-8 py-5 font-black text-ink-primary tabular-nums tracking-tight">{{ number_format((float)$row->tong) }}đ</td>
-                                <td class="px-8 py-5 font-medium text-ink-secondary/60 tabular-nums tracking-tight">{{ number_format($row->tong / $row->so_luong) }}đ</td>
-                                <td class="px-8 py-5 text-right">
-                                    <div class="flex items-center justify-end gap-1.5 text-status-success">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </article>
+        {{-- Detailed Fiscal Audit --}}
+        <x-admin.table-card>
+            <thead>
+                <tr>
+                    <th>Fiscal Reporting Period</th>
+                    <th class="text-center">Transaction Volume</th>
+                    <th class="text-right">Total Aggregate Revenue</th>
+                    <th class="text-right">AOV (Average Order Value)</th>
+                    <th class="text-right">Fiscal Health</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($doanhThuTheoThang as $row)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="py-6">
+                            <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors">Tháng {{ str_pad($row->thang, 2, '0', STR_PAD_LEFT) }} / {{ $row->nam }}</div>
+                            <div class="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
+                                <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                Institutional Reporting
+                            </div>
+                        </td>
+                        <td class="py-6 text-center">
+                            <div class="text-[11px] font-black text-slate-600 tabular-nums bg-white px-3 py-1.5 rounded-xl inline-block border border-slate-200/60 shadow-sm min-w-[45px]">{{ $row->so_luong }}</div>
+                        </td>
+                        <td class="py-6 text-right">
+                            <div class="text-[15px] font-black text-slate-900 tabular-nums tracking-tighter leading-none">{{ number_format((float)$row->tong) }}<small class="ml-0.5 text-slate-400">VND</small></div>
+                        </td>
+                        <td class="py-6 text-right">
+                            <div class="text-[11px] font-black text-slate-400 tabular-nums tracking-tighter">{{ number_format($row->tong / $row->so_luong) }}<small class="ml-0.5 opacity-50">VND</small></div>
+                        </td>
+                        <td class="py-6 text-right">
+                            <div class="flex items-center justify-end">
+                                <div class="h-9 w-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm group-hover:scale-110 transition-transform">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </x-admin.table-card>
     </div>
 
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        const data = @json($doanhThuTheoThang);
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.map(d => `T${d.thang}/${d.nam}`),
-                datasets: [{
-                    label: 'Doanh thu',
-                    data: data.map(d => d.tong),
-                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                    borderColor: 'rgb(16, 185, 129)',
-                    borderWidth: 0,
-                    borderRadius: 8,
-                    barThickness: 32,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#111827',
-                        titleFont: { family: 'Geist Sans', size: 10, weight: '900' },
-                        bodyFont: { family: 'Geist Sans', size: 12, weight: 'bold' },
-                        padding: 12,
-                        cornerRadius: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.raw);
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('revenueChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const data = JSON.parse(canvas.dataset.revenue || '[]');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => `CY T${d.thang}/${d.nam}`),
+                    datasets: [{
+                        label: 'Revenue Analysis',
+                        data: data.map(d => d.tong),
+                        backgroundColor: 'rgba(37, 99, 235, 0.95)',
+                        hoverBackgroundColor: '#0f172a',
+                        borderWidth: 0,
+                        borderRadius: 12,
+                        barThickness: 36,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: { top: 20 }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { size: 10, weight: '900', family: 'Inter', letterSpacing: 1 },
+                            bodyFont: { size: 13, weight: '900', family: 'Inter' },
+                            padding: 20,
+                            cornerRadius: 16,
+                            displayColors: false,
+                            borderWidth: 1,
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            callbacks: {
+                                label: function(context) {
+                                    return new Intl.NumberFormat('vi-VN', { 
+                                        style: 'currency', 
+                                        currency: 'VND',
+                                        maximumFractionDigits: 0
+                                    }).format(context.raw);
+                                }
                             }
                         }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        border: { display: false },
-                        ticks: {
-                            font: { family: 'Geist Sans', size: 9, weight: 'bold' },
-                            color: '#9ca3af'
-                        }
                     },
-                    y: {
-                        grid: { color: 'rgba(229, 231, 235, 0.5)', drawTicks: false },
-                        border: { display: false, dash: [4, 4] },
-                        ticks: {
-                            font: { family: 'Geist Sans', size: 9, weight: 'bold' },
-                            color: '#9ca3af',
-                            callback: function(value) {
-                                if (value >= 1000000) return (value / 1000000) + 'tr';
-                                return value;
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { size: 9, weight: '900', family: 'Inter' },
+                                color: '#94a3b8',
+                                padding: 10
+                            }
+                        },
+                        y: {
+                            grid: { 
+                                color: 'rgba(226, 232, 240, 0.5)', 
+                                drawTicks: false,
+                                lineWidth: 1
+                            },
+                            border: { 
+                                display: false, 
+                                dash: [8, 8] 
+                            },
+                            ticks: {
+                                font: { size: 9, weight: '900', family: 'Inter' },
+                                color: '#94a3b8',
+                                padding: 15,
+                                callback: function(value) {
+                                    if (value >= 1000000) return (value / 1000000) + 'M';
+                                    return value;
+                                }
                             }
                         }
                     }
                 }
-            }
+            });
         });
     </script>
     @endpush

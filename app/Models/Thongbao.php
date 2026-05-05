@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class Thongbao extends Model
@@ -13,21 +12,13 @@ class Thongbao extends Model
     protected $table = 'thongbao';
 
     protected $fillable = [
-        'tieude',
-        'noidung',
-        'doituong',
-        'phong_id',
-        'sinhvien_id',
-        'ngaydang',
+        'tieu_de',
+        'noi_dung',
+        'loai_thong_bao',
+        'doi_tuong_nhan',
     ];
 
-    public function phong(): BelongsTo
-    {
-        return $this->belongsTo(Phong::class, 'phong_id');
-    }
-
-    public function sinhvien(): BelongsTo
-    {
-        return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
-    }
+    protected $casts = [
+        'doi_tuong_nhan' => 'string',
+    ];
 }

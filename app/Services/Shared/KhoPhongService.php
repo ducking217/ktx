@@ -13,66 +13,74 @@ class KhoPhongService implements KhoPhongServiceInterface
 {
     public function layBanDoKyTucXa(Request $request): array
     {
-        $toa = $request->query('toa', 'A');
+        $toaNhaId = $request->query('toa_nha_id');
+        if (!$toaNhaId) {
+            $toaNhaId = \App\Models\ToaNha::first()?->id;
+        }
         $tang = (int) $request->query('tang', 1);
 
-        $danhsachphong = Phong::where('tenphong', 'like', \App\Helpers\SecurityHelper::escapeLike($toa) . '%')->where('tang', $tang)->orderBy('tenphong')->get();
-        $phongIds = $danhsachphong->pluck('id');
-
-        $allSinhvien = Sinhvien::whereIn('phong_id', $phongIds)->with('taikhoan')->get()->groupBy('phong_id');
-        $allDangky = Dangky::whereIn('phong_id', $phongIds)
-            ->whereIn('trangthai', [RegistrationStatus::Pending->value, RegistrationStatus::ApprovedPendingPayment->value])
-            ->get()->groupBy('phong_id');
+        $danhsachphong = Phong::with(['loaiphong', 'giuongs.current_hopdong.sinhvien.user'])
+            ->where('toa_nha_id', $toaNhaId)
+            ->where('tang', $tang)
+            ->orderBy('ten_phong')
+            ->get();
 
         $mapData = $danhsachphong->map(fn($phong) => [
             'phong' => $phong,
-            'beds' => $this->anhXaGiuong($phong, $allSinhvien->get($phong->id, collect()), $allDangky->get($phong->id, collect()))
+            'beds' => $phong->giuongs->map(fn($g) => [
+                'id' => $g->id,
+                'no' => $g->ma_giuong,
+                'status' => strtoupper($g->trang_thai instanceof \BackedEnum ? $g->trang_thai->value : (string)$g->trang_thai),
+                'student' => $g->trang_thai === \App\Enums\BedStatus::Occupied ? [
+                    'name' => $g->current_hopdong?->sinhvien?->user?->name ?? 'N/A',
+                    'mssv' => $g->current_hopdong?->sinhvien?->ma_sinh_vien ?? ''
+                ] : null
+            ])
         ]);
 
         return [
             'mapData' => $mapData,
-            'toa' => $toa,
+            'toaNhaId' => $toaNhaId,
             'tang' => $tang,
-            'allToa' => ['A', 'B'],
-            'allTang' => [1, 2, 3],
-            'campusStats' => $this->layThongKeCoSo()
+            'allToa' => \App\Models\ToaNha::orderBy('ten_toa_nha')->get(),
+            'allTang' => Phong::where('toa_nha_id', $toaNhaId)->select('tang')->distinct()->orderBy('tang')->pluck('tang'),
+            'campusStats' => $this->layThongKeCoSo(),
+            'toa' => \App\Models\ToaNha::find($toaNhaId)?->ten_toa_nha ?? 'N/A'
         ];
     }
 
     public function layThongKeCoSo(): array
     {
-        $totalBeds = 384;
-        $occupied = Sinhvien::whereNotNull('phong_id')->count();
-        $pending = Dangky::whereIn('trangthai', [RegistrationStatus::Pending->value, RegistrationStatus::ApprovedPendingPayment->value])->count();
-        
+        $totalBeds = \App\Models\Giuong::count();
+        $occupied  = \App\Models\Giuong::where('trang_thai', \App\Enums\BedStatus::Occupied)->count();
+        $pending   = \App\Models\Giuong::where('trang_thai', \App\Enums\BedStatus::Pending)->count();
+        $broken    = \App\Models\Giuong::where('trang_thai', \App\Enums\BedStatus::Broken)->count();
+
         return [
-            'available' => max(0, $totalBeds - $occupied - $pending),
-            'occupied' => $occupied,
-            'pending' => $pending,
+            'total'     => $totalBeds,
+            'available' => max(0, $totalBeds - $occupied - $pending - $broken),
+            'occupied'  => $occupied,
+            'pending'   => $pending,
+            'broken'    => $broken,
         ];
     }
 
     public function layTrangThaiGiuong(int $phongId): array
     {
-        // Simple wrapper for single room
-        return []; // Implementation simplified for now
-    }
+        $giuongs = \App\Models\Giuong::where('phong_id', $phongId)
+            ->with(['current_hopdong.sinhvien.user'])
+            ->orderBy('ma_giuong')
+            ->get();
 
-    private function anhXaGiuong($phong, $sinhviens, $dangkys): array
-    {
-        $beds = [];
-        $svMap = $sinhviens->keyBy('giuong_no');
-        $dkMap = $dangkys->keyBy('giuong_no');
-
-        for ($i = 1; $i <= 8; $i++) {
-            if ($sv = $svMap->get($i)) {
-                $beds[] = ['no' => $i, 'status' => 'OCCUPIED', 'student' => ['name' => $sv->taikhoan->name, 'mssv' => $sv->masinhvien]];
-            } elseif ($dk = $dkMap->get($i)) {
-                $beds[] = ['no' => $i, 'status' => 'PENDING', 'registration' => ['name' => $dk->ho_ten, 'status' => $dk->trangthai]];
-            } else {
-                $beds[] = ['no' => $i, 'status' => 'AVAILABLE'];
-            }
-        }
-        return $beds;
+        return $giuongs->map(fn($g) => [
+            'id'      => $g->id,
+            'ma'      => $g->ma_giuong,
+            'status'  => $g->trang_thai instanceof \BackedEnum ? $g->trang_thai->value : (string)$g->trang_thai,
+            'label'   => method_exists($g->trang_thai, 'label') ? $g->trang_thai->label() : (string)$g->trang_thai,
+            'student' => $g->trang_thai === \App\Enums\BedStatus::Occupied ? [
+                'name' => $g->current_hopdong?->sinhvien?->user?->name ?? 'N/A',
+                'mssv' => $g->current_hopdong?->sinhvien?->ma_sinh_vien ?? '',
+            ] : null,
+        ])->toArray();
     }
 }

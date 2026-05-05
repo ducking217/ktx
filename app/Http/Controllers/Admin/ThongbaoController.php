@@ -21,10 +21,10 @@ class ThongbaoController extends Controller
     public function store(Request $request)
     {
         $duLieu = $request->validate([
-            'tieude' => ['required', 'string', 'max:255'],
-            'noidung' => ['required', 'string'],
-            'doituong' => ['nullable', 'in:sinhvien,admin,tatca'],
-            'ngaydang' => ['nullable', 'date'],
+            'tieu_de' => ['required', 'string', 'max:255'],
+            'noi_dung' => ['required', 'string'],
+            'loai_thong_bao' => ['nullable', 'in:general,emergency,maintenance,finance'],
+            'doi_tuong_nhan' => ['nullable', 'in:all,guest,sinhvien,admin'],
         ]);
 
         $ketQua = $this->thongbaoService->store($duLieu);
@@ -34,10 +34,10 @@ class ThongbaoController extends Controller
     public function update(Request $request, int $id)
     {
         $duLieu = $request->validate([
-            'tieude' => ['required', 'string', 'max:255'],
-            'noidung' => ['required', 'string'],
-            'doituong' => ['nullable', 'in:sinhvien,admin,tatca'],
-            'ngaydang' => ['nullable', 'date'],
+            'tieu_de' => ['required', 'string', 'max:255'],
+            'noi_dung' => ['required', 'string'],
+            'loai_thong_bao' => ['nullable', 'in:general,emergency,maintenance,finance'],
+            'doi_tuong_nhan' => ['nullable', 'in:all,guest,sinhvien,admin'],
         ]);
 
         $ketQua = $this->thongbaoService->update($id, $duLieu);

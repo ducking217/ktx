@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Contracts\Student\BaohongServiceInterface;
-use App\Enums\MaintenanceStatus;
+use App\Enums\BaohongStatus;
 use Illuminate\Http\Request;
 
 class BaohongController extends Controller
@@ -23,19 +23,12 @@ class BaohongController extends Controller
     {
         $this->authorize('baohong.manage');
         $dulieu = $request->validate([
-            'trangthai' => ['required', 'in:' . implode(',', [
-                MaintenanceStatus::Pending->value,
-                MaintenanceStatus::Scheduled->value,
-                MaintenanceStatus::InProgress->value,
-                MaintenanceStatus::Completed->value,
-            ])],
-            'ngayhen' => ['nullable', 'date'],
-            'noidung' => ['nullable', 'string'],
-            'do_sinh_vien_gay_ra' => ['nullable', 'boolean'],
-            'phi_boi_thuong' => ['nullable', 'numeric', 'min:0'],
+            'trang_thai' => ['required', 'in:' . implode(',', BaohongStatus::values())],
         ]);
 
-        $result = $this->baohongService->updateMaintenance($id, $dulieu);
+        $result = $this->baohongService->updateMaintenance($id, [
+            'trang_thai' => $dulieu['trang_thai'],
+        ]);
 
         return redirect()->back()->with([
             'toast_loai' => $result['success'] ? 'thanhcong' : 'loi',

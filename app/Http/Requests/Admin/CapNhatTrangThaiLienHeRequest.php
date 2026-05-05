@@ -19,9 +19,9 @@ class CapNhatTrangThaiLienHeRequest extends FormRequest
                 Lienhe::TRANG_THAI_CHUA_XU_LY,
                 Lienhe::TRANG_THAI_DA_XU_LY,
             ])],
-            'ghi_chu_admin' => ['nullable', 'string'],
+            'gui_email' => ['nullable', 'boolean'],
+            'ghi_chu_admin' => ['nullable', 'string', 'required_if:gui_email,1'],
         ];
     }
 }
-
 

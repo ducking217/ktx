@@ -21,6 +21,16 @@ class PhongController extends Controller
     public function index(Request $request)
     {
         $data = $this->truyVanPhongService->lietKePhongChoAdmin($request);
+        $data['toanhis'] = \App\Models\ToaNha::orderBy('ten_toa_nha')->get();
+        $data['loaiphongs'] = \App\Models\LoaiPhong::orderBy('ten_loai')->get();
+
+        $taiSanPhongId = (int) $request->query('taisan_phong_id', 0);
+        $data['taiSanPhongId'] = $taiSanPhongId > 0 ? $taiSanPhongId : null;
+        $data['phongTaiSan'] = $taiSanPhongId > 0
+            ? \App\Models\Phong::with(['taisans' => fn($q) => $q->orderBy('ten_tai_san')])->find($taiSanPhongId)
+            : null;
+        $data['tatCaPhongChoChon'] = \App\Models\Phong::select(['id', 'toa_nha_id', 'ten_phong'])->orderBy('ten_phong')->get();
+        
         return view('admin.phong.danhsach', $data);
     }
 
@@ -59,7 +69,11 @@ class PhongController extends Controller
 
     public function soDo(Request $request)
     {
-        $data = $this->khoPhongService->layBanDoKyTucXa($request);
-        return view('admin.phong.map', $data);
+        return redirect()
+            ->route('admin.phong.index')
+            ->with([
+                'toast_loai' => 'thanhcong',
+                'toast_noidung' => 'Sơ đồ KTX đã được gộp vào trang Phòng & Tài sản.',
+            ]);
     }
 }

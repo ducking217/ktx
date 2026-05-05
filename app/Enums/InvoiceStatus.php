@@ -4,18 +4,20 @@ namespace App\Enums;
 
 enum InvoiceStatus: string
 {
+    case Unpaid = 'unpaid';
     case PendingConfirmation = 'pending_confirmation';
-    case Pending = 'pending';
     case Paid = 'paid';
     case Overdue = 'overdue';
+    case Cancelled = 'cancelled';
 
     public function label(): string
     {
         return match($this) {
+            self::Unpaid => 'Chưa thanh toán',
             self::PendingConfirmation => 'Chờ xác nhận',
-            self::Pending => 'Chưa thanh toán',
             self::Paid => 'Đã thanh toán',
             self::Overdue => 'Quá hạn',
+            self::Cancelled => 'Đã hủy',
         };
     }
 

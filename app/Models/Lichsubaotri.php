@@ -10,17 +10,17 @@ class Lichsubaotri extends Model
 {
     use HasFactory;
 
-    protected $table = 'lichsubaotri';
+    protected $table = 'lich_su_bao_tri';
 
     protected $fillable = [
         'vattu_id',
         'phong_id',
-        'ngaybaotri',
-        'noidung',
-        'chiphi',
-        'donvithuchien',
-        'nguoithuchien',
-        'trangthai',
+        'ngay_bao_tri',
+        'noi_dung',
+        'chi_phi',
+        'don_vi_thuc_hien',
+        'nguoi_thuc_hien',
+        'trang_thai',
     ];
 
     public function vattu(): BelongsTo

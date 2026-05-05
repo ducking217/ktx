@@ -15,9 +15,27 @@ class FileController extends Controller
      */
     public function showPrivateFile(Request $request, string $path): StreamedResponse
     {
-        // Validate signed URL
-        if (! URL::hasValidSignature($request)) {
+        $user = $request->user();
+        $isAdmin = $user && method_exists($user, 'isAdminGroup') ? (bool) $user->isAdminGroup() : false;
+
+        $path = ltrim($path, '/');
+        if (str_contains($path, '..')) {
+            abort(403);
+        }
+
+        if (! $isAdmin && ! URL::hasValidSignature($request)) {
             abort(403, 'Invalid or expired signed URL');
+        }
+
+        if (! $isAdmin) {
+            $sv = $user?->sinhvien;
+            $allowedPaths = array_values(array_filter([
+                $sv?->anh_the_path,
+                $sv?->anh_cccd_path,
+            ]));
+            if (! in_array($path, $allowedPaths, true)) {
+                abort(403);
+            }
         }
 
         if (! Storage::disk('private')->exists($path)) {
@@ -32,8 +50,7 @@ class FileController extends Controller
      */
     public static function generateSignedUrl(string $path, int $expiresInMinutes = 60): string
     {
-        return URL::signedRoute('private.file', ['path' => $path], now()->addMinutes($expiresInMinutes));
+        return URL::temporarySignedRoute('private.file', now()->addMinutes($expiresInMinutes), ['path' => $path]);
     }
 }
-
 

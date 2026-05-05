@@ -24,11 +24,6 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-
-        // Đồng bộ trạng thái phòng khi giường thay đổi
-        GiuongStatusChanged::class => [
-            SyncRoomAvailability::class,
-        ],
     ];
 
     /**

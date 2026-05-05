@@ -2,22 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\DisciplineLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * @property int $id
- * @property int $sinhvien_id
- * @property string $noidung
- * @property \Illuminate\Support\Carbon|string $ngayvipham
- * @property \App\Enums\DisciplineLevel $mucdo
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\Sinhvien $sinhvien
- */
 class Kyluat extends Model
 {
     use HasFactory, SoftDeletes;
@@ -26,17 +15,20 @@ class Kyluat extends Model
 
     protected $fillable = [
         'sinhvien_id',
-        'noidung',
-        'ngayvipham',
-        'mucdo',
+        'tieu_de',
+        'noi_dung',
+        'muc_do',
+        'ngay_vi_pham',
+        'hinh_thuc_xu_ly',
     ];
 
     protected $casts = [
-        'ngayvipham' => 'date',
-        'mucdo' => \App\Enums\DisciplineLevel::class,
+        'sinhvien_id' => 'integer',
+        'muc_do' => DisciplineLevel::class,
+        'ngay_vi_pham' => 'date',
     ];
 
-    public function sinhvien(): BelongsTo
+    public function sinhvien()
     {
         return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
     }

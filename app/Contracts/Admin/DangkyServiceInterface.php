@@ -17,19 +17,9 @@ interface DangkyServiceInterface
     public function yeuCauTraPhong(): array;
 
     /**
-     * Gửi yêu cầu đổi phòng (Sinh viên).
-     */
-    public function yeuCauDoiPhong(array $data): array;
-
-    /**
      * Lấy danh sách đăng ký cho Admin.
      */
     public function lietKeDangKyAdmin(Request $request): array;
-
-    /**
-     * Duyệt đăng ký (Admin).
-     */
-    public function duyetDangKy(int $id, ?string $ngayHetHan = null): array;
 
     /**
      * Từ chối đăng ký (Admin).
@@ -52,12 +42,27 @@ interface DangkyServiceInterface
     public function luuDangkyKhach(array $data): array;
 
     /**
-     * Du lieu form dang ky cho khach.
+     * Lấy dữ liệu form đăng ký cho khách.
      */
-    public function layDuLieuFormDangKyKhach(int $phongId, ?int $giuongNo = null): array;
+    public function layDuLieuFormDangKyKhach(int $phongId): array;
 
     /**
      * Tra cuu ho so dang ky theo token.
      */
     public function layDuLieuTraCuuKhach(?string $token): array;
+
+    /**
+     * Duyệt đăng ký (Admin) - Tạo hợp đồng tự động.
+     */
+    public function duyetDangKy(int $id, ?string $ngayHetHan = null): array;
+
+    /**
+     * Xử lý yêu cầu trả phòng (Admin) - Thanh lý hợp đồng và giải phóng giường.
+     */
+    public function xuLyYeuCauTraPhong(int $dangkyId): array;
+
+    /**
+     * Từ chối yêu cầu trả phòng (Admin).
+     */
+    public function tuChoiYeuCauTraPhong(int $dangkyId, ?string $reason): array;
 }

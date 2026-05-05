@@ -18,10 +18,11 @@ class DangkyDaDuyetMail extends Mailable
     use SerializesModels;
 
     public function __construct(
-        public Sinhvien $sinhvien,
-        public Phong $phong,
-        public Hopdong $hopdong,
-        public Hoadon $hoadon
+        public ?string $userName,
+        public ?string $tenPhong,
+        public ?string $maGiuong,
+        public ?string $ngayBatDau,
+        public ?string $ngayKetThuc
     ) {
     }
 

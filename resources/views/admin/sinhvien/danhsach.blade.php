@@ -1,188 +1,110 @@
 <x-admin-layout>
-    <x-slot:title>Hồ sơ sinh viên nội trú</x-slot:title>
+    <x-slot:title>Quản lý Hồ sơ Sinh viên Nội trú</x-slot:title>
 
-    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-xl font-bold text-ink-primary font-display uppercase tracking-tight">Cơ sở dữ liệu sinh viên</h1>
-            <p class="text-xs font-medium text-ink-secondary/60">Quản lý hồ sơ nhân khẩu và lịch sử lưu trú cư dân.</p>
-        </div>
+    <div class="space-y-8">
+        <x-admin.page-header
+            title="Cơ sở dữ liệu cư dân"
+            subtitle="Quản lý định danh, hồ sơ nhân khẩu và lịch sử cư trú sinh viên."
+        />
 
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <form action="{{ route('admin.quanlysinhvien') }}" method="GET" class="flex items-center gap-2">
-                <div class="relative group">
-                    <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-secondary/40 group-focus-within:text-ink-primary transition-colors">
-                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        {{-- Filter Bar --}}
+        <div class="saas-card p-6 bg-slate-50/50 border-dashed">
+            <form action="{{ route('admin.quanlysinhvien') }}" method="GET" class="flex flex-wrap items-end gap-6">
+                <div class="flex-1 min-w-[300px]">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Tìm kiếm sinh viên</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-4 flex items-center text-slate-400 group-focus-within:text-blue-500 transition-colors pointer-events-none">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" /></svg>
+                        </div>
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Mã sinh viên hoặc họ tên..." class="saas-input pl-12 h-11">
                     </div>
-                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Mã số hoặc họ tên..." class="w-full sm:w-56 rounded-xl border border-ui-border bg-white py-2 pl-9 pr-4 text-xs font-medium text-ink-primary placeholder:text-ink-secondary/30 focus:border-ink-primary/30 focus:outline-none focus:ring-4 focus:ring-ink-primary/5 transition-all" />
                 </div>
-                <button type="submit" class="rounded-xl bg-ink-primary px-4 py-2 text-[10px] font-bold text-white shadow-sm transition-all hover:bg-ink-primary/90 active:scale-[0.98]">
-                    Truy vấn
-                </button>
+                <div class="flex items-end gap-3">
+                    <button type="submit" class="saas-btn-primary h-11 px-6">Tìm kiếm</button>
+                    @if(request('q'))
+                        <a href="{{ route('admin.quanlysinhvien') }}" class="saas-btn-secondary h-11 px-5">Xóa lọc</a>
+                    @endif
+                </div>
             </form>
         </div>
-    </div>
 
-    <article class="overflow-hidden rounded-2xl bg-white border border-ui-border shadow-sm">
-        {{-- Desktop View --}}
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-left text-sm text-ink-primary">
-                <thead class="bg-ui-bg/50 border-b border-ui-border text-[10px] font-bold uppercase tracking-widest text-ink-secondary">
-                    <tr>
-                        <th class="px-6 py-4 font-bold">Danh tính cư dân</th>
-                        <th class="px-6 py-4 font-bold">Mã số & Lớp</th>
-                        <th class="px-6 py-4 font-bold">Vị trí hiện tại</th>
-                        <th class="px-6 py-4 font-bold">Liên lạc</th>
-                        <th class="px-6 py-4 font-bold">Ngày tham gia</th>
-                        <th class="px-6 py-4 font-bold text-right">Điều phối</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-ui-border">
-                    @forelse($danhsachsinhvien as $sinhvien)
-                        <tr class="group transition-colors hover:bg-ui-bg/50">
-                            <td class="px-6 py-5">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-ui-bg ring-1 ring-ui-border">
-                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($sinhvien->taikhoan?->name ?? 'N/A') }}&background=f8f9fa&color=0f172a&bold=true" alt="Avatar" />
+        <x-admin.table-card>
+            <thead>
+                <tr>
+                    <th>Sinh viên</th>
+                    <th>Lớp học</th>
+                    <th>Phòng hiện tại</th>
+                    <th>Liên hệ</th>
+                    <th>Ngày tạo hồ sơ</th>
+                    <th class="text-right">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($danhsachsinhvien as $sinhvien)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="py-5">
+                            <div class="flex items-center gap-4">
+                                <div class="h-10 w-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs font-bold text-slate-500 uppercase tabular-nums">{{ mb_substr($sinhvien->taikhoan?->name ?? 'N', 0, 2) }}</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $sinhvien->taikhoan?->name ?? 'N/A' }}</div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 tabular-nums">
+                                        MSSV: {{ $sinhvien->ma_sinh_vien }}
                                     </div>
-                                    <a href="{{ route('admin.sinhvien.chitiet', $sinhvien->id) }}" class="group">
-                                        <div class="font-bold text-ink-primary font-display text-base group-hover:text-brand-emerald transition-colors">{{ $sinhvien->taikhoan?->name ?? 'N/A' }}</div>
-                                        <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/40 group-hover:text-brand-emerald/60 transition-colors">Xem hồ sơ cư dân →</div>
-                                    </a>
                                 </div>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="text-sm font-bold text-ink-primary tabular-nums tracking-tight">{{ $sinhvien->masinhvien }}</div>
-                                <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mt-0.5">{{ $sinhvien->lop }}</div>
-                            </td>
-                            <td class="px-6 py-5">
-                                @if($sinhvien->phong)
-                                    <div class="flex items-center gap-2 font-bold text-ink-primary">
-                                        <div class="h-7 w-7 flex items-center justify-center rounded-lg bg-ui-bg text-ink-secondary/60 ring-1 ring-ui-border">
-                                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                                        </div>
-                                        {{ $sinhvien->phong->tenphong }}
-                                    </div>
-                                @else
-                                    <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-ui-bg text-ink-secondary/40 ring-1 ring-inset ring-ui-border">Chưa xếp</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="text-xs font-bold text-ink-primary tabular-nums tracking-tighter">{{ $sinhvien->sodienthoai }}</div>
-                                <div class="text-[10px] font-medium text-ink-secondary/40 mt-0.5">{{ $sinhvien->taikhoan?->email ?? 'N/A' }}</div>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="text-sm font-bold text-ink-primary tabular-nums">{{ $sinhvien->created_at->format('d/m/Y') }}</div>
-                            </td>
-                            <td class="px-6 py-5 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.sinhvien.chitiet', $sinhvien->id) }}" class="flex h-8 w-8 items-center justify-center rounded-lg border border-ui-border bg-white text-ink-secondary shadow-sm transition-colors hover:bg-ui-bg hover:text-brand-emerald" title="Hồ sơ chi tiết">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-24 text-center">
-                                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ui-bg text-ink-secondary/50 mb-3">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                                </div>
-                                <div class="text-sm font-bold text-ink-primary">Không có dữ liệu sinh viên</div>
-                                <div class="text-[11px] text-ink-secondary mt-1">Chưa có sinh viên nào hoặc không tìm thấy kết quả phù hợp.</div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- Mobile Card List --}}
-        <div class="md:hidden divide-y divide-ui-border">
-            @forelse($danhsachsinhvien as $sinhvien)
-                <div class="p-5 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl border border-ui-border bg-ui-bg p-0.5">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($sinhvien->taikhoan?->name ?? 'N/A') }}&background=f8f9fa&color=0f172a&bold=true" alt="Avatar" class="h-full w-full rounded-lg object-cover">
-                        </div>
-                        <div>
-                            <a href="{{ route('admin.sinhvien.chitiet', $sinhvien->id) }}">
-                                <div class="font-bold text-ink-primary font-display text-base uppercase tracking-tight">{{ $sinhvien->taikhoan?->name ?? 'N/A' }}</div>
-                            </a>
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/40">{{ $sinhvien->masinhvien }} • {{ $sinhvien->lop }}</div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
-                        <div class="space-y-1">
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Phòng</div>
-                            <div class="text-xs font-bold text-ink-primary">
-                                {{ $sinhvien->phong->tenphong ?? 'Chưa xếp' }}
                             </div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Liên lạc</div>
-                            <div class="text-xs font-bold text-ink-primary tabular-nums tracking-tighter">{{ $sinhvien->sodienthoai }}</div>
-                        </div>
-                        <div class="space-y-1 col-span-2">
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Email học thuật</div>
-                            <div class="text-xs font-bold text-ink-primary truncate">{{ $sinhvien->taikhoan?->email ?? 'N/A' }}</div>
-                        </div>
-                    </div>
+                        </td>
+                        <td class="py-5">
+                            <div class="text-xs font-bold text-slate-700 tracking-tight uppercase">{{ $sinhvien->lop }}</div>
+                        </td>
+                        <td class="py-5">
+                            @if($sinhvien->phong_hien_tai())
+                                <div class="inline-flex items-center gap-2 font-bold text-slate-900 text-sm">
+                                    <div class="h-7 w-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-sm flex-shrink-0">
+                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1-1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                    </div>
+                                    {{ $sinhvien->phong_hien_tai()->ten_phong }}
+                                </div>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
+                                    Chưa xếp phòng
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-5">
+                            <div class="text-xs font-bold text-slate-900 tabular-nums">{{ $sinhvien->user?->phone ?? 'N/A' }}</div>
+                            <div class="text-[10px] text-slate-400 font-medium mt-1 lowercase">{{ $sinhvien->user?->email ?? 'N/A' }}</div>
+                        </td>
+                        <td class="py-5">
+                            <div class="text-xs font-bold text-slate-900 tabular-nums">{{ $sinhvien->created_at->format('d/m/Y') }}</div>
+                        </td>
+                        <td class="py-5 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                <a href="{{ route('admin.sinhvien.chitiet', $sinhvien->id) }}" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xem hồ sơ">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-24 text-center">
+                            <div class="flex flex-col items-center gap-4 text-slate-200">
+                                <svg class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Không có dữ liệu sinh viên phù hợp</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-admin.table-card>
 
-                    <a href="{{ route('admin.sinhvien.chitiet', $sinhvien->id) }}" class="w-full flex h-10 items-center justify-center gap-2 rounded-xl bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-primary ring-1 ring-ui-border">
-                        Xem hồ sơ chi tiết
-                    </a>
-                </div>
-            @empty
-                <div class="py-20 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có dữ liệu sinh viên</div>
-            @endforelse
-        </div>
         @if(method_exists($danhsachsinhvien, 'links'))
-            <div class="border-t border-ui-border px-6 py-4 bg-ui-bg/30">
+            <div class="mt-8">
                 {{ $danhsachsinhvien->withQueryString()->links() }}
             </div>
         @endif
-    </article>
-
-    @push('modals')
-        @foreach($danhsachsinhvien as $sinhvien)
-            <x-modal id="modal-chitiet-{{ $sinhvien->id }}" title="Hồ sơ nhân khẩu cư dân" subtitle="Thông tin định danh và lịch sử lưu trú của sinh viên.">
-                <div class="space-y-6">
-                    <div class="flex items-center gap-5 p-4 rounded-2xl bg-ui-bg/50 ring-1 ring-inset ring-ui-border">
-                        <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ui-border">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($sinhvien->taikhoan?->name ?? 'N/A') }}&background=ffffff&color=0f172a&bold=true&size=128" alt="Avatar Large" />
-                        </div>
-                        <div>
-                            <div class="font-bold text-ink-primary font-display text-2xl leading-tight">{{ $sinhvien->taikhoan?->name ?? 'N/A' }}</div>
-                            <div class="text-xs font-bold text-ink-secondary/60 uppercase tracking-widest mt-1">{{ $sinhvien->masinhvien }} • {{ $sinhvien->lop }}</div>
-                        </div>
-                    </div>
-
-                    <div class="divide-y divide-ui-border rounded-2xl bg-white p-6 ring-1 ring-inset ring-ui-border">
-                        <div class="flex items-center justify-between py-3">
-                            <span class="text-xs font-bold text-ink-secondary uppercase tracking-widest">Email học thuật</span>
-                            <span class="text-sm font-bold text-ink-primary">{{ $sinhvien->taikhoan?->email ?? 'N/A' }}</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3">
-                            <span class="text-xs font-bold text-ink-secondary uppercase tracking-widest">Số điện thoại</span>
-                            <span class="text-sm font-bold text-ink-primary tabular-nums">{{ $sinhvien->sodienthoai }}</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3">
-                            <span class="text-xs font-bold text-ink-secondary uppercase tracking-widest">Giới tính</span>
-                            <span class="text-sm font-bold text-ink-primary">{{ $sinhvien->gioitinh }}</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3">
-                            <span class="text-xs font-bold text-ink-secondary uppercase tracking-widest">Vị trí phòng</span>
-                            <span class="text-sm font-bold text-ink-primary">{{ $sinhvien->phong->tenphong ?? 'Chưa xếp' }}</span>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <button type="button" data-modal-hide="modal-chitiet-{{ $sinhvien->id }}" class="w-full rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Đóng hồ sơ</button>
-                    </div>
-                </div>
-            </x-modal>
-        @endforeach
-    @endpush
+    </div>
 </x-admin-layout>
-

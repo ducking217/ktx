@@ -31,7 +31,15 @@ class TraPhongService implements TraPhongServiceInterface
 
     public function kiemTraNo(Sinhvien $sinhvien): array
     {
-        $pending = Hoadon::where('sinhvien_id', $sinhvien->id)->where('trangthaithanhtoan', InvoiceStatus::Pending->value)->get();
+        $hopdongIds = $sinhvien->hopdongs()->pluck('id')->all();
+        if (empty($hopdongIds)) {
+            return ['has_debt' => false, 'count' => 0, 'invoices' => collect()];
+        }
+
+        $pending = Hoadon::whereIn('hopdong_id', $hopdongIds)
+            ->whereIn('trang_thai', [InvoiceStatus::Unpaid->value, InvoiceStatus::Overdue->value])
+            ->get();
+
         return ['has_debt' => $pending->count() > 0, 'count' => $pending->count(), 'invoices' => $pending];
     }
 
@@ -39,7 +47,7 @@ class TraPhongService implements TraPhongServiceInterface
     {
         try {
             return DB::transaction(function () use ($contractId) {
-                $hopdong = Hopdong::with(['sinhvien.taikhoan', 'phong'])->lockForUpdate()->find($contractId);
+                $hopdong = Hopdong::with(['sinhvien.user', 'giuong.phong'])->lockForUpdate()->find($contractId);
                 if (!$hopdong) return $this->traVeLoi('Không tìm thấy hợp đồng.');
 
                 $sinhvien = $hopdong->sinhvien;
@@ -48,36 +56,20 @@ class TraPhongService implements TraPhongServiceInterface
 
                 $oldData = $hopdong->toArray();
                 
-                // Xử lý hoàn cọc / phạt trước khi thanh lý
-                $refundResult = $this->refundService->xuLyHoanTien($hopdong);
-                if (!$refundResult['success']) {
-                    return $this->traVeLoi($refundResult['message']);
+                // Sử dụng HopdongService để thực hiện thanh lý chuẩn v2
+                $result = $this->contractService->thanhLyHopDong($contractId);
+                
+                if (!$result['success']) {
+                    return $result;
                 }
 
-                $this->hoanTatTraPhong($hopdong, $sinhvien);
                 $this->ghiNhatKyTraPhong($contractId, $oldData);
 
-                return $this->traVeThanhCong('Thanh lý thành công. ' . $refundResult['message']);
+                return $this->traVeThanhCong('Thanh lý thành công. ' . ($result['message'] ?? ''));
             });
         } catch (\Exception $e) {
             Log::error("Checkout failed: " . $e->getMessage());
             return $this->traVeLoi('Lỗi: ' . $e->getMessage());
-        }
-    }
-
-    private function hoanTatTraPhong($hopdong, $sinhvien)
-    {
-        $phongId = $hopdong->phong_id;
-        $giuongNo = $sinhvien?->giuong_no;
-
-        $hopdong->update(['trang_thai' => ContractStatus::Terminated->value]);
-        if ($sinhvien) {
-            $sinhvien->update(['phong_id' => null, 'giuong_no' => null]);
-            $sinhvien->taikhoan?->moveToExStudent();
-        }
-
-        if ($phongId && $giuongNo) {
-            event(new \App\Events\GiuongStatusChanged((int)$phongId, (int)$giuongNo, \App\Enums\BedStatus::Available, \App\Enums\BedStatus::Occupied, 'Thanh lý'));
         }
     }
 
@@ -88,7 +80,7 @@ class TraPhongService implements TraPhongServiceInterface
             'Hopdong',
             $id,
             $oldData,
-            ['trang_thai' => ContractStatus::Terminated->value, 'sinhvien_phong_id' => null]
+            ['trang_thai' => ContractStatus::Terminated->value]
         );
     }
 }

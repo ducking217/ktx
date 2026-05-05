@@ -31,7 +31,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'vaitro' => \App\Enums\UserRole::SinhVien,
             'is_active' => true,
-            'gioitinh' => 'Nam',
+            'gender' => \App\Enums\Gender::Male,
         ];
     }
 
@@ -51,7 +51,7 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'vaitro' => \App\Enums\UserRole::AdminTruong,
+            'vaitro' => \App\Enums\UserRole::Admin,
         ]);
     }
 
@@ -61,7 +61,7 @@ class UserFactory extends Factory
     public function adminToaNha(): static
     {
         return $this->state(fn (array $attributes) => [
-            'vaitro' => \App\Enums\UserRole::AdminToaNha,
+            'vaitro' => \App\Enums\UserRole::Admin,
         ]);
     }
 

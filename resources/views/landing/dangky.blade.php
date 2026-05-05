@@ -52,26 +52,6 @@
                         <form action="{{ route('guest.dangky.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                             @csrf
                             <input type="hidden" name="phong_id" value="{{ $phong->id }}">
-                            
-                            @if($giuong_no)
-                                <input type="hidden" name="giuong_no" value="{{ $giuong_no }}">
-                            @else
-                                <div class="bg-ui-bg border border-ui-border p-6">
-                                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary block mb-3">Lựa chọn giường cư trú</label>
-                                    <div class="relative">
-                                        <select name="giuong_no" required class="w-full bg-white border border-ui-border text-ink-primary text-sm font-bold rounded-none focus:ring-0 focus:border-ink-primary p-3 transition-colors cursor-pointer @error('giuong_no') border-red-500 @enderror">
-                                            <option value="">-- Chọn vị trí giường --</option>
-                                            @for($i = 1; $i <= $phong->succhuamax; $i++)
-                                                <option value="{{ $i }}">Giường số {{ $i }}</option>
-                                            @endfor
-                                        </select>
-                                        @error('giuong_no') <p class="mt-2 text-[10px] font-bold text-red-500">{{ $message }}</p> @enderror
-                                    </div>
-                                    <p class="mt-3 text-[10px] font-medium text-ink-secondary flex items-center gap-1.5">
-                                        <span class="text-ink-primary">ℹ</span> Vui lòng chọn giường để tiếp tục quá trình đăng ký.
-                                    </p>
-                                </div>
-                            @endif
 
                             <div class="grid gap-6 sm:grid-cols-2">
                                 <div>

@@ -57,4 +57,22 @@ class DangkyController extends Controller
         $result = $this->dangkyService->xacNhanThanhToan($id);
         return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
     }
+
+    /**
+     * Xử lý yêu cầu trả phòng.
+     */
+    public function xuLyTraPhong(int $id)
+    {
+        $result = $this->dangkyService->xuLyYeuCauTraPhong($id);
+        return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
+    }
+
+    /**
+     * Từ chối yêu cầu trả phòng.
+     */
+    public function tuChoiTraPhong(Request $request, int $id)
+    {
+        $result = $this->dangkyService->tuChoiYeuCauTraPhong($id, $request->input('ghichu'));
+        return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
+    }
 }

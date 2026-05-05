@@ -13,48 +13,65 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'admin',
-            'email' => 'admin@ktx.test',
-            'password' => Hash::make('12345678'),
-            'vaitro' => 'admin',
-            'gioitinh' => 'Nam',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@ktx.test'],
+            [
+                'name' => 'admin',
+                'password' => Hash::make('12345678'),
+                'vaitro' => 'admin',
+                'gender' => 'male',
+            ]
+        );
 
-        User::create([
-            'name' => 'sinhvien 1',
-            'email' => 'sv1@ktx.test',
-            'password' => Hash::make('12345678'),
-            'vaitro' => 'sinhvien',
-            'gioitinh' => 'Nam',
-        ]);
-        User::create([
-            'name' => 'sinhvien 2',
-            'email' => 'sv2@ktx.test',
-            'password' => Hash::make('12345678'),
-            'vaitro' => 'sinhvien',
-            'gioitinh' => 'Nữ',
-        ]);
-        User::create([
-            'name' => 'sinhvien 3',
-            'email' => 'sv3@ktx.test',
-            'password' => Hash::make('12345678'),
-            'vaitro' => 'sinhvien',
-            'gioitinh' => 'Nam',
-        ]);
-        User::create([
-            'name' => 'sinhvien 4',
-            'email' => 'sv4@ktx.test',
-            'password' => Hash::make('12345678'),
-            'vaitro' => 'sinhvien',
-            'gioitinh' => 'Nữ',
-        ]);
-        User::create([
-            'name' => 'sinhvien 5',
-            'email' => 'sv5@ktx.test',
-            'password' => Hash::make('12345678'),
-            'vaitro' => 'sinhvien',
-            'gioitinh' => 'Nam',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'sv1@ktx.test'],
+            [
+                'name' => 'sinhvien 1',
+                'password' => Hash::make('12345678'),
+                'vaitro' => 'sinhvien',
+                'gender' => 'male',
+                'phone' => '0900000001',
+            ]
+        );
+        User::updateOrCreate(
+            ['email' => 'sv2@ktx.test'],
+            [
+                'name' => 'sinhvien 2',
+                'password' => Hash::make('12345678'),
+                'vaitro' => 'sinhvien',
+                'gender' => 'female',
+                'phone' => '0900000002',
+            ]
+        );
+        User::updateOrCreate(
+            ['email' => 'sv3@ktx.test'],
+            [
+                'name' => 'sinhvien 3',
+                'password' => Hash::make('12345678'),
+                'vaitro' => 'sinhvien',
+                'gender' => 'male',
+                'phone' => '0900000003',
+            ]
+        );
+        User::updateOrCreate(
+            ['email' => 'sv4@ktx.test'],
+            [
+                'name' => 'sinhvien 4',
+                'password' => Hash::make('12345678'),
+                'vaitro' => 'sinhvien',
+                'gender' => 'female',
+                'phone' => '0900000004',
+            ]
+        );
+        User::updateOrCreate(
+            ['email' => 'sv5@ktx.test'],
+            [
+                'name' => 'sinhvien 5',
+                'password' => Hash::make('12345678'),
+                'vaitro' => 'sinhvien',
+                'gender' => 'male',
+                'phone' => '0900000005',
+            ]
+        );
     }
 }

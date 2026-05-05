@@ -16,20 +16,20 @@
             <h2 style="color: #00A86B;">Chúc mừng bạn!</h2>
         </div>
         <p>Chào {{ $dangky->ho_ten }},</p>
-        <p>Hồ sơ đăng ký phòng của bạn tại <strong>{{ $dangky->phong->tenphong }}</strong> đã được Ban quản lý phê duyệt bước 1.</p>
-        <p>Để hoàn tất việc giữ chỗ và kích hoạt tài khoản sinh viên, vui lòng thực hiện thanh toán lệ phí tháng đầu tiên:</p>
+        <p>Hồ sơ đăng ký phòng của bạn tại <strong>{{ $dangky->phong?->tenphong ?? 'Chưa xác định' }}</strong> đã được Ban quản lý phê duyệt bước 1.</p>
+        <p>Để hoàn tất việc giữ chỗ và được cấp phòng chính thức, vui lòng thực hiện thanh toán phí thế chân (tiền cọc):</p>
         
         <div class="info-box">
             <h4 style="margin-top: 0;">Thông tin thanh toán:</h4>
-            <p><strong>Số tiền:</strong> {{ number_format($dangky->phong->giaphong, 0, ',', '.') }} VNĐ</p>
+            <p><strong>Số tiền:</strong> {{ number_format($soTien ?? 0, 0, ',', '.') }} VNĐ</p>
             <p><strong>Ngân hàng:</strong> VietinBank</p>
             <p><strong>Số tài khoản:</strong> 123456789</p>
             <p><strong>Chủ tài khoản:</strong> BAN QUAN LY KTX ABC</p>
             <p><strong>Nội dung CK:</strong> KTX {{ $dangky->id }} {{ $dangky->so_dien_thoai }}</p>
         </div>
 
-        <p>Hạn chót thanh toán: <strong>{{ $dangky->expires_at->format('d/m/Y H:i') }}</strong></p>
-        <p>Sau khi thanh toán thành công, Admin sẽ xác nhận và gửi thông tin tài khoản đăng nhập cho bạn qua email này.</p>
+        <p>Hạn chót thanh toán: <strong>{{ $dangky->token_expires_at?->format('d/m/Y H:i') ?? 'N/A' }}</strong></p>
+        <p>Sau khi thanh toán thành công, Admin sẽ xác nhận, cấp phòng và gửi link đăng nhập cho bạn qua email này.</p>
         
         <div style="text-align: center; margin: 30px 0;">
             <a href="{{ route('guest.lookup', ['token' => $dangky->lookup_token]) }}" class="btn">Xem chi tiết đơn</a>

@@ -4,16 +4,18 @@ namespace App\Services\Student;
 
 use App\Contracts\Core\KiemToanServiceInterface;
 use App\Contracts\Student\BaohongServiceInterface;
+use App\Enums\BaohongStatus;
 use App\Models\Baohong;
-use App\Models\Phong;
 use App\Models\Sinhvien;
-use App\Enums\MaintenanceStatus;
+use App\Models\Taisan;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class BaohongService implements BaohongServiceInterface
 {
@@ -26,53 +28,98 @@ class BaohongService implements BaohongServiceInterface
     public function getStudentMaintenanceRequests(): array
     {
         $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
-        if (!$sinhvien) return ['danhsachbaohong' => collect()];
+        if (!$sinhvien) return ['danhsachbaohong' => collect(), 'sinhvien' => null];
+
+        $hopdong = $sinhvien->current_hopdong;
+        $phongId = (int) ($hopdong?->phong_id ?? 0);
+        $taisanTrongPhong = $phongId > 0
+            ? Taisan::where('phong_id', $phongId)->orderBy('ten_tai_san')->get()
+            : collect();
 
         return [
+            'sinhvien' => $sinhvien,
             'danhsachbaohong' => Baohong::where('sinhvien_id', $sinhvien->id)
-                ->with('phong')
+                ->with(['phong', 'taisan'])
                 ->orderByDesc('created_at')
-                ->get()
+                ->get(),
+            'taisanTrongPhong' => $taisanTrongPhong,
         ];
     }
 
     public function storeMaintenance(array $data, ?object $file): array
     {
         try {
-            $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
-            if (!$sinhvien) return ['success' => false, 'message' => 'Không tìm thấy thông tin sinh viên.'];
-            if (!$sinhvien->phong_id) return ['success' => false, 'message' => 'Bạn chưa được xếp phòng.'];
+            return DB::transaction(function () use ($data, $file) {
+                $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
+                if (!$sinhvien) {
+                    return $this->traVeLoi('Không tìm thấy thông tin sinh viên. Vui lòng liên hệ ban quản lý.');
+                }
 
-            $imagePath = $this->handleImageUpload($file);
+                $hopdong = $sinhvien->current_hopdong;
+                if (!$hopdong) {
+                    return $this->traVeLoi('Bạn chưa được xếp phòng hoặc hợp đồng không còn hiệu lực.');
+                }
 
-            Baohong::create([
-                'sinhvien_id' => $sinhvien->id,
-                'phong_id' => (int) $sinhvien->phong_id,
-                'mota' => $data['mota'],
-                'noidung' => $data['noidung'] ?? null,
-                'anhminhhoa' => $imagePath,
-                'trangthai' => MaintenanceStatus::Pending->value,
-            ]);
+                if (!$hopdong->phong_id) {
+                    return $this->traVeLoi('Không xác định được phòng. Vui lòng liên hệ ban quản lý.');
+                }
 
-            return ['success' => true, 'message' => 'Gửi báo hỏng thành công.'];
+                $phongId = (int) $hopdong->phong_id;
+                $taisanId = isset($data['taisan_id']) ? (int) $data['taisan_id'] : null;
+                if ($taisanId) {
+                    $taisanHopLe = Taisan::where('id', $taisanId)->where('phong_id', $phongId)->exists();
+                    if (!$taisanHopLe) {
+                        return $this->traVeLoi('Tài sản không hợp lệ hoặc không thuộc phòng của bạn.');
+                    }
+                }
+
+                $imagePath = $this->handleImageUpload($file);
+
+                $payload = [
+                    'sinhvien_id'   => $sinhvien->id,
+                    'phong_id'      => $phongId,
+                    'giuong_id'     => $hopdong->giuong_id ? (int) $hopdong->giuong_id : null,
+                    'mo_ta'         => $data['mota'],
+                    'hinh_anh_path' => $imagePath,
+                    'trang_thai'    => BaohongStatus::Pending->value,
+                    'muc_do'        => 'low',
+                ];
+
+                if (Schema::hasColumn('baohong', 'taisan_id')) {
+                    $payload['taisan_id'] = $taisanId ?: null;
+                }
+
+                $baohong = Baohong::create($payload);
+
+                return $this->traVeThanhCong(
+                    'Gửi báo hỏng thành công. Ban quản lý sẽ xử lý sớn nhất.',
+                    ['baohong' => $baohong]
+                );
+            });
         } catch (\Throwable $e) {
-            Log::error("Store maintenance failed: " . $e->getMessage());
-            return ['success' => false, 'message' => $e->getMessage()];
+            Log::error('BaohongService::storeMaintenance thất bại', [
+                'user_id' => Auth::id(),
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
+            return $this->traVeLoi('Đã có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau.');
         }
     }
 
     public function listMaintenanceRequestsAdmin(Request $request): array
     {
-        $status = $request->query('status', 'Tất cả');
-        $requests = Baohong::with(['sinhvien.taikhoan', 'phong'])
-            ->when($status !== 'Tất cả', fn($q) => $q->where('trangthai', $status))
+        $status = $request->query('status', '');
+        $statusEnum = BaohongStatus::tryFrom($status);
+
+        $requests = Baohong::with(['sinhvien.user', 'phong'])
+            ->when($statusEnum, fn ($q) => $q->where('trang_thai', $statusEnum))
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
 
         return [
             'danhsachbaohong' => $requests,
-            'status' => $status,
+            'status' => $statusEnum?->value,
         ];
     }
 
@@ -83,23 +130,12 @@ class BaohongService implements BaohongServiceInterface
             if (!$baohong) return ['success' => false, 'message' => 'Không tìm thấy báo hỏng.'];
 
             return DB::transaction(function () use ($baohong, $data) {
-                $isFault = (bool) ($data['do_sinh_vien_gay_ra'] ?? false);
-                $fee = (int) ($data['phi_boi_thuong'] ?? 0);
-
                 $oldData = $baohong->toArray();
                 $baohong->update([
-                    'trangthai' => $data['trangthai'],
-                    'ngayhen' => $data['ngayhen'] ?? $baohong->ngayhen,
-                    'noidung' => $data['noidung'] ?? $baohong->noidung,
-                    'do_sinh_vien_gay_ra' => $isFault,
-                    'phi_boi_thuong' => $fee,
+                    'trang_thai' => $data['trang_thai'],
                 ]);
 
                 $this->auditLog('Cap nhat trang thai bao hong', 'Baohong', $baohong->id, $oldData, $baohong->toArray());
-
-                if ($data['trangthai'] === MaintenanceStatus::Completed->value && $isFault && $fee > 0) {
-                    $this->taoHoaDonPhat($baohong, $fee);
-                }
 
                 $this->notifyStudent($baohong);
 
@@ -114,10 +150,17 @@ class BaohongService implements BaohongServiceInterface
     private function handleImageUpload(?object $file): ?string
     {
         if (!$file) return null;
+
         $dir = public_path('anhbaohong');
         File::ensureDirectoryExists($dir);
-        $fileName = time() . '_' . $file->getClientOriginalName();
+
+        // Use random filename instead of original to prevent issues with
+        // non-ASCII characters (Vietnamese), spaces, and path traversal.
+        $extension = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $fileName  = time() . '_' . Str::random(12) . '.' . $extension;
+
         $file->move($dir, $fileName);
+
         return 'anhbaohong/' . $fileName;
     }
 
@@ -126,23 +169,14 @@ class BaohongService implements BaohongServiceInterface
         $this->kiemToanService->ghiNhatKy($action, $model, $id, $old, $new);
     }
 
-    private function taoHoaDonPhat(object $baohong, int $fee): void
-    {
-        $sinhvien = Sinhvien::find($baohong->sinhvien_id);
-        if ($sinhvien) {
-            app(\App\Services\Admin\HoadonService::class)->taoHoaDonPhat(
-                $sinhvien, (int)$fee, "Bồi thường hư hỏng: " . ($baohong->tieude ?? 'Thiết bị KTX')
-            );
-        }
-    }
-
     private function notifyStudent(object $baohong): void
     {
-        $sinhvien = Sinhvien::with('taikhoan')->find($baohong->sinhvien_id);
-        if ($sinhvien?->taikhoan) {
-            $sinhvien->taikhoan->notify(new \App\Notifications\TrangThaiBaohongNotification(
+        $sinhvien = Sinhvien::with('user')->find($baohong->sinhvien_id);
+        if ($sinhvien?->user) {
+            $trangThaiLabel = $baohong->trang_thai instanceof BaohongStatus ? $baohong->trang_thai->label() : (string) ($baohong->trang_thai ?? 'N/A');
+            $sinhvien->user->notify(new \App\Notifications\TrangThaiBaohongNotification(
                 $baohong, 
-                $baohong->trangthai ?? 'Chưa xác định'
+                $trangThaiLabel
             ));
         }
     }

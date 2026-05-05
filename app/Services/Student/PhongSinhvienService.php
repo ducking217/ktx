@@ -4,6 +4,7 @@ namespace App\Services\Student;
 
 use App\Contracts\Student\PhongSinhvienServiceInterface;
 use App\Models\Danhgia;
+use App\Models\Dangky;
 use App\Models\Hoadon;
 use App\Models\Hopdong;
 use App\Models\Phong;
@@ -11,36 +12,63 @@ use App\Models\Sinhvien;
 use App\Models\Taisan;
 use App\Models\Thongbao;
 use App\Models\Vattu;
+use App\Enums\RegistrationStatus;
 use Illuminate\Support\Facades\Auth;
 
 class PhongSinhvienService implements PhongSinhvienServiceInterface
 {
     public function layThongTinPhongToi(): array
     {
-        $sinhvien = Sinhvien::where('user_id', Auth::id())->with(['taikhoan', 'phong'])->first();
+        $sinhvien = Sinhvien::where('user_id', Auth::id())->with(['user', 'current_hopdong.giuong.phong.loaiphong'])->first();
         if (!$sinhvien) return ['error' => 'Không tìm thấy thông tin sinh viên.'];
 
-        if (!$sinhvien->phong_id) {
+        $hopdong = $sinhvien->current_hopdong;
+        if (!$hopdong || !$hopdong->giuong?->phong_id) {
             return [
                 'sinhvien' => $sinhvien,
                 'coPhong' => false,
+                'daGuiYeuCauTraPhong' => false,
                 'danhsachphongtrong' => $this->layDanhSachPhongPhuHop($sinhvien),
             ];
         }
 
-        $phong = Phong::with(['danhsachtaisan', 'danhsachvattu'])->find($sinhvien->phong_id);
-        $banCungPhong = Sinhvien::where('phong_id', $sinhvien->phong_id)->where('id', '<>', $sinhvien->id)->with('taikhoan')->get();
-        $hopdong = Hopdong::where('sinhvien_id', $sinhvien->id)->where('trang_thai', Hopdong::trangThaiDangHieuLuc())->first();
-        $hoadon = Hoadon::where('phong_id', $sinhvien->phong_id)->where('trangthaithanhtoan', Hoadon::trangThaiChuaThanhToan())->orderByDesc('created_at')->get();
+        $phongId = $hopdong->giuong->phong_id;
+        $phong = Phong::with(['taisans', 'vattus', 'loaiphong'])->find($phongId);
+        
+        // Bạn cùng phòng: những sinh viên có hợp đồng active trong cùng phòng
+        $banCungPhong = Sinhvien::whereHas('hopdongs', function ($q) use ($phongId) {
+            $q->where('trang_thai', \App\Enums\ContractStatus::Active->value)
+              ->whereHas('giuong', fn($g) => $g->where('phong_id', $phongId));
+        })->where('id', '<>', $sinhvien->id)->with('user')->get();
+
+        $hoadon = Hoadon::where('hopdong_id', $hopdong->id)
+            ->where('trang_thai', \App\Enums\InvoiceStatus::Unpaid->value)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $daGuiYeuCauTraPhong = Dangky::where('user_id', $sinhvien->user_id)
+            ->where('trang_thai', RegistrationStatus::Pending)
+            ->where('ghi_chu', 'like', 'TRA_PHONG%')
+            ->exists();
 
         return [
-            'sinhvien' => $sinhvien, 'coPhong' => true, 'phong' => $phong, 'banCungPhong' => $banCungPhong,
-            'hopdongHienTai' => $hopdong, 'hoadonChuaThanhToan' => $hoadon, 'tongNo' => $hoadon->sum('tongtien'),
-            'taisan' => Taisan::where('phong_id', $sinhvien->phong_id)->get(),
-            'vattu' => Vattu::where('phong_id', $sinhvien->phong_id)->get(),
-            'daDanhGia' => Danhgia::where('sinhvien_id', $sinhvien->id)->where('phong_id', $sinhvien->phong_id)->whereYear('ngaydanhgia', now()->year)->whereMonth('ngaydanhgia', now()->month)->exists(),
-            'diemTrungBinh' => round(Danhgia::where('phong_id', $sinhvien->phong_id)->avg('diem') ?? 0, 1),
-            'thongbaoMoiNhat' => Thongbao::where('doituong', 'sinhvien')->orWhereNull('doituong')->orderByDesc('ngaydang')->limit(5)->get(),
+            'sinhvien' => $sinhvien, 
+            'coPhong' => true, 
+            'phong' => $phong, 
+            'banCungPhong' => $banCungPhong,
+            'hopdongHienTai' => $hopdong, 
+            'hoadonChuaThanhToan' => $hoadon, 
+            'tongNo' => $hoadon->sum('tong_tien'),
+            'taisan' => $phong->taisans,
+            'vattu' => $phong->vattus ?? collect(),
+            'daGuiYeuCauTraPhong' => $daGuiYeuCauTraPhong,
+            'daDanhGia' => Danhgia::where('sinhvien_id', $sinhvien->id)
+                ->where('phong_id', $phongId)
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->exists(),
+            'diemTrungBinh' => round(Danhgia::where('phong_id', $phongId)->avg('rating') ?? 0, 1),
+            'thongbaoMoiNhat' => Thongbao::whereIn('doi_tuong_nhan', ['all', 'sinhvien'])->orderByDesc('created_at')->limit(5)->get(),
             'canhBaoHetHan' => $this->layCanhBaoHetHan($hopdong),
         ];
     }
@@ -59,10 +87,19 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
 
     private function layDanhSachPhongPhuHop($sinhvien)
     {
-        $gioitinh = $sinhvien->taikhoan->gioitinh ?? null;
-        return Phong::when($gioitinh, fn($q) => $q->where('gioitinh', $gioitinh))
-            ->withCount('danhsachsinhvien')->get()
-            ->filter(fn($p) => $p->danhsachsinhvien_count < (int)$p->succhuamax)
+        $gioitinh = $sinhvien->user->gender ?? null;
+        return Phong::when($gioitinh, fn($q) => $q->where('gioi_tinh_han_che', $gioitinh))
+            ->with([
+                'loaiphong',
+                'toanha',
+                'taisans:id,phong_id,ten_tai_san,so_luong',
+                'vattus:id,phong_id,ten_vat_tu,so_luong',
+            ])
+            ->withCount(['giuongs as so_nguoi_dang_o' => function ($query) {
+                $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+            }])
+            ->get()
+            ->filter(fn($p) => $p->so_nguoi_dang_o < (int)($p->loaiphong->suc_chua ?? 0))
             ->take(5);
     }
 }

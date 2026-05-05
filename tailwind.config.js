@@ -33,11 +33,12 @@ export default {
                     success: 'oklch(var(--success-lch) / <alpha-value>)',
                     warning: 'oklch(var(--warning-lch) / <alpha-value>)',
                     error: 'oklch(var(--error-lch) / <alpha-value>)',
+                    info: 'oklch(var(--info-lch) / <alpha-value>)',
                 },
             },
             fontFamily: {
-                sans: ['Onest', ...defaultTheme.fontFamily.sans],
-                display: ['Bricolage Grotesque', ...defaultTheme.fontFamily.sans],
+                sans: ['Geist Sans', ...defaultTheme.fontFamily.sans],
+                display: ['Quicksand', ...defaultTheme.fontFamily.sans],
             },
             letterSpacing: {
                 tight: '-0.01em',

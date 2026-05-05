@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Student;
 
+use App\Enums\Gender;
 use App\Models\User;
-use App\Models\Sinhvien;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,29 +27,29 @@ class CapNhatHoSoRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
-            // Thêm các trường cho sinh viên
-            'masinhvien' => [
+            'phone' => ['nullable', 'string', 'max:30'],
+            'gender' => ['nullable', Rule::in([Gender::Male->value, Gender::Female->value, Gender::Other->value])],
+            'dob' => ['nullable', 'date'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'id_card' => ['nullable', 'string', 'max:30'],
+            'ma_sinh_vien' => [
                 'nullable',
                 'string',
                 'max:20',
-                Rule::unique('sinhvien')->ignore($this->user()->sinhvien->id ?? 0),
+                Rule::unique('sinhvien', 'ma_sinh_vien')->ignore($this->user()->sinhvien->id ?? 0),
             ],
             'lop' => ['nullable', 'string', 'max:50'],
-            'sodienthoai' => ['nullable', 'string', 'max:15'],
-            'gioitinh' => ['nullable', 'in:Nam,Nữ'],
-            'ngaysinh' => ['nullable', 'date'],
-            'diachi' => ['nullable', 'string', 'max:500'],
-            'dantoc' => ['nullable', 'string', 'max:50'],
-            'so_cccd' => ['nullable', 'string', 'max:20'],
+            'khoa' => ['nullable', 'string', 'max:100'],
+            'ngay_nhap_hoc' => ['nullable', 'date'],
+            'anh_the' => ['nullable', 'image', 'max:4096'],
+            'anh_cccd' => ['nullable', 'image', 'max:4096'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'masinhvien.unique' => 'Mã sinh viên này đã tồn tại trên hệ thống.',
+            'ma_sinh_vien.unique' => 'Mã sinh viên này đã tồn tại trên hệ thống.',
         ];
     }
 }
-
-

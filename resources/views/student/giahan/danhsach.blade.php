@@ -3,77 +3,79 @@
 @section('student_page_title', 'Gia hạn hợp đồng')
 
 @section('noidung')
-    <div class="space-y-8 animate-fade-up">
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h2 class="text-xl font-black text-ink-primary uppercase tracking-tight">Yêu cầu đã gửi</h2>
-                <p class="text-[10px] font-bold text-ink-secondary/50 uppercase tracking-widest mt-1">Quản lý lịch sử gia hạn hợp đồng nội trú</p>
-            </div>
-            <a href="{{ route('student.giahan.tao') }}" class="pdu-btn-primary shadow-lg shadow-brand-emerald/20 !px-6">
-                <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                Tạo yêu cầu mới
+    <div class="space-y-8">
+        <x-admin.page-header
+            title="Gia hạn hợp đồng"
+            subtitle="Lịch sử yêu cầu gia hạn thời gian lưu trú."
+        >
+            <a href="{{ route('student.giahan.tao') }}" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Gửi yêu cầu mới
             </a>
-        </header>
+        </x-admin.page-header>
 
-        <article class="pdu-card !p-0 overflow-hidden shadow-xl shadow-ink-primary/5">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-ui-bg/50 border-b border-ui-border">
-                            <th class="px-6 py-4 text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">Hợp đồng</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">Ngày mong muốn</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">Lý do</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">Trạng thái</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-ink-secondary/40 uppercase tracking-[0.2em]">Ghi chú Admin</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-ui-border">
-                        @forelse ($yeuCauGiaHan as $item)
-                            <tr class="group hover:bg-ui-bg/30 transition-colors">
-                                <td class="px-6 py-5">
-                                    <div class="font-display font-black text-ink-primary tracking-tight">{{ $item->hopdong->ma_hd }}</div>
-                                    <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-widest">{{ $item->hopdong->phong->tenphong }}</div>
-                                </td>
-                                <td class="px-6 py-5 font-bold text-ink-primary tabular-nums tracking-tight">
-                                    {{ $item->ngay_ket_thuc_moi->format('d/m/Y') }}
-                                </td>
-                                <td class="px-6 py-5">
-                                    <p class="text-xs text-ink-secondary/80 max-w-xs truncate" title="{{ $item->ly_do }}">
-                                        {{ $item->ly_do ?: 'Không có lý do' }}
-                                    </p>
-                                </td>
-                                <td class="px-6 py-5">
-                                    <span @class([
-                                        'inline-flex items-center rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-widest ring-1',
-                                        'bg-status-warning/10 text-status-warning ring-status-warning/20' => $item->trang_thai->value === 'pending',
-                                        'bg-status-success/10 text-status-success ring-status-success/20' => $item->trang_thai->value === 'approved',
-                                        'bg-status-error/10 text-status-error ring-status-error/20' => $item->trang_thai->value === 'rejected',
-                                    ])>
-                                        {{ $item->trang_thai->label() }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-5">
-                                    <span class="text-xs italic text-ink-secondary/60">{{ $item->ghi_chu_admin ?: '—' }}</span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-32 text-center">
-                                    <div class="flex flex-col items-center justify-center text-ink-secondary/20">
-                                        <svg class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        <p class="text-[10px] font-black uppercase tracking-widest italic">Bạn chưa gửi yêu cầu gia hạn nào</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+        <!-- Data Table -->
+        <x-admin.table-card>
+            <thead>
+                <tr>
+                    <th>Hợp đồng</th>
+                    <th class="text-center">Ngày mong muốn</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th>Lý do</th>
+                    <th class="text-right">Ghi chú từ BQL</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($yeuCauGiaHan as $item)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="py-4">
+                            <div class="text-sm font-bold text-slate-900 uppercase tracking-tight">{{ $item->hopdong->ma_hd }}</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ $item->hopdong->phong->tenphong ?? 'N/A' }}</div>
+                        </td>
+                        <td class="py-4 text-center">
+                            <span class="text-xs font-bold text-slate-600 tabular-nums bg-slate-100 px-2 py-1 rounded-lg uppercase tracking-widest">{{ $item->ngay_ket_thuc_moi->format('d/m/Y') }}</span>
+                        </td>
+                        <td class="py-4 text-center">
+                            @php
+                                $status = $item->trang_thai->value;
+                                $badgeClass = match($status) {
+                                    'pending' => 'saas-badge-warning',
+                                    'approved' => 'saas-badge-success',
+                                    'rejected' => 'saas-badge-error',
+                                    default => 'bg-slate-100 text-slate-600',
+                                };
+                            @endphp
+                            <span class="saas-badge {{ $badgeClass }}">
+                                @if($status === 'pending')
+                                    <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-current animate-pulse"></span>
+                                @endif
+                                {{ $item->trang_thai->label() }}
+                            </span>
+                        </td>
+                        <td class="py-4">
+                            <p class="text-xs font-medium text-slate-700 line-clamp-1" title="{{ $item->ly_do }}">{{ $item->ly_do ?: 'Không có lý do' }}</p>
+                        </td>
+                        <td class="py-4 text-right">
+                            <p class="text-xs font-medium text-slate-500 italic">{{ $item->ghi_chu_admin ?: '—' }}</p>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="py-24 text-center">
+                            <div class="flex flex-col items-center gap-4 text-slate-200">
+                                <svg class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Chưa có yêu cầu gia hạn nào</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-admin.table-card>
+        
+        @if($yeuCauGiaHan->hasPages())
+            <div class="mt-8">
+                {{ $yeuCauGiaHan->links() }}
             </div>
-            @if($yeuCauGiaHan->hasPages())
-                <div class="px-6 py-4 bg-ui-bg/30 border-t border-ui-border">
-                    {{ $yeuCauGiaHan->links() }}
-                </div>
-            @endif
-        </article>
+        @endif
     </div>
 @endsection

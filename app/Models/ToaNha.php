@@ -2,29 +2,38 @@
 
 namespace App\Models;
 
+use App\Enums\Gender;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ToaNha extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $table = 'toa_nhas';
+    protected $table = 'toa_nha';
 
     protected $fillable = [
         'ten_toa_nha',
         'ma_toa_nha',
+        'gioi_tinh',
+        'dia_chi',
         'mo_ta',
+        'so_phong',
+        'so_tang',
     ];
 
-    public function danhsachphong(): HasMany
+    protected $casts = [
+        'so_phong' => 'integer',
+        'so_tang' => 'integer',
+        'gioi_tinh' => Gender::class,
+    ];
+
+    public function phongs()
     {
         return $this->hasMany(Phong::class, 'toa_nha_id');
     }
 
-    public function danhsachuser(): HasMany
+    public function users()
     {
         return $this->hasMany(User::class, 'toa_nha_id');
     }

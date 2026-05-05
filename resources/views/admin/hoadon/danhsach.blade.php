@@ -1,319 +1,311 @@
 <x-admin-layout>
-    <x-slot:title>Quản lý Hóa đơn & Công nợ</x-slot:title>
+    <x-slot:title>Quản lý Hóa đơn & Tài chính</x-slot:title>
 
-    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h1 class="text-3xl font-display font-black tracking-tight text-ink-primary uppercase">Hóa đơn & Công nợ</h1>
-            <p class="mt-1 text-sm font-medium text-ink-secondary italic">Quản lý dòng tiền, chỉ số điện nước và trạng thái thanh toán.</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="{{ route('admin.hoadon.nhap_hang_loat') }}" class="pdu-btn-ghost group">
-                <svg class="mr-2 h-4 w-4 text-ink-secondary group-hover:text-brand-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Nhập hàng loạt
-            </a>
-            <button type="button" data-modal-target="modal-xulyhoadon" data-modal-toggle="modal-xulyhoadon" class="pdu-btn-primary">
-                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                Ghi chỉ số mới
-            </button>
-        </div>
-    </div>
+    <div class="space-y-8">
+        <x-admin.page-header
+            title="Hóa đơn & Tài chính"
+            subtitle="Giám sát dòng tiền cư trú, chỉ số tiện ích và quản lý lịch sử giao dịch toàn diện."
+        >
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.hoadon.nhap_hang_loat') }}" class="saas-btn-secondary h-11 px-5 shadow-sm">
+                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Nhập hàng loạt
+                </a>
+                <button type="button" data-modal-target="modal-xulyhoadon" data-modal-toggle="modal-xulyhoadon" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                    Ghi chỉ số mới
+                </button>
+            </div>
+        </x-admin.page-header>
 
-    <!-- Filters & Stats -->
-    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="pdu-card flex flex-col justify-between py-4">
-            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Tổng công nợ</div>
-            <div class="mt-2 text-2xl font-display font-black tracking-tighter tabular-nums">{{ number_format($thongke['tong_no'] ?? 0) }}đ</div>
-        </div>
-        <div class="pdu-card flex flex-col justify-between py-4 border-l-4 border-l-status-error">
-            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Quá hạn</div>
-            <div class="mt-2 text-2xl font-display font-black tracking-tighter tabular-nums text-status-error">{{ $thongke['so_qua_han'] ?? 0 }} phiếu</div>
-        </div>
-        <div class="pdu-card flex flex-col justify-between py-4 border-l-4 border-l-status-warning">
-            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Chờ thanh toán</div>
-            <div class="mt-2 text-2xl font-display font-black tracking-tighter tabular-nums text-status-warning">{{ $thongke['so_cho_duyet'] ?? 0 }} phiếu</div>
-        </div>
-        <div class="pdu-card flex flex-col justify-between py-4 border-l-4 border-l-status-success">
-            <div class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Đã thu tháng này</div>
-            <div class="mt-2 text-2xl font-display font-black tracking-tighter tabular-nums text-status-success">{{ number_format($thongke['da_thu_thang'] ?? 0) }}đ</div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="pdu-card overflow-hidden !p-0 shadow-xl shadow-ink-primary/5">
-        {{-- Desktop View --}}
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-secondary border-b border-ui-border">
-                    <tr>
-                        <th class="px-6 py-4">Mã / Kỳ hạn</th>
-                        <th class="px-6 py-4">Đối tượng / Phòng</th>
-                        <th class="px-6 py-4 text-right">Tổng tiền</th>
-                        <th class="px-6 py-4 text-center">Trạng thái</th>
-                        <th class="px-6 py-4 text-right">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-ui-border">
-                    @forelse ($danhsachhoadon as $hoadon)
-                        <tr class="group hover:bg-ui-bg/50 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-ink-primary tabular-nums">#{{ $hoadon->id }}</div>
-                                <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-tighter">Kỳ T{{ $hoadon->thang }}/{{ $hoadon->nam }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-ink-primary font-display">{{ $hoadon->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
-                                <div class="flex items-center gap-1.5 text-[10px] font-bold text-ink-secondary/60 uppercase tracking-widest mt-0.5">
-                                    <span class="h-1 w-1 rounded-full bg-brand-emerald"></span>
-                                    {{ $hoadon->phong?->tenphong ?? 'N/A' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="font-display font-black text-ink-primary tabular-nums">{{ number_format($hoadon->tongtien) }}đ</div>
-                                <div class="text-[9px] font-bold text-ink-secondary/30 uppercase italic">{{ $hoadon->loai_hoadon === 'monthly' ? 'Hàng tháng' : 'Phát sinh' }}</div>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                @php
-                                    $status = $hoadon->trangthaithanhtoan;
-                                    $class = match($status) {
-                                        \App\Enums\InvoiceStatus::Paid => 'bg-status-success/10 text-status-success ring-status-success/20',
-                                        \App\Enums\InvoiceStatus::Overdue => 'bg-status-error/10 text-status-error ring-status-error/20',
-                                        default => 'bg-status-warning/10 text-status-warning ring-status-warning/20',
-                                    };
-                                @endphp
-                                <span class="inline-flex rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-widest ring-1 {{ $class }}">
-                                    {{ $status->label() }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="h-9 w-9 rounded-xl bg-ui-bg flex items-center justify-center text-ink-secondary border border-ui-border hover:bg-white hover:text-brand-emerald hover:border-brand-emerald/30 transition-all active:scale-95 shadow-sm" title="Tải PDF">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    </a>
-                                    
-                                    @if ($hoadon->trangthaithanhtoan !== \App\Enums\InvoiceStatus::Paid)
-                                        <form action="{{ route('admin.xacnhanthanhtoan', $hoadon->id) }}" method="POST" onsubmit="return confirm('Xác nhận sinh viên đã đóng tiền?')">
-                                            @csrf
-                                            <button type="submit" class="h-9 w-9 rounded-xl bg-ink-primary flex items-center justify-center text-white hover:bg-brand-emerald transition-all active:scale-95 shadow-lg shadow-ink-primary/10">
-                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="py-20 text-center">
-                                <div class="text-lg font-display font-black text-ink-secondary/20 uppercase italic tracking-widest">Không có dữ liệu hóa đơn</div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- Mobile Card List --}}
-        <div class="md:hidden divide-y divide-ui-border">
-            @forelse ($danhsachhoadon as $hoadon)
-                <div class="p-5 space-y-4">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="font-bold text-ink-primary tabular-nums">#{{ $hoadon->id }}</div>
-                            <div class="text-[10px] font-bold text-ink-secondary/40 uppercase tracking-tighter">Tháng {{ $hoadon->thang }}/{{ $hoadon->nam }}</div>
-                        </div>
-                        @php
-                            $status = $hoadon->trangthaithanhtoan;
-                            $class = match($status) {
-                                \App\Enums\InvoiceStatus::Paid => 'bg-status-success/10 text-status-success ring-status-success/20',
-                                \App\Enums\InvoiceStatus::Overdue => 'bg-status-error/10 text-status-error ring-status-error/20',
-                                default => 'bg-status-warning/10 text-status-warning ring-status-warning/20',
-                            };
-                        @endphp
-                        <span class="inline-flex rounded-lg px-2 py-0.5 text-[8px] font-black uppercase tracking-widest ring-1 {{ $class }}">
-                            {{ $status->label() }}
-                        </span>
+        {{-- Thống kê tóm tắt --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="saas-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-10 w-10 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center border border-slate-200/60">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4 rounded-xl bg-ui-bg/30 p-4 ring-1 ring-inset ring-ui-border">
-                        <div class="space-y-1">
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Cư dân</div>
-                            <div class="text-xs font-bold text-ink-primary truncate font-display">{{ $hoadon->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Vị trí</div>
-                            <div class="text-xs font-bold text-ink-primary">{{ $hoadon->phong?->tenphong ?? 'N/A' }}</div>
-                        </div>
-                        <div class="space-y-1 col-span-2">
-                            <div class="text-[8px] font-bold text-ink-secondary/40 uppercase tracking-widest">Tổng quyết toán</div>
-                            <div class="text-lg font-display font-black text-ink-primary tabular-nums">{{ number_format($hoadon->tongtien) }}đ</div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="flex-1 flex h-10 items-center justify-center gap-2 rounded-xl bg-ui-bg text-[10px] font-bold uppercase tracking-widest text-ink-secondary ring-1 ring-ui-border">
-                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Tải PDF
-                        </a>
-                        @if ($hoadon->trangthaithanhtoan !== \App\Enums\InvoiceStatus::Paid)
-                            <form action="{{ route('admin.xacnhanthanhtoan', $hoadon->id) }}" method="POST" class="flex-1">
-                                @csrf
-                                <button type="submit" class="w-full h-10 rounded-xl bg-ink-primary text-[10px] font-bold uppercase tracking-widest text-white shadow-lg shadow-ink-primary/10">Xác nhận</button>
-                            </form>
-                        @endif
-                    </div>
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Tổng nợ</span>
                 </div>
-            @empty
-                <div class="py-20 text-center text-ink-secondary/20 uppercase font-black text-[10px] tracking-widest">Không có dữ liệu hóa đơn</div>
-            @endforelse
+                <div class="text-2xl font-semibold text-slate-900 tabular-nums">{{ number_format((int) ($thongke['tong_no'] ?? 0)) }}<span class="text-xs font-semibold text-slate-400 ml-1.5 uppercase">VNĐ</span></div>
+                <div class="mt-1 text-xs text-slate-500">Tổng công nợ đang theo dõi.</div>
+            </div>
+
+            <div class="saas-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-10 w-10 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center border border-rose-200/50">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Quá hạn</span>
+                </div>
+                <div class="text-2xl font-semibold text-rose-700 tabular-nums">{{ $thongke['so_qua_han'] ?? 0 }}<span class="text-xs font-semibold text-rose-400 ml-1.5 uppercase">HĐ</span></div>
+                <div class="mt-1 text-xs text-slate-500">Cần nhắc thanh toán.</div>
+            </div>
+
+            <div class="saas-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-10 w-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200/50">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Chờ thu</span>
+                </div>
+                <div class="text-2xl font-semibold text-amber-700 tabular-nums">{{ $thongke['so_cho_thu'] ?? 0 }}<span class="text-xs font-semibold text-amber-400 ml-1.5 uppercase">HĐ</span></div>
+                <div class="mt-1 text-xs text-slate-500">Chưa thu hoặc chờ xác nhận.</div>
+            </div>
+
+            <div class="saas-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/50">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Đã thu</span>
+                </div>
+                <div class="text-2xl font-semibold text-emerald-700 tabular-nums">{{ number_format((int) ($thongke['da_thu_thang'] ?? 0)) }}<span class="text-xs font-semibold text-emerald-400 ml-1.5 uppercase">VNĐ</span></div>
+                <div class="mt-1 text-xs text-slate-500">Tổng thu trong tháng.</div>
+            </div>
         </div>
+
+        @php
+            $activeTab = (string) ($activeTab ?? request()->query('tab', 'cho-xac-nhan'));
+            $tabs = $tabs ?? [
+                'cho_xac_nhan' => 0,
+                'cong_no' => 0,
+                'lich_su' => 0,
+                'hoan_coc' => 0,
+            ];
+            $tabItems = [
+                'cho-xac-nhan' => ['label' => 'Chờ xác nhận', 'count' => (int) ($tabs['cho_xac_nhan'] ?? 0)],
+                'cong-no' => ['label' => 'Công nợ', 'count' => (int) ($tabs['cong_no'] ?? 0)],
+                'lich-su' => ['label' => 'Lịch sử thu', 'count' => (int) ($tabs['lich_su'] ?? 0)],
+                'hoan-coc' => ['label' => 'Hoàn cọc', 'count' => (int) ($tabs['hoan_coc'] ?? 0)],
+            ];
+        @endphp
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <div class="text-sm font-semibold text-slate-900">Bộ lọc theo luồng xử lý</div>
+                <div class="mt-0.5 text-xs text-slate-500">Ưu tiên đối soát giao dịch trước, sau đó xử lý công nợ.</div>
+            </div>
+            <nav class="flex items-center gap-1 p-1 rounded-xl bg-slate-100/80 w-fit" aria-label="Bộ lọc hóa đơn">
+                @foreach($tabItems as $tabValue => $tab)
+                    @php
+                        $isActive = $activeTab === $tabValue;
+                        $href = request()->fullUrlWithQuery(['tab' => $tabValue, 'page' => 1]);
+                    @endphp
+                    <a
+                        href="{{ $href }}"
+                        class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ $isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
+                        aria-current="{{ $isActive ? 'page' : 'false' }}"
+                    >
+                        {{ $tab['label'] }}
+                        <span class="ml-2 inline-flex min-w-[20px] items-center justify-center rounded-full bg-slate-200/70 px-1.5 py-0.5 text-[10px] font-bold text-slate-700 tabular-nums">
+                            {{ $tab['count'] }}
+                        </span>
+                    </a>
+                @endforeach
+            </nav>
+        </div>
+
+        <x-admin.table-card>
+            <thead>
+                <tr>
+                    <th>Hóa đơn</th>
+                    <th>Sinh viên</th>
+                    <th class="text-right">Số tiền</th>
+                    <th>Giao dịch</th>
+                    <th>Hạn thanh toán</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-right">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($danhsachhoadon as $hoadon)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="py-5">
+                            @php
+                                $maHoaDon = $hoadon->ma_hoa_don ?: ('HD-' . str_pad((string) $hoadon->id, 6, '0', STR_PAD_LEFT));
+                            @endphp
+                            <div class="text-sm font-bold text-slate-900 tabular-nums leading-tight">{{ $maHoaDon }}</div>
+                            <div class="mt-1 text-xs text-slate-500">
+                                {{ $hoadon->loai_hoadon_label }}@if($hoadon->ghi_chu) • {{ $hoadon->ghi_chu }}@endif
+                            </div>
+                        </td>
+                        <td class="py-5">
+                            <div class="text-sm font-bold text-slate-800 leading-tight group-hover:text-slate-900 transition-colors">{{ $hoadon->hopdong?->sinhvien?->user?->name ?? 'Chưa xác định' }}</div>
+                            <div class="mt-1 text-xs text-slate-500">
+                                Phòng {{ $hoadon->hopdong?->giuong?->phong?->ten_phong ?? '—' }}
+                            </div>
+                        </td>
+                        <td class="py-5 text-right">
+                            <div class="text-sm font-bold text-slate-900 tabular-nums leading-tight">{{ number_format((int) $hoadon->tong_tien) }}<small class="ml-0.5 text-slate-400 font-bold uppercase">VNĐ</small></div>
+                            <div class="mt-1 text-xs text-slate-500 tabular-nums">{{ $hoadon->created_at?->format('d/m/Y') ?? '—' }}</div>
+                        </td>
+                        <td class="py-5">
+                            @php
+                                $giaoDichChoXacNhan = $hoadon->trang_thai === \App\Enums\InvoiceStatus::PendingConfirmation
+                                    ? $hoadon->giao_dich_gan_nhat
+                                    : null;
+                            @endphp
+
+                            @if ($giaoDichChoXacNhan)
+                                <div class="text-[11px] font-bold text-slate-900 tabular-nums leading-tight">{{ $giaoDichChoXacNhan->ma_giao_dich ?? '—' }}</div>
+                                <div class="mt-1 text-[10px] font-semibold text-slate-500 leading-snug">
+                                    {{ $giaoDichChoXacNhan->ghi_chu ?? '—' }}
+                                </div>
+                                <div class="mt-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                    {{ $giaoDichChoXacNhan->ngay_giao_dich?->format('d/m/Y H:i') ?? '—' }}
+                                </div>
+                            @else
+                                <div class="text-sm font-bold text-slate-300">—</div>
+                            @endif
+                        </td>
+                        <td class="py-5 text-slate-600">
+                            <div class="tabular-nums">{{ $hoadon->ngay_het_han?->format('d/m/Y') ?? '—' }}</div>
+                        </td>
+                        <td class="py-5 text-center">
+                            @php
+                                $statusInvoice = $hoadon->trang_thai;
+                                $statusBadgeInvoice = match($statusInvoice) {
+                                    \App\Enums\InvoiceStatus::Paid => 'saas-badge-success',
+                                    \App\Enums\InvoiceStatus::PendingConfirmation => 'saas-badge-info',
+                                    \App\Enums\InvoiceStatus::Overdue => 'saas-badge-error',
+                                    default => 'saas-badge-warning',
+                                };
+                            @endphp
+                            <span class="saas-badge {{ $statusBadgeInvoice }}">
+                                {{ $statusInvoice->label() }}
+                            </span>
+                        </td>
+                        <td class="py-5 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="saas-btn-secondary h-9 px-3 text-xs font-semibold">
+                                    PDF
+                                </a>
+
+                                @php
+                                    $loaiHoadon = (string) ($hoadon->loai_hoadon ?? '');
+                                    $coTheNhacNo = in_array($hoadon->trang_thai, [\App\Enums\InvoiceStatus::Unpaid, \App\Enums\InvoiceStatus::Overdue], true)
+                                        && $loaiHoadon !== 'refund';
+                                @endphp
+                                @if ($coTheNhacNo)
+                                    <form action="{{ route('admin.hoadon.nhacno', $hoadon->id) }}" method="POST" data-confirm="{{ e('Gửi nhắc nợ cho hóa đơn ' . $maHoaDon . '?') }}" onsubmit="return confirm(this.dataset.confirm)">
+                                        @csrf
+                                        <button type="submit" class="saas-btn-secondary h-9 px-3 text-xs font-semibold">
+                                            Nhắc nợ
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if ($hoadon->trang_thai !== \App\Enums\InvoiceStatus::Paid)
+                                    @php
+                                        $isRefund = (string) ($hoadon->loai_hoadon ?? '') === 'refund';
+                                        $confirmText = $isRefund
+                                            ? ('Xác nhận đã hoàn tiền cọc ' . $maHoaDon . ' (Số tiền: ' . number_format((int) $hoadon->tong_tien, 0, ',', '.') . 'đ)?')
+                                            : ('Xác nhận đã thu hóa đơn ' . $maHoaDon . ' (Số tiền: ' . number_format((int) $hoadon->tong_tien, 0, ',', '.') . 'đ)?');
+                                    @endphp
+                                    <form action="{{ route('admin.xacnhanthanhtoan', $hoadon->id) }}" method="POST" data-confirm="{{ e($confirmText) }}" onsubmit="return confirm(this.dataset.confirm)">
+                                        @csrf
+                                        <button type="submit" class="saas-btn-primary h-9 px-3 text-xs font-semibold">
+                                            {{ $isRefund ? 'Xác nhận hoàn' : 'Xác nhận' }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="py-24 text-center">
+                            <x-empty-state
+                                title="Chưa có hóa đơn"
+                                description="Không có dữ liệu trong tab hiện tại."
+                            />
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-admin.table-card>
+
+        @if(method_exists($danhsachhoadon, 'links'))
+            <div class="mt-8">
+                {{ $danhsachhoadon->links() }}
+            </div>
+        @endif
     </div>
 
     @push('modals')
-        <x-modal id="modal-nhaphangloat" title="Nhập chỉ số hàng loạt" subtitle="Điền chỉ số mới cho tất cả các phòng trong cùng một bảng để kết xuất hóa đơn nhanh chóng.">
-            <form method="POST" action="{{ route('admin.hoadon.bulk') }}" class="space-y-6">
-                @csrf
-                <div class="grid grid-cols-2 gap-5">
-                    <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Kỳ quyết toán (Tháng)</label>
-                        <input name="thang" type="number" value="{{ now()->format('m') }}" class="linear-input mt-1.5 font-bold tabular-nums" required />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Năm vận hành</label>
-                        <input name="nam" type="number" value="{{ now()->format('Y') }}" class="linear-input mt-1.5 font-bold tabular-nums" required />
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto rounded-2xl border border-ui-border max-h-[400px]">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-ui-bg sticky top-0 z-10 text-[10px] font-bold uppercase tracking-widest text-ink-secondary border-b border-ui-border">
-                            <tr>
-                                <th class="px-4 py-3">Phòng</th>
-                                <th class="px-4 py-3">Điện cũ → Mới</th>
-                                <th class="px-4 py-3">Nước cũ → Mới</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-ui-border">
-                            @foreach ($danhsachphong as $phong)
-                                <tr>
-                                    <td class="px-4 py-3 font-bold text-ink-primary">{{ $phong->tenphong }}</td>
-                                    <td class="px-4 py-3">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" name="hoa_don[{{ $phong->id }}][chisodiencu]" value="0" class="w-16 rounded-lg border-ui-border bg-ui-bg/50 px-2 py-1 text-[11px] tabular-nums" placeholder="Cũ" />
-                                            <svg class="h-3 w-3 text-ink-secondary/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                                            <input type="number" name="hoa_don[{{ $phong->id }}][chisodienmoi]" class="w-16 rounded-lg border-ui-border px-2 py-1 text-[11px] font-bold tabular-nums" placeholder="Mới" required />
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" name="hoa_don[{{ $phong->id }}][chisonuoccu]" value="0" class="w-16 rounded-lg border-ui-border bg-ui-bg/50 px-2 py-1 text-[11px] tabular-nums" placeholder="Cũ" />
-                                            <svg class="h-3 w-3 text-ink-secondary/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                                            <input type="number" name="hoa_don[{{ $phong->id }}][chisonuocmoi]" class="w-16 rounded-lg border-ui-border px-2 py-1 text-[11px] font-bold tabular-nums" placeholder="Mới" required />
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="flex gap-3 pt-4">
-                    <button type="button" data-modal-hide="modal-nhaphangloat" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Hủy bỏ</button>
-                    <button type="submit" class="flex-[2] rounded-xl bg-ink-primary py-3 text-sm font-bold text-white shadow-lg shadow-ink-primary/20 transition-all hover:bg-brand-emerald">Khởi tạo hàng loạt</button>
-                </div>
-            </form>
-        </x-modal>
-
-        <x-modal id="modal-xulyhoadon" title="Kê khai chỉ số tiện ích" subtitle="Nhập chỉ số điện nước mới nhất để hệ thống tự động kết xuất hóa đơn tháng.">
+        <x-modal id="modal-xulyhoadon" title="Ghi chỉ số điện nước" subtitle="Nhập chỉ số điện nước định kỳ để hệ thống tự động tạo hóa đơn tháng.">
             <form method="POST" action="{{ route('admin.xulyhoadon') }}" class="space-y-6">
                 @csrf
-                <div>
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Phòng cư trú chỉ định</label>
-                    <select name="phong_id" class="linear-select mt-1.5 font-bold" required>
-                        <option value="">-- Chọn phòng kết xuất --</option>
+                <div class="space-y-2">
+                    <label for="phong_id" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phòng cần ghi chỉ số</label>
+                    <select name="phong_id" id="phong_id" class="saas-input font-bold h-11" required>
+                        <option value="">-- Chọn phòng --</option>
                         @foreach ($danhsachphong as $phong)
-                            <option value="{{ $phong->id }}">{{ $phong->tenphong }}</option>
+                            <option value="{{ $phong->id }}">{{ $phong->ten_phong }}</option>
                         @endforeach
                     </select>
                 </div>
 
-                <div class="grid grid-cols-2 gap-5">
-                    <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Kỳ quyết toán (Tháng)</label>
-                        <input name="thang" type="number" value="{{ old('thang', now()->format('m')) }}" class="linear-input mt-1.5 font-bold tabular-nums" required />
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="thang" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Tháng</label>
+                        <input name="thang" id="thang" type="number" value="{{ now()->format('m') }}" class="saas-input font-bold tabular-nums h-11" required />
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/50">Năm vận hành</label>
-                        <input name="nam" type="number" value="{{ old('nam', now()->format('Y')) }}" class="linear-input mt-1.5 font-bold tabular-nums" required />
-                    </div>
-                </div>
-
-                <div class="space-y-4 rounded-2xl bg-ui-bg/50 p-6 ring-1 ring-inset ring-ui-border">
-                    <div class="grid grid-cols-2 gap-5">
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60">Chỉ số Điện Cũ</label>
-                            <input name="chisodiencu" type="number" value="{{ old('chisodiencu', 0) }}" class="linear-input !bg-white tabular-nums" required />
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60">Chỉ số Điện Mới</label>
-                            <input name="chisodienmoi" type="number" value="{{ old('chisodienmoi', 0) }}" class="linear-input !bg-white font-bold text-ink-primary tabular-nums" required />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-5">
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60">Chỉ số Nước Cũ</label>
-                            <input name="chisonuoccu" type="number" value="{{ old('chisonuoccu', 0) }}" class="linear-input !bg-white tabular-nums" required />
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary/60">Chỉ số Nước Mới</label>
-                            <input name="chisonuocmoi" type="number" value="{{ old('chisonuocmoi', 0) }}" class="linear-input !bg-white font-bold text-ink-primary tabular-nums" required />
-                        </div>
+                    <div class="space-y-2">
+                        <label for="nam" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Năm</label>
+                        <input name="nam" id="nam" type="number" value="{{ now()->format('Y') }}" class="saas-input font-bold tabular-nums h-11" required />
                     </div>
                 </div>
 
-                <div class="flex gap-3 pt-4">
-                    <button type="button" data-modal-hide="modal-xulyhoadon" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Hủy bỏ</button>
-                    <button type="submit" class="flex-[2] rounded-xl bg-ink-primary py-3 text-sm font-bold text-white shadow-lg shadow-ink-primary/20 transition-all hover:bg-brand-emerald">Khởi tạo hóa đơn</button>
+                <div class="saas-card p-6 bg-slate-50 border-dashed border-slate-200">
+                    <div class="grid grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <div class="h-5 w-5 rounded-lg bg-amber-500 text-white flex items-center justify-center">
+                                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                Điện
+                            </h4>
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Chỉ số cũ</label>
+                                <input name="chisodiencu" type="number" value="0" class="saas-input h-10 tabular-nums text-sm font-bold" required />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-bold uppercase text-blue-600 tracking-wider">Chỉ số mới</label>
+                                <input name="chisodienmoi" type="number" value="0" class="saas-input h-11 font-bold text-slate-900 tabular-nums border-blue-200 focus:border-blue-600" required />
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <div class="h-5 w-5 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                </div>
+                                Nước
+                            </h4>
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Chỉ số cũ</label>
+                                <input name="chisonuoccu" type="number" value="0" class="saas-input h-10 tabular-nums text-sm font-bold" required />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-bold uppercase text-blue-600 tracking-wider">Chỉ số mới</label>
+                                <input name="chisonuocmoi" type="number" value="0" class="saas-input h-11 font-bold text-slate-900 tabular-nums border-blue-200 focus:border-blue-600" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center gap-3 p-4 bg-white/70 rounded-xl border border-slate-200/40">
+                        <svg class="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-[10px] text-slate-500 font-bold leading-relaxed">
+                            Hệ thống sẽ tự động tính chênh lệch chỉ số và áp dụng đơn giá để tạo hóa đơn.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-2">
+                    <button type="button" data-modal-hide="modal-xulyhoadon" class="saas-btn-secondary flex-1 h-11">Hủy</button>
+                    <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-blue-500/20">Tạo hóa đơn</button>
                 </div>
             </form>
         </x-modal>
-
-        @foreach ($danhsachhoadon as $hoadon)
-            <x-modal id="modal-chitiethoadon-{{ $hoadon->id }}" title="Chi tiết quyết toán" subtitle="Bản tóm tắt các khoản chi phí tiện ích cho phòng {{ $mapphong[$hoadon->phong_id]->tenphong ?? 'N/A' }} kỳ {{ $hoadon->thang }}/{{ $hoadon->nam }}.">
-                <div class="space-y-6">
-                    <div class="divide-y divide-ui-border rounded-2xl bg-ui-bg/50 p-6 ring-1 ring-inset ring-ui-border">
-                        <div class="flex items-center justify-between py-3">
-                            <span class="text-sm font-bold text-ink-secondary">Tiền phòng cơ bản</span>
-                            <span class="text-sm font-bold text-ink-primary tabular-nums">{{ number_format(optional($mapphong[$hoadon->phong_id])->giaphong ?? 0) }}đ</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-ink-secondary">Tiền điện tiêu thụ</span>
-                                <span class="text-[10px] font-medium text-ink-secondary/40 tabular-nums">({{ $hoadon->chisodiencu }} → {{ $hoadon->chisodienmoi }} kWh)</span>
-                            </div>
-                            <span class="text-sm font-bold text-ink-primary tabular-nums">{{ number_format(($hoadon->chisodienmoi - $hoadon->chisodiencu) * $dongiadien) }}đ</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-ink-secondary">Lưu lượng nước</span>
-                                <span class="text-[10px] font-medium text-ink-secondary/40 tabular-nums">({{ $hoadon->chisonuoccu }} → {{ $hoadon->chisonuocmoi }} m³)</span>
-                            </div>
-                            <span class="text-sm font-bold text-ink-primary tabular-nums">{{ number_format(($hoadon->chisonuocmoi - $hoadon->chisonuoccu) * $dongianuoc) }}đ</span>
-                        </div>
-                        <div class="flex items-center justify-between py-5">
-                            <span class="text-base font-bold text-ink-primary uppercase tracking-tight font-display">Tổng quyết toán</span>
-                            <span class="text-2xl font-bold text-ink-primary font-display tabular-nums">{{ number_format($hoadon->tongtien) }}đ</span>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-brand-emerald py-3 text-sm font-bold text-white shadow-lg shadow-brand-emerald/20 transition-all hover:bg-brand-emerald/90">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Tải bản in PDF
-                        </a>
-                        <button type="button" data-modal-hide="modal-chitiethoadon-{{ $hoadon->id }}" class="flex-1 rounded-xl bg-ui-bg py-3 text-sm font-bold text-ink-primary ring-1 ring-ui-border transition-colors hover:bg-white">Đóng bản tóm tắt</button>
-                    </div>
-                </div>
-            </x-modal>
-        @endforeach
     @endpush
 </x-admin-layout>

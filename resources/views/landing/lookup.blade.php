@@ -48,6 +48,12 @@
 
             {{-- Result Found --}}
             @if($dangky)
+                @php
+                    $statusEnum = $dangky->trang_thai instanceof \App\Enums\RegistrationStatus
+                        ? $dangky->trang_thai
+                        : \App\Enums\RegistrationStatus::tryFrom((string) ($dangky->trang_thai ?? ''));
+                    $isCompleted = $statusEnum?->value === \App\Enums\RegistrationStatus::Completed->value;
+                @endphp
                 <div class="space-y-8">
                     <div class="bg-white border border-ui-border shadow-sm">
                         {{-- Card Header --}}
@@ -60,8 +66,8 @@
                                     </div>
                                     <h3 class="text-4xl font-display font-bold tracking-tight">Hồ sơ #{{ $dangky->id }}</h3>
                                 </div>
-                                <div class="px-5 py-2.5 text-sm font-bold uppercase tracking-widest border {{ $dangky->trangthai->value === \App\Enums\RegistrationStatus::Completed->value ? 'bg-brand-emerald text-white border-brand-emerald' : 'bg-white text-ink-primary border-white' }}">
-                                    {{ $dangky->trangthai->label() }}
+                                <div class="px-5 py-2.5 text-sm font-bold uppercase tracking-widest border {{ $isCompleted ? 'bg-brand-emerald text-white border-brand-emerald' : 'bg-white text-ink-primary border-white' }}">
+                                    {{ $statusEnum?->label() ?? 'Không xác định' }}
                                 </div>
                             </div>
                         </div>
@@ -103,21 +109,21 @@
                                             <div class="w-10 h-10 bg-ui-bg border border-ui-border flex items-center justify-center text-ink-primary shrink-0 opacity-50">🏠</div>
                                             <div class="pt-0.5">
                                                 <p class="text-[10px] font-bold text-ink-secondary uppercase tracking-widest mb-1">Phòng dự kiến</p>
-                                                <p class="text-base font-bold text-ink-primary">{{ $dangky->phong->tenphong }} <span class="text-ink-secondary font-medium">(Giường #{{ $dangky->giuong_no }})</span></p>
+                                                <p class="text-base font-bold text-ink-primary">{{ $dangky->phong?->tenphong ?? 'Chưa xác định' }}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-start gap-4">
                                             <div class="w-10 h-10 bg-ui-bg border border-ui-border flex items-center justify-center text-ink-primary shrink-0 opacity-50">📅</div>
                                             <div class="pt-0.5">
                                                 <p class="text-[10px] font-bold text-ink-secondary uppercase tracking-widest mb-1">Thời hạn giữ chỗ</p>
-                                                <p class="text-base font-bold text-ink-primary">{{ $dangky->expires_at ? $dangky->expires_at->format('d/m/Y H:i') : 'Vô thời hạn' }}</p>
+                                                <p class="text-base font-bold text-ink-primary">{{ $dangky->token_expires_at ? $dangky->token_expires_at->format('d/m/Y H:i') : 'Vô thời hạn' }}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-start gap-4">
                                             <div class="w-10 h-10 bg-brand-emerald/5 border border-brand-emerald/20 flex items-center justify-center text-brand-emerald shrink-0">💰</div>
                                             <div class="pt-0.5">
                                                 <p class="text-[10px] font-bold text-ink-secondary uppercase tracking-widest mb-1">Phí cọc (Tiêu chuẩn)</p>
-                                                <p class="text-base font-bold text-brand-emerald">{{ number_format($dangky->phong->giaphong) }}đ</p>
+                                                <p class="text-base font-bold text-brand-emerald">{{ number_format($dangky->phong?->giaphong ?? 0) }}đ</p>
                                             </div>
                                         </div>
                                     </div>
@@ -130,11 +136,12 @@
                                 
                                 <div class="relative max-w-2xl mx-auto">
                                     @php
+                                        $statusValue = $statusEnum?->value;
                                         $statuses = [
                                             ['label' => 'Đã tiếp nhận', 'desc' => 'Hệ thống đã nhận đơn', 'active' => true],
-                                            ['label' => 'Đang thẩm định', 'desc' => 'Admin đang kiểm tra thông tin', 'active' => in_array($dangky->trangthai->value, [\App\Enums\RegistrationStatus::Approved->value, \App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value])],
-                                            ['label' => 'Chờ thanh toán', 'desc' => 'Vui lòng nộp phí giữ chỗ', 'active' => in_array($dangky->trangthai->value, [\App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value])],
-                                            ['label' => 'Hoàn tất', 'desc' => 'Đã sẵn sàng nhận phòng', 'active' => $dangky->trangthai->value === \App\Enums\RegistrationStatus::Completed->value],
+                                            ['label' => 'Đang thẩm định', 'desc' => 'Admin đang kiểm tra thông tin', 'active' => in_array($statusValue, [\App\Enums\RegistrationStatus::Approved->value, \App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value], true)],
+                                            ['label' => 'Chờ thanh toán', 'desc' => 'Vui lòng nộp phí giữ chỗ', 'active' => in_array($statusValue, [\App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value], true)],
+                                            ['label' => 'Hoàn tất', 'desc' => 'Đã sẵn sàng nhận phòng', 'active' => $statusValue === \App\Enums\RegistrationStatus::Completed->value],
                                         ];
                                         $currentStep = 0;
                                         foreach($statuses as $idx => $s) if($s['active']) $currentStep = $idx;
@@ -171,14 +178,14 @@
                                 </div>
 
                                 {{-- Action Box --}}
-                                @if($dangky->trangthai->value === \App\Enums\RegistrationStatus::ApprovedPendingPayment->value)
+                                @if(($statusEnum?->value) === \App\Enums\RegistrationStatus::ApprovedPendingPayment->value)
                                     <div class="mt-16 p-8 bg-brand-emerald/5 border border-brand-emerald/20">
                                         <div class="flex items-center gap-3 mb-4">
                                             <div class="w-8 h-8 bg-brand-emerald text-white flex items-center justify-center text-sm">ℹ</div>
                                             <h5 class="text-lg font-display font-bold text-ink-primary uppercase tracking-wide">Yêu cầu hoàn tất lệ phí</h5>
                                         </div>
                                         <p class="text-ink-secondary leading-relaxed mb-6">
-                                            Chúc mừng! Hồ sơ của bạn đã được phê duyệt sơ bộ. Vui lòng hoàn tất thanh toán lệ phí giữ chỗ trước <span class="font-bold text-ink-primary border-b border-ink-primary">{{ $dangky->expires_at->format('H:i, d/m/Y') }}</span> để giữ quyền ưu tiên nhận phòng.
+                                            Chúc mừng! Hồ sơ của bạn đã được phê duyệt sơ bộ. Vui lòng hoàn tất thanh toán lệ phí giữ chỗ trước <span class="font-bold text-ink-primary border-b border-ink-primary">{{ $dangky->token_expires_at?->format('H:i, d/m/Y') ?? 'N/A' }}</span> để giữ quyền ưu tiên nhận phòng.
                                         </p>
                                         <div class="bg-white p-6 border border-ui-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                             <div>

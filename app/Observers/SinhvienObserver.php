@@ -20,10 +20,6 @@ class SinhvienObserver
      */
     public function created(Sinhvien $sinhvien): void
     {
-        if ($sinhvien->phong_id) {
-            $this->syncRoomOccupancy((int) $sinhvien->phong_id);
-        }
-        
         $this->kiemToanService->ghiNhatKy(
             'create',
             'Sinhvien',
@@ -38,23 +34,14 @@ class SinhvienObserver
      */
     public function updated(Sinhvien $sinhvien): void
     {
-        if ($sinhvien->wasChanged('phong_id')) {
-            $oldRoomId = $sinhvien->getOriginal('phong_id');
-            $newRoomId = $sinhvien->phong_id;
-
-            if ($oldRoomId) {
-                $this->syncRoomOccupancy((int) $oldRoomId);
-            }
-
-            if ($newRoomId) {
-                $this->syncRoomOccupancy((int) $newRoomId);
-            }
-
-            // Log chuyển phòng
-            if ($oldRoomId && $newRoomId && $oldRoomId != $newRoomId) {
-                $this->kiemToanService->ghiNhatKyDoiPhong($sinhvien->id, (int) $oldRoomId, (int) $newRoomId);
-            }
-        }
+        // Ghi nhật ký các thay đổi
+        $this->kiemToanService->ghiNhatKy(
+            'update',
+            'Sinhvien',
+            $sinhvien->id,
+            $sinhvien->getOriginal(),
+            $sinhvien->toArray()
+        );
     }
 
     /**
@@ -62,11 +49,6 @@ class SinhvienObserver
      */
     public function deleted(Sinhvien $sinhvien): void
     {
-        $phongId = $sinhvien->phong_id ?? $sinhvien->getOriginal('phong_id');
-        if ($phongId) {
-            $this->syncRoomOccupancy((int) $phongId);
-        }
-        
         $this->kiemToanService->ghiNhatKy(
             'delete',
             'Sinhvien',
@@ -81,10 +63,6 @@ class SinhvienObserver
      */
     public function restored(Sinhvien $sinhvien): void
     {
-        if ($sinhvien->phong_id) {
-            $this->syncRoomOccupancy((int) $sinhvien->phong_id);
-        }
-        
         $this->kiemToanService->ghiNhatKy(
             'restore',
             'Sinhvien',
@@ -92,20 +70,5 @@ class SinhvienObserver
             null,
             $sinhvien->toArray()
         );
-    }
-
-    /**
-     * Synchronize actual occupancy count (dango) for a specific room.
-     * Đếm trực tiếp từ bảng sinhvien để đảm bảo tính chính xác.
-     */
-    private function syncRoomOccupancy(int $roomId): void
-    {
-        if ($roomId <= 0) {
-            return;
-        }
-
-        // Đếm sinh viên thực tế từ bảng sinhvien (chỉ sinh viên đang hoạt động)
-        $occupancy = Sinhvien::where('phong_id', $roomId)->withoutTrashed()->count();
-        Phong::where('id', $roomId)->update(['dango' => $occupancy]);
     }
 }
