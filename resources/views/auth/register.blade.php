@@ -40,7 +40,7 @@
                 {{-- Email & Giới tính --}}
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div class="space-y-2.5 group sm:col-span-1">
-                        <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 group-focus-within:text-slate-900 transition-colors">Địa chỉ Email</label>
+                        <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 group-focus-within:text-slate-900 transition-colors">Địa chỉ thư điện tử</label>
                         <input id="email" type="email" name="email" value="{{ old('email', $prefillEmail ?? '') }}" 
                                class="saas-input h-14 bg-slate-50/30 border-slate-100 focus:bg-white transition-all" 
                                placeholder="mssv@pdu.edu.vn" required autocomplete="username" />

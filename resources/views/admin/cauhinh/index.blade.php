@@ -12,7 +12,7 @@
                 <div class="bg-slate-50/50 border-b border-slate-200/60 px-10 py-5">
                     <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-900 flex items-center gap-2.5">
                         <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                        Operational Meta-Parameters
+                        Tham số vận hành
                     </h3>
                 </div>
                 
@@ -42,7 +42,7 @@
 
                         <div class="space-y-8">
                             <div>
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-1">Đường dây nóng (Institutional Hotline)</label>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-1">Đường dây nóng</label>
                                 <div class="relative group">
                                     <div class="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none">
                                         <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1.01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
@@ -69,7 +69,7 @@
                     <div class="flex justify-end pt-10 border-t border-slate-100">
                         <button type="submit" class="saas-btn-primary h-12 px-10 shadow-xl shadow-blue-500/20 group">
                             <svg class="h-4.5 w-4.5 mr-2.5 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                            Commit Configuration Change
+                            Lưu cấu hình
                         </button>
                     </div>
                 </form>

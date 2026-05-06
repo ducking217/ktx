@@ -84,7 +84,7 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-900 tracking-tight">{{ $hoadon->ghi_chu }}</h4>
+                                        <h4 class="text-sm font-bold text-slate-900 tracking-tight">{{ preg_replace('/\bKy\s+/u', 'Tháng ', (string) $hoadon->ghi_chu) }}</h4>
                                         <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{{ $hoadon->loai_hoadon === 'dien_nuoc' ? 'Hóa đơn dịch vụ' : 'Hợp đồng cư trú' }}</div>
                                     </div>
                                 </div>

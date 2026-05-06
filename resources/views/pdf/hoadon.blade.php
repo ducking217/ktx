@@ -101,7 +101,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="label">Kỳ thanh toán:</td>
+                <td class="label">Tháng thanh toán:</td>
                 <td>{{ $kyHienThi }}</td>
             </tr>
             <tr>
@@ -115,7 +115,7 @@
             </tr>
             <tr>
                 <td class="label">Ghi chú chuyển khoản:</td>
-                <td>{{ $giaoDichChoXacNhan->ghi_chu ?? '........' }}</td>
+                <td>{{ $giaoDichChoXacNhan->ghi_chu ? preg_replace('/\bKy\s+/u', 'Tháng ', (string) $giaoDichChoXacNhan->ghi_chu) : '........' }}</td>
             </tr>
             <tr>
                 <td class="label">Ngày giao dịch:</td>

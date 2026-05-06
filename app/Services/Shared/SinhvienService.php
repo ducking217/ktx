@@ -12,7 +12,9 @@ use App\Models\Phong;
 use App\Models\Sinhvien;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SinhvienService implements SinhvienServiceInterface
 {
@@ -88,17 +90,49 @@ class SinhvienService implements SinhvienServiceInterface
 
         DB::transaction(function () use ($user, $sinhvien, $data) {
             // Cập nhật thông tin trên bảng users
-            $user->update([
-                'name'   => $data['name']    ?? $user->name,
-                'gender' => $data['gender'] ?? $user->gender,
-                'phone'  => $data['phone']  ?? $user->phone,
+            $user->fill([
+                'name' => $data['name'] ?? $user->name,
+                'email' => $data['email'] ?? $user->email,
+                'phone' => $data['phone'] ?? null,
+                'gender' => $data['gender'] ?? null,
+                'dob' => $data['dob'] ?? null,
+                'address' => $data['address'] ?? null,
+                'id_card' => $data['id_card'] ?? null,
             ]);
 
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
+            $user->save();
+
             // Cập nhật thông tin riêng của Sinhvien
-            $sinhvien->update([
+            $sinhvien->fill([
                 'ma_sinh_vien' => $data['ma_sinh_vien'] ?? $sinhvien->ma_sinh_vien,
-                'lop'          => $data['lop']          ?? $sinhvien->lop,
+                'lop' => $data['lop'] ?? null,
+                'khoa' => $data['khoa'] ?? null,
+                'ngay_nhap_hoc' => $data['ngay_nhap_hoc'] ?? null,
             ]);
+
+            $anhThe = $data['anh_the'] ?? null;
+            if ($anhThe instanceof UploadedFile) {
+                if ($sinhvien->anh_the_path) {
+                    Storage::disk('private')->delete($sinhvien->anh_the_path);
+                }
+                $sinhvien->anh_the_path = $anhThe->store("sinhvien/{$sinhvien->id}/anh-the", 'private');
+            }
+
+            $anhCccd = $data['anh_cccd'] ?? null;
+            if ($anhCccd instanceof UploadedFile) {
+                if ($sinhvien->anh_cccd_path) {
+                    Storage::disk('private')->delete($sinhvien->anh_cccd_path);
+                }
+                $sinhvien->anh_cccd_path = $anhCccd->store("sinhvien/{$sinhvien->id}/anh-cccd", 'private');
+            }
+
+            if ($sinhvien->isDirty()) {
+                $sinhvien->save();
+            }
         });
 
         return $this->traVeThanhCong('Cập nhật sinh viên thành công.');

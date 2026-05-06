@@ -28,7 +28,7 @@
             <div class="space-y-6">
                 {{-- Email Field --}}
                 <div class="space-y-2.5 group">
-                    <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 group-focus-within:text-slate-900 transition-colors">Địa chỉ Email</label>
+                    <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 group-focus-within:text-slate-900 transition-colors">Địa chỉ thư điện tử</label>
                     <div class="relative">
                         <input id="email" type="email" name="email" value="{{ old('email') }}" 
                                class="saas-input h-14 pl-12 bg-slate-50/30 border-slate-100 focus:bg-white transition-all" 

@@ -37,24 +37,24 @@
                 @forelse ($yeuCauGiaHan as $item)
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-5">
-                            <div class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{{ $item->sinhvien?->user?->name ?? $item->sinhvien?->taikhoan?->name ?? 'N/A' }}</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">{{ $item->sinhvien?->ma_sinh_vien ?? $item->sinhvien?->masinhvien ?? 'N/A' }}</div>
+                            <div class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{{ $item->sinhvien?->user?->name ?? $item->sinhvien?->taikhoan?->name ?? 'Chưa có' }}</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">{{ $item->sinhvien?->ma_sinh_vien ?? $item->sinhvien?->masinhvien ?? 'Chưa có' }}</div>
                         </td>
                         <td class="py-5">
-                            <div class="text-xs font-bold text-slate-900 tabular-nums tracking-tight">{{ $item->hopdong ? 'REF-' . $item->hopdong->id : 'N/A' }}</div>
+                            <div class="text-xs font-bold text-slate-900 tabular-nums tracking-tight">{{ $item->hopdong ? 'REF-' . $item->hopdong->id : 'Chưa có' }}</div>
                             <div class="flex items-center gap-1.5 text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1.5">
                                 <span class="h-1 w-1 rounded-full bg-blue-500"></span>
-                                {{ $item->hopdong?->phong?->ten_phong ?? 'N/A' }}
+                                {{ $item->hopdong?->phong?->ten_phong ?? 'Chưa có' }}
                             </div>
                         </td>
                         <td class="py-5 text-center">
                             <div class="text-xs font-bold text-slate-500 tabular-nums tracking-tight">
-                                {{ $item->hopdong?->ngay_ket_thuc?->format('d/m/Y') ?? 'N/A' }}
+                                {{ $item->hopdong?->ngay_ket_thuc?->format('d/m/Y') ?? 'Chưa có' }}
                             </div>
                         </td>
                         <td class="py-5 text-center">
                             <div class="text-xs font-bold text-emerald-600 tabular-nums tracking-tight bg-emerald-50 px-2.5 py-1 rounded-lg inline-block">
-                                {{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'N/A' }}
+                                {{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'Chưa có' }}
                             </div>
                         </td>
                         <td class="py-5 text-center">
@@ -117,7 +117,7 @@
                         </div>
                         <div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hạn cư trú mới</div>
-                            <div class="text-lg font-bold text-slate-900 tabular-nums">{{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'N/A' }}</div>
+                            <div class="text-lg font-bold text-slate-900 tabular-nums">{{ $item->ngay_ket_thuc_moi?->format('d/m/Y') ?? 'Chưa có' }}</div>
                         </div>
                     </div>
                 </div>

@@ -17,7 +17,7 @@
                         <div class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"/></svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Tên, email hoặc số điện thoại..." class="saas-input pl-9 text-xs">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Tên, thư điện tử hoặc số điện thoại..." class="saas-input pl-9 text-xs">
                     </div>
                 </div>
                 <div class="w-44">

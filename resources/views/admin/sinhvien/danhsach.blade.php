@@ -48,7 +48,7 @@
                                     <span class="text-xs font-bold text-slate-500 uppercase tabular-nums">{{ mb_substr($sinhvien->taikhoan?->name ?? 'N', 0, 2) }}</span>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $sinhvien->taikhoan?->name ?? 'N/A' }}</div>
+                                    <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $sinhvien->taikhoan?->name ?? 'Chưa có' }}</div>
                                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 tabular-nums">
                                         MSSV: {{ $sinhvien->ma_sinh_vien }}
                                     </div>
@@ -74,8 +74,8 @@
                             @endif
                         </td>
                         <td class="py-5">
-                            <div class="text-xs font-bold text-slate-900 tabular-nums">{{ $sinhvien->user?->phone ?? 'N/A' }}</div>
-                            <div class="text-[10px] text-slate-400 font-medium mt-1 lowercase">{{ $sinhvien->user?->email ?? 'N/A' }}</div>
+                            <div class="text-xs font-bold text-slate-900 tabular-nums">{{ $sinhvien->user?->phone ?? 'Chưa có' }}</div>
+                            <div class="text-[10px] text-slate-400 font-medium mt-1 lowercase">{{ $sinhvien->user?->email ?? 'Chưa có' }}</div>
                         </td>
                         <td class="py-5">
                             <div class="text-xs font-bold text-slate-900 tabular-nums">{{ $sinhvien->created_at->format('d/m/Y') }}</div>

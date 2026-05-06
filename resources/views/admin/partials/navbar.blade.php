@@ -4,7 +4,7 @@
         <button class="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <h1 class="text-lg font-semibold tracking-tight text-slate-900">{{ $pageTitle ?? 'Dashboard' }}</h1>
+        <h1 class="text-lg font-semibold tracking-tight text-slate-900">{{ $pageTitle ?? 'Bảng điều khiển' }}</h1>
     </div>
 
     <!-- Right: Actions -->
@@ -34,7 +34,7 @@
             <div class="h-6 w-6 rounded-md bg-slate-900 flex items-center justify-center text-[10px] font-bold text-white uppercase">
                 {{ substr(auth()->user()->name ?? 'A', 0, 1) }}
             </div>
-            <span class="text-sm font-medium hidden sm:inline">{{ auth()->user()->name ?? 'Admin' }}</span>
+            <span class="text-sm font-medium hidden sm:inline">{{ auth()->user()->name ?? 'Quản trị' }}</span>
         </a>
     </div>
 </header>

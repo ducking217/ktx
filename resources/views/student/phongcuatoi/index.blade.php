@@ -17,6 +17,49 @@
                 </div>
                 <h3 class="text-xl font-bold text-slate-900 mb-2 tracking-tight">Bạn chưa có hồ sơ lưu trú</h3>
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-10 max-w-sm mx-auto leading-relaxed">Hãy đăng ký phòng để bắt đầu sử dụng các dịch vụ tại Ký túc xá PDU.</p>
+
+                @if(!empty($dangkyPhongGanNhat))
+                    @php
+                        $statusEnum = $dangkyPhongGanNhat->trang_thai;
+                        $statusBadgeDangKy = match ($statusEnum) {
+                            \App\Enums\RegistrationStatus::Approved, \App\Enums\RegistrationStatus::Completed => 'saas-badge-success',
+                            \App\Enums\RegistrationStatus::ApprovedPendingPayment => 'saas-badge-info',
+                            \App\Enums\RegistrationStatus::Rejected => 'saas-badge-error',
+                            \App\Enums\RegistrationStatus::Pending => 'saas-badge-warning',
+                            default => 'saas-badge-info'
+                        };
+                        $tenPhongDangKy = $dangkyPhongGanNhat->phong?->tenphong
+                            ?? (($dangkyPhongGanNhat->toanha?->ten_toa_nha ?? null) ? 'Tòa ' . $dangkyPhongGanNhat->toanha->ten_toa_nha : null)
+                            ?? 'Chưa có';
+                    @endphp
+
+                    <div class="w-full max-w-2xl mx-auto text-left mb-10">
+                        <div class="saas-card p-6 bg-slate-50/50">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div>
+                                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Phản hồi đăng ký phòng</div>
+                                    <div class="mt-2 flex items-center gap-3">
+                                        <span class="saas-badge {{ $statusBadgeDangKy }}">{{ $statusEnum?->label() ?? 'Chưa có' }}</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 tabular-nums">
+                                            Gửi lúc {{ $dangkyPhongGanNhat->created_at?->format('d/m/Y H:i') ?? 'Chưa có' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-left sm:text-right">
+                                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nguyện vọng</div>
+                                    <div class="mt-1 text-sm font-bold text-slate-900">{{ $tenPhongDangKy }}</div>
+                                </div>
+                            </div>
+
+                            @if($dangkyPhongGanNhat->trang_thai === \App\Enums\RegistrationStatus::Rejected)
+                                <div class="mt-5 rounded-xl bg-white p-4 border border-slate-100">
+                                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Lý do từ chối</div>
+                                    <div class="text-sm font-semibold text-slate-900 leading-relaxed">{{ $dangkyPhongGanNhat->ghi_chu ?: 'Chưa có' }}</div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
                 
                 @if($danhsachphongtrong->count() > 0)
                     <div class="w-full text-left mt-12 border-t border-slate-100 pt-10">
@@ -171,7 +214,7 @@
                                         <div>
                                             <div class="font-bold text-slate-900 text-sm tracking-tight mb-0.5">{{ $ban->taikhoan->name ?? 'Người dùng' }}</div>
                                             <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                                                <span>{{ $ban->mssv ?? 'N/A' }}</span>
+                                                <span>{{ $ban->mssv ?? 'Chưa có' }}</span>
                                                 <span class="h-1 w-1 rounded-full bg-slate-200"></span>
                                                 <span>Sinh viên</span>
                                             </div>

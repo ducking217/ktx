@@ -176,7 +176,7 @@
                                     <table class="w-full text-left">
                                         <thead class="bg-slate-50 border-b border-slate-200">
                                             <tr>
-                                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kỳ hóa đơn</th>
+                                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tháng hóa đơn</th>
                                                 <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Số tiền</th>
                                                 <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Trạng thái</th>
                                             </tr>
@@ -191,9 +191,9 @@
                                                         }
                                                         $kyHienThi = $ky
                                                             ?? ($hoadon->ngay_thanh_toan?->format('m/Y') ?? $hoadon->created_at?->format('m/Y'))
-                                                            ?? 'N/A';
+                                                            ?? 'Chưa có';
                                                     @endphp
-                                                    <td class="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-tight">Kỳ {{ $kyHienThi }}</td>
+                                                    <td class="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-tight">Tháng {{ $kyHienThi }}</td>
                                                     <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums tracking-tight">{{ number_format((int) $hoadon->tong_tien) }}đ</td>
                                                     <td class="px-6 py-4">
                                                         @php
@@ -249,8 +249,8 @@
                                 @endif
                             </div>
                             <div>
-                                <div class="text-sm font-bold text-slate-900 leading-none">{{ $phongHienTai?->ten_phong ?? $user->sinhvien->phong?->ten_phong ?? 'N/A' }}</div>
-                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1.5">Giường {{ $giuongHienTai?->ma_giuong ?? $hopdongHienTai?->giuong?->ma_giuong ?? 'N/A' }}</div>
+                                <div class="text-sm font-bold text-slate-900 leading-none">{{ $phongHienTai?->ten_phong ?? $user->sinhvien->phong?->ten_phong ?? 'Chưa có' }}</div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1.5">Giường {{ $giuongHienTai?->ma_giuong ?? $hopdongHienTai?->giuong?->ma_giuong ?? 'Chưa có' }}</div>
                             </div>
                         </div>
 
@@ -262,7 +262,7 @@
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hợp đồng</span>
                                 <span class="saas-badge {{ $user->sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first() ? 'saas-badge-success' : 'saas-badge-error' }}">
-                                    {{ $user->sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first() ? 'Còn hiệu lực' : 'N/A' }}
+                                    {{ $user->sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first() ? 'Còn hiệu lực' : 'Không có' }}
                                 </span>
                             </div>
                         </div>

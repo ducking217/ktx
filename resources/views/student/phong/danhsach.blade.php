@@ -52,11 +52,11 @@
                                 </div>
                                 <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 flex items-center gap-1.5">
                                     <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h10M7 12h10M7 17h10"/></svg>
-                                    {{ $phong->loaiphong?->ten_loai ?? 'N/A' }}
+                                    {{ $phong->loaiphong?->ten_loai ?? 'Không có' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-xs font-bold text-slate-900 uppercase tracking-tight">{{ $phong->toanha?->ten_toa_nha ?? 'N/A' }}</div>
+                                <div class="text-xs font-bold text-slate-900 uppercase tracking-tight">{{ $phong->toanha?->ten_toa_nha ?? 'Không có' }}</div>
                                 <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Tầng {{ $phong->tang }}</div>
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -73,17 +73,23 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <form method="POST" action="{{ route('student.dangkyphong') }}" class="form-dangky inline-block">
-                                    @csrf
-                                    <input type="hidden" name="phong_id" value="{{ $phong->id }}">
-                                    <button type="submit"
-                                            class="saas-btn-primary h-9 px-4 disabled:opacity-50 disabled:cursor-not-allowed text-[10px]">
-                                        <span class="btn-content">Đặt phòng</span>
-                                        <span class="btn-loader hidden">
-                                            <svg class="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                        </span>
-                                    </button>
-                                </form>
+                                <div class="inline-flex items-center justify-end gap-2">
+                                    <a href="{{ route('public.chitietvattu', ['id' => $phong->id, 'back' => 'student']) }}"
+                                       class="saas-btn-secondary h-9 px-4 text-[10px]">
+                                        Chi tiết
+                                    </a>
+                                    <form method="POST" action="{{ route('student.dangkyphong') }}" class="form-dangky">
+                                        @csrf
+                                        <input type="hidden" name="phong_id" value="{{ $phong->id }}">
+                                        <button type="submit"
+                                                class="saas-btn-primary h-9 px-4 disabled:opacity-50 disabled:cursor-not-allowed text-[10px]">
+                                            <span class="btn-content">Đặt phòng</span>
+                                            <span class="btn-loader hidden">
+                                                <svg class="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            </span>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -127,7 +133,7 @@
                                 @php
                                     $sapTrongDate = $phong->ngay_trong_som_nhat instanceof \Illuminate\Support\Carbon
                                         ? $phong->ngay_trong_som_nhat->format('d/m/Y')
-                                        : 'N/A';
+                                        : 'Chưa có';
                                     $soGiuongSapTrong = (int) ($phong->so_giuong_sap_trong ?? 0);
                                     $vatTuPreview = $phong->vattus?->take(2) ?? collect();
                                     $taiSanPreview = $phong->taisans?->take(2) ?? collect();
@@ -135,10 +141,10 @@
                                 <tr class="hover:bg-slate-50/50 transition-colors">
                                     <td class="px-6 py-4">
                                         <div class="text-sm font-bold text-slate-900 uppercase tracking-tight">{{ $phong->ten_phong }}</div>
-                                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{{ $phong->loaiphong?->ten_loai ?? 'N/A' }}</div>
+                                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{{ $phong->loaiphong?->ten_loai ?? 'Không có' }}</div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="text-xs font-bold text-slate-900 uppercase tracking-tight">{{ $phong->toanha?->ten_toa_nha ?? 'N/A' }}</div>
+                                        <div class="text-xs font-bold text-slate-900 uppercase tracking-tight">{{ $phong->toanha?->ten_toa_nha ?? 'Không có' }}</div>
                                         <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Tầng {{ $phong->tang }}</div>
                                     </td>
                                     <td class="px-6 py-4 space-y-2">

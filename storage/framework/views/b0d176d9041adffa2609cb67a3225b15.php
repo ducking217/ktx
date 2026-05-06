@@ -4,7 +4,7 @@
         <button class="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <h1 class="text-lg font-semibold tracking-tight text-slate-900"><?php echo e($pageTitle ?? 'Dashboard'); ?></h1>
+        <h1 class="text-lg font-semibold tracking-tight text-slate-900"><?php echo e($pageTitle ?? 'Bảng điều khiển'); ?></h1>
     </div>
 
     <!-- Right: Actions -->
@@ -35,7 +35,7 @@
                 <?php echo e(substr(auth()->user()->name ?? 'A', 0, 1)); ?>
 
             </div>
-            <span class="text-sm font-medium hidden sm:inline"><?php echo e(auth()->user()->name ?? 'Admin'); ?></span>
+            <span class="text-sm font-medium hidden sm:inline"><?php echo e(auth()->user()->name ?? 'Quản trị'); ?></span>
         </a>
     </div>
 </header>

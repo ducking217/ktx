@@ -220,7 +220,7 @@
                                                         }
                                                         $kyHienThi = $ky
                                                             ?? ($hoadon->ngay_thanh_toan?->format('m/Y') ?? $hoadon->created_at?->format('m/Y'))
-                                                            ?? 'N/A';
+                                                            ?? 'Chưa có';
                                                     ?>
                                                     <td class="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-tight">Kỳ <?php echo e($kyHienThi); ?></td>
                                                     <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e(number_format((int) $hoadon->tong_tien)); ?>đ</td>
@@ -279,8 +279,8 @@
                                 <?php endif; ?>
                             </div>
                             <div>
-                                <div class="text-sm font-bold text-slate-900 leading-none"><?php echo e($phongHienTai?->ten_phong ?? $user->sinhvien->phong?->ten_phong ?? 'N/A'); ?></div>
-                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1.5">Giường <?php echo e($giuongHienTai?->ma_giuong ?? $hopdongHienTai?->giuong?->ma_giuong ?? 'N/A'); ?></div>
+                                <div class="text-sm font-bold text-slate-900 leading-none"><?php echo e($phongHienTai?->ten_phong ?? $user->sinhvien->phong?->ten_phong ?? 'Chưa có'); ?></div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1.5">Giường <?php echo e($giuongHienTai?->ma_giuong ?? $hopdongHienTai?->giuong?->ma_giuong ?? 'Chưa có'); ?></div>
                             </div>
                         </div>
 
@@ -292,7 +292,7 @@
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hợp đồng</span>
                                 <span class="saas-badge <?php echo e($user->sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first() ? 'saas-badge-success' : 'saas-badge-error'); ?>">
-                                    <?php echo e($user->sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first() ? 'Còn hiệu lực' : 'N/A'); ?>
+                                    <?php echo e($user->sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first() ? 'Còn hiệu lực' : 'Không có'); ?>
 
                                 </span>
                             </div>

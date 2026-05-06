@@ -15,12 +15,12 @@
         <x-admin.table-card>
             <thead>
                 <tr>
-                    <th>Target Asset</th>
+                    <th>Phạm vi</th>
                     <th>Nội dung công tác</th>
-                    <th>Scheduled Date</th>
-                    <th>Field Technician</th>
-                    <th class="text-center">Operational Status</th>
-                    <th class="text-right">Management Actions</th>
+                    <th>Ngày thực hiện</th>
+                    <th>Người thực hiện</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-right">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,14 +31,14 @@
                                 <div class="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
                                 {{ $item->phong->ten_phong ?? 'Toàn hệ thống' }}
                             </div>
-                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 ml-4">Infrastructure Asset</div>
+                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 ml-4">Hạng mục</div>
                         </td>
                         <td class="py-6 max-w-xs">
                             <div class="text-[13px] font-bold leading-relaxed text-slate-600 italic border-l-2 border-slate-100 pl-4">"{{ $item->noidung }}"</div>
                         </td>
                         <td class="py-6">
                             <div class="text-[13px] font-black text-slate-900 tabular-nums tracking-tight">{{ date('d/m/Y', strtotime($item->ngaybaotri)) }}</div>
-                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mt-1.5">Fiscal Period</div>
+                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mt-1.5">Tháng bảo trì</div>
                         </td>
                         <td class="py-6">
                             <div class="flex items-center gap-3">
@@ -87,7 +87,7 @@
                                 <div class="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-200 border border-slate-100 border-dashed">
                                     <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 </div>
-                                <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Maintenance Schedule is Clear</h4>
+                                <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Không có kế hoạch bảo trì</h4>
                                 <p class="text-[11px] text-slate-400 font-medium max-w-xs">Chưa có kế hoạch bảo trì nào được thiết lập trong giai đoạn này.</p>
                             </div>
                         </td>
@@ -108,7 +108,7 @@
             <form method="POST" action="{{ route('admin.thembaotri') }}" class="space-y-8 p-2">
                 @csrf
                 <div>
-                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Target Infrastructure Asset</label>
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Phạm vi bảo trì</label>
                     <div class="relative group">
                         <select name="phong_id" class="saas-input h-12 px-5 font-black uppercase tracking-tight appearance-none bg-white">
                             <option value="">-- Toàn bộ hệ thống kỹ thuật --</option>
@@ -133,8 +133,8 @@
                         <input name="ngaybaotri" required type="date" value="{{ date('Y-m-d') }}" class="saas-input h-12 px-5 font-black tabular-nums bg-white" />
                     </div>
                     <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Technician In-Charge</label>
-                        <input name="nguoithuchien" required type="text" class="saas-input h-12 px-5 font-black uppercase tracking-tight" placeholder="Assignee name..." />
+                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Người thực hiện</label>
+                        <input name="nguoithuchien" required type="text" class="saas-input h-12 px-5 font-black uppercase tracking-tight" placeholder="Nhập tên người thực hiện..." />
                     </div>
                 </div>
 
@@ -175,7 +175,7 @@
                             <input name="ngaybaotri" required type="date" value="{{ $item->ngaybaotri }}" class="saas-input h-12 px-5 font-black tabular-nums bg-white" />
                         </div>
                         <div>
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Field Technician</label>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2.5 block">Người thực hiện</label>
                             <input name="nguoithuchien" required type="text" value="{{ $item->nguoithuchien }}" class="saas-input h-12 px-5 font-black uppercase tracking-tight" />
                         </div>
                     </div>

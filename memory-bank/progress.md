@@ -20,6 +20,106 @@
 - [ ] Mobile App cho Sinh viên.
 - [ ] Hệ thống AI dự báo bảo trì thiết bị.
 
+## 2026-05-06 - Landing: Thống kê realtime từ DB
+
+### Hoàn thành ✅
+- Khối thống kê Landing hiển thị realtime: **Số sinh viên** (bảng `sinhvien`), **Số phòng** (bảng `phong`), **Số tòa** (bảng `toa_nha`).
+
+### Files Updated
+- `app/Services/Core/TrangChuService.php`
+- `resources/views/landing/index.blade.php`
+
+## 2026-05-06 - Admin Sinh viên: Đồng bộ hiển thị hồ sơ định danh
+
+### Hoàn thành ✅
+- Trang chi tiết sinh viên (Admin) hiển thị đúng **email/điện thoại/ngày sinh/địa chỉ** theo dữ liệu đã cập nhật ở “Hồ sơ cá nhân” (nguồn `users`), thay vì đọc các field legacy trống.
+- Fix hiển thị ảnh định danh (ảnh thẻ/CCCD): chuyển signed URL sang dạng query `private-files?path=...` để tránh lỗi route param chứa dấu `/` làm ảnh không tải.
+
+### Files Updated
+- `resources/views/admin/sinhvien/chitiet.blade.php`
+- `app/Http/Controllers/Shared/FileController.php`
+- `routes/web.php`
+
+## 2026-05-06 - Admin Sinh viên: Bổ sung trường hồ sơ + cho phép hiệu chỉnh
+
+### Hoàn thành ✅
+- Trang chi tiết sinh viên (Admin) hiển thị thêm các trường học vụ theo hồ sơ sinh viên: **MSSV, lớp, khoa, ngày nhập học, CCCD**.
+- Admin có thể **hiệu chỉnh hồ sơ sinh viên** (users + sinhvien), hỗ trợ cập nhật **ảnh thẻ/ảnh CCCD**.
+
+### Files Updated
+- `resources/views/admin/sinhvien/chitiet.blade.php`
+- `app/Http/Controllers/Admin/SinhvienController.php`
+- `app/Services/Shared/SinhvienService.php`
+
+## 2026-05-06 - Admin Sidebar: Thêm link cấu hình hệ thống
+
+### Hoàn thành ✅
+- Thêm mục “Cấu hình” vào sidebar Admin để truy cập trang thiết lập giá điện/nước và hotline.
+
+### Files Updated
+- `resources/views/admin/partials/sidebar.blade.php`
+
+## 2026-05-06 - Student Phòng trống: Mở link chi tiết phòng
+
+### Hoàn thành ✅
+- Thêm nút “Chi tiết” trên danh sách phòng trống (Sinh viên) để xem vật tư/tài sản của phòng qua trang chi tiết công khai (có nút quay lại đúng về Student).
+
+### Files Updated
+- `resources/views/student/phong/danhsach.blade.php`
+
+## 2026-05-06 - Admin Liên hệ: Nhất quán UI + Việt hóa
+
+### Hoàn thành ✅
+- Chuẩn hóa copy/tiêu đề/cột bảng trang “Liên hệ” về tiếng Việt, đồng bộ cách trình bày theo thiết kế Admin hiện tại.
+
+### Files Updated
+- `resources/views/admin/lienhe/danhsach.blade.php`
+
+## 2026-05-06 - Việt hóa toàn bộ UI (Admin/Student/Landing/Auth)
+
+### Hoàn thành ✅
+- Việt hóa toàn bộ nội dung hiển thị (menu/header/bảng/form/empty state/email), loại bỏ chuỗi tiếng Anh và thay fallback `N/A` bằng “Chưa có/Không xác định”.
+
+### Files Updated
+- `resources/views/layouts/admin.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+- `resources/views/admin/partials/navbar.blade.php`
+- `resources/views/student/layouts/chinh.blade.php`
+- `resources/views/layouts/landing.blade.php`
+- `resources/views/landing/index.blade.php`
+- `resources/views/landing/lookup.blade.php`
+- `resources/views/admin/baotri/danhsach.blade.php`
+- `resources/views/admin/baocao/taichinh.blade.php`
+- `resources/views/admin/hoadon/nhap-hang-loat.blade.php`
+- `resources/views/admin/cauhinh/index.blade.php`
+- `resources/views/admin/phong/danhsach.blade.php`
+- `resources/views/admin/phong/chitiet.blade.php`
+- `resources/views/admin/baohong/danhsach.blade.php`
+- `resources/views/admin/hopdong/danhsach.blade.php`
+- `resources/views/admin/kyluat/danhsach.blade.php`
+- `resources/views/admin/sinhvien/danhsach.blade.php`
+- `resources/views/admin/sinhvien/chitiet.blade.php`
+- `resources/views/admin/dangky/danhsach.blade.php`
+- `resources/views/admin/accounts/index.blade.php`
+- `resources/views/admin/accounts/form.blade.php`
+- `resources/views/student/phong/danhsach.blade.php`
+- `resources/views/student/hopdong/index.blade.php`
+- `resources/views/student/phongcuatoi/index.blade.php`
+- `resources/views/student/phongcuatoi/lichSuHoaDon.blade.php`
+- `resources/views/student/phongcuatoi/chiTietHoaDon.blade.php`
+- `resources/views/student/baohong/danhsach.blade.php`
+- `resources/views/student/giahan/danhsach.blade.php`
+- `resources/views/student/giahan/tao.blade.php`
+- `resources/views/student/hoadon/danhsach.blade.php`
+- `resources/views/profile/edit.blade.php`
+- `resources/views/profile/partials/update-profile-information-form.blade.php`
+- `resources/views/profile/partials/update-password-form.blade.php`
+- `resources/views/auth/login.blade.php`
+- `resources/views/auth/register.blade.php`
+- `resources/views/auth/forgot-password.blade.php`
+- `resources/views/auth/reset-password.blade.php`
+- `resources/views/emails/payment-request.blade.php`
+
 ## 2026-05-05 - Chuẩn hóa canonical URL Sinh viên (Gia hạn)
 
 ### Hoàn thành ✅
@@ -116,6 +216,16 @@
 
 ### Files Updated
 - `resources/views/admin/thongbao/danhsach.blade.php`
+
+## 2026-05-06 - Student Đăng ký phòng: Xem phản hồi Admin
+
+### Hoàn thành ✅
+- Sinh viên (chưa có phòng) xem được trạng thái đơn đăng ký phòng gần nhất: Chờ xử lý/Chờ thanh toán/Đã duyệt/Từ chối/Hoàn tất.
+- Khi Admin từ chối, sinh viên thấy lý do (đọc từ `dangky.ghi_chu`).
+
+### Files Updated
+- `app/Services/Student/PhongSinhvienService.php`
+- `resources/views/student/phongcuatoi/index.blade.php`
 
 ## 2026-05-05 - Fix Student Thông báo: trang chi tiết không hiện nội dung
 

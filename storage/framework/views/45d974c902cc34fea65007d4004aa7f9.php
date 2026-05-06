@@ -81,14 +81,14 @@
                         </td>
                         <td class="py-5">
                             <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($item->sinhvien?->user?->name ?? 'Chưa xác định'); ?></div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5"><?php echo e($item->sinhvien?->ma_sinh_vien ?? 'N/A'); ?></div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5"><?php echo e($item->sinhvien?->ma_sinh_vien ?? 'Chưa có'); ?></div>
                         </td>
                         <td class="py-5">
                             <div class="flex items-center gap-2">
                                 <div class="h-8 w-8 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all shadow-sm">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/></svg>
                                 </div>
-                                <span class="text-sm font-bold text-slate-700"><?php echo e($item->giuong?->phong?->ten_phong ?? 'N/A'); ?></span>
+                                <span class="text-sm font-bold text-slate-700"><?php echo e($item->giuong?->phong?->ten_phong ?? 'Chưa có'); ?></span>
                             </div>
                         </td>
                         <td class="py-5 min-w-[160px]">
@@ -199,7 +199,7 @@
                         <div class="h-12 w-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-xl shadow-sm">👤</div>
                         <div>
                             <div class="text-base font-bold text-slate-900 leading-none"><?php echo e($item->sinhvien?->user?->name ?? 'Chưa xác định'); ?></div>
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1.5">Mã SV: <?php echo e($item->sinhvien->ma_sinh_vien ?? 'N/A'); ?></div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1.5">Mã SV: <?php echo e($item->sinhvien->ma_sinh_vien ?? 'Chưa có'); ?></div>
                         </div>
                     </div>
 

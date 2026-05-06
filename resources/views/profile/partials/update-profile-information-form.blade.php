@@ -27,7 +27,7 @@
 
             {{-- Email --}}
             <div class="space-y-2">
-                <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Địa chỉ Email</label>
+                <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Địa chỉ thư điện tử</label>
                 <div class="relative group">
                     <input id="email" name="email" type="email" class="saas-input pl-11" value="{{ old('email', $user->email) }}" required autocomplete="username" />
                     <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors pointer-events-none">
@@ -39,7 +39,7 @@
                 @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                     <div class="mt-3 text-[10px] font-bold text-amber-600 flex items-center gap-1.5">
                         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                        <span>Email chưa được xác minh.</span>
+                        <span>Thư điện tử chưa được xác minh.</span>
                         <button form="send-verification" class="ml-1 underline hover:text-amber-800 transition-colors">
                             Gửi lại mã
                         </button>
@@ -118,7 +118,7 @@
                                             <img src="{{ $anhTheUrl }}" class="h-full w-full object-cover" />
                                         </a>
                                     @else
-                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">N/A</div>
+                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">Chưa có</div>
                                     @endif
                                 </div>
                                 <div class="flex-1 space-y-2">
@@ -138,7 +138,7 @@
                                             <img src="{{ $anhCccdUrl }}" class="h-full w-full object-cover" />
                                         </a>
                                     @else
-                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">N/A</div>
+                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">Chưa có</div>
                                     @endif
                                 </div>
                                 <div class="flex-1 space-y-2">

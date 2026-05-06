@@ -17,8 +17,8 @@
             }
             $kyHienThi = $ky
                 ?? ($hoadon->ngay_thanh_toan?->format('m/Y') ?? $hoadon->created_at?->format('m/Y'))
-                ?? 'N/A';
-            $tenPhong = $hoadon->hopdong?->giuong?->phong?->ten_phong ?? $hoadon->phong?->ten_phong ?? 'N/A';
+                ?? 'Chưa có';
+            $tenPhong = $hoadon->hopdong?->giuong?->phong?->ten_phong ?? $hoadon->phong?->ten_phong ?? 'Chưa có';
             $maHoaDon = $hoadon->ma_hoa_don ?: ('HD-' . str_pad((string) $hoadon->id, 6, '0', STR_PAD_LEFT));
 
             $statusInvoice = $hoadon->trang_thai;
@@ -53,7 +53,7 @@
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <div class="font-semibold text-slate-900">Đã hoàn tiền cọc</div>
-                            <div class="mt-0.5 text-sm text-slate-500">Ngày hoàn: <?php echo e($hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'N/A'); ?></div>
+                            <div class="mt-0.5 text-sm text-slate-500">Ngày hoàn: <?php echo e($hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'Chưa có'); ?></div>
                         </div>
                         <div class="text-sm text-slate-500">Vui lòng giữ biên nhận khi cần đối soát.</div>
                     </div>
@@ -61,7 +61,7 @@
             <?php else: ?>
                 <div class="saas-card p-5">
                     <div class="font-semibold text-slate-900">Chờ Ban quản lý hoàn tiền cọc</div>
-                    <div class="mt-0.5 text-sm text-slate-500">Dự kiến xử lý trước: <?php echo e($hoadon->ngay_het_han?->format('d/m/Y') ?? 'N/A'); ?></div>
+                    <div class="mt-0.5 text-sm text-slate-500">Dự kiến xử lý trước: <?php echo e($hoadon->ngay_het_han?->format('d/m/Y') ?? 'Chưa có'); ?></div>
                     <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
                         Vui lòng đến Phòng quản lý để nhận tiền cọc. Mang theo CCCD hoặc thẻ sinh viên.
                     </div>
@@ -70,7 +70,7 @@
         <?php elseif($hoadon->trang_thai === \App\Enums\InvoiceStatus::Paid): ?>
             <div class="saas-card p-5">
                 <div class="font-semibold text-slate-900">Hóa đơn đã được thanh toán</div>
-                <div class="mt-0.5 text-sm text-slate-500">Ngày thanh toán: <?php echo e($hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'N/A'); ?></div>
+                <div class="mt-0.5 text-sm text-slate-500">Ngày thanh toán: <?php echo e($hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'Chưa có'); ?></div>
             </div>
         <?php elseif($hoadon->trang_thai === \App\Enums\InvoiceStatus::PendingConfirmation): ?>
             <div class="saas-card p-5">
@@ -84,7 +84,7 @@
 
                 </div>
                 <div class="mt-0.5 text-sm text-slate-500">
-                    Hạn thanh toán: <?php echo e($hoadon->ngay_het_han?->format('d/m/Y') ?? 'N/A'); ?>
+                    Hạn thanh toán: <?php echo e($hoadon->ngay_het_han?->format('d/m/Y') ?? 'Chưa có'); ?>
 
                 </div>
                 <?php if($hoadon->trang_thai === \App\Enums\InvoiceStatus::Overdue): ?>
@@ -106,7 +106,7 @@
                     <div>
                         <div class="font-semibold text-slate-900">Nhắc nợ từ Ban quản lý</div>
                         <div class="mt-0.5 text-sm text-slate-500">
-                            <?php echo e($nhacNoMoiNhat->created_at?->format('d/m/Y H:i') ?? 'N/A'); ?>
+                            <?php echo e($nhacNoMoiNhat->created_at?->format('d/m/Y H:i') ?? 'Chưa có'); ?>
 
                         </div>
                     </div>

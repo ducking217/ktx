@@ -59,7 +59,7 @@
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                     <?php if(auth()->guard()->check()): ?>
                         <a href="<?php echo e(route('dieuhuong')); ?>" class="pdu-btn-primary w-full sm:w-auto gap-2 shadow-lg shadow-ink-primary/10">
-                            Đi đến Dashboard
+                            Đi đến Bảng điều khiển
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     <?php else: ?>
@@ -78,7 +78,7 @@
             <div class="mt-24 max-w-[1000px] mx-auto relative z-20 bg-ui-card rounded-2xl border border-ui-border shadow-sm overflow-hidden">
                 <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-ui-border">
                     <div class="p-8 flex flex-col items-center text-center group">
-                        <span class="font-display text-4xl font-bold text-ink-primary mb-1 tracking-tight"><?php echo e($sinhVienDangO); ?></span>
+                        <span class="font-display text-4xl font-bold text-ink-primary mb-1 tracking-tight"><?php echo e($soSinhVien); ?></span>
                         <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Sinh viên</span>
                     </div>
                     <div class="p-8 flex flex-col items-center text-center group">
@@ -86,8 +86,8 @@
                         <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Phòng ở</span>
                     </div>
                     <div class="p-8 flex flex-col items-center text-center group">
-                        <span class="font-display text-4xl font-bold text-ink-primary mb-1 tracking-tight"><?php echo e($soTang); ?></span>
-                        <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Tầng lầu</span>
+                        <span class="font-display text-4xl font-bold text-ink-primary mb-1 tracking-tight"><?php echo e($soToa); ?></span>
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-ink-secondary/60">Tòa nhà</span>
                     </div>
                     <div class="p-8 flex flex-col items-center text-center group bg-ui-bg/50">
                         <span class="font-display text-4xl font-bold text-brand-emerald mb-1 tracking-tight">PDU</span>
@@ -192,7 +192,7 @@
                         <div class="flex justify-between items-start mb-5">
                             <div>
                                 <h3 class="text-base font-display font-bold text-ink-primary mb-0.5"><?php echo e($phong->ten_phong); ?></h3>
-                                <p class="text-[10px] font-bold text-ink-secondary uppercase tracking-wider">Tầng <?php echo e($phong->tang); ?> · <?php echo e($phong->gioi_tinh_han_che?->label() ?? 'N/A'); ?></p>
+                                <p class="text-[10px] font-bold text-ink-secondary uppercase tracking-wider">Tầng <?php echo e($phong->tang); ?> · <?php echo e($phong->gioi_tinh_han_che?->label() ?? 'Không có'); ?></p>
                             </div>
                             <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border <?php echo e($isAvailable ? 'border-brand-emerald text-brand-emerald bg-brand-emerald/5' : 'border-red-500 text-red-600 bg-red-500/5'); ?>">
                                 <?php echo e($isAvailable ? 'Còn '.$conTrong : 'Kín chỗ'); ?>

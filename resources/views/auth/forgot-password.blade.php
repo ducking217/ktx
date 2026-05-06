@@ -14,7 +14,7 @@
             <div class="relative">
                 <div class="absolute -left-4 top-0 h-12 w-1 bg-slate-900 rounded-full"></div>
                 <h1 class="text-4xl font-black tracking-tight text-slate-900 leading-none mb-3">Quên mật khẩu?</h1>
-                <p class="text-sm font-medium text-slate-500 leading-relaxed">Nhập email để hệ thống gửi liên kết đặt lại mật khẩu bảo mật.</p>
+                <p class="text-sm font-medium text-slate-500 leading-relaxed">Nhập địa chỉ thư điện tử để hệ thống gửi liên kết đặt lại mật khẩu bảo mật.</p>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
             @csrf
 
             <div class="space-y-2.5 group">
-                <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 group-focus-within:text-slate-900 transition-colors">Địa chỉ Email xác thực</label>
+                <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 group-focus-within:text-slate-900 transition-colors">Địa chỉ thư điện tử xác thực</label>
                 <div class="relative">
                     <input id="email" type="email" name="email" value="{{ old('email') }}" 
                            class="saas-input h-14 pl-12 bg-slate-50/30 border-slate-100 focus:bg-white transition-all" 

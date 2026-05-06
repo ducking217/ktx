@@ -47,7 +47,7 @@
                 <!-- CTA -->
                 <div class="flex items-center gap-4">
                     <?php if(auth()->guard()->check()): ?>
-                        <a href="<?php echo e(route('dieuhuong')); ?>" class="hidden sm:inline-flex text-[12px] font-bold uppercase tracking-widest text-ink-secondary hover:text-ink-primary transition-colors duration-200">Dashboard</a>
+                        <a href="<?php echo e(route('dieuhuong')); ?>" class="hidden sm:inline-flex text-[12px] font-bold uppercase tracking-widest text-ink-secondary hover:text-ink-primary transition-colors duration-200">Bảng điều khiển</a>
                         <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
                             <?php echo csrf_field(); ?>
                             <button type="submit" class="bg-ui-bg hover:bg-ui-muted text-ink-primary px-5 py-3 rounded-xl text-[12px] font-bold uppercase tracking-widest transition-all duration-200 border border-ui-border">Đăng xuất</button>
@@ -86,7 +86,7 @@
                 <div class="flex flex-col gap-3 text-xs font-bold uppercase tracking-widest text-ink-secondary">
                     <a href="#" class="hover:text-ink-primary transition-colors duration-200">Facebook</a>
                     <a href="#" class="hover:text-ink-primary transition-colors duration-200">Zalo OA</a>
-                    <a href="#" class="hover:text-ink-primary transition-colors duration-200">Email</a>
+                    <a href="#" class="hover:text-ink-primary transition-colors duration-200">Thư điện tử</a>
                 </div>
             </div>
 
@@ -101,8 +101,8 @@
         </div>
         
         <div class="max-w-[1280px] mx-auto px-6 mt-20 pt-8 border-t border-ui-border flex flex-col sm:flex-row items-center justify-between text-[10px] font-bold uppercase tracking-widest text-ink-secondary/40">
-            <span>&copy; <?php echo e(date('Y')); ?> Đại học Phương Đông. All rights reserved.</span>
-            <span class="mt-2 sm:mt-0 flex items-center gap-1">Designed for Excellence in Hanoi.</span>
+            <span>&copy; <?php echo e(date('Y')); ?> Đại học Phương Đông. Bảo lưu mọi quyền.</span>
+            <span class="mt-2 sm:mt-0 flex items-center gap-1">Thiết kế cho vận hành tại Hà Nội.</span>
         </div>
     </footer>
     <?php if (isset($component)) { $__componentOriginal7cfab914afdd05940201ca0b2cbc009b = $component; } ?>
@@ -126,4 +126,5 @@
 <?php unset($__componentOriginal7cfab914afdd05940201ca0b2cbc009b); ?>
 <?php endif; ?>
 </body>
-</html><?php /**PATH D:\laragon\www\hethongquanlyktxv1\resources\views/layouts/landing.blade.php ENDPATH**/ ?>
+</html>
+<?php /**PATH D:\laragon\www\hethongquanlyktxv1\resources\views/layouts/landing.blade.php ENDPATH**/ ?>

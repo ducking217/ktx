@@ -82,7 +82,7 @@
                                     <span class="text-xs font-bold text-slate-500 uppercase tabular-nums"><?php echo e(mb_substr($sinhvien->taikhoan?->name ?? 'N', 0, 2)); ?></span>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($sinhvien->taikhoan?->name ?? 'N/A'); ?></div>
+                                    <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($sinhvien->taikhoan?->name ?? 'Chưa có'); ?></div>
                                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 tabular-nums">
                                         MSSV: <?php echo e($sinhvien->ma_sinh_vien); ?>
 
@@ -110,8 +110,8 @@
                             <?php endif; ?>
                         </td>
                         <td class="py-5">
-                            <div class="text-xs font-bold text-slate-900 tabular-nums"><?php echo e($sinhvien->user?->phone ?? 'N/A'); ?></div>
-                            <div class="text-[10px] text-slate-400 font-medium mt-1 lowercase"><?php echo e($sinhvien->user?->email ?? 'N/A'); ?></div>
+                            <div class="text-xs font-bold text-slate-900 tabular-nums"><?php echo e($sinhvien->user?->phone ?? 'Chưa có'); ?></div>
+                            <div class="text-[10px] text-slate-400 font-medium mt-1 lowercase"><?php echo e($sinhvien->user?->email ?? 'Chưa có'); ?></div>
                         </td>
                         <td class="py-5">
                             <div class="text-xs font-bold text-slate-900 tabular-nums"><?php echo e($sinhvien->created_at->format('d/m/Y')); ?></div>

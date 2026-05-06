@@ -77,10 +77,10 @@
                         <div class="group flex items-center justify-between p-6 transition-colors hover:bg-ui-bg/30">
                             <div class="flex items-center gap-4">
                                 <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-2xl bg-ui-bg ring-1 ring-ui-border">
-                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($sinhvien->user?->name ?? 'N/A') }}&background=f8f9fa&color=0f172a&bold=true" alt="Avatar" />
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($sinhvien->user?->name ?? 'Chưa có') }}&background=f8f9fa&color=0f172a&bold=true" alt="Avatar" />
                                 </div>
                                 <div>
-                                    <div class="font-bold text-ink-primary font-display text-lg">{{ $sinhvien->user?->name ?? 'N/A' }}</div>
+                                    <div class="font-bold text-ink-primary font-display text-lg">{{ $sinhvien->user?->name ?? 'Chưa có' }}</div>
                                     <div class="flex items-center gap-2 mt-0.5">
                                         <span class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary">{{ $sinhvien->ma_sinh_vien ?? $sinhvien->masinhvien }}</span>
                                         <span class="h-1 w-1 rounded-full bg-ui-border"></span>
@@ -91,7 +91,7 @@
                             
                             <div class="flex items-center gap-4">
                                 <div class="text-right hidden sm:block">
-                                    <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $sinhvien->user?->phone ?? 'N/A' }}</div>
+                                    <div class="text-xs font-bold text-ink-primary tabular-nums">{{ $sinhvien->user?->phone ?? 'Chưa có' }}</div>
                                     <div class="text-[10px] font-medium text-ink-secondary/40 uppercase tracking-widest mt-0.5">Liên lạc</div>
                                 </div>
                                 <a href="{{ route('admin.quanlysinhvien', ['q' => $sinhvien->ma_sinh_vien ?? $sinhvien->masinhvien]) }}" class="flex h-9 w-9 items-center justify-center rounded-xl bg-ui-bg text-ink-secondary hover:text-ink-primary ring-1 ring-ui-border transition-colors">

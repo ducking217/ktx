@@ -113,7 +113,7 @@
                                 };
                             @endphp
                             <span class="saas-badge {{ $badgeClass }}">
-                                {{ $baohong->trang_thai?->label() ?? 'N/A' }}
+                                {{ $baohong->trang_thai?->label() ?? 'Không xác định' }}
                             </span>
                         </td>
                         <td class="px-8 py-5 text-right">

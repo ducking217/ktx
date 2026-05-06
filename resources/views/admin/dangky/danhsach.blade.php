@@ -52,9 +52,9 @@
                             <div class="flex flex-col">
                                 <span class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $dangky->ho_ten ?? $dangky->user?->name ?? 'Chưa xác định' }}</span>
                                 <div class="flex items-center gap-3 mt-1.5">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $dangky->email ?? $dangky->user?->email ?? 'N/A' }}</span>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $dangky->email ?? $dangky->user?->email ?? 'Chưa có' }}</span>
                                     <div class="h-1 w-1 rounded-full bg-slate-200"></div>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest tabular-nums">{{ $dangky->so_dien_thoai ?? $dangky->user?->phone ?? 'N/A' }}</span>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest tabular-nums">{{ $dangky->so_dien_thoai ?? $dangky->user?->phone ?? 'Chưa có' }}</span>
                                 </div>
                             </div>
                         </td>
@@ -62,14 +62,14 @@
                             <div class="flex flex-col items-center gap-1.5">
                                 <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
                                     {{ \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG')
-                                        ? ($dangky->user?->sinhvien?->current_hopdong?->giuong?->phong?->ten_phong ?? 'N/A')
+                                        ? ($dangky->user?->sinhvien?->current_hopdong?->giuong?->phong?->ten_phong ?? 'Chưa có')
                                         : ($dangky->phong?->ten_phong ?? 'Chưa phân phòng') }}
                                 </span>
                                 @php
                                     $isTraPhong = \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG');
                                     $loaiDangKy = $isTraPhong ? \App\Enums\RegistrationType::Return : \App\Enums\RegistrationType::Rental;
                                 @endphp
-                                <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400">{{ $loaiDangKy?->label() ?? 'N/A' }}</span>
+                                <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400">{{ $loaiDangKy?->label() ?? 'Chưa có' }}</span>
                             </div>
                         </td>
                         <td class="py-5 text-center">
@@ -85,7 +85,7 @@
                             @endphp
                             <div class="flex flex-col items-center gap-1.5">
                                 <span class="saas-badge {{ $statusBadgeDangKy }}">
-                                    {{ $statusEnum?->label() ?? 'N/A' }}
+                                    {{ $statusEnum?->label() ?? 'Chưa có' }}
                                 </span>
                                 @if($dangky->token_expires_at && $dangky->trang_thai === \App\Enums\RegistrationStatus::ApprovedPendingPayment)
                                     <div class="text-[9px] font-bold text-rose-500 uppercase tracking-widest tabular-nums bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100/50">

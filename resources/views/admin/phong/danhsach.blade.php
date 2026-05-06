@@ -90,7 +90,7 @@
                         <tr class="hover:bg-slate-50/50 transition-colors group">
                             <td class="py-5">
                                 <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $phong->ten_phong }}</div>
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">Tầng {{ $phong->tang }} • Tòa {{ $phong->toanha->ten_toa_nha ?? 'N/A' }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">Tầng {{ $phong->tang }} • Tòa {{ $phong->toanha->ten_toa_nha ?? 'Chưa có' }}</div>
                             </td>
                             <td class="py-5 text-center">
                                 <span class="text-xs font-bold text-slate-600 tabular-nums bg-slate-100 px-2 py-1 rounded-lg">{{ $succhuamax }} người</span>
@@ -119,7 +119,7 @@
                                 @if($daydu)
                                     <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                         <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-                                        Full chỗ
+                                        Kín chỗ
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
@@ -183,7 +183,7 @@
                         <header class="flex items-start justify-between mb-10">
                             <div>
                                 <h3 class="text-4xl font-bold text-slate-900 leading-none tabular-nums group-hover:text-blue-600 transition-colors">{{ $phong->ten_phong }}</h3>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3">Tầng {{ $phong->tang }} • Tòa {{ $phong->toanha->ten_toa_nha ?? 'N/A' }}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3">Tầng {{ $phong->tang }} • Tòa {{ $phong->toanha->ten_toa_nha ?? 'Chưa có' }}</p>
                             </div>
                             <div class="h-11 w-11 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors border border-slate-100 shadow-sm">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>

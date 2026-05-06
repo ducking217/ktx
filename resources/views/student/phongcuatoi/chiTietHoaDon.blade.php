@@ -19,8 +19,8 @@
             }
             $kyHienThi = $ky
                 ?? ($hoadon->ngay_thanh_toan?->format('m/Y') ?? $hoadon->created_at?->format('m/Y'))
-                ?? 'N/A';
-            $tenPhong = $hoadon->hopdong?->giuong?->phong?->ten_phong ?? $hoadon->phong?->ten_phong ?? 'N/A';
+                ?? 'Chưa có';
+            $tenPhong = $hoadon->hopdong?->giuong?->phong?->ten_phong ?? $hoadon->phong?->ten_phong ?? 'Chưa có';
             $maHoaDon = $hoadon->ma_hoa_don ?: ('HD-' . str_pad((string) $hoadon->id, 6, '0', STR_PAD_LEFT));
 
             $statusInvoice = $hoadon->trang_thai;
@@ -53,7 +53,7 @@
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <div class="font-semibold text-slate-900">Đã hoàn tiền cọc</div>
-                            <div class="mt-0.5 text-sm text-slate-500">Ngày hoàn: {{ $hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'N/A' }}</div>
+                            <div class="mt-0.5 text-sm text-slate-500">Ngày hoàn: {{ $hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'Chưa có' }}</div>
                         </div>
                         <div class="text-sm text-slate-500">Vui lòng giữ biên nhận khi cần đối soát.</div>
                     </div>
@@ -61,7 +61,7 @@
             @else
                 <div class="saas-card p-5">
                     <div class="font-semibold text-slate-900">Chờ Ban quản lý hoàn tiền cọc</div>
-                    <div class="mt-0.5 text-sm text-slate-500">Dự kiến xử lý trước: {{ $hoadon->ngay_het_han?->format('d/m/Y') ?? 'N/A' }}</div>
+                    <div class="mt-0.5 text-sm text-slate-500">Dự kiến xử lý trước: {{ $hoadon->ngay_het_han?->format('d/m/Y') ?? 'Chưa có' }}</div>
                     <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
                         Vui lòng đến Phòng quản lý để nhận tiền cọc. Mang theo CCCD hoặc thẻ sinh viên.
                     </div>
@@ -70,7 +70,7 @@
         @elseif($hoadon->trang_thai === \App\Enums\InvoiceStatus::Paid)
             <div class="saas-card p-5">
                 <div class="font-semibold text-slate-900">Hóa đơn đã được thanh toán</div>
-                <div class="mt-0.5 text-sm text-slate-500">Ngày thanh toán: {{ $hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'N/A' }}</div>
+                <div class="mt-0.5 text-sm text-slate-500">Ngày thanh toán: {{ $hoadon->ngay_thanh_toan?->format('d/m/Y') ?? 'Chưa có' }}</div>
             </div>
         @elseif($hoadon->trang_thai === \App\Enums\InvoiceStatus::PendingConfirmation)
             <div class="saas-card p-5">
@@ -83,7 +83,7 @@
                     {{ $hoadon->trang_thai === \App\Enums\InvoiceStatus::Overdue ? 'Hóa đơn đã quá hạn' : 'Hóa đơn chưa thanh toán' }}
                 </div>
                 <div class="mt-0.5 text-sm text-slate-500">
-                    Hạn thanh toán: {{ $hoadon->ngay_het_han?->format('d/m/Y') ?? 'N/A' }}
+                    Hạn thanh toán: {{ $hoadon->ngay_het_han?->format('d/m/Y') ?? 'Chưa có' }}
                 </div>
                 @if($hoadon->trang_thai === \App\Enums\InvoiceStatus::Overdue)
                     <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
@@ -104,7 +104,7 @@
                     <div>
                         <div class="font-semibold text-slate-900">Nhắc nợ từ Ban quản lý</div>
                         <div class="mt-0.5 text-sm text-slate-500">
-                            {{ $nhacNoMoiNhat->created_at?->format('d/m/Y H:i') ?? 'N/A' }}
+                            {{ $nhacNoMoiNhat->created_at?->format('d/m/Y H:i') ?? 'Chưa có' }}
                         </div>
                     </div>
                     <div class="text-sm text-slate-600">
@@ -225,7 +225,7 @@
                     'so_tien' => (int) ($hoadon->tong_tien ?? 0),
                     'don_vi' => 'VNĐ',
                     'thoi_gian' => $hoadon->created_at?->format('d/m/Y') ?? '-',
-                    'mo_ta' => (string) ($hoadon->ghi_chu ?? ''),
+                    'mo_ta' => preg_replace('/\bKy\s+/u', 'Tháng ', (string) ($hoadon->ghi_chu ?? '')),
                 ]];
             } else {
                 $items = [
@@ -241,14 +241,14 @@
                         'so_tien' => (int) ($hoadon->tien_dien ?? 0),
                         'don_vi' => 'VNĐ',
                         'thoi_gian' => $kyApDung,
-                        'mo_ta' => $dienText !== '' ? ('Chỉ số: ' . $dienText . '.') : 'Chưa có chỉ số điện ghi nhận cho kỳ này.',
+                        'mo_ta' => $dienText !== '' ? ('Chỉ số: ' . $dienText . '.') : 'Chưa có chỉ số điện ghi nhận cho tháng này.',
                     ],
                     [
                         'ten' => 'Tiền nước',
                         'so_tien' => (int) ($hoadon->tien_nuoc ?? 0),
                         'don_vi' => 'VNĐ',
                         'thoi_gian' => $kyApDung,
-                        'mo_ta' => $nuocText !== '' ? ('Chỉ số: ' . $nuocText . '.') : 'Chưa có chỉ số nước ghi nhận cho kỳ này.',
+                        'mo_ta' => $nuocText !== '' ? ('Chỉ số: ' . $nuocText . '.') : 'Chưa có chỉ số nước ghi nhận cho tháng này.',
                     ],
                     [
                         'ten' => 'Phí dịch vụ',
@@ -266,7 +266,7 @@
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <h3 class="font-semibold text-slate-900">Chi tiết các khoản phí</h3>
-                <div class="mt-0.5 text-xs text-slate-500">Kỳ áp dụng: {{ $kyApDung }}</div>
+                <div class="mt-0.5 text-xs text-slate-500">Tháng áp dụng: {{ $kyApDung }}</div>
             </div>
             <div class="text-right">
                 <div class="text-xs font-semibold text-slate-500">Tổng tiền</div>
@@ -323,7 +323,7 @@
                 </svg>
                 <div>
                     <p class="font-semibold text-slate-900">Ghi chú</p>
-                    <p class="text-sm text-slate-600">{{ $hoadon->ghi_chu }}</p>
+                    <p class="text-sm text-slate-600">{{ preg_replace('/\bKy\s+/u', 'Tháng ', (string) $hoadon->ghi_chu) }}</p>
                 </div>
             </div>
         </div>

@@ -135,7 +135,7 @@
                                 };
                             ?>
                             <span class="saas-badge <?php echo e($badgeClass); ?>">
-                                <?php echo e($baohong->trang_thai?->label() ?? 'N/A'); ?>
+                                <?php echo e($baohong->trang_thai?->label() ?? 'Không xác định'); ?>
 
                             </span>
                         </td>

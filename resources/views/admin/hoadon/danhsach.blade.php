@@ -13,7 +13,7 @@
                 </a>
                 <button type="button" data-modal-target="modal-xulyhoadon" data-modal-toggle="modal-xulyhoadon" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
                     <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
-                    Ghi chỉ số mới
+                    Tạo hóa đơn tháng
                 </button>
             </div>
         </x-admin.page-header>
@@ -124,10 +124,13 @@
                         <td class="py-5">
                             @php
                                 $maHoaDon = $hoadon->ma_hoa_don ?: ('HD-' . str_pad((string) $hoadon->id, 6, '0', STR_PAD_LEFT));
+                                $ghiChuHoaDon = $hoadon->ghi_chu
+                                    ? preg_replace('/\bKy\s+/u', 'Tháng ', (string) $hoadon->ghi_chu)
+                                    : null;
                             @endphp
                             <div class="text-sm font-bold text-slate-900 tabular-nums leading-tight">{{ $maHoaDon }}</div>
                             <div class="mt-1 text-xs text-slate-500">
-                                {{ $hoadon->loai_hoadon_label }}@if($hoadon->ghi_chu) • {{ $hoadon->ghi_chu }}@endif
+                                {{ $hoadon->loai_hoadon_label }}@if($ghiChuHoaDon) • {{ $ghiChuHoaDon }}@endif
                             </div>
                         </td>
                         <td class="py-5">
@@ -148,9 +151,14 @@
                             @endphp
 
                             @if ($giaoDichChoXacNhan)
+                                @php
+                                    $ghiChuGiaoDich = $giaoDichChoXacNhan->ghi_chu
+                                        ? preg_replace('/\bKy\s+/u', 'Tháng ', (string) $giaoDichChoXacNhan->ghi_chu)
+                                        : null;
+                                @endphp
                                 <div class="text-[11px] font-bold text-slate-900 tabular-nums leading-tight">{{ $giaoDichChoXacNhan->ma_giao_dich ?? '—' }}</div>
                                 <div class="mt-1 text-[10px] font-semibold text-slate-500 leading-snug">
-                                    {{ $giaoDichChoXacNhan->ghi_chu ?? '—' }}
+                                    {{ $ghiChuGiaoDich ?? '—' }}
                                 </div>
                                 <div class="mt-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                                     {{ $giaoDichChoXacNhan->ngay_giao_dich?->format('d/m/Y H:i') ?? '—' }}

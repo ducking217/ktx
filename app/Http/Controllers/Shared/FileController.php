@@ -13,12 +13,16 @@ class FileController extends Controller
     /**
      * Show private file (CCCD, etc.) via signed URL or admin auth.
      */
-    public function showPrivateFile(Request $request, string $path): StreamedResponse
+    public function showPrivateFile(Request $request, ?string $path = null): StreamedResponse
     {
         $user = $request->user();
         $isAdmin = $user && method_exists($user, 'isAdminGroup') ? (bool) $user->isAdminGroup() : false;
 
+        $path = (string) ($path ?: $request->query('path', ''));
         $path = ltrim($path, '/');
+        if ($path === '') {
+            abort(404);
+        }
         if (str_contains($path, '..')) {
             abort(403);
         }
@@ -53,4 +57,3 @@ class FileController extends Controller
         return URL::temporarySignedRoute('private.file', now()->addMinutes($expiresInMinutes), ['path' => $path]);
     }
 }
-

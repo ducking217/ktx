@@ -33,7 +33,7 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-ink-secondary">Địa chỉ Email</label>
+                            <label class="text-[10px] font-black uppercase tracking-widest text-ink-secondary">Địa chỉ thư điện tử</label>
                             <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}" required
                                 class="pdu-input w-full" placeholder="admin@pdu.edu.vn">
                             @error('email') <p class="text-[10px] font-bold text-status-error uppercase mt-1">{{ $message }}</p> @enderror

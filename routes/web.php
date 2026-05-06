@@ -278,10 +278,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/private-files/{path}', [FileController::class, 'showPrivateFile'])
-    ->where('path', '.*')
+Route::get('/private-files', [FileController::class, 'showPrivateFile'])
     ->middleware(['auth'])
     ->name('private.file');
+
+Route::get('/private-files/{path}', [FileController::class, 'showPrivateFile'])
+    ->where('path', '.*')
+    ->middleware(['auth']);
 
 // Trạm điều hướng trung gian
 Route::get('/dieuhuong', function () {

@@ -24,7 +24,7 @@
                         <option value="">Tất cả sinh viên</option>
                         @foreach($sinhviens as $s)
                             <option value="{{ $s->id }}" {{ $selectedSinhvien == $s->id ? 'selected' : '' }}>
-                                {{ $s->masinhvien }} — {{ $s->user->name ?? 'N/A' }}
+                                {{ $s->masinhvien }} — {{ $s->user->name ?? 'Chưa có' }}
                             </option>
                         @endforeach
                     </select>
@@ -66,7 +66,7 @@
                         @endphp
                         <td class="py-5">
                             <span class="text-[11px] font-bold text-slate-400 tabular-nums bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60 uppercase tracking-widest">
-                                {{ $item->sinhvien?->ma_sinh_vien ?? 'N/A' }}
+                                {{ $item->sinhvien?->ma_sinh_vien ?? 'Chưa có' }}
                             </span>
                         </td>
                         <td class="py-5">
@@ -152,7 +152,7 @@
                     <select name="sinhvien_id" id="sinhvien_id_new" required class="saas-input h-11 font-bold">
                         <option value="">-- Chọn sinh viên --</option>
                         @foreach($sinhviens as $s)
-                            <option value="{{ $s->id }}">{{ $s->masinhvien }} — {{ $s->user->name ?? 'N/A' }}</option>
+                            <option value="{{ $s->id }}">{{ $s->masinhvien }} — {{ $s->user->name ?? 'Chưa có' }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -202,8 +202,8 @@
                     <div class="p-5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center gap-4">
                         <div class="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-lg shadow-sm">👤</div>
                         <div>
-                            <div class="text-sm font-bold text-slate-900 leading-none">{{ $item->sinhvien->user->name ?? 'N/A' }}</div>
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1.5">{{ $item->sinhvien?->ma_sinh_vien ?? 'N/A' }}</div>
+                            <div class="text-sm font-bold text-slate-900 leading-none">{{ $item->sinhvien->user->name ?? 'Chưa có' }}</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1.5">{{ $item->sinhvien?->ma_sinh_vien ?? 'Chưa có' }}</div>
                         </div>
                     </div>
 

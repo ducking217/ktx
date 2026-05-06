@@ -11,13 +11,10 @@
                     <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     Quay lại
                 </a>
-                <button type="button" class="saas-btn-secondary h-9 px-4 text-xs">
-                    <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    PDF
-                </button>
+                
                 <button type="button" data-modal-target="modal-edit-{{ $sinhvien->id }}" data-modal-toggle="modal-edit-{{ $sinhvien->id }}" class="saas-btn-primary h-9 px-5 text-xs shadow-lg shadow-blue-500/20">
                     <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    Hiệu chỉnh
+                    Chỉnh sửa hồ sơ sinh viên
                 </button>
             </div>
         </x-admin.page-header>
@@ -92,7 +89,7 @@
                                         <img src="{{ $anhTheUrl }}" class="h-full w-full object-cover transition-all duration-500 group-hover/doc:scale-105" />
                                     </a>
                                 @else
-                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">No Photo</div>
+                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">Chưa có ảnh</div>
                                 @endif
                             </div>
                             <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest text-center">Ảnh thẻ</div>
@@ -104,7 +101,7 @@
                                         <img src="{{ $anhCccdUrl }}" class="h-full w-full object-cover transition-all duration-500 group-hover/doc:scale-105" />
                                     </a>
                                 @else
-                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">No CCCD</div>
+                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">Chưa có CCCD</div>
                                 @endif
                             </div>
                             <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest text-center">CCCD</div>
@@ -137,7 +134,7 @@
                             <div>
                                 <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Ngày nhập nội</div>
                                 <div class="text-sm font-bold text-white tabular-nums tracking-tight leading-none">
-                                    {{ $sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first()?->ngay_bat_dau?->format('d/m/Y') ?? 'N/A' }}
+                                    {{ $sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first()?->ngay_bat_dau?->format('d/m/Y') ?? 'Chưa có' }}
                                 </div>
                             </div>
                         </div>
@@ -188,31 +185,66 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Mã sinh viên
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $sinhvien->ma_sinh_vien }}</div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    Lớp
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tracking-tight">{{ $sinhvien->lop ?? 'Chưa có' }}</div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                     Email định danh
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 break-all tracking-tight">{{ $sinhvien->taikhoan?->email }}</div>
+                                <div class="text-sm font-bold text-slate-900 break-all tracking-tight">{{ $sinhvien->user?->email ?? 'Chưa có' }}</div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                                     Số điện thoại
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $sinhvien->sodienthoai }}</div>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $sinhvien->user?->phone ?? 'Chưa có' }}</div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                     Ngày sinh
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $sinhvien->ngaysinh }}</div>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $sinhvien->user?->dob?->format('d/m/Y') ?? 'Chưa có' }}</div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     Địa chỉ thường trú
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 leading-relaxed tracking-tight">{{ $sinhvien->diachi }}</div>
+                                <div class="text-sm font-bold text-slate-900 leading-relaxed tracking-tight">{{ $sinhvien->user?->address ?? 'Chưa có' }}</div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2v2c0 1.105 1.343 2 3 2s3-.895 3-2v-2c0-1.105-1.343-2-3-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
+                                    Số CCCD / Định danh
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $sinhvien->user?->id_card ?? 'Chưa có' }}</div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Khoa
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tracking-tight">{{ $sinhvien->khoa ?? 'Chưa có' }}</div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    Ngày nhập học
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight">{{ $sinhvien->ngay_nhap_hoc?->format('d/m/Y') ?? 'Chưa có' }}</div>
                             </div>
                         </div>
                     </div>
@@ -243,7 +275,7 @@
                                         <tr class="hover:bg-slate-50/30 transition-all">
                                             <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums">#{{ $hopdong->id }}</td>
                                             <td class="px-6 py-4">
-                                                <div class="text-xs font-bold text-slate-900">P.{{ $hopdong->phong?->ten_phong ?? 'N/A' }}</div>
+                                                <div class="text-xs font-bold text-slate-900">P.{{ $hopdong->phong?->ten_phong ?? 'Chưa có' }}</div>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center gap-3 text-[10px] font-bold tabular-nums">
@@ -324,7 +356,7 @@
                             <table class="w-full text-left">
                                 <thead class="bg-slate-50/50 border-b border-slate-100">
                                     <tr>
-                                        <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Kỳ hóa đơn</th>
+                                        <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tháng hóa đơn</th>
                                         <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Tổng tiền</th>
                                         <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Trạng thái</th>
                                     </tr>
@@ -366,4 +398,132 @@
             </div>
         </div>
     </div>
+
+    @push('modals')
+        <x-modal id="modal-edit-{{ $sinhvien->id }}" title="Hiệu chỉnh hồ sơ sinh viên" subtitle="Cập nhật thông tin định danh và hồ sơ học vụ.">
+            <form method="POST" action="{{ route('admin.capnhatsinhvien', $sinhvien->id) }}" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="name" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Họ và tên</label>
+                        <input id="name" name="name" type="text" class="saas-input" value="{{ old('name', $sinhvien->user?->name) }}" required />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('name')" />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Địa chỉ thư điện tử</label>
+                        <input id="email" name="email" type="email" class="saas-input" value="{{ old('email', $sinhvien->user?->email) }}" required />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('email')" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="ma_sinh_vien" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Mã sinh viên</label>
+                        <input id="ma_sinh_vien" name="ma_sinh_vien" type="text" class="saas-input font-bold tabular-nums" value="{{ old('ma_sinh_vien', $sinhvien->ma_sinh_vien) }}" required />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('ma_sinh_vien')" />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="lop" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Lớp</label>
+                        <input id="lop" name="lop" type="text" class="saas-input" value="{{ old('lop', $sinhvien->lop) }}" placeholder="Ví dụ: CNTT K15" />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('lop')" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="khoa" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Khoa</label>
+                        <input id="khoa" name="khoa" type="text" class="saas-input" value="{{ old('khoa', $sinhvien->khoa) }}" placeholder="Ví dụ: Công nghệ thông tin" />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('khoa')" />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="ngay_nhap_hoc" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ngày nhập học</label>
+                        <input id="ngay_nhap_hoc" name="ngay_nhap_hoc" type="date" class="saas-input tabular-nums" value="{{ old('ngay_nhap_hoc', $sinhvien->ngay_nhap_hoc?->format('Y-m-d')) }}" />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('ngay_nhap_hoc')" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="phone" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Số điện thoại</label>
+                        <input id="phone" name="phone" type="text" class="saas-input tabular-nums" value="{{ old('phone', $sinhvien->user?->phone) }}" />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('phone')" />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="gender" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Giới tính</label>
+                        <select id="gender" name="gender" class="saas-input font-bold !pr-10">
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="male" {{ old('gender', $sinhvien->user?->gender?->value) === 'male' ? 'selected' : '' }}>Nam</option>
+                            <option value="female" {{ old('gender', $sinhvien->user?->gender?->value) === 'female' ? 'selected' : '' }}>Nữ</option>
+                            <option value="other" {{ old('gender', $sinhvien->user?->gender?->value) === 'other' ? 'selected' : '' }}>Khác</option>
+                        </select>
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('gender')" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="dob" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ngày sinh</label>
+                        <input id="dob" name="dob" type="date" class="saas-input tabular-nums" value="{{ old('dob', $sinhvien->user?->dob?->format('Y-m-d')) }}" />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('dob')" />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="id_card" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Số CCCD / Định danh</label>
+                        <input id="id_card" name="id_card" type="text" class="saas-input tabular-nums" value="{{ old('id_card', $sinhvien->user?->id_card) }}" />
+                        <x-input-error class="mt-1 ml-1" :messages="$errors->get('id_card')" />
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="address" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Địa chỉ liên hệ</label>
+                    <textarea id="address" name="address" rows="2" class="saas-input !h-auto py-3 resize-none font-medium" placeholder="Số nhà, tên đường, xã/phường, quận/huyện, tỉnh/thành phố...">{{ old('address', $sinhvien->user?->address) }}</textarea>
+                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('address')" />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ảnh thẻ (3x4)</div>
+                        <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-slate-50/50 p-4">
+                            <div class="flex items-start gap-4">
+                                <div class="h-20 w-16 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
+                                    @if($anhTheUrl)
+                                        <a href="{{ $anhTheUrl }}" target="_blank" rel="noopener">
+                                            <img src="{{ $anhTheUrl }}" class="h-full w-full object-cover" />
+                                        </a>
+                                    @else
+                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">Chưa có</div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 space-y-2">
+                                    <input type="file" name="anh_the" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:border-r file:border-slate-200 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-white file:text-slate-900 hover:file:bg-slate-50 transition-colors cursor-pointer border border-slate-200 bg-white rounded-lg" />
+                                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('anh_the')" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ảnh CCCD</div>
+                        <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-slate-50/50 p-4">
+                            <div class="flex items-start gap-4">
+                                <div class="h-20 w-32 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
+                                    @if($anhCccdUrl)
+                                        <a href="{{ $anhCccdUrl }}" target="_blank" rel="noopener">
+                                            <img src="{{ $anhCccdUrl }}" class="h-full w-full object-cover" />
+                                        </a>
+                                    @else
+                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">Chưa có</div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 space-y-2">
+                                    <input type="file" name="anh_cccd" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:border-r file:border-slate-200 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-white file:text-slate-900 hover:file:bg-slate-50 transition-colors cursor-pointer border border-slate-200 bg-white rounded-lg" />
+                                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('anh_cccd')" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+                    <button type="button" data-modal-hide="modal-edit-{{ $sinhvien->id }}" class="saas-btn-secondary h-11 px-6">
+                        Hủy bỏ
+                    </button>
+                    <button type="submit" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+                        Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </x-modal>
+    @endpush
 </x-admin-layout>

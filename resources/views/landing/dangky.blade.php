@@ -70,7 +70,7 @@
 
                             <div class="grid gap-6 sm:grid-cols-2">
                                 <div>
-                                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mb-2 block">Địa chỉ Email</label>
+                                    <label class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary mb-2 block">Địa chỉ thư điện tử</label>
                                     <input type="email" name="email" required value="{{ old('email') }}"
                                            class="w-full bg-white border border-ui-border text-ink-primary rounded-none focus:ring-0 focus:border-ink-primary p-3 transition-colors" placeholder="example@email.com">
                                     @error('email') <p class="mt-2 text-[10px] font-bold text-red-500">{{ $message }}</p> @enderror

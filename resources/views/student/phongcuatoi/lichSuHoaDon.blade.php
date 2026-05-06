@@ -92,7 +92,7 @@
                             }
                             $kyHienThi = $ky
                                 ?? ($item->ngay_thanh_toan?->format('m/Y') ?? $item->created_at?->format('m/Y'))
-                                ?? 'N/A';
+                                ?? 'Chưa có';
                             $tenLoai = $isRefund ? 'Hoàn cọc' : ($isDeposit ? 'Tiền cọc' : ($isExtra ? 'Phát sinh' : 'Hóa đơn tháng'));
 
                             $statusInvoice = $item->trang_thai;

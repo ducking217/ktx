@@ -30,7 +30,7 @@
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-4">
                             <div class="text-sm font-bold text-slate-900 uppercase tracking-tight">{{ $item->hopdong->ma_hd }}</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ $item->hopdong->phong->tenphong ?? 'N/A' }}</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ $item->hopdong->phong->tenphong ?? 'Chưa có' }}</div>
                         </td>
                         <td class="py-4 text-center">
                             <span class="text-xs font-bold text-slate-600 tabular-nums bg-slate-100 px-2 py-1 rounded-lg uppercase tracking-widest">{{ $item->ngay_ket_thuc_moi->format('d/m/Y') }}</span>

@@ -26,13 +26,10 @@
                     <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     Quay lại
                 </a>
-                <button type="button" class="saas-btn-secondary h-9 px-4 text-xs">
-                    <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    PDF
-                </button>
+                
                 <button type="button" data-modal-target="modal-edit-<?php echo e($sinhvien->id); ?>" data-modal-toggle="modal-edit-<?php echo e($sinhvien->id); ?>" class="saas-btn-primary h-9 px-5 text-xs shadow-lg shadow-blue-500/20">
                     <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    Hiệu chỉnh
+                    Chỉnh sửa hồ sơ sinh viên
                 </button>
             </div>
          <?php echo $__env->renderComponent(); ?>
@@ -118,7 +115,7 @@
                                         <img src="<?php echo e($anhTheUrl); ?>" class="h-full w-full object-cover transition-all duration-500 group-hover/doc:scale-105" />
                                     </a>
                                 <?php else: ?>
-                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">No Photo</div>
+                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">Chưa có ảnh</div>
                                 <?php endif; ?>
                             </div>
                             <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest text-center">Ảnh thẻ</div>
@@ -130,7 +127,7 @@
                                         <img src="<?php echo e($anhCccdUrl); ?>" class="h-full w-full object-cover transition-all duration-500 group-hover/doc:scale-105" />
                                     </a>
                                 <?php else: ?>
-                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">No CCCD</div>
+                                    <div class="flex h-full w-full items-center justify-center text-[9px] font-bold text-slate-300 uppercase">Chưa có CCCD</div>
                                 <?php endif; ?>
                             </div>
                             <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest text-center">CCCD</div>
@@ -163,7 +160,7 @@
                             <div>
                                 <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Ngày nhập nội</div>
                                 <div class="text-sm font-bold text-white tabular-nums tracking-tight leading-none">
-                                    <?php echo e($sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first()?->ngay_bat_dau?->format('d/m/Y') ?? 'N/A'); ?>
+                                    <?php echo e($sinhvien->hopdongs->where('trang_thai', \App\Enums\ContractStatus::Active)->first()?->ngay_bat_dau?->format('d/m/Y') ?? 'Chưa có'); ?>
 
                                 </div>
                             </div>
@@ -196,11 +193,6 @@
                         <div class="text-2xl font-bold text-rose-600 tabular-nums tracking-tight"><?php echo e($sinhvien->kyluats->count()); ?></div>
                         <div class="h-0.5 w-4 bg-rose-200 mt-3 group-hover:w-8 group-hover:bg-rose-500 transition-all"></div>
                     </div>
-                    <div class="saas-card p-5 bg-emerald-50/20 border-none group hover:bg-white hover:shadow-xl transition-all duration-300">
-                        <div class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Đánh giá</div>
-                        <div class="text-2xl font-bold text-emerald-600 tabular-nums tracking-tight"><?php echo e($sinhvien->danhgias->count()); ?></div>
-                        <div class="h-0.5 w-4 bg-emerald-200 mt-3 group-hover:w-8 group-hover:bg-emerald-500 transition-all"></div>
-                    </div>
                     <div class="saas-card p-5 bg-blue-50/20 border-none group hover:bg-white hover:shadow-xl transition-all duration-300">
                         <div class="text-[8px] font-bold text-blue-500 uppercase tracking-widest mb-3">Hóa đơn</div>
                         <div class="text-2xl font-bold text-blue-600 tabular-nums tracking-tight"><?php echo e($hoadons->count()); ?></div>
@@ -220,31 +212,66 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Mã sinh viên
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e($sinhvien->ma_sinh_vien); ?></div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    Lớp
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tracking-tight"><?php echo e($sinhvien->lop ?? 'Chưa có'); ?></div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                     Email định danh
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 break-all tracking-tight"><?php echo e($sinhvien->taikhoan?->email); ?></div>
+                                <div class="text-sm font-bold text-slate-900 break-all tracking-tight"><?php echo e($sinhvien->user?->email ?? 'Chưa có'); ?></div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                                     Số điện thoại
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e($sinhvien->sodienthoai); ?></div>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e($sinhvien->user?->phone ?? 'Chưa có'); ?></div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                     Ngày sinh
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e($sinhvien->ngaysinh); ?></div>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e($sinhvien->user?->dob?->format('d/m/Y') ?? 'Chưa có'); ?></div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     Địa chỉ thường trú
                                 </label>
-                                <div class="text-sm font-bold text-slate-900 leading-relaxed tracking-tight"><?php echo e($sinhvien->diachi); ?></div>
+                                <div class="text-sm font-bold text-slate-900 leading-relaxed tracking-tight"><?php echo e($sinhvien->user?->address ?? 'Chưa có'); ?></div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2v2c0 1.105 1.343 2 3 2s3-.895 3-2v-2c0-1.105-1.343-2-3-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
+                                    Số CCCD / Định danh
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e($sinhvien->user?->id_card ?? 'Chưa có'); ?></div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Khoa
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tracking-tight"><?php echo e($sinhvien->khoa ?? 'Chưa có'); ?></div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    Ngày nhập học
+                                </label>
+                                <div class="text-sm font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e($sinhvien->ngay_nhap_hoc?->format('d/m/Y') ?? 'Chưa có'); ?></div>
                             </div>
                         </div>
                     </div>
@@ -256,7 +283,6 @@
                         <button @click="activeTab = 'contracts'" :class="activeTab === 'contracts' ? 'bg-white text-blue-600 shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Hợp đồng</button>
                         <button @click="activeTab = 'discipline'" :class="activeTab === 'discipline' ? 'bg-white text-rose-600 shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Kỷ luật</button>
                         <button @click="activeTab = 'bills'" :class="activeTab === 'bills' ? 'bg-white text-blue-600 shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Hóa đơn</button>
-                        <button @click="activeTab = 'evaluations'" :class="activeTab === 'evaluations' ? 'bg-white text-emerald-600 shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Đánh giá</button>
                     </div>
 
                     <div class="saas-card overflow-hidden border-slate-200/60 shadow-sm">
@@ -276,7 +302,7 @@
                                         <tr class="hover:bg-slate-50/30 transition-all">
                                             <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums">#<?php echo e($hopdong->id); ?></td>
                                             <td class="px-6 py-4">
-                                                <div class="text-xs font-bold text-slate-900">P.<?php echo e($hopdong->phong?->ten_phong ?? 'N/A'); ?></div>
+                                                <div class="text-xs font-bold text-slate-900">P.<?php echo e($hopdong->phong?->ten_phong ?? 'Chưa có'); ?></div>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center gap-3 text-[10px] font-bold tabular-nums">
@@ -326,8 +352,16 @@
                                         <tr class="hover:bg-slate-50/30 transition-all">
                                             <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums"><?php echo e($kyluat->ngay_vi_pham->format('d/m/Y')); ?></td>
                                             <td class="px-6 py-4">
-                                                <span class="saas-badge saas-badge-error text-[8px] font-bold px-3 py-1">
-                                                    <?php echo e($kyluat->muc_do->label()); ?>
+                                                <?php
+                                                    $mucDoValue = $kyluat->muc_do?->value ?? $kyluat->muc_do;
+                                                    $badgeClass = match($mucDoValue) {
+                                                        \App\Enums\DisciplineLevel::High->value => 'saas-badge-error',
+                                                        \App\Enums\DisciplineLevel::Medium->value => 'saas-badge-warning',
+                                                        default => 'saas-badge-info',
+                                                    };
+                                                ?>
+                                                <span class="saas-badge <?php echo e($badgeClass); ?> text-[8px] font-bold px-3 py-1">
+                                                    <?php echo e($kyluat->muc_do?->label() ?? 'Bình thường'); ?>
 
                                                 </span>
                                             </td>
@@ -352,7 +386,7 @@
                             <table class="w-full text-left">
                                 <thead class="bg-slate-50/50 border-b border-slate-100">
                                     <tr>
-                                        <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Kỳ hóa đơn</th>
+                                        <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tháng hóa đơn</th>
                                         <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Tổng tiền</th>
                                         <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Trạng thái</th>
                                     </tr>
@@ -390,48 +424,404 @@
                             </table>
                         </div>
 
-                        
-                        <div x-show="activeTab === 'evaluations'" x-transition class="animate-fade-in">
-                            <table class="w-full text-left">
-                                <thead class="bg-slate-50/50 border-b border-slate-100">
-                                    <tr>
-                                        <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ngày</th>
-                                        <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Điểm</th>
-                                        <th class="px-6 py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Nhận xét</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    <?php $__empty_1 = true; $__currentLoopData = $sinhvien->danhgias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $danhgia): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                        <tr class="hover:bg-slate-50/30 transition-all">
-                                            <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums"><?php echo e($danhgia->ngaydanhgia->format('d/m/Y')); ?></td>
-                                            <td class="px-6 py-4">
-                                                <div class="flex items-center gap-1 text-amber-400">
-                                                    <?php for($i = 1; $i <= 5; $i++): ?>
-                                                        <svg class="h-3 w-3 <?php echo e($i <= $danhgia->diem ? 'fill-current' : 'text-slate-100'); ?>" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                        </svg>
-                                                    <?php endfor; ?>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 text-xs text-slate-600 font-medium italic">
-                                                "<?php echo e($danhgia->noidung); ?>"
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                        <tr>
-                                            <td colspan="3" class="px-6 py-20 text-center">
-                                                <p class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Chưa có đánh giá</p>
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <?php $__env->startPush('modals'); ?>
+        <?php if (isset($component)) { $__componentOriginal9f64f32e90b9102968f2bc548315018c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9f64f32e90b9102968f2bc548315018c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modal','data' => ['id' => 'modal-edit-'.e($sinhvien->id).'','title' => 'Hiệu chỉnh hồ sơ sinh viên','subtitle' => 'Cập nhật thông tin định danh và hồ sơ học vụ.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'modal-edit-'.e($sinhvien->id).'','title' => 'Hiệu chỉnh hồ sơ sinh viên','subtitle' => 'Cập nhật thông tin định danh và hồ sơ học vụ.']); ?>
+            <form method="POST" action="<?php echo e(route('admin.capnhatsinhvien', $sinhvien->id)); ?>" enctype="multipart/form-data" class="space-y-6">
+                <?php echo csrf_field(); ?>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="name" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Họ và tên</label>
+                        <input id="name" name="name" type="text" class="saas-input" value="<?php echo e(old('name', $sinhvien->user?->name)); ?>" required />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('name')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('name'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="email" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Địa chỉ thư điện tử</label>
+                        <input id="email" name="email" type="email" class="saas-input" value="<?php echo e(old('email', $sinhvien->user?->email)); ?>" required />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('email')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('email'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="ma_sinh_vien" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Mã sinh viên</label>
+                        <input id="ma_sinh_vien" name="ma_sinh_vien" type="text" class="saas-input font-bold tabular-nums" value="<?php echo e(old('ma_sinh_vien', $sinhvien->ma_sinh_vien)); ?>" required />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('ma_sinh_vien')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('ma_sinh_vien'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="lop" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Lớp</label>
+                        <input id="lop" name="lop" type="text" class="saas-input" value="<?php echo e(old('lop', $sinhvien->lop)); ?>" placeholder="Ví dụ: CNTT K15" />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('lop')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('lop'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="khoa" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Khoa</label>
+                        <input id="khoa" name="khoa" type="text" class="saas-input" value="<?php echo e(old('khoa', $sinhvien->khoa)); ?>" placeholder="Ví dụ: Công nghệ thông tin" />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('khoa')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('khoa'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="ngay_nhap_hoc" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ngày nhập học</label>
+                        <input id="ngay_nhap_hoc" name="ngay_nhap_hoc" type="date" class="saas-input tabular-nums" value="<?php echo e(old('ngay_nhap_hoc', $sinhvien->ngay_nhap_hoc?->format('Y-m-d'))); ?>" />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('ngay_nhap_hoc')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('ngay_nhap_hoc'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="phone" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Số điện thoại</label>
+                        <input id="phone" name="phone" type="text" class="saas-input tabular-nums" value="<?php echo e(old('phone', $sinhvien->user?->phone)); ?>" />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('phone')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('phone'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="gender" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Giới tính</label>
+                        <select id="gender" name="gender" class="saas-input font-bold !pr-10">
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="male" <?php echo e(old('gender', $sinhvien->user?->gender?->value) === 'male' ? 'selected' : ''); ?>>Nam</option>
+                            <option value="female" <?php echo e(old('gender', $sinhvien->user?->gender?->value) === 'female' ? 'selected' : ''); ?>>Nữ</option>
+                            <option value="other" <?php echo e(old('gender', $sinhvien->user?->gender?->value) === 'other' ? 'selected' : ''); ?>>Khác</option>
+                        </select>
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('gender')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('gender'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="dob" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ngày sinh</label>
+                        <input id="dob" name="dob" type="date" class="saas-input tabular-nums" value="<?php echo e(old('dob', $sinhvien->user?->dob?->format('Y-m-d'))); ?>" />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('dob')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('dob'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="id_card" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Số CCCD / Định danh</label>
+                        <input id="id_card" name="id_card" type="text" class="saas-input tabular-nums" value="<?php echo e(old('id_card', $sinhvien->user?->id_card)); ?>" />
+                        <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('id_card')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('id_card'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="address" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Địa chỉ liên hệ</label>
+                    <textarea id="address" name="address" rows="2" class="saas-input !h-auto py-3 resize-none font-medium" placeholder="Số nhà, tên đường, xã/phường, quận/huyện, tỉnh/thành phố..."><?php echo e(old('address', $sinhvien->user?->address)); ?></textarea>
+                    <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('address')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('address'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ảnh thẻ (3x4)</div>
+                        <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-slate-50/50 p-4">
+                            <div class="flex items-start gap-4">
+                                <div class="h-20 w-16 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
+                                    <?php if($anhTheUrl): ?>
+                                        <a href="<?php echo e($anhTheUrl); ?>" target="_blank" rel="noopener">
+                                            <img src="<?php echo e($anhTheUrl); ?>" class="h-full w-full object-cover" />
+                                        </a>
+                                    <?php else: ?>
+                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">Chưa có</div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="flex-1 space-y-2">
+                                    <input type="file" name="anh_the" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:border-r file:border-slate-200 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-white file:text-slate-900 hover:file:bg-slate-50 transition-colors cursor-pointer border border-slate-200 bg-white rounded-lg" />
+                                    <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('anh_the')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('anh_the'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ảnh CCCD</div>
+                        <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-slate-50/50 p-4">
+                            <div class="flex items-start gap-4">
+                                <div class="h-20 w-32 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
+                                    <?php if($anhCccdUrl): ?>
+                                        <a href="<?php echo e($anhCccdUrl); ?>" target="_blank" rel="noopener">
+                                            <img src="<?php echo e($anhCccdUrl); ?>" class="h-full w-full object-cover" />
+                                        </a>
+                                    <?php else: ?>
+                                        <div class="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-300 uppercase italic">Chưa có</div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="flex-1 space-y-2">
+                                    <input type="file" name="anh_cccd" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:border-r file:border-slate-200 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-white file:text-slate-900 hover:file:bg-slate-50 transition-colors cursor-pointer border border-slate-200 bg-white rounded-lg" />
+                                    <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['class' => 'mt-1 ml-1','messages' => $errors->get('anh_cccd')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mt-1 ml-1','messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('anh_cccd'))]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $attributes = $__attributesOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__attributesOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf94ed9c5393ef72725d159fe01139746)): ?>
+<?php $component = $__componentOriginalf94ed9c5393ef72725d159fe01139746; ?>
+<?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
+<?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+                    <button type="button" data-modal-hide="modal-edit-<?php echo e($sinhvien->id); ?>" class="saas-btn-secondary h-11 px-6">
+                        Hủy bỏ
+                    </button>
+                    <button type="submit" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+                        Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9f64f32e90b9102968f2bc548315018c)): ?>
+<?php $attributes = $__attributesOriginal9f64f32e90b9102968f2bc548315018c; ?>
+<?php unset($__attributesOriginal9f64f32e90b9102968f2bc548315018c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9f64f32e90b9102968f2bc548315018c)): ?>
+<?php $component = $__componentOriginal9f64f32e90b9102968f2bc548315018c; ?>
+<?php unset($__componentOriginal9f64f32e90b9102968f2bc548315018c); ?>
+<?php endif; ?>
+    <?php $__env->stopPush(); ?>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal91fdd17964e43374ae18c674f95cdaa3)): ?>

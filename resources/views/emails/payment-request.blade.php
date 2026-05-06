@@ -28,8 +28,8 @@
             <p><strong>Nội dung CK:</strong> KTX {{ $dangky->id }} {{ $dangky->so_dien_thoai }}</p>
         </div>
 
-        <p>Hạn chót thanh toán: <strong>{{ $dangky->token_expires_at?->format('d/m/Y H:i') ?? 'N/A' }}</strong></p>
-        <p>Sau khi thanh toán thành công, Admin sẽ xác nhận, cấp phòng và gửi link đăng nhập cho bạn qua email này.</p>
+        <p>Hạn chót thanh toán: <strong>{{ $dangky->token_expires_at?->format('d/m/Y H:i') ?? 'Chưa có' }}</strong></p>
+        <p>Sau khi thanh toán thành công, Ban quản lý sẽ xác nhận, cấp phòng và gửi liên kết đăng nhập cho bạn qua thư này.</p>
         
         <div style="text-align: center; margin: 30px 0;">
             <a href="{{ route('guest.lookup', ['token' => $dangky->lookup_token]) }}" class="btn">Xem chi tiết đơn</a>

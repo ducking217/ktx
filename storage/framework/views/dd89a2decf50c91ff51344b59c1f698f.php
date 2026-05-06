@@ -86,8 +86,8 @@
                 <?php $__empty_1 = true; $__currentLoopData = $danhsachbaohong; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $baohong): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-5">
-                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($baohong->sinhvien?->user?->name ?? 'N/A'); ?></div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 tabular-nums">MSSV: <?php echo e($baohong->sinhvien?->ma_sinh_vien ?? 'N/A'); ?></div>
+                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($baohong->sinhvien?->user?->name ?? 'Chưa có'); ?></div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 tabular-nums">MSSV: <?php echo e($baohong->sinhvien?->ma_sinh_vien ?? 'Chưa có'); ?></div>
                         </td>
                         <td class="py-5">
                             <div class="inline-flex items-center gap-2 text-sm font-bold text-slate-900">
@@ -124,7 +124,7 @@
                                 };
                             ?>
                             <span class="saas-badge <?php echo e($statusClass); ?>">
-                                <?php echo e($status?->label() ?? 'N/A'); ?>
+                                <?php echo e($status?->label() ?? 'Không xác định'); ?>
 
                             </span>
                         </td>

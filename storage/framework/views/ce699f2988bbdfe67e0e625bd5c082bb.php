@@ -13,14 +13,14 @@
     <div class="space-y-10 pb-20">
         <?php if (isset($component)) { $__componentOriginalcb19cb35a534439097b02b8af91726ee = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalcb19cb35a534439097b02b8af91726ee = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.page-header','data' => ['title' => 'Batch Utility Measurement','subtitle' => 'Hệ thống kê khai chỉ số hạ tầng tập trung, tối ưu hóa quy trình kết xuất hóa đơn đa điểm cho toàn thể đơn vị cư trú.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.page-header','data' => ['title' => 'Nhập chỉ số điện nước (hàng loạt)','subtitle' => 'Hệ thống kê khai chỉ số hạ tầng tập trung, tối ưu hóa quy trình kết xuất hóa đơn đa điểm cho toàn thể đơn vị cư trú.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('admin.page-header'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['title' => 'Batch Utility Measurement','subtitle' => 'Hệ thống kê khai chỉ số hạ tầng tập trung, tối ưu hóa quy trình kết xuất hóa đơn đa điểm cho toàn thể đơn vị cư trú.']); ?>
+<?php $component->withAttributes(['title' => 'Nhập chỉ số điện nước (hàng loạt)','subtitle' => 'Hệ thống kê khai chỉ số hạ tầng tập trung, tối ưu hóa quy trình kết xuất hóa đơn đa điểm cho toàn thể đơn vị cư trú.']); ?>
             <a href="<?php echo e(route('admin.quanlyhoadon')); ?>" class="saas-btn-secondary h-12 px-6 text-[10px] font-black uppercase tracking-[0.15em] border-slate-200">
                 <svg class="h-4 w-4 mr-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 Quay lại
@@ -51,23 +51,23 @@
                     <div class="bg-slate-50/50 border-b border-slate-200/60 px-10 py-5">
                         <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-900 flex items-center gap-2.5">
                             <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                            Fiscal Period Context
+                            Kỳ nhập chỉ số
                         </h3>
                     </div>
                     <div class="p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Kỳ quyết toán (Audit Month)</label>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Tháng</label>
                             <select name="thang" x-model="thang" class="saas-input h-12 font-black tabular-nums bg-slate-50/30 border-slate-200/80 focus:bg-white transition-all">
                                 <?php for($i = 1; $i <= 12; $i++): ?>
-                                    <option value="<?php echo e($i); ?>">Period Month <?php echo e(str_pad($i, 2, '0', STR_PAD_LEFT)); ?></option>
+                                    <option value="<?php echo e($i); ?>">Tháng <?php echo e(str_pad($i, 2, '0', STR_PAD_LEFT)); ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Chu kỳ vận hành (Year)</label>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Năm</label>
                             <select name="nam" x-model="nam" class="saas-input h-12 font-black tabular-nums bg-slate-50/30 border-slate-200/80 focus:bg-white transition-all">
                                 <?php for($i = now()->year - 1; $i <= now()->year + 1; $i++): ?>
-                                    <option value="<?php echo e($i); ?>">Fiscal Year <?php echo e($i); ?></option>
+                                    <option value="<?php echo e($i); ?>">Năm <?php echo e($i); ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
@@ -86,9 +86,9 @@
 <?php $component->withAttributes([]); ?>
                     <thead>
                         <tr>
-                            <th>Managed Unit Asset</th>
-                            <th class="text-center">Grid Power Indices (Prev → Latest)</th>
-                            <th class="text-center">Water Supply Indices (Prev → Latest)</th>
+                            <th>Phòng</th>
+                            <th class="text-center">Chỉ số điện (cũ → mới)</th>
+                            <th class="text-center">Chỉ số nước (cũ → mới)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -150,7 +150,7 @@
                             class="saas-btn-primary h-12 px-10 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 disabled:opacity-40 disabled:cursor-not-allowed group"
                             :disabled="!rooms.every(r => isValid(r))">
                             <svg class="h-4 w-4 mr-2.5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                            Commit <?php echo e(count($danhsachphong)); ?> Audit Results
+                            Lưu <?php echo e(count($danhsachphong)); ?> chỉ số
                         </button>
                     </div>
                 </div>

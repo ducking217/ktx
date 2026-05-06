@@ -8,19 +8,19 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-     <?php $__env->slot('title', null, []); ?> Hệ thống Tiếp nhận & Phản hồi Cư dân <?php $__env->endSlot(); ?>
+     <?php $__env->slot('title', null, []); ?> Quản lý Liên hệ <?php $__env->endSlot(); ?>
 
     <div class="space-y-10 pb-20">
         <?php if (isset($component)) { $__componentOriginalcb19cb35a534439097b02b8af91726ee = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalcb19cb35a534439097b02b8af91726ee = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.page-header','data' => ['title' => 'Institutional Inbox','subtitle' => 'Tiếp nhận, thẩm định và phản hồi các kiến nghị, đóng góp từ cộng đồng cư dân để nâng cao chất lượng vận hành.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.page-header','data' => ['title' => 'Hộp thư liên hệ','subtitle' => 'Tiếp nhận và phản hồi các kiến nghị, đóng góp để nâng cao chất lượng vận hành.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('admin.page-header'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['title' => 'Institutional Inbox','subtitle' => 'Tiếp nhận, thẩm định và phản hồi các kiến nghị, đóng góp từ cộng đồng cư dân để nâng cao chất lượng vận hành.']); ?>
+<?php $component->withAttributes(['title' => 'Hộp thư liên hệ','subtitle' => 'Tiếp nhận và phản hồi các kiến nghị, đóng góp để nâng cao chất lượng vận hành.']); ?>
             <?php if (isset($component)) { $__componentOriginalca9a59ffed06600c602f2637b0b34f87 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalca9a59ffed06600c602f2637b0b34f87 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.status-tabs','data' => ['items' => [
@@ -72,12 +72,12 @@
 <?php $component->withAttributes([]); ?>
             <thead>
                 <tr>
-                    <th>Feedback Provider</th>
-                    <th>Communication Channel</th>
-                    <th>Manifest / Petition</th>
-                    <th>Temporal Stamp</th>
-                    <th class="text-center">Lifecycle State</th>
-                    <th class="text-right">Audit Controls</th>
+                    <th>Người gửi</th>
+                    <th>Kênh liên hệ</th>
+                    <th>Nội dung</th>
+                    <th>Thời gian</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-right">Thao tác</th>
                 </tr>
             </thead>
             <tbody x-data="{ openId: null }">
@@ -85,7 +85,7 @@
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-6">
                             <div class="text-[13px] font-black text-slate-900 leading-none group-hover:text-blue-600 transition-colors"><?php echo e($lienhe->ho_ten); ?></div>
-                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mt-2.5">Verified Resident</div>
+                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mt-2.5">Người gửi</div>
                         </td>
                         <td class="py-6">
                             <div class="flex items-center gap-3 text-[12px] font-black text-slate-600 tabular-nums">
@@ -97,13 +97,13 @@
                             </div>
                         </td>
                         <td class="py-6 max-w-sm">
-                            <div class="text-[11px] font-bold leading-relaxed text-slate-600 italic line-clamp-2 border-l-2 border-slate-100 pl-4 group-hover:border-blue-500 transition-all">
+                            <div class="text-[11px] font-semibold leading-relaxed text-slate-600 line-clamp-2 rounded-xl bg-slate-50/70 px-4 py-3 ring-1 ring-slate-200/50">
                                 "<?php echo e(Str::limit($lienhe->noi_dung, 150)); ?>"
                             </div>
                         </td>
                         <td class="py-6">
-                            <div class="text-[12px] font-black text-slate-900 tabular-nums tracking-tighter"><?php echo e($lienhe->created_at->format('d.m.Y')); ?></div>
-                            <div class="text-[9px] font-black text-slate-400 tabular-nums uppercase mt-1.5"><?php echo e($lienhe->created_at->format('H:i')); ?> <span class="ml-1 opacity-40">Z</span></div>
+                            <div class="text-[12px] font-black text-slate-900 tabular-nums tracking-tighter"><?php echo e($lienhe->created_at->format('d/m/Y')); ?></div>
+                            <div class="text-[9px] font-black text-slate-400 tabular-nums uppercase mt-1.5"><?php echo e($lienhe->created_at->format('H:i')); ?></div>
                         </td>
                         <td class="py-6 text-center">
                             <?php
@@ -195,7 +195,7 @@
 
                                                 <div>
                                                     <label class="block text-xs font-semibold text-slate-600">Phản hồi của Ban quản lý</label>
-                                                    <textarea name="ghi_chu_admin" rows="5" class="mt-2 w-full rounded-xl border border-slate-200/60 bg-ui-bg px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" placeholder="Soạn phản hồi để gửi qua email, hoặc ghi chú nội bộ..."><?php echo e(old('ghi_chu_admin', $lienhe->ghi_chu_admin)); ?></textarea>
+                                                    <textarea name="ghi_chu_admin" rows="5" class="mt-2 w-full rounded-xl border border-slate-200/60 bg-ui-bg px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" placeholder="Soạn phản hồi để gửi qua thư điện tử, hoặc ghi chú nội bộ..."><?php echo e(old('ghi_chu_admin', $lienhe->ghi_chu_admin)); ?></textarea>
                                                     <?php $__errorArgs = ['ghi_chu_admin'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -219,14 +219,14 @@ unset($__errorArgs, $__bag); ?>
 
                                                 <?php if (isset($component)) { $__componentOriginal5b8b2d0f151a30be878e1a760ec3900c = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal5b8b2d0f151a30be878e1a760ec3900c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.confirmation-modal','data' => ['type' => 'info','title' => 'Gửi phản hồi','message' => 'Gửi phản hồi qua email cho người gửi và đánh dấu liên hệ là đã xử lý?','confirmText' => 'Gửi']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.confirmation-modal','data' => ['type' => 'info','title' => 'Gửi phản hồi','message' => 'Gửi phản hồi qua thư điện tử cho người gửi và đánh dấu liên hệ là đã xử lý?','confirmText' => 'Gửi']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('confirmation-modal'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['type' => 'info','title' => 'Gửi phản hồi','message' => 'Gửi phản hồi qua email cho người gửi và đánh dấu liên hệ là đã xử lý?','confirmText' => 'Gửi']); ?>
+<?php $component->withAttributes(['type' => 'info','title' => 'Gửi phản hồi','message' => 'Gửi phản hồi qua thư điện tử cho người gửi và đánh dấu liên hệ là đã xử lý?','confirmText' => 'Gửi']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal5b8b2d0f151a30be878e1a760ec3900c)): ?>
@@ -251,8 +251,8 @@ unset($__errorArgs, $__bag); ?>
                                 <div class="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 border border-slate-100 border-dashed">
                                     <svg class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
                                 </div>
-                                <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Aggregate Inbox Clear</h4>
-                                <p class="text-[11px] text-slate-400 font-medium max-w-xs">Không có kiến nghị hay phản hồi nào cần thẩm định tại thời điểm hiện hành.</p>
+                                <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Không có liên hệ</h4>
+                                <p class="text-[11px] text-slate-400 font-medium max-w-xs">Hiện chưa có liên hệ nào cần xử lý tại thời điểm này.</p>
                             </div>
                         </td>
                     </tr>

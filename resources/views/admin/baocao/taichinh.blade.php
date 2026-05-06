@@ -3,14 +3,14 @@
 
     <div class="space-y-10 pb-20">
         <x-admin.page-header
-            title="Fiscal Intelligence"
+            title="Báo cáo tài chính"
             subtitle="Phân tích định lượng luồng tiền, biến động doanh thu và hiệu suất tài sản lưu trú."
         >
             <form action="{{ route('admin.baocao.xuat_excel') }}" method="GET" class="flex items-center gap-3">
                 <div class="relative group">
                     <select name="nam" class="saas-input h-11 px-5 pr-10 text-[11px] font-black uppercase tracking-[0.2em] bg-white border-slate-200 focus:ring-slate-900/5 appearance-none cursor-pointer">
                         @for($i = date('Y'); $i >= date('Y') - 2; $i--)
-                            <option value="{{ $i }}">{{ $i }} Fiscal Year</option>
+                            <option value="{{ $i }}">Năm {{ $i }}</option>
                         @endfor
                     </select>
                     <div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-slate-400">
@@ -19,7 +19,7 @@
                 </div>
                 <button type="submit" class="saas-btn-primary h-11 px-8 shadow-lg shadow-blue-500/20 group">
                     <svg class="h-4.5 w-4.5 mr-2.5 group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Export Datasets
+                    Xuất dữ liệu
                 </button>
             </form>
         </x-admin.page-header>
@@ -29,10 +29,10 @@
             <div class="saas-card p-8 border-l-[6px] border-emerald-500 bg-emerald-50/5 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    Net Revenue (Month)
+                    Doanh thu (tháng)
                 </div>
                 <div class="flex items-end justify-between">
-                    <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($doanhThuThangNay) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnd</span></div>
+                    <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($doanhThuThangNay) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnđ</span></div>
                     <div @class([
                         'text-[10px] font-black px-2.5 py-1.5 rounded-xl shadow-sm border',
                         'bg-emerald-50 text-emerald-600 border-emerald-100' => $tangTruong >= 0,
@@ -47,9 +47,9 @@
             <div class="saas-card p-8 border-l-[6px] border-blue-600 bg-blue-50/5 hover:shadow-2xl hover:shadow-blue-600/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                    Managed Deposits
+                    Tổng tiền cọc
                 </div>
-                <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($tongCocHienTai) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnd</span></div>
+                <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($tongCocHienTai) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnđ</span></div>
                 <div class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mt-3 bg-blue-50/50 w-fit px-2 py-0.5 rounded-lg border border-blue-100/50">
                     Ký quỹ an sinh cư dân
                 </div>
@@ -58,23 +58,23 @@
             <div class="saas-card p-8 border-l-[6px] border-amber-500 bg-amber-50/5 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                    Occupancy Rate
+                    Tỷ lệ lấp đầy
                 </div>
                 <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ $tyLeLapDay }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">%</span></div>
                 <div class="text-[10px] font-black text-amber-600 uppercase tracking-widest mt-3 flex items-center gap-1.5">
                     <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                    {{ $phongDangThue }}/{{ $tongPhong }} active units
+                    {{ $phongDangThue }}/{{ $tongPhong }} phòng đang vận hành
                 </div>
             </div>
 
             <div class="saas-card p-8 border-l-[6px] border-slate-900 bg-slate-900/5 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-slate-900"></span>
-                    Fiscal Year Total
+                    Tổng doanh thu năm
                 </div>
-                <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($doanhThuTheoThang->sum('tong')) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnd</span></div>
+                <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($doanhThuTheoThang->sum('tong')) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnđ</span></div>
                 <div class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">
-                    Verified through {{ $doanhThuTheoThang->sum('so_luong') }} TX events
+                    Đối soát theo {{ $doanhThuTheoThang->sum('so_luong') }} giao dịch
                 </div>
             </div>
         </div>
@@ -84,13 +84,13 @@
             <div class="lg:col-span-8 saas-card p-10 border-slate-200/60 shadow-xl shadow-slate-200/5">
                 <div class="flex items-center justify-between mb-12">
                     <div>
-                        <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em]">Revenue Stream Analysis</h3>
+                        <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em]">Phân tích doanh thu</h3>
                         <p class="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-tight">Biểu đồ đối soát biến động dòng tiền 12 chu kỳ gần nhất</p>
                     </div>
                     <div class="flex items-center gap-5">
                         <div class="flex items-center gap-2">
                             <span class="h-2 w-2 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)]"></span>
-                            <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Gross Revenue (VND)</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Doanh thu (VNĐ)</span>
                         </div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@
             <div class="lg:col-span-4 saas-card p-10 border-slate-200/60 shadow-xl shadow-slate-200/5">
                 <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em] mb-10 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    Top Performing Assets
+                    Phòng doanh thu cao
                 </h3>
                 <div class="space-y-8">
                     @foreach($topPhong as $phong)
@@ -112,16 +112,16 @@
                                     {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
                                 </div>
                                 <div>
-                                    <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors leading-none">{{ $phong->phong?->ten_phong ?? 'N/A' }}</div>
+                                    <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors leading-none">{{ $phong->phong?->ten_phong ?? 'Không có' }}</div>
                                     <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 flex items-center gap-1.5">
                                         <span class="h-1 w-1 rounded-full bg-slate-300"></span>
-                                        Tầng {{ $phong->phong?->tang ?? '0' }} Infrastructure
+                                        Tầng {{ $phong->phong?->tang ?? '0' }}
                                     </div>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <div class="text-[15px] font-black text-slate-900 tabular-nums tracking-tighter leading-none">{{ number_format((float)$phong->tong) }}</div>
-                                <div class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.15em] mt-2">Revenue Lead</div>
+                                <div class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.15em] mt-2">Doanh thu</div>
                             </div>
                         </div>
                     @endforeach
@@ -133,11 +133,11 @@
         <x-admin.table-card>
             <thead>
                 <tr>
-                    <th>Fiscal Reporting Period</th>
-                    <th class="text-center">Transaction Volume</th>
-                    <th class="text-right">Total Aggregate Revenue</th>
-                    <th class="text-right">AOV (Average Order Value)</th>
-                    <th class="text-right">Fiscal Health</th>
+                    <th>Tháng báo cáo</th>
+                    <th class="text-center">Số giao dịch</th>
+                    <th class="text-right">Tổng doanh thu</th>
+                    <th class="text-right">Trung bình/giao dịch</th>
+                    <th class="text-right">Tình trạng</th>
                 </tr>
             </thead>
             <tbody>
@@ -147,17 +147,17 @@
                             <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors">Tháng {{ str_pad($row->thang, 2, '0', STR_PAD_LEFT) }} / {{ $row->nam }}</div>
                             <div class="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
                                 <span class="h-1 w-1 rounded-full bg-slate-300"></span>
-                                Institutional Reporting
+                                Báo cáo nội bộ
                             </div>
                         </td>
                         <td class="py-6 text-center">
                             <div class="text-[11px] font-black text-slate-600 tabular-nums bg-white px-3 py-1.5 rounded-xl inline-block border border-slate-200/60 shadow-sm min-w-[45px]">{{ $row->so_luong }}</div>
                         </td>
                         <td class="py-6 text-right">
-                            <div class="text-[15px] font-black text-slate-900 tabular-nums tracking-tighter leading-none">{{ number_format((float)$row->tong) }}<small class="ml-0.5 text-slate-400">VND</small></div>
+                            <div class="text-[15px] font-black text-slate-900 tabular-nums tracking-tighter leading-none">{{ number_format((float)$row->tong) }}<small class="ml-0.5 text-slate-400">VNĐ</small></div>
                         </td>
                         <td class="py-6 text-right">
-                            <div class="text-[11px] font-black text-slate-400 tabular-nums tracking-tighter">{{ number_format($row->tong / $row->so_luong) }}<small class="ml-0.5 opacity-50">VND</small></div>
+                            <div class="text-[11px] font-black text-slate-400 tabular-nums tracking-tighter">{{ number_format($row->tong / $row->so_luong) }}<small class="ml-0.5 opacity-50">VNĐ</small></div>
                         </td>
                         <td class="py-6 text-right">
                             <div class="flex items-center justify-end">
@@ -184,9 +184,9 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(d => `CY T${d.thang}/${d.nam}`),
+                    labels: data.map(d => `T${d.thang}/${d.nam}`),
                     datasets: [{
-                        label: 'Revenue Analysis',
+                        label: 'Phân tích doanh thu',
                         data: data.map(d => d.tong),
                         backgroundColor: 'rgba(37, 99, 235, 0.95)',
                         hoverBackgroundColor: '#0f172a',

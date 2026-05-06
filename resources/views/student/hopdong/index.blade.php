@@ -279,7 +279,7 @@
                                         </div>
                                         <div>
                                             <div class="font-bold text-slate-900 text-sm uppercase tracking-tight">{{ $item->phong->tenphong ?? 'Chưa xác định' }}</div>
-                                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{{ $item->phong->toa ?? 'N/A' }} • Tầng {{ $item->phong->tang ?? 'N/A' }}</div>
+                                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{{ $item->phong->toa ?? 'Chưa có' }} • Tầng {{ $item->phong->tang ?? 'Chưa có' }}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -308,7 +308,7 @@
 
                                         $statusLabel = $item->trang_thai instanceof \App\Enums\ContractStatus
                                             ? $item->trang_thai->label()
-                                            : (\App\Enums\ContractStatus::tryFrom($statusValue)?->label() ?? 'N/A');
+                                            : (\App\Enums\ContractStatus::tryFrom($statusValue)?->label() ?? 'Không xác định');
 
                                         $badgeClass = match ($statusValue) {
                                             \App\Enums\ContractStatus::Active->value => 'saas-badge-success',

@@ -6,7 +6,9 @@ use App\Contracts\Core\TrangChuServiceInterface;
 use App\Models\Cauhinh;
 use App\Models\Lienhe;
 use App\Models\Phong;
+use App\Models\Sinhvien;
 use App\Models\Thongbao;
+use App\Models\ToaNha;
 use Illuminate\Support\Facades\DB;
 
 class TrangChuService implements TrangChuServiceInterface
@@ -21,6 +23,8 @@ class TrangChuService implements TrangChuServiceInterface
             
         $tongSucChua = (int) \App\Models\LoaiPhong::sum('suc_chua');
         $sinhVienDangO = (int) \App\Models\Giuong::where('trang_thai', \App\Enums\BedStatus::Occupied->value)->count();
+        $soSinhVien = (int) Sinhvien::count();
+        $soToa = (int) ToaNha::count();
 
         return [
             'tongSoPhong' => $phongList->count(),
@@ -34,7 +38,8 @@ class TrangChuService implements TrangChuServiceInterface
             })->count(),
             'giaTrungBinh' => \App\Models\LoaiPhong::avg('gia_thang') ?? 1200000,
             'sinhVienDangO' => $sinhVienDangO,
-            'soTang' => $phongList->pluck('tang')->unique()->count(),
+            'soSinhVien' => $soSinhVien,
+            'soToa' => $soToa,
             'phongList' => $phongList,
             'cauhinh' => Cauhinh::pluck('giatri', 'ten')->toArray(),
             'thongbao' => Thongbao::whereIn('doi_tuong_nhan', ['all', 'sinhvien'])

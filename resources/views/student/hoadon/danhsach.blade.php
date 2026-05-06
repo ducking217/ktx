@@ -136,7 +136,7 @@
                 <div class="mb-8 flex items-start justify-between">
                     <div>
                         <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
-                            Biên lai điện tử • {{ $chiTiet['thang'] ?? 'N/A' }}/{{ $chiTiet['nam'] ?? 'N/A' }}
+                            Biên lai điện tử • {{ $chiTiet['thang'] ?? 'Chưa có' }}/{{ $chiTiet['nam'] ?? 'Chưa có' }}
                         </div>
                         <h3 class="text-2xl font-bold text-slate-900 tracking-tight uppercase">Thông tin Thanh toán</h3>
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Mã tra soát: #INV-{{ str_pad((string)$item->id, 8, '0', STR_PAD_LEFT) }}</p>
@@ -152,7 +152,7 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div class="space-y-1">
                                 <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Phòng ở</span>
-                                <div class="font-bold text-slate-900 text-sm">{{ $phong?->ten_phong ?? 'N/A' }}</div>
+                                <div class="font-bold text-slate-900 text-sm">{{ $phong?->ten_phong ?? 'Chưa có' }}</div>
                             </div>
                             <div class="space-y-1">
                                 <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Loại phòng</span>
@@ -182,12 +182,12 @@
 
                     <div class="md:col-span-5 flex flex-col items-center justify-center p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
                         @php
-                            $phongTen = $phong?->ten_phong ?? 'N/A';
-                            $qrText = 'KTX - ' . $phongTen . ' - ' . ($chiTiet['thang'] ?? 'N/A') . '/' . ($chiTiet['nam'] ?? 'N/A') . ' - ' . number_format($item->tong_tien) . 'd';
+                            $phongTen = $phong?->ten_phong ?? 'Chưa có';
+                            $qrText = 'KTX - ' . $phongTen . ' - ' . ($chiTiet['thang'] ?? 'Chưa có') . '/' . ($chiTiet['nam'] ?? 'Chưa có') . ' - ' . number_format($item->tong_tien) . 'd';
                             $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($qrText);
                         @endphp
                         <img src="{{ $qrUrl }}" alt="QR" class="h-32 w-32 object-contain rounded-lg" />
-                        <div class="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Quét mã thanh toán<br/>(QR-Banking)</div>
+                        <div class="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Quét mã thanh toán<br/>(QR chuyển khoản)</div>
                     </div>
                 </div>
 

@@ -41,7 +41,7 @@
             <?php else: ?>
                 <div class="rounded-xl bg-blue-50 p-4 border border-blue-100">
                     <p class="text-[10px] font-bold uppercase tracking-widest text-blue-600">
-                        Bạn đang đăng nhập bằng link email. Hãy đặt mật khẩu để lần sau đăng nhập nhanh hơn.
+                        Bạn đang đăng nhập bằng liên kết trong thư điện tử. Hãy đặt mật khẩu để lần sau đăng nhập nhanh hơn.
                     </p>
                 </div>
             <?php endif; ?>

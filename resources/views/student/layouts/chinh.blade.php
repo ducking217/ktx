@@ -136,7 +136,7 @@
                 @if(isset($title))
                     {{ $title }}
                 @else
-                    @yield('student_page_title', 'Dashboard')
+                    @yield('student_page_title', 'Tổng quan')
                 @endif
             </h1>
         </div>
@@ -182,22 +182,22 @@
 <nav class="fixed bottom-6 left-1/2 z-50 flex w-[calc(100%-3rem)] max-w-sm -translate-x-1/2 items-center justify-around rounded-2xl border border-slate-200/60 bg-white/95 p-2 shadow-xl backdrop-blur-xl lg:hidden">
     <a href="{{ route('student.trangchu') }}" class="flex flex-col items-center gap-1 rounded-xl p-2 transition-colors {{ request()->routeIs('student.trangchu') ? 'text-slate-900 bg-slate-100' : 'text-slate-500 hover:text-slate-900' }}">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span class="text-[10px] font-medium">Home</span>
+        <span class="text-[10px] font-medium">Trang chủ</span>
     </a>
     <a href="{{ route('student.hoadoncuaem') }}" class="flex flex-col items-center gap-1 rounded-xl p-2 transition-colors relative {{ request()->routeIs('student.hoadoncuaem') ? 'text-slate-900 bg-slate-100' : 'text-slate-500 hover:text-slate-900' }}">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span class="text-[10px] font-medium">Bill</span>
+        <span class="text-[10px] font-medium">Hóa đơn</span>
         @if ($hoadonCanXuLy > 0)
             <span class="absolute top-1 right-2 h-2 w-2 rounded-full bg-rose-500"></span>
         @endif
     </a>
     <a href="{{ route('student.danhsachbaohong') }}" class="flex flex-col items-center gap-1 rounded-xl p-2 transition-colors {{ request()->routeIs('student.danhsachbaohong') ? 'text-slate-900 bg-slate-100' : 'text-slate-500 hover:text-slate-900' }}">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 012 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-        <span class="text-[10px] font-medium">Repair</span>
+        <span class="text-[10px] font-medium">Báo hỏng</span>
     </a>
     <a href="{{ route('profile.edit') }}" class="flex flex-col items-center gap-1 rounded-xl p-2 transition-colors {{ request()->routeIs('profile.edit') ? 'text-slate-900 bg-slate-100' : 'text-slate-500 hover:text-slate-900' }}">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        <span class="text-[10px] font-medium">Profile</span>
+        <span class="text-[10px] font-medium">Hồ sơ</span>
     </a>
 </nav>
 

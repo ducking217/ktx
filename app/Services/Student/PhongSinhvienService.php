@@ -24,10 +24,20 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
 
         $hopdong = $sinhvien->current_hopdong;
         if (!$hopdong || !$hopdong->giuong?->phong_id) {
+            $dangkyPhongGanNhat = Dangky::with(['phong.toanha', 'phong.loaiphong', 'toanha', 'loaiphong'])
+                ->where('user_id', $sinhvien->user_id)
+                ->where(function ($q) {
+                    $q->whereNull('ghi_chu')
+                        ->orWhere('ghi_chu', 'not like', 'TRA_PHONG%');
+                })
+                ->orderByDesc('id')
+                ->first();
+
             return [
                 'sinhvien' => $sinhvien,
                 'coPhong' => false,
                 'daGuiYeuCauTraPhong' => false,
+                'dangkyPhongGanNhat' => $dangkyPhongGanNhat,
                 'danhsachphongtrong' => $this->layDanhSachPhongPhuHop($sinhvien),
             ];
         }
