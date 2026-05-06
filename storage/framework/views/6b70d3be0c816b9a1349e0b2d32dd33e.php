@@ -56,9 +56,9 @@
             <h3 class="text-xl font-bold text-slate-900 tracking-tight">Chưa có hợp đồng</h3>
             <p class="mt-2 text-sm text-slate-500 max-w-sm mx-auto">Hợp đồng của bạn sẽ hiển thị tại đây sau khi Ban quản lý xác nhận việc xếp phòng.</p>
             <div class="mt-8">
-                <a href="<?php echo e(route('student.trangchu')); ?>" class="saas-btn-primary h-11 px-8 inline-flex items-center justify-center">
-                    Về trang chủ
-                </a>
+                <div class="text-xs text-slate-500">
+                    Các thao tác khác nằm ở thanh điều hướng bên trái.
+                </div>
             </div>
         </div>
     <?php elseif($activeTab === 'gia-han' && !$isAlumni): ?>
@@ -67,41 +67,59 @@
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div class="text-sm font-semibold text-slate-900">Thao tác nhanh</div>
-                        <div class="mt-0.5 text-xs text-slate-500">Gửi yêu cầu gia hạn hoặc gửi yêu cầu thanh lý hợp đồng.</div>
+                        <div class="mt-0.5 text-xs text-slate-500">Gửi yêu cầu gia hạn hợp đồng cư trú.</div>
                     </div>
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <a href="#form-gia-han" class="saas-btn-primary h-10 px-4 text-xs font-semibold">Gia hạn</a>
-                        <?php if($hasActiveContract): ?>
-                            <form action="<?php echo e(route('student.yeucautraphong')); ?>" method="POST" onsubmit="return confirm('Gửi yêu cầu thanh lý hợp đồng và trả phòng?')">
-                                <?php echo csrf_field(); ?>
-                                <button type="submit" class="saas-btn-danger h-10 px-4 text-xs font-semibold" <?php if(($yeuCauTraPhong?->trang_thai?->value ?? null) === \App\Enums\RegistrationStatus::Pending->value): ?> disabled <?php endif; ?>>
-                                    Yêu cầu thanh lý
-                                </button>
-                            </form>
-                        <?php endif; ?>
                     </div>
                 </div>
+            </div>
 
-                    <?php if(($yeuCauTraPhong?->trang_thai?->value ?? null) === \App\Enums\RegistrationStatus::Pending->value): ?>
-                        <div class="mt-4 rounded-xl bg-amber-50 ring-1 ring-amber-100 px-4 py-3 text-sm text-amber-700">
-                            Bạn đã gửi yêu cầu thanh lý. Ban quản lý đang xem xét và sẽ phản hồi sau.
+            <?php if($hasActiveContract): ?>
+                <?php
+                    $trangThaiTraPhong = $yeuCauTraPhong?->trang_thai?->value ?? null;
+
+                    $lyDoTuChoi = null;
+                    if ($trangThaiTraPhong === \App\Enums\RegistrationStatus::Rejected->value) {
+                        if (is_string($yeuCauTraPhong?->ghi_chu) && \Illuminate\Support\Str::startsWith($yeuCauTraPhong->ghi_chu, 'TRA_PHONG|')) {
+                            $lyDoTuChoi = trim((string) \Illuminate\Support\Str::after($yeuCauTraPhong->ghi_chu, 'TRA_PHONG|'));
+                        }
+                    }
+                ?>
+
+                <div class="saas-card p-6 bg-rose-50/30 border-rose-100/60">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="space-y-1">
+                            <div class="text-sm font-semibold text-slate-900">Kết thúc hợp đồng</div>
+                            <div class="text-xs text-slate-600">Gửi yêu cầu trả phòng, Ban quản lý sẽ xem xét trước khi thanh lý.</div>
                         </div>
-                    <?php elseif(($yeuCauTraPhong?->trang_thai?->value ?? null) === \App\Enums\RegistrationStatus::Rejected->value): ?>
-                        <?php
-                            $lyDoTuChoi = null;
-                            if (is_string($yeuCauTraPhong?->ghi_chu) && \Illuminate\Support\Str::startsWith($yeuCauTraPhong->ghi_chu, 'TRA_PHONG|')) {
-                                $lyDoTuChoi = trim((string) \Illuminate\Support\Str::after($yeuCauTraPhong->ghi_chu, 'TRA_PHONG|'));
-                            }
-                        ?>
+                        <form action="<?php echo e(route('student.yeucautraphong')); ?>" method="POST" onsubmit="return confirm('Gửi yêu cầu trả phòng và thanh lý hợp đồng? Ban quản lý sẽ xem xét trước khi thực hiện.')">
+                            <?php echo csrf_field(); ?>
+                            <button
+                                type="submit"
+                                class="saas-btn-danger h-10 px-4 text-xs font-semibold"
+                                <?php if($trangThaiTraPhong === \App\Enums\RegistrationStatus::Pending->value): ?> disabled <?php endif; ?>
+                            >
+                                Yêu cầu trả phòng
+                            </button>
+                        </form>
+                    </div>
+
+                    <?php if($trangThaiTraPhong === \App\Enums\RegistrationStatus::Pending->value): ?>
+                        <div class="mt-4 rounded-xl bg-amber-50 ring-1 ring-amber-100 px-4 py-3 text-sm text-amber-700">
+                            Bạn đã gửi yêu cầu trả phòng. Ban quản lý đang xem xét và sẽ phản hồi sau.
+                        </div>
+                    <?php elseif($trangThaiTraPhong === \App\Enums\RegistrationStatus::Rejected->value): ?>
                         <div class="mt-4 rounded-xl bg-rose-50 ring-1 ring-rose-100 px-4 py-3 text-sm text-rose-700">
-                            Yêu cầu thanh lý của bạn đã bị từ chối.
+                            Yêu cầu trả phòng của bạn đã bị từ chối.
                             <?php if($lyDoTuChoi): ?>
                                 <span class="font-semibold">Lý do:</span> <?php echo e($lyDoTuChoi); ?>
 
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
-            </div>
+                </div>
+            <?php endif; ?>
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <aside class="md:col-span-4 space-y-4">
@@ -178,7 +196,7 @@
                             </div>
 
                             <div class="flex items-center justify-end gap-3 pt-2">
-                                <a href="<?php echo e(route('student.hopdongcuatoi', ['tab' => 'hopdong'])); ?>" class="saas-btn-secondary h-10 px-4 text-xs font-semibold">Quay lại</a>
+                                <a href="<?php echo e(route('student.hopdong.index', ['tab' => 'hopdong'])); ?>" class="saas-btn-secondary h-10 px-4 text-xs font-semibold">Quay lại</a>
                                 <button type="submit" class="saas-btn-primary h-10 px-4 text-xs font-semibold" data-loading-text="Đang gửi..." <?php if(!$hasActiveContract): ?> disabled <?php endif; ?>>
                                     Gửi yêu cầu
                                 </button>

@@ -37,7 +37,7 @@
             <form action="<?php echo e(route('admin.activity-log')); ?>" method="GET" class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
                 <div>
                     <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Thực thể</label>
-                    <select name="model" class="saas-input text-xs font-bold bg-white border-slate-200">
+                    <select name="model" class="saas-input text-xs font-bold">
                         <option value="">Tất cả</option>
                         <?php $__currentLoopData = $models; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($m); ?>" <?php echo e(request('model') == $m ? 'selected' : ''); ?>><?php echo e($m); ?></option>
@@ -46,7 +46,7 @@
                 </div>
                 <div>
                     <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Quản trị viên</label>
-                    <select name="user_id" class="saas-input text-xs font-bold bg-white border-slate-200">
+                    <select name="user_id" class="saas-input text-xs font-bold">
                         <option value="">Tất cả</option>
                         <?php $__currentLoopData = $admins; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $admin): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($admin->id); ?>" <?php echo e(request('user_id') == $admin->id ? 'selected' : ''); ?>><?php echo e($admin->name); ?></option>
@@ -55,7 +55,7 @@
                 </div>
                 <div>
                     <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Loại hành động</label>
-                    <select name="action" class="saas-input text-xs font-bold bg-white border-slate-200">
+                    <select name="action" class="saas-input text-xs font-bold">
                         <option value="">Tất cả</option>
                         <?php $__currentLoopData = $actions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $act): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($act); ?>" <?php echo e(request('action') == $act ? 'selected' : ''); ?>><?php echo e($act); ?></option>
@@ -64,14 +64,14 @@
                 </div>
                 <div>
                     <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Từ ngày</label>
-                    <input type="date" name="from" value="<?php echo e(request('from')); ?>" class="saas-input text-xs font-bold tabular-nums bg-white border-slate-200">
+                    <input type="date" name="from" value="<?php echo e(request('from')); ?>" class="saas-input text-xs font-bold tabular-nums">
                 </div>
                 <div class="flex items-end gap-2">
                     <div class="flex-1">
                         <label class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Đến ngày</label>
-                        <input type="date" name="to" value="<?php echo e(request('to')); ?>" class="saas-input text-xs font-bold tabular-nums bg-white border-slate-200">
+                        <input type="date" name="to" value="<?php echo e(request('to')); ?>" class="saas-input text-xs font-bold tabular-nums">
                     </div>
-                    <button type="submit" class="saas-btn-primary h-9 w-9 flex-shrink-0 flex items-center justify-center shadow-sm shadow-blue-500/20">
+                    <button type="submit" aria-label="Tìm kiếm" class="saas-btn-primary h-11 w-11 flex-shrink-0 flex items-center justify-center">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" /></svg>
                     </button>
                 </div>
@@ -101,7 +101,7 @@
                 <?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-4 whitespace-nowrap">
-                            <div class="text-xs font-bold text-slate-900 tabular-nums group-hover:text-blue-600 transition-colors"><?php echo e($log->created_at->format('d/m/Y')); ?></div>
+                            <div class="text-xs font-bold text-slate-900 tabular-nums group-hover:text-brand-emerald transition-colors"><?php echo e($log->created_at->format('d/m/Y')); ?></div>
                             <div class="text-[9px] font-bold text-slate-400 tabular-nums mt-0.5 uppercase tracking-widest"><?php echo e($log->created_at->format('H:i:s')); ?></div>
                         </td>
                         <td class="py-4">
@@ -135,7 +135,7 @@
                             <span class="saas-badge <?php echo e($badgeClass); ?> text-[8px] font-bold px-2.5 py-0.5"><?php echo e($log->hanh_dong); ?></span>
                         </td>
                         <td class="py-4 text-right">
-                            <button type="button" data-modal-target="modal-log-<?php echo e($log->id); ?>" data-modal-toggle="modal-log-<?php echo e($log->id); ?>" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-lg transition-all" title="Xem chi tiết">
+                            <button type="button" aria-label="Xem chi tiết" data-modal-target="modal-log-<?php echo e($log->id); ?>" data-modal-toggle="modal-log-<?php echo e($log->id); ?>" class="h-11 w-11 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/15 rounded-lg transition-all" title="Xem chi tiết">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </button>
                         </td>
@@ -191,7 +191,7 @@
                         </div>
                         <div>
                             <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Hành động</div>
-                            <div class="text-xs font-bold text-blue-600 uppercase"><?php echo e($log->hanh_dong); ?></div>
+                            <div class="text-xs font-bold text-brand-emerald uppercase"><?php echo e($log->hanh_dong); ?></div>
                         </div>
                         <div>
                             <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Đối tượng</div>
@@ -213,12 +213,12 @@
 
                     <?php if($log->du_lieu_moi): ?>
                         <div class="space-y-2">
-                            <label class="text-[9px] font-bold text-blue-500 uppercase tracking-widest flex items-center gap-1.5">
-                                <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                            <label class="text-[9px] font-bold text-brand-emerald uppercase tracking-widest flex items-center gap-1.5">
+                                <span class="h-1.5 w-1.5 rounded-full bg-brand-emerald"></span>
                                 Sau thay đổi
                             </label>
-                            <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4">
-                                <pre class="w-full text-[11px] text-blue-900 overflow-x-auto font-mono leading-relaxed"><?php echo e(json_encode($log->du_lieu_moi, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); ?></pre>
+                            <div class="bg-brand-emerald/5 border border-brand-emerald/15 rounded-xl p-4">
+                                <pre class="w-full text-[11px] text-ink-primary overflow-x-auto font-mono leading-relaxed"><?php echo e(json_encode($log->du_lieu_moi, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); ?></pre>
                             </div>
                         </div>
                     <?php endif; ?>

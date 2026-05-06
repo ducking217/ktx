@@ -20,7 +20,7 @@ class HoadonController extends Controller
         $data = $this->hoadonService->lietKeHoaDonAdmin($request);
         if (! $request->query->has('tab') && ! $request->query->has('trang_thai') && isset($data['activeTab'])) {
             return redirect()
-                ->route('admin.quanlyhoadon', array_filter([
+                ->route('admin.hoadon.index', array_filter([
                     'tab' => $data['activeTab'],
                     'phong_id' => $request->query('phong_id'),
                 ], fn ($v) => $v !== null && $v !== ''));
@@ -112,7 +112,7 @@ class HoadonController extends Controller
 
         $result = $this->hoadonService->xuLyHoaDonHangLoat($dulieu);
         
-        return redirect()->route('admin.quanlyhoadon')->with([
+        return redirect()->route('admin.hoadon.index')->with([
             'toast_loai' => $result['toast_loai'], 
             'toast_noidung' => $result['toast_noidung']
         ]);

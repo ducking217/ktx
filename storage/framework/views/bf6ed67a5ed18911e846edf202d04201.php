@@ -24,7 +24,7 @@
             <button type="button"
                     data-modal-target="modal-themkyluat"
                     data-modal-toggle="modal-themkyluat"
-                    class="saas-btn-primary h-10 px-5 text-xs font-bold shadow-lg shadow-blue-500/20">
+                    class="saas-btn-primary h-10 px-5 text-xs font-bold shadow-lg shadow-emerald-500/20">
                 <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                 Ghi nhận vi phạm
             </button>
@@ -41,14 +41,14 @@
 
         
         <div class="saas-card p-6 bg-slate-50/50 border-dashed">
-            <form method="GET" action="<?php echo e(route('admin.quanlykyluat')); ?>" class="flex flex-wrap items-end gap-6">
+            <form method="GET" action="<?php echo e(route('admin.kyluat.index')); ?>" class="flex flex-wrap items-end gap-6">
                 <div class="flex-1 min-w-[200px] space-y-2">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sinh viên</label>
                     <select name="sinhvien_id" class="saas-input font-bold h-11" onchange="this.form.submit()">
                         <option value="">Tất cả sinh viên</option>
                         <?php $__currentLoopData = $sinhviens; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($s->id); ?>" <?php echo e($selectedSinhvien == $s->id ? 'selected' : ''); ?>>
-                                <?php echo e($s->masinhvien); ?> — <?php echo e($s->user->name ?? 'N/A'); ?>
+                                <?php echo e($s->masinhvien); ?> — <?php echo e($s->user->name ?? 'Chưa có'); ?>
 
                             </option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -64,7 +64,7 @@
                     </select>
                 </div>
                 <?php if(request('sinhvien_id') || request('muc_do')): ?>
-                    <a href="<?php echo e(route('admin.quanlykyluat')); ?>" class="saas-btn-secondary h-11 px-4 text-xs font-bold">
+                    <a href="<?php echo e(route('admin.kyluat.index')); ?>" class="saas-btn-secondary h-11 px-4 text-xs font-bold">
                         Xóa bộ lọc
                     </a>
                 <?php endif; ?>
@@ -100,12 +100,12 @@
                         ?>
                         <td class="py-5">
                             <span class="text-[11px] font-bold text-slate-400 tabular-nums bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60 uppercase tracking-widest">
-                                <?php echo e($item->sinhvien?->ma_sinh_vien ?? 'N/A'); ?>
+                                <?php echo e($item->sinhvien?->ma_sinh_vien ?? 'Chưa có'); ?>
 
                             </span>
                         </td>
                         <td class="py-5">
-                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($item->sinhvien->user->name ?? 'Chưa xác định'); ?></div>
+                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-emerald transition-colors"><?php echo e($item->sinhvien->user->name ?? 'Chưa xác định'); ?></div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
                                 <?php echo e($item->sinhvien?->current_hopdong?->giuong?->phong?->ten_phong ?? 'Chưa xếp phòng'); ?>
 
@@ -113,7 +113,7 @@
                         </td>
                         <td class="py-5 max-w-sm">
                             <div class="text-sm font-bold text-slate-900 leading-tight mb-1"><?php echo e($item->tieu_de); ?></div>
-                            <div class="text-xs font-medium leading-relaxed text-slate-500 border-l-2 border-slate-100 pl-3 py-0.5 line-clamp-2">
+                            <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs font-medium leading-relaxed text-slate-600 line-clamp-2 ring-1 ring-inset ring-slate-200/60">
                                 <?php echo e($item->noi_dung); ?>
 
                             </div>
@@ -143,11 +143,11 @@
                                 <button type="button"
                                         data-modal-target="modal-suakyluat-<?php echo e($item->id); ?>"
                                         data-modal-toggle="modal-suakyluat-<?php echo e($item->id); ?>"
-                                        class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md"
+                                        class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md"
                                         title="Chỉnh sửa">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 </button>
-                                <form action="<?php echo e(route('admin.xoakyluat', $item->id)); ?>" method="POST"
+                                <form action="<?php echo e(route('admin.kyluat.xoa', $item->id)); ?>" method="POST"
                                       onsubmit="return confirm('Xác nhận xóa bản ghi vi phạm này?');" class="inline">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('DELETE'); ?>
@@ -202,14 +202,14 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['id' => 'modal-themkyluat','title' => 'Ghi nhận vi phạm mới','subtitle' => 'Lưu thông tin vi phạm nội quy nội trú cho sinh viên được chỉ định.']); ?>
-            <form method="POST" action="<?php echo e(route('admin.themkyluat')); ?>" class="space-y-6">
+            <form method="POST" action="<?php echo e(route('admin.kyluat.store')); ?>" class="space-y-6">
                 <?php echo csrf_field(); ?>
                 <div class="space-y-2">
                     <label for="sinhvien_id_new" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Sinh viên</label>
                     <select name="sinhvien_id" id="sinhvien_id_new" required class="saas-input h-11 font-bold">
                         <option value="">-- Chọn sinh viên --</option>
                         <?php $__currentLoopData = $sinhviens; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($s->id); ?>"><?php echo e($s->masinhvien); ?> — <?php echo e($s->user->name ?? 'N/A'); ?></option>
+                            <option value="<?php echo e($s->id); ?>"><?php echo e($s->masinhvien); ?> — <?php echo e($s->user->name ?? 'Chưa có'); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
@@ -246,7 +246,7 @@
 
                 <div class="flex gap-4 pt-2">
                     <button type="button" data-modal-hide="modal-themkyluat" class="saas-btn-secondary flex-1 h-11">Hủy</button>
-                    <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-blue-500/20">Lưu vi phạm</button>
+                    <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Lưu vi phạm</button>
                 </div>
             </form>
          <?php echo $__env->renderComponent(); ?>
@@ -272,13 +272,13 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['id' => 'modal-suakyluat-'.e($item->id).'','title' => 'Chỉnh sửa vi phạm','subtitle' => 'Cập nhật thông tin bản ghi vi phạm đã ghi nhận.']); ?>
-                <form method="POST" action="<?php echo e(route('admin.capnhatkyluat', ['id' => $item->id])); ?>" class="space-y-6">
+                <form method="POST" action="<?php echo e(route('admin.kyluat.capnhat', ['id' => $item->id])); ?>" class="space-y-6">
                     <?php echo csrf_field(); ?>
                     <div class="p-5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center gap-4">
                         <div class="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-lg shadow-sm">👤</div>
                         <div>
-                            <div class="text-sm font-bold text-slate-900 leading-none"><?php echo e($item->sinhvien->user->name ?? 'N/A'); ?></div>
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1.5"><?php echo e($item->sinhvien?->ma_sinh_vien ?? 'N/A'); ?></div>
+                            <div class="text-sm font-bold text-slate-900 leading-none"><?php echo e($item->sinhvien->user->name ?? 'Chưa có'); ?></div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1.5"><?php echo e($item->sinhvien?->ma_sinh_vien ?? 'Chưa có'); ?></div>
                         </div>
                     </div>
 
@@ -314,7 +314,7 @@
 
                     <div class="flex gap-4 pt-2">
                         <button type="button" data-modal-hide="modal-suakyluat-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-11">Hủy</button>
-                        <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-blue-500/20">Lưu thay đổi</button>
+                        <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Lưu thay đổi</button>
                     </div>
                 </form>
              <?php echo $__env->renderComponent(); ?>

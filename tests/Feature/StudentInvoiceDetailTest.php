@@ -69,7 +69,7 @@ class StudentInvoiceDetailTest extends TestCase
                 && ($context['hoadon_id'] ?? null) === $hoadon->id
             );
 
-        $response = $this->actingAs($user)->get(route('student.phongcuatoi.hoadon.chitiet', $hoadon->id));
+        $response = $this->actingAs($user)->get(route('student.hoadon.chitiet', $hoadon->id));
 
         $response->assertOk();
         $response->assertSee('Chi tiết các khoản phí');
@@ -107,7 +107,7 @@ class StudentInvoiceDetailTest extends TestCase
             'tong_tien' => 0,
         ]);
 
-        $response = $this->actingAs($user)->get(route('student.phongcuatoi.hoadon.chitiet', $hoadon->id));
+        $response = $this->actingAs($user)->get(route('student.hoadon.chitiet', $hoadon->id));
 
         $response->assertOk();
         $response->assertSee('Không có khoản phí nào để hiển thị.');
@@ -138,7 +138,7 @@ class StudentInvoiceDetailTest extends TestCase
             'tong_tien' => 1850000,
         ]);
 
-        $response = $this->actingAs($user)->get(route('student.phongcuatoi.hoadon.chitiet', $hoadon->id));
+        $response = $this->actingAs($user)->get(route('student.hoadon.chitiet', $hoadon->id));
 
         $response->assertOk();
         $response->assertSee('Chưa có chỉ số điện ghi nhận cho kỳ này.');

@@ -11,12 +11,12 @@
             <div class="saas-card overflow-hidden shadow-2xl shadow-slate-200/40 border-slate-200/60">
                 <div class="bg-slate-50/50 border-b border-slate-200/60 px-10 py-5">
                     <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-900 flex items-center gap-2.5">
-                        <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                        <span class="h-1.5 w-1.5 rounded-full bg-brand-emerald"></span>
                         Tham số vận hành
                     </h3>
                 </div>
                 
-                <form method="POST" action="{{ route('admin.capnhatcauhinh') }}" class="p-10 space-y-10">
+                <form method="POST" action="{{ route('admin.cauhinh.capnhat') }}" class="p-10 space-y-10">
                     @csrf
                     <div class="grid gap-10 md:grid-cols-2">
                         <div class="space-y-8">
@@ -44,7 +44,7 @@
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-1">Đường dây nóng</label>
                                 <div class="relative group">
-                                    <div class="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none">
+                                    <div class="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-emerald transition-colors pointer-events-none">
                                         <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1.01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                                     </div>
                                     <input type="text" name="hotline"
@@ -53,9 +53,9 @@
                                 </div>
                             </div>
                             
-                            <div class="rounded-2xl bg-blue-50/40 p-7 border border-blue-100/50 shadow-sm">
-                                <div class="flex items-start gap-4 text-blue-900/70">
-                                    <div class="h-8 w-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/20">
+                            <div class="rounded-2xl bg-emerald-50/40 p-7 border border-emerald-100/60 shadow-sm">
+                                <div class="flex items-start gap-4 text-emerald-950/70">
+                                    <div class="h-8 w-8 rounded-xl bg-brand-emerald text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-600/20">
                                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     </div>
                                     <p class="text-[11px] font-bold leading-relaxed italic mt-1 uppercase tracking-tight">
@@ -67,7 +67,7 @@
                     </div>
 
                     <div class="flex justify-end pt-10 border-t border-slate-100">
-                        <button type="submit" class="saas-btn-primary h-12 px-10 shadow-xl shadow-blue-500/20 group">
+                        <button type="submit" class="saas-btn-primary h-12 px-10 shadow-xl shadow-emerald-500/20 group">
                             <svg class="h-4.5 w-4.5 mr-2.5 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             Lưu cấu hình
                         </button>

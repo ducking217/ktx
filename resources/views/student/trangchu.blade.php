@@ -46,14 +46,14 @@
                         <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Công nợ hiện tại</span>
                     </div>
                     <div class="flex items-baseline gap-1 mb-1">
-                        <span class="text-2xl font-bold tracking-tight tabular-nums {{ $tongTienCanDong > 0 ? 'text-rose-600' : 'text-slate-900' }}">{{ number_format($tongTienCanDong) }}</span>
+                        <span class="text-2xl font-bold tracking-tight tabular-nums {{ $tongTienCanDong > 0 ? 'text-rose-600' : 'text-brand-emerald' }}">{{ number_format($tongTienCanDong) }}</span>
                         <span class="text-xs font-bold text-slate-300">VNĐ</span>
                     </div>
-                    <div class="text-[11px] font-bold uppercase tracking-widest {{ $tongTienCanDong > 0 ? 'text-rose-400' : 'text-slate-400' }}">
+                    <div class="text-[11px] font-bold uppercase tracking-widest {{ $tongTienCanDong > 0 ? 'text-rose-400' : 'text-brand-emerald/70' }}">
                         {{ $tongTienCanDong > 0 ? 'Cần thanh toán ngay' : 'Đã hoàn tất nghĩa vụ' }}
                     </div>
                 </div>
-                <a href="{{ route('student.hoadoncuaem') }}" class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700 transition-colors w-fit">
+                <a href="{{ route('student.hoadon.index') }}" class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-emerald hover:text-brand-emerald/80 transition-colors w-fit">
                     Chi tiết hóa đơn
                     <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -69,7 +69,7 @@
                 <article class="saas-card overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
                         <h2 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Giao dịch gần nhất</h2>
-                        <a href="{{ route('student.hoadoncuaem') }}" class="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700">Tất cả</a>
+                        <a href="{{ route('student.hoadon.index') }}" class="text-[10px] font-bold uppercase tracking-widest text-brand-emerald hover:text-brand-emerald/80">Tất cả</a>
                     </div>
 
                     <div class="divide-y divide-slate-50">
@@ -110,13 +110,13 @@
                 <div class="grid grid-cols-3 gap-6">
                     @php
                         $quickActions = [
-                            ['route' => 'student.hoadoncuaem', 'label' => 'Thanh toán', 'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
-                            ['route' => 'student.giahan.index', 'label' => 'Gia hạn', 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
+                            ['route' => 'student.hoadon.index', 'label' => 'Thanh toán', 'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
+                            ['route' => 'student.hopdong.index', 'label' => 'Gia hạn', 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 'params' => ['tab' => 'gia-han']],
                             ['route' => 'student.thongbao', 'label' => 'Bản tin', 'icon' => 'M15 17h5l-1.4-1.4a2 2 0 01-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 01-6 0'],
                         ];
                     @endphp
                     @foreach ($quickActions as $action)
-                        <a href="{{ route($action['route']) }}" class="saas-card p-5 group flex flex-col items-center gap-3 transition-all hover:border-slate-300 text-center">
+                        <a href="{{ route($action['route'], $action['params'] ?? []) }}" class="saas-card p-5 group flex flex-col items-center gap-3 transition-all hover:border-slate-300 text-center">
                             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 border border-slate-100 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all duration-300">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $action['icon'] }}"/></svg>
                             </div>
@@ -136,7 +136,7 @@
                         @forelse ($thongbao as $item)
                             <a href="{{ route('student.chitietthongbao', $item->id) }}" class="group block p-5 transition-colors hover:bg-slate-50/50">
                                 <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 tabular-nums">{{ $item->created_at->format('d/m/Y') }}</div>
-                                <h4 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 tracking-tight group-hover:text-blue-600 transition-colors">{{ $item->tieu_de }}</h4>
+                                <h4 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 tracking-tight group-hover:text-brand-emerald transition-colors">{{ $item->tieu_de }}</h4>
                             </a>
                         @empty
                             <div class="py-12 text-center">
@@ -159,7 +159,7 @@
                             @foreach ($lienhekhancap as $contact)
                                 <div class="flex flex-col gap-1 group/line">
                                     <span class="text-[9px] font-bold uppercase tracking-widest text-slate-600 group-hover/line:text-slate-400 transition-colors">{{ $contact['title'] }}</span>
-                                    <a href="tel:{{ $contact['phone'] }}" class="text-sm font-bold tabular-nums tracking-tight hover:text-blue-400 transition-colors text-slate-300">{{ $contact['phone'] }}</a>
+                                    <a href="tel:{{ $contact['phone'] }}" class="text-sm font-bold tabular-nums tracking-tight hover:text-brand-emerald transition-colors text-slate-300">{{ $contact['phone'] }}</a>
                                 </div>
                             @endforeach
                         </div>

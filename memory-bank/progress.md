@@ -15,6 +15,22 @@
 - [x] Fix lỗi logic tính toán hóa đơn điện nước.
 - [x] Đảm bảo tính nhất quán của dữ liệu (Database Constraints & Logic).
 
+## 2026-05-06 - Hóa đơn: Chuẩn hóa hiển thị trạng thái (Admin/Student)
+
+### Hoàn thành ✅
+- Chuẩn hóa 1 nguồn sự thật cho badge + label trạng thái hóa đơn qua `InvoiceStatus` để Admin/Student không lệch copy/màu.
+- Đồng bộ nhãn hoàn cọc về “Chờ hoàn tiền / Đã hoàn tiền” khi `loai_hoadon = refund`.
+- Tinh gọn giao diện danh sách hóa đơn Sinh viên: bỏ khối thống kê trùng lặp, đồng bộ layout table-card và empty state.
+- Tinh gọn cụm hành động Admin: ưu tiên hành động chính trước, “Nhắc nợ” chuyển sang nút phụ để giảm nhiễu.
+
+### Files Updated
+- `app/Enums/InvoiceStatus.php`
+- `resources/views/admin/hoadon/danhsach.blade.php`
+- `resources/views/student/phongcuatoi/lichSuHoaDon.blade.php`
+- `resources/views/student/phongcuatoi/chiTietHoaDon.blade.php`
+- `resources/views/profile/edit.blade.php`
+- `resources/views/student/hoadon/danhsach.blade.php`
+
 ## Việc cần làm tiếp theo (Bảo trì)
 - [ ] Tích hợp thanh toán Online (VNPay/Momo).
 - [ ] Mobile App cho Sinh viên.
@@ -28,6 +44,87 @@
 ### Files Updated
 - `app/Services/Core/TrangChuService.php`
 - `resources/views/landing/index.blade.php`
+
+## 2026-05-06 - Layout System: Tokens + App Shell (Admin/Student/App)
+
+### Hoàn thành ✅
+- Chuẩn hoá design tokens qua CSS variables: màu OKLCH (ui/ink/brand/status), font stacks (Geist Sans/Quicksand), spacing rhythm 4pt, radius/shadow/focus.
+- Đồng bộ typography base cho headings (font-display + tracking/leading) và selection/focus states theo brand emerald.
+- Refactor Admin shell: sidebar có off-canvas trên mobile (Alpine), overlay + nút hamburger hoạt động, màu active state theo brand.
+- Chuẩn hoá shell màu nền/border theo token `ui/*` cho App navigation và Student layout (không thay đổi nội dung trang).
+- Bổ sung class nền tảng cho `linear-shell`, `linear-btn-*`, `pdu-btn-primary` để không phụ thuộc CSS thiếu định nghĩa.
+
+### Files Updated
+- `resources/css/app.css`
+- `resources/views/layouts/admin.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+- `resources/views/admin/partials/navbar.blade.php`
+- `resources/views/layouts/navigation.blade.php`
+- `resources/views/layouts/app.blade.php`
+- `resources/views/student/layouts/chinh.blade.php`
+
+## 2026-05-06 - Colorize: Emerald/Jade điểm nhấn (Sidebar/Active/Stats/CTA)
+
+### Hoàn thành ✅
+- Sidebar Admin dùng nền emerald đậm (deep token) và active nav item highlight theo emerald.
+- CTA buttons mặc định của shell (`saas-btn-primary`) chuyển sang emerald solid.
+- Stat numbers và các điểm nhấn điều hướng chính trên Dashboard (Admin/Student) chuyển về emerald, giữ mức độ tiết chế.
+
+### Files Updated
+- `resources/css/app.css`
+- `resources/views/admin/partials/sidebar.blade.php`
+- `resources/views/admin/trangchu.blade.php`
+- `resources/views/student/layouts/chinh.blade.php`
+- `resources/views/student/trangchu.blade.php`
+
+## 2026-05-06 - Harden (UI): A11y labels + contrast sidebar
+
+### Hoàn thành ✅
+- Bổ sung accessible name (aria-label) cho các nút icon-only ở Admin Activity Log.
+- Tăng độ tương phản cho section label trong sidebar emerald (white opacity cao hơn) để an toàn WCAG hơn.
+
+### Files Updated
+- `resources/views/admin/activity-log.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+
+## 2026-05-06 - Adapt (UI): Touch targets ≥44px (Admin)
+
+### Hoàn thành ✅
+- Nâng kích thước các nút icon quan trọng lên chuẩn tối thiểu ~44px (h-11/w-11) để dễ thao tác trên mobile.
+- Áp dụng cho: nút submit filter + nút xem chi tiết (Activity Log), hamburger menu và icon thông báo (Admin navbar).
+
+### Files Updated
+- `resources/views/admin/activity-log.blade.php`
+- `resources/views/admin/partials/navbar.blade.php`
+
+## 2026-05-06 - Colorize (UI): Dọn “blue lane” còn sót (Admin Activity Log + Navbar)
+
+### Hoàn thành ✅
+- Loại bỏ các điểm nhấn xanh dương còn sót ở Activity Log (hover/text/border/bg) để đồng bộ brand emerald.
+- Input/search focus accent trong Admin navbar chuyển về emerald.
+- Giữ mức độ colorize tiết chế: chỉ áp dụng cho hover/active và các điểm nhấn thao tác chính.
+
+### Files Updated
+- `resources/views/admin/activity-log.blade.php`
+- `resources/views/admin/partials/navbar.blade.php`
+
+## 2026-05-06 - Distill (UI): Giảm override card để token là nguồn sự thật
+
+### Hoàn thành ✅
+- Gỡ các utility lặp (`border-slate-200/60`, `shadow-sm`) khỏi các thẻ đã dùng `saas-card` trong Admin Dashboard để `.saas-card` tự chịu trách nhiệm border/shadow theo token.
+- Không thay đổi nội dung trang, chỉ tinh gọn class layout/surface.
+
+### Files Updated
+- `resources/views/admin/trangchu.blade.php`
+
+## 2026-05-06 - Polish (UI): Đồng bộ accent Emerald, loại bỏ blue lane (Admin Dashboard)
+
+### Hoàn thành ✅
+- Loại bỏ hoàn toàn các class `blue-*` còn sót trên Admin Dashboard.
+- Đồng bộ điểm nhấn chính (hover border/shadow, badge count, hover text, quick access icon) về emerald theo DESIGN.md.
+
+### Files Updated
+- `resources/views/admin/trangchu.blade.php`
 
 ## 2026-05-06 - Admin Sinh viên: Đồng bộ hiển thị hồ sơ định danh
 
@@ -66,6 +163,95 @@
 
 ### Files Updated
 - `resources/views/student/phong/danhsach.blade.php`
+
+## 2026-05-06 - Student IA: Giảm phân mảnh điều hướng (Dashboard là hub duy nhất)
+
+### Hoàn thành ✅
+- Loại bỏ cross-module link/CTA khỏi các trang không phải Dashboard (ví dụ: “Phòng của tôi” không còn dẫn sang Hóa đơn/Hợp đồng/Báo hỏng/Tài sản).
+- Gỡ nút “Chi tiết” (route public) khỏi danh sách phòng trống để Student UI không dẫn sang trang công khai ngoài module.
+- Chuẩn hoá đường dẫn canonical cho Hóa đơn/Hợp đồng/Gia hạn/Phòng/Kỷ luật: loại bỏ các route legacy để codebase chỉ còn 1 đường chuẩn cho mỗi module.
+- CTA “Gia hạn” trong component chỉ hiển thị trên Dashboard; các trang khác chỉ hướng dẫn vào đúng module.
+
+### Files Updated
+- `routes/web.php`
+- `resources/views/student/phongcuatoi/index.blade.php`
+- `resources/views/student/phongcuatoi/lichSuHoaDon.blade.php`
+- `resources/views/student/phongcuatoi/chiTietHoaDon.blade.php`
+- `resources/views/student/phong/danhsach.blade.php`
+- `resources/views/student/hopdong/index.blade.php`
+- `resources/views/student/layouts/chinh.blade.php`
+- `resources/views/student/trangchu.blade.php`
+- `resources/views/components/countdown-hopdong.blade.php`
+- `resources/views/landing/phong/vattu.blade.php`
+- `app/Http/Controllers/Student/HopdongController.php`
+- `app/Http/Controllers/Student/GiaHanController.php`
+- `app/Http/Controllers/Student/KyluatController.php`
+- `app/Http/Controllers/Admin/KyluatController.php`
+- `app/Notifications/HoadonMoiNotification.php`
+- `tests/Feature/StudentInterfaceTest.php`
+- `tests/Feature/StudentInvoiceDetailTest.php`
+- `resources/views/student/kyluat/index.blade.php`
+
+## 2026-05-06 - Admin IA: Giảm phân mảnh điều hướng (Dashboard là hub duy nhất)
+
+### Hoàn thành ✅
+- Gỡ cross-module link/CTA trong nội dung các trang Admin (ngoài Dashboard) để tránh “màn nào cũng dẫn đi khắp nơi”.
+- Trang “Chi tiết phòng” không còn nút nhảy sang module “Sinh viên” từ danh sách nhân khẩu; thao tác tra cứu sinh viên thực hiện qua module “Sinh viên” (sidebar) hoặc Dashboard.
+
+## 2026-05-06 - Admin UI: Chuẩn hóa điều hướng + Emerald accent (không đổi nghiệp vụ)
+
+### Hoàn thành ✅
+- Sidebar Admin hiển thị đầy đủ module (1 cấp Admin toàn quyền): thêm link “Lịch bảo trì”, “Báo cáo tài chính”, badge công nợ ở “Hóa đơn”.
+- Chuẩn hóa accent Emerald cho các màn Admin trọng yếu (bỏ “blue lane” ở CTA/hover/icon buttons) nhưng giữ nguyên routes + form payload để không ảnh hưởng backend.
+- Dọn triệt để `blue-*` còn sót trong Admin (kể cả indicator giới tính phòng), đồng bộ về slate/rose/emerald.
+- Gỡ side-stripe `border-l-*` (>=2px) khỏi bảng/list; thay bằng callout nền nhạt + ring để sạch và đúng rule.
+- Module “Công nợ” tách riêng: loại khỏi scope theo yêu cầu (không bật route/view).
+- Fix logic phân tab Hóa đơn (Admin): hóa đơn `refund` không còn lẫn vào tab “Công nợ”, đồng thời thống kê “Tổng nợ/Quá hạn/Chờ thu/Đã thu” không tính refund.
+- Tabs Hóa đơn: active state dùng emerald rõ ràng, header table không còn wrap chữ khi viewport hẹp.
+- Phòng map: bỏ badge giới tính dạng absolute, đưa vào header card để không chồng chéo nội dung.
+- Fix hiển thị Sidebar Admin: bỏ `x-cloak` trên sidebar để không bị ẩn vĩnh viễn khi Alpine chưa khởi chạy (desktop luôn thấy sidebar).
+- Fix hiển thị Sidebar Admin: sidebar luôn hiển thị cố định (không phụ thuộc Alpine toggle), nội dung main luôn chừa `pl-64` để không bị che.
+
+### Files Updated
+- `resources/views/admin/partials/sidebar.blade.php`
+- `resources/views/admin/toanha/index.blade.php`
+- `resources/views/admin/toanha/form.blade.php`
+- `resources/views/admin/phong/danhsach.blade.php`
+- `resources/views/admin/phong/chitiet.blade.php`
+- `resources/views/admin/phong/map.blade.php`
+- `resources/views/admin/sinhvien/danhsach.blade.php`
+- `resources/views/admin/sinhvien/chitiet.blade.php`
+- `resources/views/admin/dangky/danhsach.blade.php`
+- `resources/views/admin/hopdong/danhsach.blade.php`
+- `resources/views/admin/giahan/danhsach.blade.php`
+- `resources/views/admin/hoadon/danhsach.blade.php`
+- `resources/views/admin/hoadon/nhap-hang-loat.blade.php`
+- `resources/views/admin/baohong/danhsach.blade.php`
+- `resources/views/admin/baotri/danhsach.blade.php`
+- `resources/views/admin/kyluat/danhsach.blade.php`
+- `resources/views/admin/lienhe/danhsach.blade.php`
+- `resources/views/admin/thongbao/danhsach.blade.php`
+- `resources/views/admin/cauhinh/index.blade.php`
+- `resources/views/admin/accounts/index.blade.php`
+- `resources/views/components/admin/status-tabs.blade.php`
+
+## 2026-05-06 - Admin IA: Canonical routes (1 đường dẫn chính thức / chức năng)
+
+### Hoàn thành ✅
+- Chuẩn hoá route names Admin sang `admin.<module>.*` theo module prefixes mới (`/admin/hoa-don`, `/admin/hop-dong`, `/admin/sinh-vien`, ...).
+- Thay toàn bộ link/redirect/form action trong Admin Blade + Controller từ các route legacy (`admin.quanly*`, `admin.xuly*`, `admin.capnhat*` cũ) sang route canonical.
+- Rà soát bổ sung: chuẩn hoá nốt route Bảo trì sang `admin.baotri.*` và loại bỏ footer Blade bị lặp trong view Bảo trì.
+
+### Files Updated
+- `routes/web.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+- `resources/views/layouts/admin.blade.php`
+- `resources/views/admin/partials/navbar.blade.php`
+- `resources/views/admin/trangchu.blade.php`
+- `resources/views/admin/*/*.blade.php`
+- `app/Http/Controllers/Admin/HoadonController.php`
+- `app/Http/Controllers/Admin/HopdongController.php`
+- `resources/views/admin/baotri/danhsach.blade.php`
 
 ## 2026-05-06 - Admin Liên hệ: Nhất quán UI + Việt hóa
 

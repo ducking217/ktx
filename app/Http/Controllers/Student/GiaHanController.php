@@ -18,12 +18,12 @@ class GiaHanController extends Controller
 
     public function index()
     {
-        return redirect()->route('student.hopdongcuatoi', ['tab' => 'gia-han']);
+        return redirect()->route('student.hopdong.index', ['tab' => 'gia-han']);
     }
 
     public function create()
     {
-        return redirect()->route('student.hopdongcuatoi', ['tab' => 'gia-han']);
+        return redirect()->route('student.hopdong.index', ['tab' => 'gia-han']);
     }
 
     public function store(Request $request)
@@ -40,7 +40,7 @@ class GiaHanController extends Controller
             $dulieu['ly_do'] ?? null
         );
 
-        return redirect()->route('student.hopdongcuatoi', ['tab' => 'gia-han'])->with([
+        return redirect()->route('student.hopdong.index', ['tab' => 'gia-han'])->with([
             'toast_loai' => $result['toast_loai'],
             'toast_noidung' => $result['toast_noidung'],
         ]);

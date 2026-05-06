@@ -37,7 +37,7 @@
 
         <a
             href="{{ route($route, $hrefParams) }}"
-            class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ $isActive ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' }}"
+            class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ $isActive ? 'bg-white text-brand-emerald shadow-sm' : 'text-slate-400 hover:text-slate-600' }}"
             aria-current="{{ $isActive ? 'page' : 'false' }}"
         >
             {{ $label }}

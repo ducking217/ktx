@@ -21,7 +21,7 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['title' => 'Tài khoản quản trị','subtitle' => 'Quản lý nhân sự và phân quyền vận hành hệ thống KTX.']); ?>
-            <a href="<?php echo e(route('admin.accounts.tao')); ?>" class="saas-btn-primary h-9 px-4 text-xs shadow-sm shadow-blue-500/20">
+            <a href="<?php echo e(route('admin.accounts.tao')); ?>" class="saas-btn-primary h-9 px-4 text-xs shadow-sm shadow-emerald-500/20">
                 <svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                 Tạo tài khoản
             </a>
@@ -44,7 +44,7 @@
                         <div class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"/></svg>
                         </div>
-                        <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Tên, email hoặc số điện thoại..." class="saas-input pl-9 text-xs">
+                        <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Tên, thư điện tử hoặc số điện thoại..." class="saas-input pl-9 text-xs">
                     </div>
                 </div>
                 <div class="w-44">
@@ -114,7 +114,7 @@
                         <td class="py-4 text-xs font-bold text-slate-500 tabular-nums"><?php echo e($acc->created_at->format('d/m/Y')); ?></td>
                         <td class="py-4 text-right">
                             <div class="flex items-center justify-end gap-1">
-                                <a href="<?php echo e(route('admin.accounts.sua', $acc->id)); ?>" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-lg transition-all" title="Chỉnh sửa">
+                                <a href="<?php echo e(route('admin.accounts.sua', $acc->id)); ?>" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-lg transition-all" title="Chỉnh sửa">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
                                 <?php if(auth()->id() !== $acc->id): ?>

@@ -2,7 +2,20 @@
 - Framework: Laravel 11 (Artisan)
 - Tools: @openspace (System), @impeccable (UI)
 - Memory: Luôn đọc `memory-bank/` trước khi làm và cập nhật `progress.md` sau khi xong.
+Khi thực hiện các yêu cầu liên quan đến Frontend, UI/UX hoặc nội dung giao diện, hãy luôn tuân thủ quy trình tư duy sau:
+# UI/UX & AI-Slop Prevention
+Khi làm Frontend/UI:
+1. **Hierarchy:** `DESIGN.md` (Brand/Style) > `PRODUCT.md` (Context) > `/impeccable/` (Technical Standards).
+2. **Standard:** Tuân thủ hệ thống Spacing/Typography/Color trong `/impeccable/reference/`.
+3. **UX Writing:** Dùng `/impeccable/reference/ux-writing.md` để viết chữ súc tích, không nói quá.
+4. **Anti-Slop:** Tự động dùng `/impeccable distill` nếu UI quá rối. Không gradient mặc định, không card-in-card.
+
+5. CÁCH PHẢN HỒI:
+   - Chỉ áp dụng các quy tắc này khi làm UI/UX. Nếu làm Backend/Logic, hãy bỏ qua để tiết kiệm token.
+   - Khi viết code UI, nếu có sự mâu thuẫn giữa DESIGN.md và Impeccable, hãy ưu tiên DESIGN.md về mặt thẩm mỹ nhưng dùng Impeccable để tối ưu kỹ thuật (ví dụ: lấy màu từ DESIGN.md nhưng áp dụng độ tương phản từ Impeccable).
+
 - Style: đọc STANDARDS.md trước khi làm.
+Khi code
 1. Hãy suy nghĩ kỹ trước khi lập trình
 Đừng vội phán đoán. Đừng che giấu sự bối rối. Hãy công khai những sự đánh đổi.
 

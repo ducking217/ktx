@@ -2,7 +2,7 @@
 
 <?php $__env->startSection('noidung'); ?>
     <div class="mb-6 flex justify-end">
-        <form method="GET" action="<?php echo e(route('student.danhsachphong')); ?>" class="relative group w-full md:w-72">
+        <form method="GET" action="<?php echo e(route('student.phong.index')); ?>" class="relative group w-full md:w-72">
             <input name="q" value="<?php echo e(request('q')); ?>" type="text" placeholder="Tìm theo tên phòng..."
                    class="saas-input pl-10" />
             <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -74,10 +74,6 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="inline-flex items-center justify-end gap-2">
-                                    <a href="<?php echo e(route('public.chitietvattu', ['id' => $phong->id, 'back' => 'student'])); ?>"
-                                       class="saas-btn-secondary h-9 px-4 text-[10px]">
-                                        Chi tiết
-                                    </a>
                                     <form method="POST" action="<?php echo e(route('student.dangkyphong')); ?>" class="form-dangky">
                                         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="phong_id" value="<?php echo e($phong->id); ?>">
@@ -165,12 +161,6 @@
                                             <?php $__currentLoopData = $taiSanPreview; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ts): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <div class="text-[10px] font-medium text-slate-600 truncate" title="<?php echo e($ts->tentaisan); ?>"><?php echo e($ts->tentaisan); ?> × <?php echo e($ts->soluong); ?></div>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        </div>
-                                        <div class="mt-2">
-                                            <a href="<?php echo e(route('public.chitietvattu', ['id' => $phong->id, 'back' => 'student'])); ?>" class="saas-btn-secondary h-7 px-3 text-[9px] inline-flex items-center gap-1.5">
-                                                Xem chi tiết
-                                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                                            </a>
                                         </div>
                                     </td>
                                 </tr>

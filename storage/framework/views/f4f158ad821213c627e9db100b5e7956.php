@@ -1,6 +1,8 @@
+<?php $__env->startSection('student_page_title', 'Chi tiết hóa đơn'); ?>
+
 <?php $__env->startSection('noidung'); ?>
     <div class="mb-6">
-        <a href="<?php echo e(route('student.hoadoncuaem')); ?>" class="saas-btn-ghost h-9 px-3 text-xs mb-2 w-fit">
+        <a href="<?php echo e(route('student.hoadon.index')); ?>" class="saas-btn-ghost h-9 px-3 text-xs mb-2 w-fit">
             <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
@@ -21,13 +23,10 @@
             $tenPhong = $hoadon->hopdong?->giuong?->phong?->ten_phong ?? $hoadon->phong?->ten_phong ?? 'Chưa có';
             $maHoaDon = $hoadon->ma_hoa_don ?: ('HD-' . str_pad((string) $hoadon->id, 6, '0', STR_PAD_LEFT));
 
+            $invoiceType = $loai;
             $statusInvoice = $hoadon->trang_thai;
-            $statusBadge = match($statusInvoice) {
-                \App\Enums\InvoiceStatus::Paid => 'saas-badge-success',
-                \App\Enums\InvoiceStatus::PendingConfirmation => 'saas-badge-info',
-                \App\Enums\InvoiceStatus::Overdue => 'saas-badge-error',
-                default => $isRefund ? 'saas-badge-info' : 'saas-badge-warning',
-            };
+            $statusBadge = $statusInvoice->badgeClass($invoiceType);
+            $statusLabel = $statusInvoice->displayLabel($invoiceType);
         ?>
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -41,7 +40,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <span class="saas-badge <?php echo e($statusBadge); ?>"><?php echo e($statusInvoice->label()); ?></span>
+                <span class="saas-badge <?php echo e($statusBadge); ?>"><?php echo e($statusLabel); ?></span>
             </div>
         </div>
     </div>
@@ -173,7 +172,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="<?php echo e(route('student.phongcuatoi.hoadon.yeu_cau_xac_nhan', $hoadon->id)); ?>" class="mt-6 rounded-lg border border-slate-200/60 bg-slate-50 p-4">
+            <form method="POST" action="<?php echo e(route('student.hoadon.yeu_cau_xac_nhan', $hoadon->id)); ?>" class="mt-6 rounded-lg border border-slate-200/60 bg-slate-50 p-4">
                 <?php echo csrf_field(); ?>
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
@@ -229,7 +228,7 @@
                     'so_tien' => (int) ($hoadon->tong_tien ?? 0),
                     'don_vi' => 'VNĐ',
                     'thoi_gian' => $hoadon->created_at?->format('d/m/Y') ?? '-',
-                    'mo_ta' => (string) ($hoadon->ghi_chu ?? ''),
+                    'mo_ta' => preg_replace('/\bKy\s+/u', 'Tháng ', (string) ($hoadon->ghi_chu ?? '')),
                 ]];
             } else {
                 $items = [
@@ -245,14 +244,14 @@
                         'so_tien' => (int) ($hoadon->tien_dien ?? 0),
                         'don_vi' => 'VNĐ',
                         'thoi_gian' => $kyApDung,
-                        'mo_ta' => $dienText !== '' ? ('Chỉ số: ' . $dienText . '.') : 'Chưa có chỉ số điện ghi nhận cho kỳ này.',
+                        'mo_ta' => $dienText !== '' ? ('Chỉ số: ' . $dienText . '.') : 'Chưa có chỉ số điện ghi nhận cho tháng này.',
                     ],
                     [
                         'ten' => 'Tiền nước',
                         'so_tien' => (int) ($hoadon->tien_nuoc ?? 0),
                         'don_vi' => 'VNĐ',
                         'thoi_gian' => $kyApDung,
-                        'mo_ta' => $nuocText !== '' ? ('Chỉ số: ' . $nuocText . '.') : 'Chưa có chỉ số nước ghi nhận cho kỳ này.',
+                        'mo_ta' => $nuocText !== '' ? ('Chỉ số: ' . $nuocText . '.') : 'Chưa có chỉ số nước ghi nhận cho tháng này.',
                     ],
                     [
                         'ten' => 'Phí dịch vụ',
@@ -270,7 +269,7 @@
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <h3 class="font-semibold text-slate-900">Chi tiết các khoản phí</h3>
-                <div class="mt-0.5 text-xs text-slate-500">Kỳ áp dụng: <?php echo e($kyApDung); ?></div>
+                <div class="mt-0.5 text-xs text-slate-500">Tháng áp dụng: <?php echo e($kyApDung); ?></div>
             </div>
             <div class="text-right">
                 <div class="text-xs font-semibold text-slate-500">Tổng tiền</div>
@@ -327,7 +326,7 @@
                 </svg>
                 <div>
                     <p class="font-semibold text-slate-900">Ghi chú</p>
-                    <p class="text-sm text-slate-600"><?php echo e($hoadon->ghi_chu); ?></p>
+                    <p class="text-sm text-slate-600"><?php echo e(preg_replace('/\bKy\s+/u', 'Tháng ', (string) $hoadon->ghi_chu)); ?></p>
                 </div>
             </div>
         </div>

@@ -53,7 +53,7 @@
 
                 <div class="flex items-center justify-end gap-5 pt-4">
                     <a href="{{ route('admin.toanha.index') }}" class="text-[11px] font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest px-6 py-3 transition-all">Hủy bỏ thao tác</a>
-                    <button type="submit" class="saas-btn-primary h-14 px-12 shadow-2xl shadow-blue-500/30 text-xs font-black uppercase tracking-widest">
+                    <button type="submit" class="saas-btn-primary h-14 px-12 shadow-2xl shadow-emerald-500/30 text-xs font-black uppercase tracking-widest">
                         {{ isset($toaNha) ? 'Lưu cấu hình hệ thống' : 'Khởi tạo thực thể' }}
                     </button>
                 </div>
@@ -62,7 +62,7 @@
             <div class="lg:col-span-5 space-y-10">
                 <div class="saas-card p-10 bg-slate-50/50 border-dashed border-slate-300">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-10 flex items-center gap-2">
-                        <span class="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></span>
+                        <span class="h-1.5 w-1.5 rounded-full bg-brand-emerald shadow-[0_0_8px_rgba(16,185,129,0.45)]"></span>
                         Quy mô & Phân bổ hạ tầng
                     </h3>
                     
@@ -70,8 +70,8 @@
                         <div class="space-y-2.5">
                             <label for="so_tang" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Giới hạn số tầng</label>
                             <div class="relative group">
-                                <input type="number" name="so_tang" id="so_tang" value="{{ old('so_tang', $toaNha->so_tang ?? '') }}" min="1" max="50" placeholder="0" class="saas-input h-12 pl-14 font-black tabular-nums transition-all group-hover:border-slate-400 focus:border-blue-500" />
-                                <div class="absolute inset-y-0 left-5 flex items-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                <input type="number" name="so_tang" id="so_tang" value="{{ old('so_tang', $toaNha->so_tang ?? '') }}" min="1" max="50" placeholder="0" class="saas-input h-12 pl-14 font-black tabular-nums transition-all group-hover:border-slate-400 focus:border-brand-emerald" />
+                                <div class="absolute inset-y-0 left-5 flex items-center text-slate-400 group-hover:text-brand-emerald transition-colors">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                 </div>
                             </div>
@@ -83,8 +83,8 @@
                         <div class="space-y-2.5">
                             <label for="so_phong" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Định mức tổng số phòng</label>
                             <div class="relative group">
-                                <input type="number" name="so_phong" id="so_phong" value="{{ old('so_phong', $toaNha->so_phong ?? '') }}" min="1" max="2000" placeholder="0" class="saas-input h-12 pl-14 font-black tabular-nums transition-all group-hover:border-slate-400 focus:border-blue-500" />
-                                <div class="absolute inset-y-0 left-5 flex items-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                <input type="number" name="so_phong" id="so_phong" value="{{ old('so_phong', $toaNha->so_phong ?? '') }}" min="1" max="2000" placeholder="0" class="saas-input h-12 pl-14 font-black tabular-nums transition-all group-hover:border-slate-400 focus:border-brand-emerald" />
+                                <div class="absolute inset-y-0 left-5 flex items-center text-slate-400 group-hover:text-brand-emerald transition-colors">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                                 </div>
                             </div>
@@ -105,14 +105,14 @@
                             </select>
                         </div>
 
-                        <div class="p-6 rounded-2xl {{ isset($toaNha) ? 'bg-slate-100 border-slate-200' : 'bg-blue-50 border-blue-100/50 shadow-blue-500/5' }} border shadow-sm mt-4">
+                        <div class="p-6 rounded-2xl {{ isset($toaNha) ? 'bg-slate-100 border-slate-200' : 'bg-emerald-50 border-emerald-100/60 shadow-emerald-500/5' }} border shadow-sm mt-4">
                             <div class="flex gap-4">
-                                <svg class="h-5 w-5 {{ isset($toaNha) ? 'text-slate-400' : 'text-blue-500' }} flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <p class="text-[11px] font-bold {{ isset($toaNha) ? 'text-slate-500' : 'text-blue-700' }} leading-relaxed uppercase tracking-tight">
+                                <svg class="h-5 w-5 {{ isset($toaNha) ? 'text-slate-400' : 'text-emerald-600' }} flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <p class="text-[11px] font-bold {{ isset($toaNha) ? 'text-slate-500' : 'text-emerald-800' }} leading-relaxed uppercase tracking-tight">
                                     @if(isset($toaNha))
                                         Áp dụng khi hệ thống tự tạo thêm phòng theo quy mô mới, các phòng đã tồn tại sẽ giữ nguyên.
                                     @else
-                                        Quy tắc khởi tạo tự động: <span class="{{ isset($toaNha) ? 'text-slate-900' : 'text-blue-900' }}">[MãTòa][Tầng][STT]</span> (Ví dụ: A1101, B2105...).
+                                        Quy tắc khởi tạo tự động: <span class="{{ isset($toaNha) ? 'text-slate-900' : 'text-emerald-950' }}">[MãTòa][Tầng][STT]</span> (Ví dụ: A1101, B2105...).
                                     @endif
                                 </p>
                             </div>

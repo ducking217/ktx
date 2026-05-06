@@ -205,7 +205,7 @@
                                     <table class="w-full text-left">
                                         <thead class="bg-slate-50 border-b border-slate-200">
                                             <tr>
-                                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kỳ hóa đơn</th>
+                                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tháng hóa đơn</th>
                                                 <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Số tiền</th>
                                                 <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Trạng thái</th>
                                             </tr>
@@ -222,7 +222,7 @@
                                                             ?? ($hoadon->ngay_thanh_toan?->format('m/Y') ?? $hoadon->created_at?->format('m/Y'))
                                                             ?? 'Chưa có';
                                                     ?>
-                                                    <td class="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-tight">Kỳ <?php echo e($kyHienThi); ?></td>
+                                                    <td class="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-tight">Tháng <?php echo e($kyHienThi); ?></td>
                                                     <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e(number_format((int) $hoadon->tong_tien)); ?>đ</td>
                                                     <td class="px-6 py-4">
                                                         <?php

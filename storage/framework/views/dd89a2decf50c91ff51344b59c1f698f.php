@@ -33,14 +33,14 @@
 <?php $component->withAttributes(['title' => 'Hệ thống báo hỏng','subtitle' => 'Giám sát luồng thông tin sự cố, điều phối nhân lực và kiểm soát chất lượng bảo trì hạ tầng.']); ?>
             <?php if (isset($component)) { $__componentOriginalca9a59ffed06600c602f2637b0b34f87 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalca9a59ffed06600c602f2637b0b34f87 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.status-tabs','data' => ['items' => $filters,'active' => $status ?? '','route' => 'admin.quanlybaohong','param' => 'status','defaultValue' => '']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.status-tabs','data' => ['items' => $filters,'active' => $status ?? '','route' => 'admin.baohong.index','param' => 'status','defaultValue' => '']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('admin.status-tabs'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['items' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($filters),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($status ?? ''),'route' => 'admin.quanlybaohong','param' => 'status','defaultValue' => '']); ?>
+<?php $component->withAttributes(['items' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($filters),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($status ?? ''),'route' => 'admin.baohong.index','param' => 'status','defaultValue' => '']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalca9a59ffed06600c602f2637b0b34f87)): ?>
@@ -86,18 +86,18 @@
                 <?php $__empty_1 = true; $__currentLoopData = $danhsachbaohong; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $baohong): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-5">
-                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($baohong->sinhvien?->user?->name ?? 'Chưa có'); ?></div>
+                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-emerald transition-colors"><?php echo e($baohong->sinhvien?->user?->name ?? 'Chưa có'); ?></div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 tabular-nums">MSSV: <?php echo e($baohong->sinhvien?->ma_sinh_vien ?? 'Chưa có'); ?></div>
                         </td>
                         <td class="py-5">
                             <div class="inline-flex items-center gap-2 text-sm font-bold text-slate-900">
-                                <span class="h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0"></span>
+                                <span class="h-1.5 w-1.5 rounded-full bg-brand-emerald flex-shrink-0"></span>
                                 <?php echo e($baohong->phong?->ten_phong ?? 'Chưa xác định'); ?>
 
                             </div>
                         </td>
                         <td class="py-5 max-w-sm">
-                            <div class="text-xs font-medium leading-relaxed text-slate-600 border-l-2 border-slate-100 pl-3 py-0.5 line-clamp-3">
+                            <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs font-medium leading-relaxed text-slate-600 line-clamp-3 ring-1 ring-inset ring-slate-200/60">
                                 <?php echo e($baohong->mo_ta); ?>
 
                             </div>
@@ -129,14 +129,14 @@
                             </span>
                         </td>
                         <td class="py-5 text-right">
-                            <form method="POST" action="<?php echo e(route('admin.capnhatbaohong', ['id' => $baohong->id])); ?>" class="inline-flex items-center gap-2 p-1.5 rounded-xl bg-white border border-slate-200 shadow-sm transition-all">
+                            <form method="POST" action="<?php echo e(route('admin.baohong.capnhat', ['id' => $baohong->id])); ?>" class="inline-flex items-center gap-2 p-1.5 rounded-xl bg-white border border-slate-200 shadow-sm transition-all">
                                 <?php echo csrf_field(); ?>
                                 <select name="trang_thai" class="bg-transparent border-none text-[10px] font-bold uppercase tracking-wider text-slate-700 focus:ring-0 cursor-pointer min-w-[100px] py-1">
                                     <?php $__currentLoopData = \App\Enums\BaohongStatus::cases(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ms): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <option value="<?php echo e($ms->value); ?>" <?php echo e($baohong->trang_thai === $ms ? 'selected' : ''); ?>><?php echo e($ms->label()); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
-                                <button type="submit" class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Lưu trạng thái">
+                                <button type="submit" class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Lưu trạng thái">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                 </button>
                             </form>

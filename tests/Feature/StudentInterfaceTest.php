@@ -72,7 +72,7 @@ class StudentInterfaceTest extends TestCase
             'ngay_nhap_hoc' => now(),
         ]);
 
-        $response = $this->actingAs($user)->get(route('student.danhsachphong'));
+        $response = $this->actingAs($user)->get(route('student.phong.index'));
 
         $response->assertStatus(200);
         $response->assertSee('A101');

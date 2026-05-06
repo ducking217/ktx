@@ -1,8 +1,10 @@
 @extends('student.layouts.chinh')
 
+@section('student_page_title', 'Chi tiết hóa đơn')
+
 @section('noidung')
     <div class="mb-6">
-        <a href="{{ route('student.hoadoncuaem') }}" class="saas-btn-ghost h-9 px-3 text-xs mb-2 w-fit">
+        <a href="{{ route('student.hoadon.index') }}" class="saas-btn-ghost h-9 px-3 text-xs mb-2 w-fit">
             <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
@@ -23,13 +25,10 @@
             $tenPhong = $hoadon->hopdong?->giuong?->phong?->ten_phong ?? $hoadon->phong?->ten_phong ?? 'Chưa có';
             $maHoaDon = $hoadon->ma_hoa_don ?: ('HD-' . str_pad((string) $hoadon->id, 6, '0', STR_PAD_LEFT));
 
+            $invoiceType = $loai;
             $statusInvoice = $hoadon->trang_thai;
-            $statusBadge = match($statusInvoice) {
-                \App\Enums\InvoiceStatus::Paid => 'saas-badge-success',
-                \App\Enums\InvoiceStatus::PendingConfirmation => 'saas-badge-info',
-                \App\Enums\InvoiceStatus::Overdue => 'saas-badge-error',
-                default => $isRefund ? 'saas-badge-info' : 'saas-badge-warning',
-            };
+            $statusBadge = $statusInvoice->badgeClass($invoiceType);
+            $statusLabel = $statusInvoice->displayLabel($invoiceType);
         @endphp
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -41,7 +40,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <span class="saas-badge {{ $statusBadge }}">{{ $statusInvoice->label() }}</span>
+                <span class="saas-badge {{ $statusBadge }}">{{ $statusLabel }}</span>
             </div>
         </div>
     </div>
@@ -169,7 +168,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('student.phongcuatoi.hoadon.yeu_cau_xac_nhan', $hoadon->id) }}" class="mt-6 rounded-lg border border-slate-200/60 bg-slate-50 p-4">
+            <form method="POST" action="{{ route('student.hoadon.yeu_cau_xac_nhan', $hoadon->id) }}" class="mt-6 rounded-lg border border-slate-200/60 bg-slate-50 p-4">
                 @csrf
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>

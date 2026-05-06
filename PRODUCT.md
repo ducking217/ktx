@@ -1,7 +1,7 @@
 ---
 register: product
-product: "Hệ Thống Quản Lý KTX (Admin)"
-version: 1
+product: "Hệ thống quản lý KTX - Trường Đại học Phương Đông (Hà Nội)"
+version: 2
 ---
 
 # Product
@@ -12,45 +12,46 @@ product
 
 ## Users
 
-Hệ thống phục vụ nhóm người dùng nội bộ KTX trong bối cảnh vận hành hàng ngày, ưu tiên tốc độ thao tác, đọc bảng số liệu, và tính truy vết.
+Hệ thống quản lý ký túc xá cho Trường Đại học Phương Đông (Hà Nội), phục vụ đồng thời 3 bề mặt: Landing (giới thiệu), Cổng Sinh viên, và Admin Dashboard.
 
-- Điều phối vận hành: duyệt hồ sơ, điều phối phòng/giường, theo dõi trạng thái theo thời gian thực.
-- Kế toán nội bộ: phát hành hóa đơn, xác nhận thanh toán, theo dõi công nợ, xuất báo cáo.
-- Kỹ thuật/Bảo trì: tiếp nhận báo hỏng, cập nhật trạng thái xử lý, quản lý lịch bảo trì.
-- Quản trị hệ thống: quản lý tài khoản/role, cấu hình hệ thống, kiểm toán hoạt động.
-
+- Sinh viên (18–22 tuổi, ít kinh nghiệm dùng app): xem thông tin, đăng ký phòng, theo dõi hợp đồng, thanh toán, gửi yêu cầu trả phòng, báo hỏng.
+- Nhân viên quản lý KTX (vận hành): quản lý phòng/giường, sinh viên, hợp đồng; xử lý yêu cầu và kiểm soát trạng thái.
+- Kế toán (đối soát): hóa đơn, xác nhận thanh toán, công nợ, hoàn tiền cọc, xuất báo cáo.
+- Bảo trì (xử lý sự cố): tiếp nhận báo hỏng, cập nhật trạng thái xử lý, theo dõi lịch sử.
+- Admin sẽ làm kiêm kế toán và bảo trì luôn.
 ## Product Purpose
 
-Số hóa vận hành ký túc xá với trọng tâm:
+Số hóa vận hành KTX theo quy trình rõ ràng, dễ hiểu, và nhất quán giữa Landing, Sinh viên, và Admin.
 
-- Chuẩn hóa quy trình (đăng ký, hợp đồng, hóa đơn, công nợ, bảo trì, kỷ luật, thông báo).
-- Giảm thời gian xử lý tác vụ lặp lại bằng bảng lọc rõ, thao tác hàng loạt, và luồng phê duyệt ít bước.
-- Tăng độ tin cậy thông tin bằng trạng thái nhất quán và lịch sử thao tác (audit trail).
+- Landing: giới thiệu KTX, tiện ích, bảng giá phòng, CTA đăng ký.
+- Student portal: đăng ký phòng, xem hợp đồng, thanh toán, gửi yêu cầu trả phòng/báo hỏng.
+- Admin dashboard: quản lý phòng/giường, sinh viên, hợp đồng, đối soát thanh toán, hoàn tiền cọc.
 
 ## Brand Personality
 
-- 3 từ khóa: Ngăn nắp, đáng tin cậy, chuyên nghiệp.
-- Giọng điệu: rõ ràng, trực diện, hành chính chuẩn mực; tránh “startup” hoặc ngôn ngữ phóng đại.
+- 3 từ khóa: Thân thiện, rõ ràng, đáng tin cậy.
+- Giọng điệu: hướng dẫn vừa đủ, tránh thuật ngữ khó; ưu tiên tiếng Việt chuẩn mực, không phô trương marketing.
 
 ## Anti-references
 
-- Thẩm mỹ “startup”: màu quá rực, gradient phô, hiệu ứng bay bổng, copy marketing.
-- Bóng đổ nặng và card quá mềm; ưu tiên đường viền mảnh + nhịp spacing ổn định.
-- Bo góc lớn (trên 8px) làm giao diện “đồ chơi”.
-- Trang bị lạm dụng modal; ưu tiên inline/progressive disclosure.
+- Gradient màu tím hoặc hiệu ứng “startup” phô trương.
+- Card lồng card, lưới card giống hệt nhau, và layout quá “busy”.
+- Easing kiểu bounce/elastic và motion gây phân tán.
+- Font Inter (không dùng cho dự án này).
+- Bóng đổ nặng, border nhấn kiểu side-stripe, và bo góc quá lớn (trên 10px).
 - Side-stripe border accent (border-left/border-right dày để nhấn).
 
 ## Design Principles
 
-- Auditability over ornament: thao tác phải truy vết, trạng thái phải nhất quán.
-- Dense but scannable: dày thông tin nhưng dễ quét mắt; tiêu đề, cột, nhãn phải phân cấp rõ.
-- Table-first workflows: bảng + filter/sort là hạ tầng cốt lõi, không phải “phụ kiện”.
-- One primary action per screen: mỗi màn hình chỉ có 1 hành động chính nổi bật, còn lại ở mức phụ trợ.
-- Confirm with context: xác nhận nêu rõ hậu quả và dữ liệu liên quan; hạn chế thao tác không đảo ngược.
+- Guided clarity: mỗi màn hình có luồng chính rõ, copy ngắn và có hướng dẫn khi cần.
+- Consistent status language: cùng một trạng thái phải cùng nhãn/màu/ý nghĩa ở mọi surface.
+- Progressive disclosure: mặc định gọn, mở rộng chi tiết theo nhu cầu.
+- One primary action per screen: 1 hành động chính nổi bật, còn lại là phụ trợ.
+- Calm confidence: cảm giác chuyên nghiệp và tin cậy, ưu tiên ổn định hơn phô diễn.
 
 ## Accessibility & Inclusion
 
 - Mục tiêu: WCAG 2.1 AA.
-- Keyboard-first baseline: tab order hợp lý, focus-visible rõ, modal có focus trap và Esc đóng.
-- Reduced motion: tôn trọng reduced-motion, chỉ animate opacity/transform.
-- Color-blind safe semantics: trạng thái không dựa vào màu đơn độc; luôn có nhãn/badge.
+- Keyboard-first baseline: tab order hợp lý, focus-visible rõ, vùng click đủ lớn.
+- Reduced motion: tôn trọng reduced-motion; chỉ animate opacity/transform, không bounce.
+- Color-blind safe semantics: không phụ thuộc màu đơn độc; luôn có nhãn/badge rõ nghĩa.

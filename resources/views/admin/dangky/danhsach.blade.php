@@ -13,7 +13,7 @@
                         'tra-phong' => 'Trả phòng (' . (int) ($countTraPhong ?? 0) . ')',
                     ]"
                     :active="$type ?? 'thue-phong'"
-                    route="admin.duyetdangky"
+                    route="admin.dangky.index"
                     param="type"
                     defaultValue="thue-phong"
                 />
@@ -28,7 +28,7 @@
                     \App\Enums\RegistrationStatus::Rejected->value => 'Từ chối',
                 ]"
                 :active="$status ?? null"
-                route="admin.duyetdangky"
+                route="admin.dangky.index"
                 param="status"
                 defaultValue="Tất cả"
             />
@@ -50,7 +50,7 @@
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-5">
                             <div class="flex flex-col">
-                                <span class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $dangky->ho_ten ?? $dangky->user?->name ?? 'Chưa xác định' }}</span>
+                                <span class="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-emerald transition-colors">{{ $dangky->ho_ten ?? $dangky->user?->name ?? 'Chưa xác định' }}</span>
                                 <div class="flex items-center gap-3 mt-1.5">
                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $dangky->email ?? $dangky->user?->email ?? 'Chưa có' }}</span>
                                     <div class="h-1 w-1 rounded-full bg-slate-200"></div>
@@ -97,7 +97,7 @@
                         <td class="py-5 text-center">
                             @if($dangky->anh_cccd_path)
                                 <div x-data="{ openPreview: false }">
-                                    <button @click="openPreview = true" type="button" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xem CCCD">
+                                    <button @click="openPreview = true" type="button" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xem CCCD">
                                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </button>
 
@@ -134,7 +134,7 @@
                                             </button>
                                         </form>
                                     @else
-                                        <form method="POST" action="{{ route('admin.xulyduyetdangky', ['id' => $dangky->id]) }}" onsubmit="return confirm('Phê duyệt hồ sơ đăng ký cư trú này?')">
+                                        <form method="POST" action="{{ route('admin.dangky.duyet', ['id' => $dangky->id]) }}" onsubmit="return confirm('Phê duyệt hồ sơ đăng ký cư trú này?')">
                                             @csrf
                                             <button type="submit" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Phê duyệt">
                                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
@@ -145,7 +145,7 @@
                                     @if(!\Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG'))
                                         <form method="POST" action="{{ route('admin.dangky.xacnhanthanhtoan', ['id' => $dangky->id]) }}" onsubmit="return confirm('Xác nhận sinh viên đã thanh toán?')">
                                             @csrf
-                                            <button type="submit" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xác nhận thanh toán">
+                                            <button type="submit" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xác nhận thanh toán">
                                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                             </button>
                                         </form>
@@ -153,7 +153,7 @@
                                 @endif
 
                                 @if (in_array($dangky->trang_thai, [\App\Enums\RegistrationStatus::Pending, \App\Enums\RegistrationStatus::ApprovedPendingPayment]))
-                                    <form method="POST" action="{{ \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG') ? route('admin.dangky.traphong.tuchoi', ['id' => $dangky->id]) : route('admin.xulytuchoidangky', ['id' => $dangky->id]) }}" onsubmit="return confirm('{{ \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG') ? 'Từ chối yêu cầu trả phòng này?' : 'Từ chối hồ sơ đăng ký này?' }}')">
+                                    <form method="POST" action="{{ \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG') ? route('admin.dangky.traphong.tuchoi', ['id' => $dangky->id]) : route('admin.dangky.tuchoi', ['id' => $dangky->id]) }}" onsubmit="return confirm('{{ \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG') ? 'Từ chối yêu cầu trả phòng này?' : 'Từ chối hồ sơ đăng ký này?' }}')">
                                         @csrf
                                         <button type="submit" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Từ chối">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>

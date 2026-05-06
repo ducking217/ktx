@@ -31,98 +31,11 @@
                 </div>
                 <h3 class="text-xl font-bold text-slate-900 mb-2 tracking-tight">Bạn chưa có hồ sơ lưu trú</h3>
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-10 max-w-sm mx-auto leading-relaxed">Hãy đăng ký phòng để bắt đầu sử dụng các dịch vụ tại Ký túc xá PDU.</p>
-
-                <?php if(!empty($dangkyPhongGanNhat)): ?>
-                    <?php
-                        $statusEnum = $dangkyPhongGanNhat->trang_thai;
-                        $statusBadgeDangKy = match ($statusEnum) {
-                            \App\Enums\RegistrationStatus::Approved, \App\Enums\RegistrationStatus::Completed => 'saas-badge-success',
-                            \App\Enums\RegistrationStatus::ApprovedPendingPayment => 'saas-badge-info',
-                            \App\Enums\RegistrationStatus::Rejected => 'saas-badge-error',
-                            \App\Enums\RegistrationStatus::Pending => 'saas-badge-warning',
-                            default => 'saas-badge-info'
-                        };
-                        $tenPhongDangKy = $dangkyPhongGanNhat->phong?->tenphong
-                            ?? (($dangkyPhongGanNhat->toanha?->ten_toa_nha ?? null) ? 'Tòa ' . $dangkyPhongGanNhat->toanha->ten_toa_nha : null)
-                            ?? 'Chưa có';
-                    ?>
-
-                    <div class="w-full max-w-2xl mx-auto text-left mb-10">
-                        <div class="saas-card p-6 bg-slate-50/50">
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                <div>
-                                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Phản hồi đăng ký phòng</div>
-                                    <div class="mt-2 flex items-center gap-3">
-                                        <span class="saas-badge <?php echo e($statusBadgeDangKy); ?>"><?php echo e($statusEnum?->label() ?? 'Chưa có'); ?></span>
-                                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 tabular-nums">
-                                            Gửi lúc <?php echo e($dangkyPhongGanNhat->created_at?->format('d/m/Y H:i') ?? 'Chưa có'); ?>
-
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="text-left sm:text-right">
-                                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nguyện vọng</div>
-                                    <div class="mt-1 text-sm font-bold text-slate-900"><?php echo e($tenPhongDangKy); ?></div>
-                                </div>
-                            </div>
-
-                            <?php if($dangkyPhongGanNhat->trang_thai === \App\Enums\RegistrationStatus::Rejected): ?>
-                                <div class="mt-5 rounded-xl bg-white p-4 border border-slate-100">
-                                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Lý do từ chối</div>
-                                    <div class="text-sm font-semibold text-slate-900 leading-relaxed"><?php echo e($dangkyPhongGanNhat->ghi_chu ?: 'Chưa có'); ?></div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if($danhsachphongtrong->count() > 0): ?>
-                    <div class="w-full text-left mt-12 border-t border-slate-100 pt-10">
-                        <div class="flex items-center gap-2 mb-8">
-                            <div class="h-1.5 w-1.5 rounded-full bg-blue-600"></div>
-                            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Đề xuất phòng trống</h4>
-                        </div>
-                        
-                        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            <?php $__currentLoopData = $danhsachphongtrong; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $phong_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <article class="saas-card p-6 flex flex-col group hover:border-slate-300 transition-all">
-                                    <div class="flex items-start justify-between mb-6">
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-slate-900 leading-none mb-2 tracking-tight group-hover:text-blue-600 transition-colors"><?php echo e($phong_item->tenphong); ?></h3>
-                                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tòa <?php echo e($phong_item->toa); ?> • Tầng <?php echo e($phong_item->tang); ?></div>
-                                        </div>
-                                        <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 border border-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-all">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="space-y-3 mb-8 border-y border-slate-50 py-4">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Phí tháng</span>
-                                            <span class="text-sm font-bold text-slate-900 tabular-nums"><?php echo e(number_format($phong_item->giaphong)); ?>đ</span>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Khả dụng</span>
-                                            <span class="saas-badge saas-badge-success !py-0 !px-2 text-[10px]"><?php echo e($phong_item->succhuamax - $phong_item->dango); ?> / <?php echo e($phong_item->succhuamax); ?></span>
-                                        </div>
-                                    </div>
-
-                                    <form method="POST" action="<?php echo e(route('student.dangkyphong')); ?>" class="mt-auto">
-                                        <?php echo csrf_field(); ?>
-                                        <input type="hidden" name="phong_id" value="<?php echo e($phong_item->id); ?>">
-                                        <button type="submit" class="saas-btn-primary w-full h-10 text-[10px] uppercase font-bold tracking-widest">Gửi yêu cầu đăng ký</button>
-                                    </form>
-                                </article>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
                 
                 <div class="mt-10">
-                    <a href="<?php echo e(route('student.danhsachphong')); ?>" class="saas-btn-secondary h-10 px-6 text-[10px] font-bold uppercase tracking-widest">
-                        Khám phá tất cả phòng
-                        <svg class="h-3.5 w-3.5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                    </a>
+                    <div class="text-xs text-slate-500 font-medium">
+                        Để đăng ký phòng, vui lòng vào mục <span class="font-semibold text-slate-900">Xem phòng trống</span> ở thanh điều hướng.
+                    </div>
                 </div>
             </div>
         <?php else: ?>
@@ -175,43 +88,12 @@
                             </div>
                             <div class="flex-1">
                                 <h3 class="text-sm font-bold text-rose-900 tracking-tight mb-1">Thời hạn lưu trú sắp kết thúc (<?php echo e($canhBaoHetHan['so_ngay_con_lai']); ?> ngày còn lại)</h3>
-                                <p class="text-[11px] font-medium text-rose-600 mb-5 leading-relaxed">Hợp đồng hiện tại sẽ hết hạn vào ngày <span class="font-bold underline"><?php echo e($canhBaoHetHan['ngay_het_han']); ?></span>. Hãy thực hiện gia hạn hoặc đăng ký trả phòng.</p>
-                                <div class="flex items-center gap-3">
-                                    <button type="button" data-modal-target="modal-giahan" data-modal-toggle="modal-giahan" class="saas-btn-primary !bg-rose-600 hover:!bg-rose-700 !border-rose-700 h-9 px-4 text-[10px] uppercase font-bold tracking-widest">Gia hạn ngay</button>
-                                    <?php if(!($daGuiYeuCauTraPhong ?? false)): ?>
-                                        <button type="button" data-modal-target="modal-traphong" data-modal-toggle="modal-traphong" class="saas-btn-secondary h-9 px-4 text-[10px] uppercase font-bold tracking-widest">Yêu cầu trả phòng</button>
-                                    <?php endif; ?>
-                                </div>
+                                <p class="text-[11px] font-medium text-rose-600 leading-relaxed">
+                                    Hợp đồng hiện tại sẽ hết hạn vào ngày <span class="font-bold underline"><?php echo e($canhBaoHetHan['ngay_het_han']); ?></span>.
+                                    Vui lòng vào mục <span class="font-bold">Hợp đồng & gia hạn</span> để thực hiện các thao tác liên quan.
+                                </p>
                             </div>
                         </div>
-                    <?php endif; ?>
-
-                    
-                    <?php if($hopdongHienTai): ?>
-                        <article class="saas-card">
-                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                                <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Pháp lý & Hợp đồng</h3>
-                                <?php if(!($daGuiYeuCauTraPhong ?? false)): ?>
-                                    <button type="button" data-modal-target="modal-traphong" data-modal-toggle="modal-traphong" class="text-[10px] font-bold uppercase tracking-widest text-rose-500 hover:text-rose-600">Thanh lý hợp đồng</button>
-                                <?php else: ?>
-                                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 italic">Đang chờ thanh lý...</span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="p-6 grid grid-cols-1 sm:grid-cols-3 gap-8">
-                                <div>
-                                    <div class="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Ngày hiệu lực</div>
-                                    <div class="text-sm font-bold text-slate-900 tabular-nums"><?php echo e(date('d/m/Y', strtotime($hopdongHienTai->ngay_bat_dau))); ?></div>
-                                </div>
-                                <div>
-                                    <div class="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Ngày kết thúc</div>
-                                    <div class="text-sm font-bold text-slate-900 tabular-nums"><?php echo e(date('d/m/Y', strtotime($hopdongHienTai->ngay_ket_thuc))); ?></div>
-                                </div>
-                                <div>
-                                    <div class="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Đơn giá áp dụng</div>
-                                    <div class="text-sm font-bold text-slate-900 tabular-nums"><?php echo e(number_format($hopdongHienTai->gia_thuc_te)); ?>đ</div>
-                                </div>
-                            </div>
-                        </article>
                     <?php endif; ?>
 
                     
@@ -246,38 +128,6 @@
                 <aside class="lg:col-span-4 space-y-8">
                     
                     
-                    <?php if($hoadonChuaThanhToan->count() > 0): ?>
-                        <article class="saas-card border-rose-200 overflow-hidden group">
-                            <div class="px-6 py-4 border-b border-rose-100 bg-rose-50/50 flex items-center justify-between">
-                                <h3 class="text-[10px] font-bold uppercase tracking-widest text-rose-600">Khoản nợ tồn đọng</h3>
-                                <svg class="h-4 w-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            </div>
-                            <div class="p-6">
-                                <div class="mb-8">
-                                    <div class="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Tổng cộng (Phòng)</div>
-                                    <div class="text-3xl font-black text-rose-600 tabular-nums tracking-tighter"><?php echo e(number_format($tongNo)); ?><span class="text-sm font-bold ml-1">đ</span></div>
-                                </div>
-
-                                <div class="space-y-3">
-                                    <?php $__currentLoopData = $hoadonChuaThanhToan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $hoadon_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <div class="flex items-center justify-between rounded-xl bg-slate-50 p-4 border border-slate-100 hover:bg-white transition-colors">
-                                            <div>
-                                                <div class="text-xs font-bold text-slate-900 mb-1">T.<?php echo e($hoadon_item->thang); ?>/<?php echo e($hoadon_item->nam); ?></div>
-                                                <div class="text-[9px] font-bold text-rose-400 uppercase tracking-widest">Hạn: <?php echo e(date('d/m', strtotime($hoadon_item->ngayxuat . ' +5 days'))); ?></div>
-                                            </div>
-                                            <div class="text-right">
-                                                <div class="text-sm font-bold text-slate-900 tabular-nums"><?php echo e(number_format($hoadon_item->tongtien)); ?>đ</div>
-                                                <a href="<?php echo e(route('student.phongcuatoi.hoadon.chitiet', $hoadon_item->id)); ?>" class="inline-block mt-1 text-[9px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700">Chi tiết</a>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                </div>
-                                <a href="<?php echo e(route('student.hoadoncuaem')); ?>" class="saas-btn-primary w-full h-10 mt-6 text-[10px] uppercase font-bold tracking-widest">Thanh toán ngay</a>
-                            </div>
-                        </article>
-                    <?php endif; ?>
-
-                    
                     <article class="saas-card overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
                             <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Kiểm kê vật tư</h3>
@@ -305,9 +155,8 @@
                                 </div>
                             <?php endif; ?>
                             
-                            <div class="space-y-2">
-                                <a href="<?php echo e(route('public.chitietvattu', ['id' => $phong->id, 'back' => 'student'])); ?>" class="saas-btn-secondary w-full h-9 text-[10px] uppercase font-bold tracking-widest">Tất cả vật tư</a>
-                                <a href="<?php echo e(route('student.danhsachbaohong')); ?>" class="saas-btn-ghost w-full h-9 text-[10px] uppercase font-bold tracking-widest text-blue-600">Báo hỏng / Sự cố</a>
+                            <div class="text-xs text-slate-500 font-medium">
+                                Xem chi tiết ở các mục tương ứng trong thanh điều hướng.
                             </div>
                         </div>
                     </article>
@@ -316,79 +165,6 @@
             </div>
         <?php endif; ?>
     </div>
-
-    
-    <?php if($coPhong): ?>
-        
-        <div id="modal-giahan" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-300">
-            <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-300">
-                <div class="mb-8 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900 tracking-tight">Gia hạn hợp đồng</h3>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Hệ thống quản lý cư trú</p>
-                    </div>
-                    <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-900 hover:text-white transition-all" data-modal-hide="modal-giahan">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-6 mb-8 text-center">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-slate-400 border border-slate-100 shadow-sm mx-auto mb-4">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
-                    </div>
-                    <h4 class="text-sm font-bold text-slate-900 mb-2">Tính năng đang cập nhật</h4>
-                    <p class="text-[11px] font-medium text-slate-500 leading-relaxed">Chức năng tự động gia hạn đang được phát triển. Vui lòng liên hệ trực tiếp BQL để làm thủ tục.</p>
-                </div>
-                <button type="button" data-modal-hide="modal-giahan" class="saas-btn-primary w-full h-11 text-[10px] uppercase font-bold tracking-widest">Đã hiểu</button>
-            </div>
-        </div>
-
-        
-        <?php if (isset($component)) { $__componentOriginal9f64f32e90b9102968f2bc548315018c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9f64f32e90b9102968f2bc548315018c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modal','data' => ['name' => 'modal-traphong','title' => 'Yêu cầu thanh lý hợp đồng','subtitle' => 'Ban quản lý sẽ xử lý yêu cầu trong 24-48h làm việc','maxWidth' => 'md']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('modal'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['name' => 'modal-traphong','title' => 'Yêu cầu thanh lý hợp đồng','subtitle' => 'Ban quản lý sẽ xử lý yêu cầu trong 24-48h làm việc','maxWidth' => 'md']); ?>
-            <div class="p-2">
-                <?php if(($daGuiYeuCauTraPhong ?? false) === true): ?>
-                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-6 mb-6 text-center">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-emerald-500 border border-emerald-100 shadow-sm mx-auto mb-4">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <h4 class="text-sm font-bold text-slate-900 mb-1">Yêu cầu đã được gửi</h4>
-                        <p class="text-[11px] font-medium text-slate-500 leading-relaxed">Hệ thống đang xử lý. BQL sẽ liên hệ bạn để kiểm kê tài sản và thanh toán nợ.</p>
-                    </div>
-                    <button type="button" x-on:click="$dispatch('close')" class="saas-btn-primary w-full h-11 text-[10px] uppercase font-bold tracking-widest">Đóng</button>
-                <?php else: ?>
-                    <div class="rounded-2xl bg-rose-50 border border-rose-100 p-6 mb-8">
-                        <h4 class="text-sm font-bold text-rose-900 mb-2">Xác nhận trả phòng?</h4>
-                        <p class="text-[11px] font-medium text-rose-600 leading-relaxed mb-0">
-                            Sau khi gửi yêu cầu, bạn không thể tự ý hủy bỏ. Vui lòng đảm bảo các khoản phí dịch vụ đã được chuẩn bị đầy đủ.
-                        </p>
-                    </div>
-                    <form method="POST" action="<?php echo e(route('student.yeucautraphong')); ?>" class="space-y-3">
-                        <?php echo csrf_field(); ?>
-                        <button type="submit" class="saas-btn-primary !bg-rose-600 hover:!bg-rose-700 !border-rose-700 w-full h-11 text-[10px] uppercase font-bold tracking-widest">Xác nhận gửi yêu cầu</button>
-                        <button type="button" x-on:click="$dispatch('close')" class="saas-btn-secondary w-full h-11 text-[10px] uppercase font-bold tracking-widest">Hủy bỏ</button>
-                    </form>
-                <?php endif; ?>
-            </div>
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9f64f32e90b9102968f2bc548315018c)): ?>
-<?php $attributes = $__attributesOriginal9f64f32e90b9102968f2bc548315018c; ?>
-<?php unset($__attributesOriginal9f64f32e90b9102968f2bc548315018c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9f64f32e90b9102968f2bc548315018c)): ?>
-<?php $component = $__componentOriginal9f64f32e90b9102968f2bc548315018c; ?>
-<?php unset($__componentOriginal9f64f32e90b9102968f2bc548315018c); ?>
-<?php endif; ?>
-
-    <?php endif; ?>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('student.layouts.chinh', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\hethongquanlyktxv1\resources\views/student/phongcuatoi/index.blade.php ENDPATH**/ ?>

@@ -34,11 +34,11 @@
 
         
         <div class="saas-card p-6 bg-slate-50/50 border-dashed">
-            <form action="<?php echo e(route('admin.quanlysinhvien')); ?>" method="GET" class="flex flex-wrap items-end gap-6">
+            <form action="<?php echo e(route('admin.sinhvien.index')); ?>" method="GET" class="flex flex-wrap items-end gap-6">
                 <div class="flex-1 min-w-[300px]">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Tìm kiếm sinh viên</label>
                     <div class="relative group">
-                        <div class="absolute inset-y-0 left-4 flex items-center text-slate-400 group-focus-within:text-blue-500 transition-colors pointer-events-none">
+                        <div class="absolute inset-y-0 left-4 flex items-center text-slate-400 group-focus-within:text-brand-emerald transition-colors pointer-events-none">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" /></svg>
                         </div>
                         <input type="text" name="q" value="<?php echo e(request('q')); ?>" placeholder="Mã sinh viên hoặc họ tên..." class="saas-input pl-12 h-11">
@@ -47,7 +47,7 @@
                 <div class="flex items-end gap-3">
                     <button type="submit" class="saas-btn-primary h-11 px-6">Tìm kiếm</button>
                     <?php if(request('q')): ?>
-                        <a href="<?php echo e(route('admin.quanlysinhvien')); ?>" class="saas-btn-secondary h-11 px-5">Xóa lọc</a>
+                        <a href="<?php echo e(route('admin.sinhvien.index')); ?>" class="saas-btn-secondary h-11 px-5">Xóa lọc</a>
                     <?php endif; ?>
                 </div>
             </form>
@@ -82,7 +82,7 @@
                                     <span class="text-xs font-bold text-slate-500 uppercase tabular-nums"><?php echo e(mb_substr($sinhvien->taikhoan?->name ?? 'N', 0, 2)); ?></span>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($sinhvien->taikhoan?->name ?? 'Chưa có'); ?></div>
+                                    <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-emerald transition-colors"><?php echo e($sinhvien->taikhoan?->name ?? 'Chưa có'); ?></div>
                                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 tabular-nums">
                                         MSSV: <?php echo e($sinhvien->ma_sinh_vien); ?>
 
@@ -96,7 +96,7 @@
                         <td class="py-5">
                             <?php if($sinhvien->phong_hien_tai()): ?>
                                 <div class="inline-flex items-center gap-2 font-bold text-slate-900 text-sm">
-                                    <div class="h-7 w-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-sm flex-shrink-0">
+                                    <div class="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100/60 shadow-sm flex-shrink-0">
                                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1-1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                                     </div>
                                     <?php echo e($sinhvien->phong_hien_tai()->ten_phong); ?>
@@ -118,7 +118,7 @@
                         </td>
                         <td class="py-5 text-right">
                             <div class="flex items-center justify-end gap-1">
-                                <a href="<?php echo e(route('admin.sinhvien.chitiet', $sinhvien->id)); ?>" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xem hồ sơ">
+                                <a href="<?php echo e(route('admin.sinhvien.chitiet', $sinhvien->id)); ?>" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xem hồ sơ">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </a>
                             </div>

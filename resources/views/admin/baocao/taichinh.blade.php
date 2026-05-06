@@ -17,7 +17,7 @@
                         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                 </div>
-                <button type="submit" class="saas-btn-primary h-11 px-8 shadow-lg shadow-blue-500/20 group">
+                <button type="submit" class="saas-btn-primary h-11 px-8 shadow-lg shadow-emerald-500/20 group">
                     <svg class="h-4.5 w-4.5 mr-2.5 group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Xuất dữ liệu
                 </button>
@@ -26,7 +26,7 @@
 
         {{-- Analytical Metric Bento --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="saas-card p-8 border-l-[6px] border-emerald-500 bg-emerald-50/5 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 group">
+            <div class="saas-card p-8 bg-emerald-50/5 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                     Doanh thu (tháng)
@@ -44,18 +44,18 @@
                 <div class="mt-4 h-1 w-8 bg-emerald-100 group-hover:w-16 transition-all duration-500"></div>
             </div>
 
-            <div class="saas-card p-8 border-l-[6px] border-blue-600 bg-blue-50/5 hover:shadow-2xl hover:shadow-blue-600/10 transition-all duration-500 group">
+            <div class="saas-card p-8 bg-emerald-50/5 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
-                    <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                     Tổng tiền cọc
                 </div>
                 <div class="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{{ number_format($tongCocHienTai) }}<span class="text-xs font-black text-slate-300 ml-1.5 uppercase tracking-tighter">vnđ</span></div>
-                <div class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mt-3 bg-blue-50/50 w-fit px-2 py-0.5 rounded-lg border border-blue-100/50">
+                <div class="text-[9px] font-black text-emerald-700 uppercase tracking-[0.2em] mt-3 bg-emerald-50/60 w-fit px-2 py-0.5 rounded-lg border border-emerald-100/60">
                     Ký quỹ an sinh cư dân
                 </div>
             </div>
 
-            <div class="saas-card p-8 border-l-[6px] border-amber-500 bg-amber-50/5 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 group">
+            <div class="saas-card p-8 bg-amber-50/5 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                     Tỷ lệ lấp đầy
@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <div class="saas-card p-8 border-l-[6px] border-slate-900 bg-slate-900/5 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 group">
+            <div class="saas-card p-8 bg-slate-900/5 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 group">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-slate-900"></span>
                     Tổng doanh thu năm
@@ -89,7 +89,7 @@
                     </div>
                     <div class="flex items-center gap-5">
                         <div class="flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)]"></span>
+                            <span class="h-2 w-2 rounded-full bg-brand-emerald shadow-[0_0_8px_rgba(16,185,129,0.35)]"></span>
                             <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Doanh thu (VNĐ)</span>
                         </div>
                     </div>
@@ -112,7 +112,7 @@
                                     {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
                                 </div>
                                 <div>
-                                    <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors leading-none">{{ $phong->phong?->ten_phong ?? 'Không có' }}</div>
+                                    <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-brand-emerald transition-colors leading-none">{{ $phong->phong?->ten_phong ?? 'Không có' }}</div>
                                     <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 flex items-center gap-1.5">
                                         <span class="h-1 w-1 rounded-full bg-slate-300"></span>
                                         Tầng {{ $phong->phong?->tang ?? '0' }}
@@ -144,7 +144,7 @@
                 @foreach($doanhThuTheoThang as $row)
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-6">
-                            <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors">Tháng {{ str_pad($row->thang, 2, '0', STR_PAD_LEFT) }} / {{ $row->nam }}</div>
+                            <div class="text-[13px] font-black text-slate-900 uppercase tracking-tight group-hover:text-brand-emerald transition-colors">Tháng {{ str_pad($row->thang, 2, '0', STR_PAD_LEFT) }} / {{ $row->nam }}</div>
                             <div class="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
                                 <span class="h-1 w-1 rounded-full bg-slate-300"></span>
                                 Báo cáo nội bộ
@@ -188,7 +188,7 @@
                     datasets: [{
                         label: 'Phân tích doanh thu',
                         data: data.map(d => d.tong),
-                        backgroundColor: 'rgba(37, 99, 235, 0.95)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.90)',
                         hoverBackgroundColor: '#0f172a',
                         borderWidth: 0,
                         borderRadius: 12,
@@ -205,8 +205,8 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: '#0f172a',
-                            titleFont: { size: 10, weight: '900', family: 'Inter', letterSpacing: 1 },
-                            bodyFont: { size: 13, weight: '900', family: 'Inter' },
+                            titleFont: { size: 10, weight: '900', family: 'Geist Sans', letterSpacing: 1 },
+                            bodyFont: { size: 13, weight: '900', family: 'Geist Sans' },
                             padding: 20,
                             cornerRadius: 16,
                             displayColors: false,

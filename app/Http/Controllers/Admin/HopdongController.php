@@ -58,7 +58,7 @@ class HopdongController extends Controller
     {
         $ketQua = $this->hopdongService->layChiTietHopDong($id);
         if (isset($ketQua['toast_loai']) && $ketQua['toast_loai'] === 'loi') {
-            return redirect()->route('admin.quanlyhopdong')->with($ketQua);
+            return redirect()->route('admin.hopdong.index')->with($ketQua);
         }
 
         $danhSach = $this->hopdongService->lietKeHopDongAdmin(request());

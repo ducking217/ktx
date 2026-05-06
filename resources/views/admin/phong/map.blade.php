@@ -87,20 +87,18 @@
                     $succhuamax = $phong->loaiphong->suc_chua ?? 0;
                 @endphp
                 <article class="group relative rounded-2xl border border-ui-border bg-ui-card p-5 shadow-sm transition-all hover:border-ink-primary/20 hover:shadow-md">
-                    {{-- Gender Indicator --}}
-                    <div class="absolute right-4 top-4">
-                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest ring-1 ring-inset {{ $phong->gioi_tinh_han_che->value === 'female' ? 'bg-rose-50 text-rose-600 ring-rose-500/20' : ($phong->gioi_tinh_han_che->value === 'male' ? 'bg-blue-50 text-blue-600 ring-blue-500/20' : 'bg-gray-50 text-gray-600 ring-gray-500/20') }}">
+                    <header class="mb-5 flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <a href="{{ route('admin.phong.chitiet', $phong->id) }}" class="group/title block">
+                                <h3 class="text-lg font-bold text-ink-primary font-display uppercase tracking-tight group-hover/title:text-ink-primary/70 transition-colors">{{ $phong->ten_phong }}</h3>
+                            </a>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span class="text-[9px] font-bold uppercase tracking-widest text-ink-secondary/40"><span class="tabular-nums">{{ $soluongdango }}/{{ $succhuamax }}</span> Đang ở</span>
+                            </div>
+                        </div>
+                        <span class="mt-0.5 inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest ring-1 ring-inset {{ $phong->gioi_tinh_han_che->value === 'female' ? 'bg-rose-50 text-rose-600 ring-rose-500/20' : ($phong->gioi_tinh_han_che->value === 'male' ? 'bg-slate-50 text-slate-700 ring-slate-500/20' : 'bg-gray-50 text-gray-600 ring-gray-500/20') }}">
                             {{ $phong->gioi_tinh_han_che->label() }}
                         </span>
-                    </div>
-
-                    <header class="mb-5">
-                        <a href="{{ route('admin.phong.chitiet', $phong->id) }}" class="group/title block">
-                            <h3 class="text-lg font-bold text-ink-primary font-display uppercase tracking-tight group-hover/title:text-ink-primary/70 transition-colors">{{ $phong->ten_phong }}</h3>
-                        </a>
-                        <div class="mt-1 flex items-center gap-2">
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-ink-secondary/40"><span class="tabular-nums">{{ $soluongdango }}/{{ $succhuamax }}</span> Đang ở</span>
-                        </div>
                     </header>
 
                     @php

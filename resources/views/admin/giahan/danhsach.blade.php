@@ -15,7 +15,7 @@
                             <option value="{{ $case->value }}" {{ $status === $case->value ? 'selected' : '' }}>{{ $case->label() }}</option>
                         @endforeach
                     </select>
-                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-brand-emerald transition-colors">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                 </div>
@@ -37,13 +37,13 @@
                 @forelse ($yeuCauGiaHan as $item)
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-5">
-                            <div class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{{ $item->sinhvien?->user?->name ?? $item->sinhvien?->taikhoan?->name ?? 'Chưa có' }}</div>
+                            <div class="text-sm font-bold text-slate-900 group-hover:text-brand-emerald transition-colors leading-tight">{{ $item->sinhvien?->user?->name ?? $item->sinhvien?->taikhoan?->name ?? 'Chưa có' }}</div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">{{ $item->sinhvien?->ma_sinh_vien ?? $item->sinhvien?->masinhvien ?? 'Chưa có' }}</div>
                         </td>
                         <td class="py-5">
-                            <div class="text-xs font-bold text-slate-900 tabular-nums tracking-tight">{{ $item->hopdong ? 'REF-' . $item->hopdong->id : 'Chưa có' }}</div>
-                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1.5">
-                                <span class="h-1 w-1 rounded-full bg-blue-500"></span>
+                            <div class="text-xs font-bold text-slate-900 tabular-nums tracking-tight">{{ $item->hopdong?->ma_hd ?? ($item->hopdong ? 'HĐ-' . $item->hopdong->id : 'Chưa có') }}</div>
+                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-brand-emerald uppercase tracking-widest mt-1.5">
+                                <span class="h-1 w-1 rounded-full bg-brand-emerald"></span>
                                 {{ $item->hopdong?->phong?->ten_phong ?? 'Chưa có' }}
                             </div>
                         </td>
@@ -110,10 +110,10 @@
         @foreach ($yeuCauGiaHan as $item)
             {{-- Modal Duyệt --}}
             <x-modal id="modal-approve-{{ $item->id }}" title="Phê duyệt gia hạn" subtitle="Xác nhận kéo dài thời hạn lưu trú cho cư dân theo đề xuất mới.">
-                <div class="p-6 rounded-2xl bg-blue-50/50 border border-blue-100 mb-6">
+                <div class="p-6 rounded-2xl bg-emerald-50/50 border border-emerald-100/60 mb-6">
                     <div class="flex items-center gap-4">
-                        <div class="h-12 w-12 rounded-xl bg-white border border-blue-100 flex items-center justify-center shadow-sm">
-                            <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <div class="h-12 w-12 rounded-xl bg-white border border-emerald-100/60 flex items-center justify-center shadow-sm">
+                            <svg class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </div>
                         <div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hạn cư trú mới</div>

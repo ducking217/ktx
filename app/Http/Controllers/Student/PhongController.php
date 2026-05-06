@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Contracts\Core\TruyVanPhongServiceInterface;
 use App\Contracts\Student\PhongSinhvienServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class PhongController extends Controller
 {
@@ -49,19 +48,6 @@ class PhongController extends Controller
             'danhsachphongsaptrong' => $data['danhsachphongsaptrong'] ?? collect(),
             'soluongdango_theophong' => $data['soluongdango_theophong'],
             'tuKhoa' => $data['tuKhoa'],
-        ]);
-    }
-
-    /**
-     * Xem tài sản phòng đang ở.
-     */
-    public function myRoomAssets(): View
-    {
-        $duLieuPhong = $this->roomService->layThongTinPhongToi();
-
-        return view('student.taisanphong', [
-            'phong' => $duLieuPhong['phong'] ?? null,
-            'taisan' => $duLieuPhong['taisan'] ?? collect(),
         ]);
     }
 }

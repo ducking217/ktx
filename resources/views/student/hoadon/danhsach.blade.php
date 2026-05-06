@@ -81,22 +81,18 @@
                     </td>
                     <td class="py-4 text-center">
                         @php
+                            $invoiceType = (string) ($item->loai_hoadon ?? '');
                             $trangThai = $item->trang_thai;
                             $isPaid = $trangThai === \App\Enums\InvoiceStatus::Paid;
                             $isPending = $trangThai === \App\Enums\InvoiceStatus::PendingConfirmation;
-                            
-                            $badgeClass = match($trangThai) {
-                                \App\Enums\InvoiceStatus::Paid => 'saas-badge-success',
-                                \App\Enums\InvoiceStatus::PendingConfirmation => 'saas-badge-info',
-                                \App\Enums\InvoiceStatus::Unpaid => 'saas-badge-warning',
-                                default => 'saas-badge-error'
-                            };
+
+                            $badgeClass = $trangThai->badgeClass($invoiceType);
                         @endphp
                         <span class="saas-badge {{ $badgeClass }}">
                             @if(!$isPaid && !$isPending)
                                 <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-current animate-pulse"></span>
                             @endif
-                            {{ $trangThai->label() }}
+                            {{ $trangThai->displayLabel($invoiceType) }}
                         </span>
                     </td>
                     <td class="py-4 text-right">

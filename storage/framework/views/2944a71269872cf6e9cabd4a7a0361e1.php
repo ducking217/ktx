@@ -21,7 +21,7 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['title' => 'Hệ thống tòa nhà','subtitle' => 'Quản lý danh mục cơ sở hạ tầng, cấu trúc tầng và định mức vận hành.']); ?>
-            <a href="<?php echo e(route('admin.toanha.tao')); ?>" class="saas-btn-primary h-9 px-4 text-xs shadow-sm shadow-blue-500/20">
+            <a href="<?php echo e(route('admin.toanha.tao')); ?>" class="saas-btn-primary h-9 px-4 text-xs shadow-sm shadow-emerald-500/20">
                 <svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                 Thêm tòa nhà
             </a>
@@ -64,7 +64,7 @@
                                 <div class="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center text-slate-300 flex-shrink-0 shadow-sm">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-4 12h1m4 0h1m-4-4h1m4 0h1m-4-4h1m4 0h1"/></svg>
                                 </div>
-                                <div class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight"><?php echo e($toaNha->ten_toa_nha); ?></div>
+                                <div class="text-xs font-bold text-slate-900 group-hover:text-brand-emerald transition-colors uppercase tracking-tight"><?php echo e($toaNha->ten_toa_nha); ?></div>
                             </div>
                         </td>
                         <td class="py-4">
@@ -97,7 +97,7 @@
                         </td>
                         <td class="py-4 text-right">
                             <div class="flex items-center justify-end gap-1">
-                                <a href="<?php echo e(route('admin.toanha.chitiet', $toaNha->id)); ?>" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-lg transition-all" title="Chỉnh sửa">
+                                <a href="<?php echo e(route('admin.toanha.chitiet', $toaNha->id)); ?>" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-lg transition-all" title="Chỉnh sửa">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
                                 <form method="POST" action="<?php echo e(route('admin.toanha.xoa', $toaNha->id)); ?>" onsubmit="return confirm('Xác nhận gỡ bỏ tòa nhà này?')">

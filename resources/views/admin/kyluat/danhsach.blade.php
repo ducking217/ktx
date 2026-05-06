@@ -9,7 +9,7 @@
             <button type="button"
                     data-modal-target="modal-themkyluat"
                     data-modal-toggle="modal-themkyluat"
-                    class="saas-btn-primary h-10 px-5 text-xs font-bold shadow-lg shadow-blue-500/20">
+                    class="saas-btn-primary h-10 px-5 text-xs font-bold shadow-lg shadow-emerald-500/20">
                 <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                 Ghi nhận vi phạm
             </button>
@@ -17,7 +17,7 @@
 
         {{-- Filter Bar --}}
         <div class="saas-card p-6 bg-slate-50/50 border-dashed">
-            <form method="GET" action="{{ route('admin.quanlykyluat') }}" class="flex flex-wrap items-end gap-6">
+            <form method="GET" action="{{ route('admin.kyluat.index') }}" class="flex flex-wrap items-end gap-6">
                 <div class="flex-1 min-w-[200px] space-y-2">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sinh viên</label>
                     <select name="sinhvien_id" class="saas-input font-bold h-11" onchange="this.form.submit()">
@@ -39,7 +39,7 @@
                     </select>
                 </div>
                 @if(request('sinhvien_id') || request('muc_do'))
-                    <a href="{{ route('admin.quanlykyluat') }}" class="saas-btn-secondary h-11 px-4 text-xs font-bold">
+                    <a href="{{ route('admin.kyluat.index') }}" class="saas-btn-secondary h-11 px-4 text-xs font-bold">
                         Xóa bộ lọc
                     </a>
                 @endif
@@ -70,14 +70,14 @@
                             </span>
                         </td>
                         <td class="py-5">
-                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $item->sinhvien->user->name ?? 'Chưa xác định' }}</div>
+                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-emerald transition-colors">{{ $item->sinhvien->user->name ?? 'Chưa xác định' }}</div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
                                 {{ $item->sinhvien?->current_hopdong?->giuong?->phong?->ten_phong ?? 'Chưa xếp phòng' }}
                             </div>
                         </td>
                         <td class="py-5 max-w-sm">
                             <div class="text-sm font-bold text-slate-900 leading-tight mb-1">{{ $item->tieu_de }}</div>
-                            <div class="text-xs font-medium leading-relaxed text-slate-500 border-l-2 border-slate-100 pl-3 py-0.5 line-clamp-2">
+                            <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs font-medium leading-relaxed text-slate-600 line-clamp-2 ring-1 ring-inset ring-slate-200/60">
                                 {{ $item->noi_dung }}
                             </div>
                         </td>
@@ -105,11 +105,11 @@
                                 <button type="button"
                                         data-modal-target="modal-suakyluat-{{ $item->id }}"
                                         data-modal-toggle="modal-suakyluat-{{ $item->id }}"
-                                        class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md"
+                                        class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md"
                                         title="Chỉnh sửa">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 </button>
-                                <form action="{{ route('admin.xoakyluat', $item->id) }}" method="POST"
+                                <form action="{{ route('admin.kyluat.xoa', $item->id) }}" method="POST"
                                       onsubmit="return confirm('Xác nhận xóa bản ghi vi phạm này?');" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -145,7 +145,7 @@
     @push('modals')
         {{-- Modal Thêm vi phạm --}}
         <x-modal id="modal-themkyluat" title="Ghi nhận vi phạm mới" subtitle="Lưu thông tin vi phạm nội quy nội trú cho sinh viên được chỉ định.">
-            <form method="POST" action="{{ route('admin.themkyluat') }}" class="space-y-6">
+            <form method="POST" action="{{ route('admin.kyluat.store') }}" class="space-y-6">
                 @csrf
                 <div class="space-y-2">
                     <label for="sinhvien_id_new" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Sinh viên</label>
@@ -189,7 +189,7 @@
 
                 <div class="flex gap-4 pt-2">
                     <button type="button" data-modal-hide="modal-themkyluat" class="saas-btn-secondary flex-1 h-11">Hủy</button>
-                    <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-blue-500/20">Lưu vi phạm</button>
+                    <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Lưu vi phạm</button>
                 </div>
             </form>
         </x-modal>
@@ -197,7 +197,7 @@
         {{-- Modals Chỉnh sửa --}}
         @foreach($kyluat as $item)
             <x-modal id="modal-suakyluat-{{ $item->id }}" title="Chỉnh sửa vi phạm" subtitle="Cập nhật thông tin bản ghi vi phạm đã ghi nhận.">
-                <form method="POST" action="{{ route('admin.capnhatkyluat', ['id' => $item->id]) }}" class="space-y-6">
+                <form method="POST" action="{{ route('admin.kyluat.capnhat', ['id' => $item->id]) }}" class="space-y-6">
                     @csrf
                     <div class="p-5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center gap-4">
                         <div class="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-lg shadow-sm">👤</div>
@@ -239,7 +239,7 @@
 
                     <div class="flex gap-4 pt-2">
                         <button type="button" data-modal-hide="modal-suakyluat-{{ $item->id }}" class="saas-btn-secondary flex-1 h-11">Hủy</button>
-                        <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-blue-500/20">Lưu thay đổi</button>
+                        <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Lưu thay đổi</button>
                     </div>
                 </form>
             </x-modal>

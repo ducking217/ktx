@@ -69,12 +69,18 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2">
-                <a href="{{ route('student.giahan.tao') }}" class="saas-btn-primary w-full justify-center group">
-                    <span>Gửi yêu cầu gia hạn</span>
-                    <svg class="w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </a>
-            </div>
+            @if(request()->routeIs('student.trangchu'))
+                <div class="flex flex-col gap-2">
+                    <a href="{{ route('student.hopdong.index', ['tab' => 'gia-han']) }}" class="saas-btn-primary w-full justify-center group">
+                        <span>Gửi yêu cầu gia hạn</span>
+                        <svg class="w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </a>
+                </div>
+            @else
+                <div class="text-xs text-slate-500">
+                    Thao tác gia hạn nằm ở mục <span class="font-semibold text-slate-900">Hợp đồng & gia hạn</span>.
+                </div>
+            @endif
         @else
             <div class="py-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
                 <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">
@@ -82,9 +88,15 @@
                 </div>
                 <p class="text-sm font-bold text-slate-900 mb-1">Bạn chưa có hợp đồng thuê phòng</p>
                 <p class="text-[10px] text-slate-500 mb-4">Hãy đăng ký phòng để bắt đầu sử dụng dịch vụ.</p>
-                <a href="{{ route('student.danhsachphong') }}" class="saas-btn-secondary py-1.5 px-4 text-xs mx-auto">
-                    Đăng ký phòng ngay
-                </a>
+                @if(request()->routeIs('student.trangchu'))
+                    <a href="{{ route('student.phong.index') }}" class="saas-btn-secondary py-1.5 px-4 text-xs mx-auto">
+                        Đăng ký phòng ngay
+                    </a>
+                @else
+                    <div class="text-xs text-slate-500">
+                        Thao tác đăng ký nằm ở mục <span class="font-semibold text-slate-900">Xem phòng trống</span>.
+                    </div>
+                @endif
             </div>
         @endif
     </div>

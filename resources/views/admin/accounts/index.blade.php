@@ -3,7 +3,7 @@
 
     <div class="space-y-6">
         <x-admin.page-header title="Tài khoản quản trị" subtitle="Quản lý nhân sự và phân quyền vận hành hệ thống KTX.">
-            <a href="{{ route('admin.accounts.tao') }}" class="saas-btn-primary h-9 px-4 text-xs shadow-sm shadow-blue-500/20">
+            <a href="{{ route('admin.accounts.tao') }}" class="saas-btn-primary h-9 px-4 text-xs shadow-sm shadow-emerald-500/20">
                 <svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                 Tạo tài khoản
             </a>
@@ -77,7 +77,7 @@
                         <td class="py-4 text-xs font-bold text-slate-500 tabular-nums">{{ $acc->created_at->format('d/m/Y') }}</td>
                         <td class="py-4 text-right">
                             <div class="flex items-center justify-end gap-1">
-                                <a href="{{ route('admin.accounts.sua', $acc->id) }}" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-lg transition-all" title="Chỉnh sửa">
+                                <a href="{{ route('admin.accounts.sua', $acc->id) }}" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-lg transition-all" title="Chỉnh sửa">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
                                 @if(auth()->id() !== $acc->id)

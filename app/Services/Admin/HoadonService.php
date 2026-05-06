@@ -54,10 +54,15 @@ class HoadonService implements HoadonServiceInterface
         $baseQuery = Hoadon::query()
             ->when($request->phong_id, fn ($q) => $q->where('phong_id', $request->phong_id));
 
+        $baseNonRefundQuery = (clone $baseQuery)->where(function ($q) {
+            $q->whereNull('loai_hoadon')
+                ->orWhere('loai_hoadon', '!=', self::LOAI_REFUND);
+        });
+
         $tabCounts = [
-            'cho_xac_nhan' => (clone $baseQuery)->where('trang_thai', InvoiceStatus::PendingConfirmation)->count(),
-            'cong_no' => (clone $baseQuery)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::Overdue])->count(),
-            'lich_su' => (clone $baseQuery)->where('trang_thai', InvoiceStatus::Paid)->count(),
+            'cho_xac_nhan' => (clone $baseNonRefundQuery)->where('trang_thai', InvoiceStatus::PendingConfirmation)->count(),
+            'cong_no' => (clone $baseNonRefundQuery)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::Overdue])->count(),
+            'lich_su' => (clone $baseNonRefundQuery)->where('trang_thai', InvoiceStatus::Paid)->count(),
             'hoan_coc' => (clone $baseQuery)->where('loai_hoadon', self::LOAI_REFUND)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::Overdue])->count(),
         ];
 
@@ -75,10 +80,25 @@ class HoadonService implements HoadonServiceInterface
             $listQuery = $listQuery->when($request->trang_thai, fn ($q) => $q->where('trang_thai', $request->trang_thai));
         } else {
             $listQuery = match ($activeTab) {
-                'cho-xac-nhan' => $listQuery->where('trang_thai', InvoiceStatus::PendingConfirmation),
-                'lich-su' => $listQuery->where('trang_thai', InvoiceStatus::Paid),
+                'cho-xac-nhan' => $listQuery
+                    ->where(function ($q) {
+                        $q->whereNull('loai_hoadon')
+                            ->orWhere('loai_hoadon', '!=', self::LOAI_REFUND);
+                    })
+                    ->where('trang_thai', InvoiceStatus::PendingConfirmation),
+                'lich-su' => $listQuery
+                    ->where(function ($q) {
+                        $q->whereNull('loai_hoadon')
+                            ->orWhere('loai_hoadon', '!=', self::LOAI_REFUND);
+                    })
+                    ->where('trang_thai', InvoiceStatus::Paid),
                 'hoan-coc' => $listQuery->where('loai_hoadon', self::LOAI_REFUND)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::Overdue]),
-                default => $listQuery->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::Overdue]),
+                default => $listQuery
+                    ->where(function ($q) {
+                        $q->whereNull('loai_hoadon')
+                            ->orWhere('loai_hoadon', '!=', self::LOAI_REFUND);
+                    })
+                    ->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::Overdue]),
             };
         }
 
@@ -91,10 +111,10 @@ class HoadonService implements HoadonServiceInterface
                 ->whereHas('giuongs', fn($q) => $q->where('trang_thai', BedStatus::Occupied))
                 ->get(),
             'thongke' => [
-                'tong_no'       => (int) (clone $baseQuery)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::PendingConfirmation, InvoiceStatus::Overdue])->sum('tong_tien'),
-                'so_qua_han'    => (int) (clone $baseQuery)->where('trang_thai', InvoiceStatus::Overdue)->count(),
-                'so_cho_thu'    => (int) (clone $baseQuery)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::PendingConfirmation])->count(),
-                'da_thu_thang'  => (int) (clone $baseQuery)->where('trang_thai', InvoiceStatus::Paid)
+                'tong_no'       => (int) (clone $baseNonRefundQuery)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::PendingConfirmation, InvoiceStatus::Overdue])->sum('tong_tien'),
+                'so_qua_han'    => (int) (clone $baseNonRefundQuery)->where('trang_thai', InvoiceStatus::Overdue)->count(),
+                'so_cho_thu'    => (int) (clone $baseNonRefundQuery)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::PendingConfirmation])->count(),
+                'da_thu_thang'  => (int) (clone $baseNonRefundQuery)->where('trang_thai', InvoiceStatus::Paid)
                     ->whereMonth('ngay_thanh_toan', now()->month)
                     ->whereYear('ngay_thanh_toan', now()->year)
                     ->sum('tong_tien'),

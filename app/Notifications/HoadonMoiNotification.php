@@ -47,7 +47,7 @@ final class HoadonMoiNotification extends Notification implements ShouldQueue
             'icon'       => 'receipt',
             'title'      => "Hóa đơn mới: {$loai}",
             'body'       => 'Số tiền: ' . number_format((int) $this->hoadon->tong_tien, 0, ',', '.') . 'đ. Vui lòng thanh toán đúng hạn.',
-            'action_url' => route('student.hoadoncuaem'),
+            'action_url' => route('student.hoadon.chitiet', $this->hoadon->id),
             'hoadon_id'  => $this->hoadon->id,
             'tong_tien'   => $this->hoadon->tong_tien,
             'loai'       => $this->hoadon->loai_hoadon,
@@ -71,7 +71,7 @@ final class HoadonMoiNotification extends Notification implements ShouldQueue
             ->greeting('Xin chào ' . ($notifiable->name ?? 'Sinh viên') . ',')
             ->line("Bạn có hóa đơn mới: **{$loai}**")
             ->line('Số tiền: **' . number_format((int) $this->hoadon->tong_tien, 0, ',', '.') . 'đ**')
-            ->action('Xem chi tiết hóa đơn', route('student.hoadoncuaem'))
+            ->action('Xem chi tiết hóa đơn', route('student.hoadon.chitiet', $this->hoadon->id))
             ->line('Vui lòng thanh toán đúng hạn để tránh phát sinh phí trễ hạn.');
     }
 }

@@ -7,7 +7,7 @@
             subtitle="Quản lý vòng đời hợp đồng, thực thi điều khoản pháp lý và quy trình thanh lý tài chính."
         >
             <div class="saas-card flex items-center px-4 h-10 bg-white/60 border-slate-200/60 shadow-sm">
-                <form action="{{ route('admin.quanlyhopdong') }}" method="GET" class="flex items-center gap-2">
+                <form action="{{ route('admin.hopdong.index') }}" method="GET" class="flex items-center gap-2">
                     <svg class="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm sinh viên, mã HĐ..." class="bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-900 w-44 placeholder:text-slate-300" />
                 </form>
@@ -16,7 +16,7 @@
 
         {{-- Filter Bar --}}
         <div class="saas-card p-6 bg-slate-50/50 border-dashed">
-            <form method="GET" action="{{ route('admin.quanlyhopdong') }}" class="flex flex-wrap items-end gap-6">
+            <form method="GET" action="{{ route('admin.hopdong.index') }}" class="flex flex-wrap items-end gap-6">
                 <div class="flex-1 min-w-[200px] space-y-2">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Trạng thái hợp đồng</label>
                     <select name="status" class="saas-input font-bold h-11" onchange="this.form.submit()">
@@ -47,7 +47,7 @@
                             <span class="text-[11px] font-bold text-slate-400 tabular-nums bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60 uppercase tracking-widest">{{ $item->ma_hd }}</span>
                         </td>
                         <td class="py-5">
-                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $item->sinhvien?->user?->name ?? 'Chưa xác định' }}</div>
+                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-emerald transition-colors">{{ $item->sinhvien?->user?->name ?? 'Chưa xác định' }}</div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">{{ $item->sinhvien?->ma_sinh_vien ?? 'Chưa có' }}</div>
                         </td>
                         <td class="py-5">
@@ -72,7 +72,7 @@
                                     $total = max(1, $end - $start);
                                     $progress = min(100, max(0, (($now - $start) / $total) * 100));
                                 @endphp
-                                <div class="bg-blue-600 h-full transition-all duration-1000 rounded-full" style="width: {{ $progress }}%"></div>
+                                <div class="bg-brand-emerald h-full transition-all duration-1000 rounded-full" style="width: {{ $progress }}%"></div>
                             </div>
                         </td>
                         <td class="py-5 text-center">
@@ -90,7 +90,7 @@
                         </td>
                         <td class="py-5 text-right">
                             <div class="flex items-center justify-end gap-1">
-                                <button type="button" data-modal-target="modal-chi-tiet-{{ $item->id }}" data-modal-toggle="modal-chi-tiet-{{ $item->id }}" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Chi tiết hợp đồng">
+                                <button type="button" data-modal-target="modal-chi-tiet-{{ $item->id }}" data-modal-toggle="modal-chi-tiet-{{ $item->id }}" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Chi tiết hợp đồng">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </button>
 
@@ -155,7 +155,7 @@
                         </div>
                         <div class="saas-card p-5 bg-white/60 border-slate-100">
                             <span class="block text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-2">Ngày kết thúc</span>
-                            <span class="text-sm font-bold text-blue-600 tabular-nums">{{ is_string($item->ngay_ket_thuc) ? $item->ngay_ket_thuc : $item->ngay_ket_thuc->format('d.m.Y') }}</span>
+                            <span class="text-sm font-bold text-brand-emerald tabular-nums">{{ is_string($item->ngay_ket_thuc) ? $item->ngay_ket_thuc : $item->ngay_ket_thuc->format('d.m.Y') }}</span>
                         </div>
                     </div>
 
@@ -184,7 +184,7 @@
                     @endif
 
                     <div class="flex gap-4 pt-2">
-                        <a href="{{ route('admin.hopdong.pdf', $item->id) }}" target="_blank" class="saas-btn-primary flex-1 h-11 justify-center shadow-lg shadow-blue-500/20">
+                        <a href="{{ route('admin.hopdong.pdf', $item->id) }}" target="_blank" class="saas-btn-primary flex-1 h-11 justify-center shadow-lg shadow-emerald-500/20">
                             <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             Xuất PDF hợp đồng
                         </a>
@@ -212,7 +212,7 @@
 
                     <div class="flex gap-4 pt-2">
                         <button type="button" data-modal-hide="modal-gia-han-{{ $item->id }}" class="saas-btn-secondary flex-1 h-11">Hủy</button>
-                        <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-blue-500/20">Xác nhận gia hạn</button>
+                        <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Xác nhận gia hạn</button>
                     </div>
                 </form>
             </x-modal>

@@ -58,30 +58,21 @@
                                 };
                             @endphp
                             <span class="saas-badge {{ $badgeClass }}">
-                                @if($mucdoEnum === \App\Enums\DisciplineLevel::High->value)
-                                    <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-current animate-pulse"></span>
-                                @endif
-                                {{ $item->muc_do?->label() ?? 'Bình thường' }}
+                                {{ $item->muc_do?->label() ?? 'Không xác định' }}
                             </span>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-24 text-center">
+                        <td colspan="4" class="px-6 py-20 text-center">
                             <div class="flex flex-col items-center gap-4 text-slate-200">
-                                <svg class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-                                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Không có vi phạm</p>
+                                <svg class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Chưa có biên bản nào</p>
                             </div>
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </x-admin.table-card>
-
-        @if(method_exists($kyluat, 'links') && $kyluat->hasPages())
-            <div class="mt-8">
-                {{ $kyluat->links() }}
-            </div>
-        @endif
     </div>
 @endsection

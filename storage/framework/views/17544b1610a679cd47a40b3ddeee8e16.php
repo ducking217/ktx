@@ -12,16 +12,24 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@100..900&family=Quicksand:wght@400..700&display=swap" rel="stylesheet">
 
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
-<body class="bg-slate-50 font-sans antialiased text-slate-900">
-    <div class="saas-layout">
+<body class="bg-ui-bg font-sans antialiased text-ink-primary">
+    <div x-data="{ sidebarOpen: false }" class="saas-layout">
+        <div
+            x-cloak
+            x-show="sidebarOpen"
+            x-transition.opacity.duration.150ms
+            class="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm lg:hidden"
+            @click="sidebarOpen = false"
+        ></div>
+
         <!-- Sidebar -->
         <?php echo $__env->make('admin.partials.sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-        <div class="flex-1 lg:pl-64 flex flex-col min-h-screen">
+        <div class="flex-1 pl-64 flex flex-col min-h-screen">
             <!-- Navbar -->
             <?php echo $__env->make('admin.partials.navbar', ['pageTitle' => $pageTitle], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
@@ -120,21 +128,21 @@
 <?php endif; ?>
 
         <!-- Mobile Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-lg border-t border-slate-200 p-2 lg:hidden">
+        <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-lg border-t border-ui-border p-2 lg:hidden">
             <div class="flex items-center justify-around max-w-md mx-auto">
-                <a href="<?php echo e(route('admin.trangchu')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.trangchu') ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'); ?>">
+                <a href="<?php echo e(route('admin.trangchu')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.trangchu') ? 'text-brand-emerald bg-brand-emerald/10' : 'text-slate-500 hover:text-slate-900'); ?>">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     <span class="text-[10px] font-medium">Trang chủ</span>
                 </a>
-                <a href="<?php echo e(route('admin.quanlyhoadon')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.quanlyhoadon') ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'); ?>">
+                <a href="<?php echo e(route('admin.hoadon.index')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.hoadon.*') ? 'text-brand-emerald bg-brand-emerald/10' : 'text-slate-500 hover:text-slate-900'); ?>">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m0 0V9a2 2 0 1 1 4 0v2m0 2v6M5 11h14" /></svg>
                     <span class="text-[10px] font-medium">Hóa đơn</span>
                 </a>
-                <a href="<?php echo e(route('admin.quanlybaohong')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.quanlybaohong') ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'); ?>">
+                <a href="<?php echo e(route('admin.baohong.index')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.baohong.*') ? 'text-brand-emerald bg-brand-emerald/10' : 'text-slate-500 hover:text-slate-900'); ?>">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span class="text-[10px] font-medium">Báo hỏng</span>
                 </a>
-                <a href="<?php echo e(route('admin.quanlysinhvien')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.quanlysinhvien') ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'); ?>">
+                <a href="<?php echo e(route('admin.sinhvien.index')); ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors <?php echo e(request()->routeIs('admin.sinhvien.*') ? 'text-brand-emerald bg-brand-emerald/10' : 'text-slate-500 hover:text-slate-900'); ?>">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     <span class="text-[10px] font-medium">Sinh viên</span>
                 </a>

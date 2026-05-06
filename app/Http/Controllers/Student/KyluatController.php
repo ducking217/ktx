@@ -17,6 +17,6 @@ class KyluatController extends Controller
     public function lietKeKyLuatSinhVien()
     {
         $data = $this->kyluatService->listKyluatStudent();
-        return view('student.kyluatcuaem', $data);
+        return view('student.kyluat.index', $data);
     }
 }

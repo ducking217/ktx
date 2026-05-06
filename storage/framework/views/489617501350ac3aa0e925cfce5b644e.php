@@ -74,6 +74,9 @@
         $tenSinhVien = $hoadon->hopdong?->sinhvien?->user?->name ?? '........';
         $maSinhVien = $hoadon->hopdong?->sinhvien?->ma_sinh_vien ?? '........';
         $tenPhong = $hoadon->phong?->ten_phong ?? $hoadon->hopdong?->giuong?->phong?->ten_phong ?? '........';
+        $giaoDichChoXacNhan = $hoadon->trang_thai === \App\Enums\InvoiceStatus::PendingConfirmation
+            ? $hoadon->giao_dich_gan_nhat
+            : null;
         $ky = null;
         if (is_string($hoadon->ghi_chu) && preg_match('/Ky\s+(\d{1,2}\/\d{4})/u', $hoadon->ghi_chu, $m)) {
             $ky = $m[1];
@@ -99,13 +102,27 @@
                 </td>
             </tr>
             <tr>
-                <td class="label">Kỳ thanh toán:</td>
+                <td class="label">Tháng thanh toán:</td>
                 <td><?php echo e($kyHienThi); ?></td>
             </tr>
             <tr>
                 <td class="label">Ngày phát hành:</td>
                 <td><?php echo e($hoadon->created_at->format('d/m/Y')); ?></td>
             </tr>
+            <?php if($giaoDichChoXacNhan): ?>
+            <tr>
+                <td class="label">Mã giao dịch:</td>
+                <td><?php echo e($giaoDichChoXacNhan->ma_giao_dich ?? '........'); ?></td>
+            </tr>
+            <tr>
+                <td class="label">Ghi chú chuyển khoản:</td>
+                <td><?php echo e($giaoDichChoXacNhan->ghi_chu ? preg_replace('/\bKy\s+/u', 'Tháng ', (string) $giaoDichChoXacNhan->ghi_chu) : '........'); ?></td>
+            </tr>
+            <tr>
+                <td class="label">Ngày giao dịch:</td>
+                <td><?php echo e($giaoDichChoXacNhan->ngay_giao_dich?->format('d/m/Y H:i') ?? '........'); ?></td>
+            </tr>
+            <?php endif; ?>
         </table>
     </div>
 

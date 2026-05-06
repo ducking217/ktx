@@ -75,7 +75,7 @@
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 </button>
 
-                                <form method="POST" action="<?php echo e(route('admin.xoathongbao', ['id' => $item->id])); ?>" x-data="{ showConfirm: false }" @confirmed="$el.submit()" class="inline">
+                                <form method="POST" action="<?php echo e(route('admin.thongbao.xoa', ['id' => $item->id])); ?>" x-data="{ showConfirm: false }" @confirmed="$el.submit()" class="inline">
                                     <?php echo csrf_field(); ?>
                                     <button type="button" @click="showConfirm = true" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Gỡ bỏ thông báo">
                                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -145,7 +145,7 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['id' => 'modal-themthongbao','title' => 'Soạn thảo thông báo','subtitle' => 'Thiết lập nội dung mới để phát hành tới cộng đồng cư dân.']); ?>
-            <form method="POST" action="<?php echo e(route('admin.themthongbao')); ?>" class="space-y-6">
+            <form method="POST" action="<?php echo e(route('admin.thongbao.store')); ?>" class="space-y-6">
                 <?php echo csrf_field(); ?>
                 <div class="space-y-2">
                     <label for="tieu_de_new" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Tiêu đề bài đăng</label>
@@ -183,7 +183,7 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['id' => 'modal-suathongbao-'.e($item->id).'','title' => 'Hiệu chỉnh thông báo','subtitle' => 'Cập nhật lại nội dung thông báo #'.e($item->id).'.']); ?>
-                <form method="POST" action="<?php echo e(route('admin.capnhatthongbao', ['id' => $item->id])); ?>" class="space-y-6">
+                <form method="POST" action="<?php echo e(route('admin.thongbao.capnhat', ['id' => $item->id])); ?>" class="space-y-6">
                     <?php echo csrf_field(); ?>
                     <div class="space-y-2">
                         <label for="tieu_de_<?php echo e($item->id); ?>" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Tiêu đề bài đăng</label>

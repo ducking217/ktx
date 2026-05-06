@@ -63,7 +63,7 @@
 
         <a
             href="<?php echo e(route($route, $hrefParams)); ?>"
-            class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all <?php echo e($isActive ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'); ?>"
+            class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all <?php echo e($isActive ? 'bg-white text-brand-emerald shadow-sm' : 'text-slate-400 hover:text-slate-600'); ?>"
             aria-current="<?php echo e($isActive ? 'page' : 'false'); ?>"
         >
             <?php echo e($label); ?>

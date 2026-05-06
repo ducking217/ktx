@@ -22,12 +22,12 @@
 <?php endif; ?>
 <?php $component->withAttributes(['title' => 'Hồ sơ sinh viên','subtitle' => 'Thông tin định danh, lịch sử cư trú và biến động tài chính của cư dân.']); ?>
             <div class="flex items-center gap-2">
-                <a href="<?php echo e(route('admin.quanlysinhvien')); ?>" class="saas-btn-secondary h-9 px-4 text-xs">
+                <a href="<?php echo e(route('admin.sinhvien.index')); ?>" class="saas-btn-secondary h-9 px-4 text-xs">
                     <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     Quay lại
                 </a>
                 
-                <button type="button" data-modal-target="modal-edit-<?php echo e($sinhvien->id); ?>" data-modal-toggle="modal-edit-<?php echo e($sinhvien->id); ?>" class="saas-btn-primary h-9 px-5 text-xs shadow-lg shadow-blue-500/20">
+                <button type="button" data-modal-target="modal-edit-<?php echo e($sinhvien->id); ?>" data-modal-toggle="modal-edit-<?php echo e($sinhvien->id); ?>" class="saas-btn-primary h-9 px-5 text-xs shadow-lg shadow-emerald-500/20">
                     <svg class="mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     Chỉnh sửa hồ sơ sinh viên
                 </button>
@@ -62,7 +62,7 @@
                                 </div>
                             <?php endif; ?>
                         </div>
-                        <div class="absolute -bottom-2 -right-2 h-10 w-10 flex items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg ring-4 ring-white">
+                        <div class="absolute -bottom-2 -right-2 h-10 w-10 flex items-center justify-center rounded-xl bg-brand-emerald text-white shadow-lg ring-4 ring-white">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                     <div class="relative z-10">
                         <h2 class="text-xl font-bold text-slate-900 tracking-tight"><?php echo e($sinhvien->user?->name); ?></h2>
                         <div class="flex items-center justify-center gap-2 mt-2">
-                            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-lg border border-blue-100"><?php echo e($sinhvien->ma_sinh_vien); ?></span>
+                            <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100/60"><?php echo e($sinhvien->ma_sinh_vien); ?></span>
                         </div>
                         
                         <div class="mt-6 flex flex-wrap justify-center gap-2">
@@ -139,14 +139,14 @@
                 <div class="saas-card p-6 bg-slate-900 border-none shadow-xl shadow-slate-900/10">
                     <div class="space-y-6">
                         <div class="flex items-center gap-4">
-                            <div class="h-10 w-10 flex flex-shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            <div class="h-10 w-10 flex flex-shrink-0 items-center justify-center rounded-xl bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1-1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                             </div>
                             <div>
                                 <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Phòng cư trú</div>
                                 <?php if($sinhvien->phong_hien_tai()): ?>
                                     <div class="text-sm font-bold text-white uppercase tracking-tight leading-none"><?php echo e($sinhvien->phong_hien_tai()->ten_phong); ?></div>
-                                    <div class="text-[9px] font-bold text-blue-400 mt-1 uppercase tracking-widest"><?php echo e($sinhvien->phong_hien_tai()->toanha?->ten_toa_nha); ?></div>
+                                    <div class="text-[9px] font-bold text-brand-emerald/80 mt-1 uppercase tracking-widest"><?php echo e($sinhvien->phong_hien_tai()->toanha?->ten_toa_nha); ?></div>
                                 <?php else: ?>
                                     <div class="text-xs font-bold text-slate-600 uppercase tracking-widest">Chưa xếp phòng</div>
                                 <?php endif; ?>
@@ -185,18 +185,18 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="saas-card p-5 bg-slate-50/50 border-none group hover:bg-white hover:shadow-xl transition-all duration-300">
                         <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-3">Hợp đồng</div>
-                        <div class="text-2xl font-bold text-slate-900 tabular-nums tracking-tight group-hover:text-blue-600 transition-colors"><?php echo e($sinhvien->hopdongs->count()); ?></div>
-                        <div class="h-0.5 w-4 bg-slate-200 mt-3 group-hover:w-8 group-hover:bg-blue-500 transition-all"></div>
+                        <div class="text-2xl font-bold text-slate-900 tabular-nums tracking-tight group-hover:text-brand-emerald transition-colors"><?php echo e($sinhvien->hopdongs->count()); ?></div>
+                        <div class="h-0.5 w-4 bg-slate-200 mt-3 group-hover:w-8 group-hover:bg-brand-emerald transition-all"></div>
                     </div>
                     <div class="saas-card p-5 bg-rose-50/20 border-none group hover:bg-white hover:shadow-xl transition-all duration-300">
                         <div class="text-[8px] font-bold text-rose-400 uppercase tracking-widest mb-3">Kỷ luật</div>
                         <div class="text-2xl font-bold text-rose-600 tabular-nums tracking-tight"><?php echo e($sinhvien->kyluats->count()); ?></div>
                         <div class="h-0.5 w-4 bg-rose-200 mt-3 group-hover:w-8 group-hover:bg-rose-500 transition-all"></div>
                     </div>
-                    <div class="saas-card p-5 bg-blue-50/20 border-none group hover:bg-white hover:shadow-xl transition-all duration-300">
-                        <div class="text-[8px] font-bold text-blue-500 uppercase tracking-widest mb-3">Hóa đơn</div>
-                        <div class="text-2xl font-bold text-blue-600 tabular-nums tracking-tight"><?php echo e($hoadons->count()); ?></div>
-                        <div class="h-0.5 w-4 bg-blue-200 mt-3 group-hover:w-8 group-hover:bg-blue-600 transition-all"></div>
+                    <div class="saas-card p-5 bg-emerald-50/20 border-none group hover:bg-white hover:shadow-xl transition-all duration-300">
+                        <div class="text-[8px] font-bold text-emerald-700 uppercase tracking-widest mb-3">Hóa đơn</div>
+                        <div class="text-2xl font-bold text-emerald-700 tabular-nums tracking-tight"><?php echo e($hoadons->count()); ?></div>
+                        <div class="h-0.5 w-4 bg-emerald-200 mt-3 group-hover:w-8 group-hover:bg-emerald-600 transition-all"></div>
                     </div>
                 </div>
 
@@ -204,7 +204,7 @@
                 <div class="saas-card overflow-hidden border-slate-200/60 shadow-sm">
                     <div class="bg-slate-50/50 border-b border-slate-100 px-8 py-5 flex items-center justify-between">
                         <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-blue-600"></span>
+                            <span class="h-2 w-2 rounded-full bg-brand-emerald"></span>
                             Thông tin chi tiết
                         </h3>
                     </div>
@@ -280,9 +280,9 @@
                 
                 <div x-data="{ activeTab: 'contracts' }" class="space-y-6">
                     <div class="flex items-center gap-1.5 bg-slate-100/50 p-1 rounded-xl border border-slate-200/60 w-fit shadow-inner">
-                        <button @click="activeTab = 'contracts'" :class="activeTab === 'contracts' ? 'bg-white text-blue-600 shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Hợp đồng</button>
+                        <button @click="activeTab = 'contracts'" :class="activeTab === 'contracts' ? 'bg-white text-brand-emerald shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Hợp đồng</button>
                         <button @click="activeTab = 'discipline'" :class="activeTab === 'discipline' ? 'bg-white text-rose-600 shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Kỷ luật</button>
-                        <button @click="activeTab = 'bills'" :class="activeTab === 'bills' ? 'bg-white text-blue-600 shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Hóa đơn</button>
+                        <button @click="activeTab = 'bills'" :class="activeTab === 'bills' ? 'bg-white text-brand-emerald shadow-sm border-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all border border-transparent">Hóa đơn</button>
                     </div>
 
                     <div class="saas-card overflow-hidden border-slate-200/60 shadow-sm">
@@ -308,7 +308,7 @@
                                                 <div class="flex items-center gap-3 text-[10px] font-bold tabular-nums">
                                                     <span class="text-slate-500"><?php echo e($hopdong->ngay_bat_dau->format('d/m/Y')); ?></span>
                                                     <svg class="h-3 w-3 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                                                    <span class="text-blue-600"><?php echo e($hopdong->ngay_ket_thuc->format('d/m/Y')); ?></span>
+                                                    <span class="text-brand-emerald"><?php echo e($hopdong->ngay_ket_thuc->format('d/m/Y')); ?></span>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 text-center">
@@ -441,7 +441,7 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['id' => 'modal-edit-'.e($sinhvien->id).'','title' => 'Hiệu chỉnh hồ sơ sinh viên','subtitle' => 'Cập nhật thông tin định danh và hồ sơ học vụ.']); ?>
-            <form method="POST" action="<?php echo e(route('admin.capnhatsinhvien', $sinhvien->id)); ?>" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" action="<?php echo e(route('admin.sinhvien.capnhat', $sinhvien->id)); ?>" enctype="multipart/form-data" class="space-y-6">
                 <?php echo csrf_field(); ?>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -806,7 +806,7 @@
                     <button type="button" data-modal-hide="modal-edit-<?php echo e($sinhvien->id); ?>" class="saas-btn-secondary h-11 px-6">
                         Hủy bỏ
                     </button>
-                    <button type="submit" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+                    <button type="submit" class="saas-btn-primary h-11 px-6 shadow-lg shadow-emerald-500/20">
                         Lưu thay đổi
                     </button>
                 </div>

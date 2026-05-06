@@ -1,7 +1,7 @@
 <x-admin-layout>
     <x-slot:title>Quản lý Hóa đơn & Tài chính</x-slot:title>
 
-    <div class="space-y-8">
+    <div class="space-y-6">
         <x-admin.page-header
             title="Hóa đơn & Tài chính"
             subtitle="Giám sát dòng tiền cư trú, chỉ số tiện ích và quản lý lịch sử giao dịch toàn diện."
@@ -11,7 +11,7 @@
                     <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Nhập hàng loạt
                 </a>
-                <button type="button" data-modal-target="modal-xulyhoadon" data-modal-toggle="modal-xulyhoadon" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+                <button type="button" data-modal-target="modal-xulyhoadon" data-modal-toggle="modal-xulyhoadon" class="saas-btn-primary h-11 px-6 shadow-lg shadow-emerald-500/20">
                     <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
                     Tạo hóa đơn tháng
                 </button>
@@ -19,7 +19,7 @@
         </x-admin.page-header>
 
         {{-- Thống kê tóm tắt --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="saas-card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div class="h-10 w-10 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center border border-slate-200/60">
@@ -94,11 +94,11 @@
                     @endphp
                     <a
                         href="{{ $href }}"
-                        class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ $isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
+                        class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ $isActive ? 'bg-white text-brand-emerald shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
                         aria-current="{{ $isActive ? 'page' : 'false' }}"
                     >
                         {{ $tab['label'] }}
-                        <span class="ml-2 inline-flex min-w-[20px] items-center justify-center rounded-full bg-slate-200/70 px-1.5 py-0.5 text-[10px] font-bold text-slate-700 tabular-nums">
+                        <span class="ml-2 inline-flex min-w-[20px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums {{ $isActive ? 'bg-brand-emerald/10 text-brand-emerald' : 'bg-slate-200/70 text-slate-700' }}">
                             {{ $tab['count'] }}
                         </span>
                     </a>
@@ -172,49 +172,49 @@
                         </td>
                         <td class="py-5 text-center">
                             @php
+                                $invoiceType = (string) ($hoadon->loai_hoadon ?? '');
                                 $statusInvoice = $hoadon->trang_thai;
-                                $statusBadgeInvoice = match($statusInvoice) {
-                                    \App\Enums\InvoiceStatus::Paid => 'saas-badge-success',
-                                    \App\Enums\InvoiceStatus::PendingConfirmation => 'saas-badge-info',
-                                    \App\Enums\InvoiceStatus::Overdue => 'saas-badge-error',
-                                    default => 'saas-badge-warning',
-                                };
+                                $statusBadgeInvoice = $statusInvoice->badgeClass($invoiceType);
+                                $statusLabel = $statusInvoice->displayLabel($invoiceType);
                             @endphp
                             <span class="saas-badge {{ $statusBadgeInvoice }}">
-                                {{ $statusInvoice->label() }}
+                                {{ $statusLabel }}
                             </span>
                         </td>
                         <td class="py-5 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="saas-btn-secondary h-9 px-3 text-xs font-semibold">
-                                    PDF
-                                </a>
-
                                 @php
                                     $loaiHoadon = (string) ($hoadon->loai_hoadon ?? '');
                                     $coTheNhacNo = in_array($hoadon->trang_thai, [\App\Enums\InvoiceStatus::Unpaid, \App\Enums\InvoiceStatus::Overdue], true)
                                         && $loaiHoadon !== 'refund';
                                 @endphp
-                                @if ($coTheNhacNo)
-                                    <form action="{{ route('admin.hoadon.nhacno', $hoadon->id) }}" method="POST" data-confirm="{{ e('Gửi nhắc nợ cho hóa đơn ' . $maHoaDon . '?') }}" onsubmit="return confirm(this.dataset.confirm)">
+                                @if ($hoadon->trang_thai !== \App\Enums\InvoiceStatus::Paid)
+                                    @php
+                                        $isRefund = (string) ($hoadon->loai_hoadon ?? '') === 'refund';
+                                        $isPendingConfirmation = $hoadon->trang_thai === \App\Enums\InvoiceStatus::PendingConfirmation;
+                                        $confirmText = $isRefund
+                                            ? ('Xác nhận đã hoàn tiền cọc ' . $maHoaDon . ' (Số tiền: ' . number_format((int) $hoadon->tong_tien, 0, ',', '.') . 'đ)?')
+                                            : ($isPendingConfirmation
+                                                ? ('Xác nhận giao dịch chuyển khoản cho hóa đơn ' . $maHoaDon . ' (Số tiền: ' . number_format((int) $hoadon->tong_tien, 0, ',', '.') . 'đ)?')
+                                                : ('Ghi nhận đã thu hóa đơn ' . $maHoaDon . ' (Số tiền: ' . number_format((int) $hoadon->tong_tien, 0, ',', '.') . 'đ)?'));
+                                    @endphp
+                                    <form action="{{ route('admin.hoadon.xacnhan', $hoadon->id) }}" method="POST" data-confirm="{{ e($confirmText) }}" onsubmit="return confirm(this.dataset.confirm)">
                                         @csrf
-                                        <button type="submit" class="saas-btn-secondary h-9 px-3 text-xs font-semibold">
-                                            Nhắc nợ
+                                        <button type="submit" class="saas-btn-primary h-9 px-3 text-xs font-semibold">
+                                            {{ $isRefund ? 'Xác nhận hoàn' : ($isPendingConfirmation ? 'Xác nhận CK' : 'Ghi nhận thu') }}
                                         </button>
                                     </form>
                                 @endif
 
-                                @if ($hoadon->trang_thai !== \App\Enums\InvoiceStatus::Paid)
-                                    @php
-                                        $isRefund = (string) ($hoadon->loai_hoadon ?? '') === 'refund';
-                                        $confirmText = $isRefund
-                                            ? ('Xác nhận đã hoàn tiền cọc ' . $maHoaDon . ' (Số tiền: ' . number_format((int) $hoadon->tong_tien, 0, ',', '.') . 'đ)?')
-                                            : ('Xác nhận đã thu hóa đơn ' . $maHoaDon . ' (Số tiền: ' . number_format((int) $hoadon->tong_tien, 0, ',', '.') . 'đ)?');
-                                    @endphp
-                                    <form action="{{ route('admin.xacnhanthanhtoan', $hoadon->id) }}" method="POST" data-confirm="{{ e($confirmText) }}" onsubmit="return confirm(this.dataset.confirm)">
+                                <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="saas-btn-secondary h-9 px-3 text-xs font-semibold">
+                                    PDF
+                                </a>
+
+                                @if ($coTheNhacNo)
+                                    <form action="{{ route('admin.hoadon.nhacno', $hoadon->id) }}" method="POST" data-confirm="{{ e('Gửi nhắc nợ cho hóa đơn ' . $maHoaDon . '?') }}" onsubmit="return confirm(this.dataset.confirm)">
                                         @csrf
-                                        <button type="submit" class="saas-btn-primary h-9 px-3 text-xs font-semibold">
-                                            {{ $isRefund ? 'Xác nhận hoàn' : 'Xác nhận' }}
+                                        <button type="submit" class="saas-btn-ghost h-9 px-3 text-xs font-semibold">
+                                            Nhắc nợ
                                         </button>
                                     </form>
                                 @endif
@@ -243,7 +243,7 @@
 
     @push('modals')
         <x-modal id="modal-xulyhoadon" title="Ghi chỉ số điện nước" subtitle="Nhập chỉ số điện nước định kỳ để hệ thống tự động tạo hóa đơn tháng.">
-            <form method="POST" action="{{ route('admin.xulyhoadon') }}" class="space-y-6">
+            <form method="POST" action="{{ route('admin.hoadon.tao_thang') }}" class="space-y-6">
                 @csrf
                 <div class="space-y-2">
                     <label for="phong_id" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phòng cần ghi chỉ số</label>
@@ -280,13 +280,13 @@
                                 <input name="chisodiencu" type="number" value="0" class="saas-input h-10 tabular-nums text-sm font-bold" required />
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[9px] font-bold uppercase text-blue-600 tracking-wider">Chỉ số mới</label>
-                                <input name="chisodienmoi" type="number" value="0" class="saas-input h-11 font-bold text-slate-900 tabular-nums border-blue-200 focus:border-blue-600" required />
+                                <label class="text-[9px] font-bold uppercase text-brand-emerald tracking-wider">Chỉ số mới</label>
+                                <input name="chisodienmoi" type="number" value="0" class="saas-input h-11 font-bold text-slate-900 tabular-nums border-emerald-200 focus:border-brand-emerald" required />
                             </div>
                         </div>
                         <div class="space-y-4">
                             <h4 class="text-[10px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                                <div class="h-5 w-5 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+                                <div class="h-5 w-5 rounded-lg bg-brand-emerald text-white flex items-center justify-center">
                                     <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                 </div>
                                 Nước
@@ -296,8 +296,8 @@
                                 <input name="chisonuoccu" type="number" value="0" class="saas-input h-10 tabular-nums text-sm font-bold" required />
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[9px] font-bold uppercase text-blue-600 tracking-wider">Chỉ số mới</label>
-                                <input name="chisonuocmoi" type="number" value="0" class="saas-input h-11 font-bold text-slate-900 tabular-nums border-blue-200 focus:border-blue-600" required />
+                                <label class="text-[9px] font-bold uppercase text-brand-emerald tracking-wider">Chỉ số mới</label>
+                                <input name="chisonuocmoi" type="number" value="0" class="saas-input h-11 font-bold text-slate-900 tabular-nums border-emerald-200 focus:border-brand-emerald" required />
                             </div>
                         </div>
                     </div>
@@ -311,7 +311,7 @@
 
                 <div class="flex gap-4 pt-2">
                     <button type="button" data-modal-hide="modal-xulyhoadon" class="saas-btn-secondary flex-1 h-11">Hủy</button>
-                    <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-blue-500/20">Tạo hóa đơn</button>
+                    <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Tạo hóa đơn</button>
                 </div>
             </form>
         </x-modal>

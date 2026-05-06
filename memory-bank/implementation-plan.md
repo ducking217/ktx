@@ -47,3 +47,71 @@
 - [x] Thêm filter `type` (thue-phong/tra-phong) trong `DangkyService::lietKeDangKyAdmin`.
 - [x] UI Admin thêm tab phân luồng và giữ nguyên query khi đổi tab/trạng thái.
 - [x] Với tab “Trả phòng”, hiển thị phòng hiện tại từ `sinhvien.current_hopdong`.
+
+## 2026-05-06 - Hóa đơn: Chuẩn hóa status badge/label (Admin/Student)
+- [x] Bổ sung `InvoiceStatus::badgeClass()` và `InvoiceStatus::displayLabel()` (hỗ trợ `refund`).
+- [x] Thay các `match()` trong Blade (Admin/Student/Profile) sang gọi method trên Enum để tránh lệch copy/màu.
+- [x] Verify nhanh diagnostics (PHP/Blade) sau khi refactor.
+
+---
+
+## 2026-05-06 - Admin UI: Kế hoạch làm lần lượt toàn bộ trang (không đổi nghiệp vụ)
+
+### Nguyên tắc không phá luồng
+- Chỉ chỉnh Blade/Tailwind/Alpine/components; không đổi Service/Observer/DB.
+- Giữ nguyên route name + request payload (name, method, field) để không lệch nghiệp vụ hiện tại.
+- Mỗi màn chỉ có 1 primary action; secondary actions đưa về icon/overflow để giảm nhiễu.
+- Luôn có states: loading (submit), empty, error (validation), permission (403 UX).
+
+### Inventory trang Admin (theo routes + view hiện có)
+- Dashboard: `admin.trangchu` → `resources/views/admin/trangchu.blade.php`
+- Tòa nhà:
+  - `admin.toanha.index|tao|chitiet|capnhat|xoa` → `resources/views/admin/toanha/index.blade.php`, `resources/views/admin/toanha/form.blade.php`
+- Phòng:
+  - `admin.phong.index|map|chitiet` → `resources/views/admin/phong/danhsach.blade.php`, `resources/views/admin/phong/map.blade.php`, `resources/views/admin/phong/chitiet.blade.php`
+  - Tài sản/Vật tư gắn với “Chi tiết phòng” (form inline) → nằm trong `phong/chitiet`
+- Sinh viên:
+  - `admin.sinhvien.index|chitiet|chuyenphong|choroiophong|capnhat` → `resources/views/admin/sinhvien/danhsach.blade.php`, `resources/views/admin/sinhvien/chitiet.blade.php`
+- Đăng ký cư trú:
+  - `admin.dangky.index|duyet|duyethoso|xacnhanthanhtoan|tuchoi|traphong.*` → `resources/views/admin/dangky/danhsach.blade.php`
+- Hợp đồng:
+  - `admin.hopdong.index|show|store|giahan|thanhly|pdf` → `resources/views/admin/hopdong/danhsach.blade.php`
+- Yêu cầu gia hạn:
+  - `admin.giahan.index|duyet|tuchoi` → `resources/views/admin/giahan/danhsach.blade.php`
+- Hóa đơn:
+  - `admin.hoadon.index|tao_thang|nhap_hang_loat|luu_hang_loat|nhacno|xacnhan|pdf` → `resources/views/admin/hoadon/danhsach.blade.php`, `resources/views/admin/hoadon/nhap-hang-loat.blade.php`
+- Báo hỏng:
+  - `admin.baohong.index|capnhat` → `resources/views/admin/baohong/danhsach.blade.php`
+- Bảo trì:
+  - `admin.baotri.index|store|capnhat|xoa|hoanthanh|vattu.baotri` → `resources/views/admin/baotri/danhsach.blade.php`
+- Kỷ luật:
+  - `admin.kyluat.index|store|capnhat|xoa` → `resources/views/admin/kyluat/danhsach.blade.php`
+- Thông báo:
+  - `admin.thongbao.index|store|capnhat|xoa` → `resources/views/admin/thongbao/danhsach.blade.php`
+- Liên hệ:
+  - `admin.lienhe.index|capnhattrangthai` → `resources/views/admin/lienhe/danhsach.blade.php`
+- Cấu hình:
+  - `admin.cauhinh.index|capnhat` → `resources/views/admin/cauhinh/index.blade.php`
+- Báo cáo tài chính:
+  - `admin.baocao.taichinh|xuat_excel` → `resources/views/admin/baocao/taichinh.blade.php` (export là action, không có view riêng)
+- Nhật ký hoạt động:
+  - `admin.activity-log` → `resources/views/admin/activity-log.blade.php`
+- Quản lý tài khoản:
+  - `admin.accounts.index|tao|luu|sua|capnhat|xoa|restore` → `resources/views/admin/accounts/index.blade.php`, `resources/views/admin/accounts/form.blade.php`
+
+### Trang “có dấu hiệu tồn tại nhưng chưa bật/thiếu view”
+- Báo cáo nợ/Công nợ: có `Admin\CongnoController@index` trả `view('admin.congno.danhsach')` nhưng hiện chưa có view trong `resources/views/admin/` và route không thấy trong `routes/web.php`. Khi đi đến giai đoạn này sẽ quyết định: bật route theo IA hay loại khỏi scope.
+
+### Thứ tự triển khai (lần lượt, bám luồng nghiệp vụ)
+1) Nền tảng UI dùng chung: Admin layout shell, sidebar/navbar, PageHeader/StatusTabs/TableCard, empty-state/toast/modal, chuẩn table/filter (không đổi logic).
+2) “Cơ sở vật chất”: Tòa nhà → Phòng (list, map, detail) vì đây là tiền đề cho các flow sau.
+3) “Nhân sự cư trú”: Sinh viên (list/detail) để phục vụ tra cứu khi duyệt hồ sơ/hợp đồng.
+4) “Onboarding”: Đăng ký cư trú (review + thu tiền + trả phòng) vì đây là flow có tần suất cao, nhiều trạng thái.
+5) “Vòng đời ở”: Hợp đồng + Yêu cầu gia hạn (list + inline actions + PDF).
+6) “Tài chính”: Hóa đơn (list + tạo tháng + nhập hàng loạt + xác nhận + PDF) theo đúng flow tạo chỉ số.
+7) “Sự cố & bảo trì”: Báo hỏng → Bảo trì (tối ưu segment theo trạng thái + update inline).
+8) “Kỷ luật”: CRUD nhẹ, ưu tiên tốc độ thao tác + confirm rõ.
+9) “Truyền thông & hộp thư”: Thông báo → Liên hệ (giảm nhiễu, giữ 1 hành động chính).
+10) “Cấu hình & báo cáo”: Cấu hình → Báo cáo tài chính (kết xuất/biểu đồ) để khóa UI cho nhóm kế toán.
+11) “Quản trị hệ thống”: Activity Log → Accounts (nhóm quyền cao, kiểm tra a11y + confirm destructive).
+12) “Công nợ” (nếu bật): tạo view + gắn route/middleware phù hợp, giữ nghiệp vụ nhắc nợ theo hiện trạng.

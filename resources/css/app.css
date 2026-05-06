@@ -1,27 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
     :root {
-        /* Modern SaaS Palette (OKLCH) - Slate/Blue Base */
+        /* Color tokens (OKLCH) */
         --ui-bg-lch: 0.98 0.005 220;
         --ui-card-lch: 1 0 0;
         --ui-border-lch: 0.92 0.01 220;
         --ui-muted-lch: 0.96 0.01 220;
 
-        /* Typography (Tinted Neutrals) */
+        /* Ink tokens (Tinted neutrals) */
         --ink-primary-lch: 0.2 0.02 220;
         --ink-secondary-lch: 0.45 0.02 220;
         --ink-tertiary-lch: 0.65 0.02 220;
 
-        /* Brand Accent - Modern Blue */
-        --brand-primary-lch: 0.55 0.18 250;
-        --brand-secondary-lch: 0.65 0.15 240;
+        /* Accent tokens (emerald/jade is canonical for this product) */
+        --brand-primary-lch: 0.65 0.15 150;
+        --brand-secondary-lch: 0.62 0.13 165;
         --brand-emerald-lch: 0.65 0.15 150;
         --brand-jade-lch: 0.62 0.13 165;
+        --brand-emerald-deep-lch: 0.34 0.08 155;
+        --brand-jade-deep-lch: 0.33 0.06 165;
 
         /* Status Colors */
         --success-lch: 0.65 0.15 150;
@@ -29,24 +29,70 @@
         --error-lch: 0.60 0.18 25;
         --info-lch: 0.60 0.15 250;
 
-        /* Semantic Variables */
+        /* Semantic colors */
         --ui-bg: oklch(var(--ui-bg-lch));
         --ui-card: oklch(var(--ui-card-lch));
         --ui-border: oklch(var(--ui-border-lch));
+        --ui-muted: oklch(var(--ui-muted-lch));
         --ink-primary: oklch(var(--ink-primary-lch));
         --ink-secondary: oklch(var(--ink-secondary-lch));
         --brand-primary: oklch(var(--brand-primary-lch));
+
+        /* Font tokens */
+        --font-sans: "Geist Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        --font-display: "Quicksand", var(--font-sans);
+
+        /* Typography scale (product UI) */
+        --text-xs: 0.75rem;
+        --text-sm: 0.875rem;
+        --text-base: 1rem;
+        --text-lg: 1.125rem;
+        --text-xl: 1.25rem;
+        --text-2xl: 1.5rem;
+
+        --leading-tight: 1.2;
+        --leading-snug: 1.35;
+        --leading-normal: 1.5;
+
+        --tracking-tight: -0.02em;
+        --tracking-normal: 0em;
+        --tracking-wide: 0.08em;
+
+        /* Spacing scale (4pt rhythm) */
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+        --space-10: 2.5rem;
+        --space-12: 3rem;
+
+        /* Radius / elevation */
+        --radius-sm: 0.5rem;
+        --radius-md: 0.625rem;
+        --radius-lg: 0.75rem;
+
+        --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
+        --shadow-md: 0 10px 26px rgb(15 23 42 / 0.08);
+        --shadow-lg: 0 18px 48px rgb(15 23 42 / 0.12);
+
+        /* Focus */
+        --focus-ring: oklch(var(--brand-emerald-lch) / 0.8);
+        --focus-offset: oklch(var(--ui-card-lch) / 1);
     }
 
     html {
-        @apply scroll-smooth;
+        @apply scroll-smooth antialiased;
+        text-rendering: geometricPrecision;
     }
 
     body {
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-family: var(--font-sans);
         background-color: var(--ui-bg);
         color: var(--ink-primary);
-        @apply antialiased selection:bg-blue-500/10 selection:text-blue-600;
+        @apply selection:bg-brand-emerald/10 selection:text-ink-primary;
     }
 
     /* Tabular numbers for all data-rich elements */
@@ -55,14 +101,16 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
-        @apply font-semibold tracking-tight text-slate-900;
-        line-height: 1.2;
+        font-family: var(--font-display);
+        line-height: var(--leading-tight);
+        letter-spacing: var(--tracking-tight);
+        @apply font-bold text-ink-primary;
     }
 
     [x-cloak] { display: none !important; }
 
     :focus-visible {
-        outline: 2px solid var(--brand-primary);
+        outline: 2px solid var(--focus-ring);
         outline-offset: 2px;
     }
 }
@@ -70,43 +118,65 @@
 @layer components {
     /* ── Shell Structure ── */
     .saas-layout {
-        @apply flex min-h-screen bg-slate-50/50;
+        display: flex;
+        min-height: 100dvh;
+        background: var(--ui-bg);
     }
 
     /* ── Minimalist Card ── */
     .saas-card {
-        @apply rounded-xl bg-white border border-slate-200/60 shadow-sm transition-all duration-200;
+        border-radius: var(--radius-lg);
+        background: var(--ui-card);
+        border: 1px solid oklch(var(--ui-border-lch) / 0.7);
+        box-shadow: var(--shadow-sm);
+        @apply transition-all duration-200;
     }
     
     .saas-card-hover:hover {
-        @apply shadow-md border-slate-200;
+        box-shadow: var(--shadow-md);
+        border-color: oklch(var(--ui-border-lch) / 0.9);
     }
 
     /* ── Precise Buttons ── */
     .saas-btn {
-        @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
         min-height: 38px;
     }
 
     .saas-btn-primary {
-        @apply saas-btn bg-slate-900 text-white hover:bg-slate-800 shadow-sm;
+        background: oklch(var(--brand-emerald-lch) / 1);
+        color: oklch(var(--ui-card-lch) / 1);
+        box-shadow: 0 12px 28px oklch(var(--brand-emerald-lch) / 0.18);
+        @apply saas-btn;
+    }
+
+    .saas-btn-primary:hover {
+        filter: brightness(0.98);
     }
 
     .saas-btn-secondary {
-        @apply saas-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300;
+        background: var(--ui-card);
+        border: 1px solid oklch(var(--ui-border-lch) / 0.8);
+        color: oklch(var(--ink-secondary-lch) / 1);
+        @apply saas-btn hover:bg-ui-muted hover:text-ink-primary;
     }
 
     .saas-btn-ghost {
-        @apply saas-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900;
+        color: oklch(var(--ink-secondary-lch) / 1);
+        @apply saas-btn hover:bg-ui-muted hover:text-ink-primary;
     }
 
     .saas-btn-danger {
-        @apply saas-btn bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100;
+        @apply saas-btn bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100;
     }
 
     /* ── Form Elements ── */
     .saas-input {
-        @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm transition-all focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 placeholder:text-slate-400;
+        border-radius: var(--radius-md);
+        background: var(--ui-card);
+        border: 1px solid oklch(var(--ui-border-lch) / 0.85);
+        color: var(--ink-primary);
+        @apply w-full px-3 py-2 text-sm transition-all placeholder:text-slate-400;
         min-height: 38px;
     }
 
@@ -128,7 +198,7 @@
     }
 
     .saas-table th {
-        @apply px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500;
+        @apply px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap;
     }
 
     .saas-table td {
@@ -155,16 +225,103 @@
 
     /* ── Navigation ── */
     .saas-sidebar-link {
-        @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900;
+        border-radius: var(--radius-md);
+        @apply flex items-center gap-3 px-3 py-2 text-sm font-semibold transition-colors;
+        color: oklch(var(--ink-secondary-lch) / 1);
     }
 
     .saas-sidebar-link-active {
-        @apply bg-white text-slate-900 shadow-sm border border-slate-200 ring-1 ring-slate-900/5;
+        background: oklch(var(--brand-emerald-lch) / 0.10);
+        border: 1px solid oklch(var(--brand-emerald-lch) / 0.22);
+        box-shadow: 0 10px 26px oklch(var(--brand-emerald-lch) / 0.08);
+        color: var(--ink-primary);
+    }
+
+    .saas-sidebar--emerald {
+        background: oklch(var(--brand-emerald-deep-lch) / 1);
+        border-color: oklch(var(--brand-emerald-deep-lch) / 0.6);
+        color: oklch(0.95 0.015 160);
+    }
+
+    .saas-sidebar--emerald .saas-sidebar-link {
+        color: oklch(0.92 0.02 160);
+    }
+
+    .saas-sidebar--emerald .saas-sidebar-link:hover {
+        background: oklch(var(--ui-card-lch) / 0.10);
+        color: oklch(var(--ui-card-lch) / 1);
+    }
+
+    .saas-sidebar--emerald .saas-sidebar-link-active {
+        background: oklch(var(--brand-emerald-lch) / 0.18);
+        border: 1px solid oklch(var(--brand-emerald-lch) / 0.28);
+        box-shadow: 0 18px 42px rgb(2 6 23 / 0.22);
+        color: oklch(var(--ui-card-lch) / 1);
+    }
+
+    .saas-number-brand {
+        color: oklch(var(--brand-emerald-lch) / 1);
     }
 
     /* ── Header ── */
     .saas-header {
-        @apply sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur-md lg:px-8;
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        height: 4rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 var(--space-4);
+        border-bottom: 1px solid oklch(var(--ui-border-lch) / 0.7);
+        background: oklch(var(--ui-card-lch) / 0.82);
+        backdrop-filter: blur(12px);
+    }
+
+    .linear-shell {
+        background: var(--ui-bg);
+        color: var(--ink-primary);
+        font-family: var(--font-sans);
+        min-height: 100dvh;
+    }
+
+    .linear-btn-primary {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200;
+        min-height: 38px;
+        background: oklch(var(--brand-emerald-lch) / 1);
+        color: oklch(var(--ui-card-lch) / 1);
+        box-shadow: 0 12px 28px oklch(var(--brand-emerald-lch) / 0.18);
+    }
+
+    .linear-btn-secondary {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200;
+        min-height: 38px;
+        background: var(--ui-card);
+        border: 1px solid oklch(var(--ui-border-lch) / 0.8);
+        color: var(--ink-primary);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .linear-btn-loading {
+        opacity: 0.75;
+        cursor: wait;
+    }
+
+    .pdu-btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold uppercase tracking-widest transition-all duration-200;
+        background: oklch(var(--brand-emerald-lch) / 1);
+        color: oklch(var(--ui-card-lch) / 1);
+        box-shadow: 0 12px 28px oklch(var(--brand-emerald-lch) / 0.20);
+    }
+
+    .pdu-btn-primary:hover {
+        filter: brightness(0.98);
+        transform: translateY(-1px);
+    }
+
+    .pdu-btn-primary:active {
+        transform: translateY(0px);
     }
 }
 
@@ -177,5 +334,39 @@
     
     .text-balance {
         text-wrap: balance;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .custom-scrollbar {
+        scrollbar-gutter: stable;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: oklch(var(--ui-border-lch) / 0.7);
+        border-radius: 999px;
+        border: 3px solid transparent;
+        background-clip: content-box;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: oklch(var(--ui-border-lch) / 0.9);
+        border: 3px solid transparent;
+        background-clip: content-box;
     }
 }
