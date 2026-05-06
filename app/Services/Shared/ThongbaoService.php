@@ -14,24 +14,36 @@ class ThongbaoService implements ThongbaoServiceInterface
     public function indexForStudent(Request $yeuCau): array
     {
         $loai = $yeuCau->query('loai', 'tatca');
+        $nhom = $yeuCau->query('nhom', 'tatca');
 
-        $query = Thongbao::where(function ($truyVan) {
+        $baseQuery = Thongbao::where(function ($truyVan) {
             $truyVan->where('doi_tuong_nhan', 'sinhvien')
                 ->orWhere('doi_tuong_nhan', 'all')
                 ->orWhereNull('doi_tuong_nhan');
         });
 
         if ($loai === 'moi_nhat') {
-            $query->where('created_at', '>=', now()->subDays(7));
+            $baseQuery->where('created_at', '>=', now()->subDays(7));
         }
 
+        if ($nhom !== 'tatca') {
+            $allowed = ['general', 'finance', 'maintenance', 'discipline', 'system'];
+            if (in_array($nhom, $allowed, true)) {
+                $baseQuery->where('loai_thong_bao', $nhom);
+            }
+        }
+
+        $queryForList = (clone $baseQuery)->orderByDesc('created_at');
+        $queryForStats = clone $baseQuery;
+
         return [
-            'thongbao' => $query->orderByDesc('created_at')->paginate(15),
+            'thongbao' => $queryForList->paginate(15),
             'loai' => $loai,
+            'nhom' => $nhom,
             'thongKe' => [
-                'tong_so' => $query->count(),
-                'trong_thang' => (clone $query)->whereYear('created_at', now()->year)->whereMonth('created_at', now()->month)->count(),
-                'tuan_nay' => (clone $query)->where('created_at', '>=', now()->subDays(7))->count(),
+                'tong_so' => (clone $queryForStats)->count(),
+                'trong_thang' => (clone $queryForStats)->whereYear('created_at', now()->year)->whereMonth('created_at', now()->month)->count(),
+                'tuan_nay' => (clone $queryForStats)->where('created_at', '>=', now()->subDays(7))->count(),
             ],
         ];
     }
@@ -125,4 +137,3 @@ class ThongbaoService implements ThongbaoServiceInterface
         }
     }
 }
-

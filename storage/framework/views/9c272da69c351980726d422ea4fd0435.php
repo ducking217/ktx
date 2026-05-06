@@ -49,7 +49,7 @@
                     <div class="w-16 h-16 bg-red-500/5 border border-red-500/20 flex items-center justify-center text-3xl mx-auto mb-6">❌</div>
                     <h3 class="text-2xl font-display font-bold text-ink-primary mb-3">Mã tra cứu không tồn tại</h3>
                     <p class="text-ink-secondary max-w-md mx-auto leading-relaxed mb-8">
-                        Chúng tôi không tìm thấy hồ sơ nào khớp với mã bạn vừa cung cấp. Vui lòng kiểm tra lại chính xác từng ký tự trong email xác nhận.
+                        Chúng tôi không tìm thấy hồ sơ nào khớp với mã bạn vừa cung cấp. Vui lòng kiểm tra lại chính xác từng ký tự trong thư điện tử xác nhận.
                     </p>
                     <a href="mailto:support@ktx.edu.vn" class="text-ink-primary border-b border-ink-primary font-bold hover:text-brand-emerald hover:border-brand-emerald transition-colors pb-0.5">Liên hệ hỗ trợ kỹ thuật →</a>
                 </div>
@@ -70,8 +70,8 @@
                             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
                                 <div>
                                     <div class="flex items-center gap-3 mb-4">
-                                        <span class="px-3 py-1 bg-white/10 border border-white/20 text-[10px] font-bold uppercase tracking-widest text-white/70">Application Receipt</span>
-                                        <span class="text-white/70 text-sm font-bold"><?php echo e($dangky->created_at->format('d M, Y')); ?></span>
+                                        <span class="px-3 py-1 bg-white/10 border border-white/20 text-[10px] font-bold uppercase tracking-widest text-white/70">Phiếu đăng ký</span>
+                                        <span class="text-white/70 text-sm font-bold"><?php echo e($dangky->created_at->format('d/m/Y')); ?></span>
                                     </div>
                                     <h3 class="text-4xl font-display font-bold tracking-tight">Hồ sơ #<?php echo e($dangky->id); ?></h3>
                                 </div>
@@ -149,7 +149,7 @@
                                         $statusValue = $statusEnum?->value;
                                         $statuses = [
                                             ['label' => 'Đã tiếp nhận', 'desc' => 'Hệ thống đã nhận đơn', 'active' => true],
-                                            ['label' => 'Đang thẩm định', 'desc' => 'Admin đang kiểm tra thông tin', 'active' => in_array($statusValue, [\App\Enums\RegistrationStatus::Approved->value, \App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value], true)],
+                                            ['label' => 'Đang thẩm định', 'desc' => 'Ban quản lý đang kiểm tra thông tin', 'active' => in_array($statusValue, [\App\Enums\RegistrationStatus::Approved->value, \App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value], true)],
                                             ['label' => 'Chờ thanh toán', 'desc' => 'Vui lòng nộp phí giữ chỗ', 'active' => in_array($statusValue, [\App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value], true)],
                                             ['label' => 'Hoàn tất', 'desc' => 'Đã sẵn sàng nhận phòng', 'active' => $statusValue === \App\Enums\RegistrationStatus::Completed->value],
                                         ];
@@ -195,7 +195,7 @@
                                             <h5 class="text-lg font-display font-bold text-ink-primary uppercase tracking-wide">Yêu cầu hoàn tất lệ phí</h5>
                                         </div>
                                         <p class="text-ink-secondary leading-relaxed mb-6">
-                                            Chúc mừng! Hồ sơ của bạn đã được phê duyệt sơ bộ. Vui lòng hoàn tất thanh toán lệ phí giữ chỗ trước <span class="font-bold text-ink-primary border-b border-ink-primary"><?php echo e($dangky->token_expires_at?->format('H:i, d/m/Y') ?? 'N/A'); ?></span> để giữ quyền ưu tiên nhận phòng.
+                                            Chúc mừng! Hồ sơ của bạn đã được phê duyệt sơ bộ. Vui lòng hoàn tất thanh toán lệ phí giữ chỗ trước <span class="font-bold text-ink-primary border-b border-ink-primary"><?php echo e($dangky->token_expires_at?->format('H:i, d/m/Y') ?? 'Chưa có'); ?></span> để giữ quyền ưu tiên nhận phòng.
                                         </p>
                                         <div class="bg-white p-6 border border-ui-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                             <div>

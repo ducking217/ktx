@@ -12,15 +12,31 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['title' => 'Thông báo hệ thống','subtitle' => 'Cập nhật các tin tức và thông báo mới nhất từ Ban quản lý KTX.']); ?>
-            <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                <a href="<?php echo e(route('student.thongbao')); ?>" 
-                   class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all rounded-lg <?php echo e($loai === 'tatca' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'); ?>">
-                    Tất cả
-                </a>
-                <a href="<?php echo e(route('student.thongbao', ['loai' => 'moi_nhat'])); ?>" 
-                   class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all rounded-lg <?php echo e($loai === 'moi_nhat' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'); ?>">
-                    Mới nhất
-                </a>
+            <div class="flex flex-col items-end gap-2">
+                <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <?php
+                        $hrefTatCa = request()->fullUrlWithQuery(['loai' => 'tatca', 'page' => 1]);
+                        $hrefMoiNhat = request()->fullUrlWithQuery(['loai' => 'moi_nhat', 'page' => 1]);
+                    ?>
+                    <a
+                        href="<?php echo e($hrefTatCa); ?>"
+                        class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all rounded-lg <?php echo e($loai === 'tatca' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'); ?>"
+                    >
+                        Tất cả
+                    </a>
+                    <a
+                        href="<?php echo e($hrefMoiNhat); ?>"
+                        class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all rounded-lg <?php echo e($loai === 'moi_nhat' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'); ?>"
+                    >
+                        Mới nhất
+                    </a>
+                </div>
+
+                <form method="POST" action="<?php echo e(route('student.thongbao.markAllRead')); ?>" class="hidden sm:block">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PATCH'); ?>
+                    <button type="submit" class="saas-btn-secondary h-10 px-4 text-xs font-semibold">Đánh dấu đã đọc</button>
+                </form>
             </div>
          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -33,11 +49,40 @@
 <?php unset($__componentOriginalcb19cb35a534439097b02b8af91726ee); ?>
 <?php endif; ?>
 
+        <?php
+            $nhom = $nhom ?? 'tatca';
+            $categories = [
+                'tatca' => 'Tất cả loại',
+                'finance' => 'Tài chính',
+                'maintenance' => 'Bảo trì',
+                'discipline' => 'Kỷ luật',
+                'system' => 'Hệ thống',
+                'general' => 'Chung',
+            ];
+        ?>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
+                    $href = request()->fullUrlWithQuery(['nhom' => $key, 'page' => 1]);
+                    $active = $nhom === $key;
+                ?>
+                <a
+                    href="<?php echo e($href); ?>"
+                    class="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-semibold transition-all <?php echo e($active ? 'bg-brand-emerald/10 text-brand-emerald ring-1 ring-brand-emerald/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'); ?>"
+                    aria-current="<?php echo e($active ? 'page' : 'false'); ?>"
+                >
+                    <?php echo e($label); ?>
+
+                </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+
         
         <div class="grid gap-6 sm:grid-cols-3">
             <article class="saas-card p-6 relative overflow-hidden group">
                 <div class="relative flex items-center gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-500/10">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-emerald/10 text-brand-emerald ring-1 ring-brand-emerald/20">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                     </div>
                     <div>
@@ -73,15 +118,20 @@
         
         <div class="space-y-4">
             <?php $__empty_1 = true; $__currentLoopData = $thongbao; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <a href="<?php echo e(route('student.chitietthongbao', $tb->id)); ?>" class="saas-card p-6 flex items-start gap-6 group hover:border-blue-200 transition-all hover:shadow-xl hover:shadow-blue-500/5">
-                    <div class="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-50 border border-slate-100 group-hover:bg-blue-50 group-hover:border-blue-100 transition-colors">
-                        <svg class="h-6 w-6 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <?php
+                    $type = (string) ($tb->loai_thong_bao ?? 'general');
+                    $typeLabel = $categories[$type] ?? 'Chung';
+                ?>
+                <a href="<?php echo e(route('student.chitietthongbao', $tb->id)); ?>" class="saas-card p-6 flex items-start gap-6 group hover:border-brand-emerald/30 transition-all hover:shadow-xl hover:shadow-emerald-500/5">
+                    <div class="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-50 border border-slate-100 group-hover:bg-brand-emerald/10 group-hover:border-brand-emerald/20 transition-colors">
+                        <svg class="h-6 w-6 text-slate-400 group-hover:text-brand-emerald transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
                         </svg>
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-3 mb-2">
-                            <h3 class="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors"><?php echo e($tb->tieu_de); ?></h3>
+                            <h3 class="text-base font-bold text-slate-900 group-hover:text-brand-emerald transition-colors"><?php echo e($tb->tieu_de); ?></h3>
+                            <span class="saas-badge bg-slate-100 text-slate-600 !py-0.5 !px-2"><?php echo e($typeLabel); ?></span>
                             <?php if(now()->diffInDays($tb->created_at) <= 3): ?>
                                 <span class="saas-badge saas-badge-success !py-0.5 !px-2 animate-pulse">Mới</span>
                             <?php endif; ?>

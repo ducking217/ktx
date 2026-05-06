@@ -28,7 +28,7 @@
 
             <div class="flex items-center gap-2 rounded-2xl bg-ui-bg p-1.5 ring-1 ring-inset ring-ui-border">
                 <span class="inline-flex items-center gap-1.5 rounded-xl bg-ui-card px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-ink-primary shadow-sm ring-1 ring-ui-border">
-                    <span class="h-1.5 w-1.5 rounded-full <?php echo e($phong->gioi_tinh_han_che->value === 'male' ? 'bg-blue-500' : ($phong->gioi_tinh_han_che->value === 'female' ? 'bg-rose-500' : 'bg-gray-500')); ?>"></span>
+                    <span class="h-1.5 w-1.5 rounded-full <?php echo e($phong->gioi_tinh_han_che->value === 'male' ? 'bg-slate-500' : ($phong->gioi_tinh_han_che->value === 'female' ? 'bg-rose-500' : 'bg-gray-500')); ?>"></span>
                     Dành cho <?php echo e($phong->gioi_tinh_han_che->label()); ?>
 
                 </span>
@@ -121,9 +121,6 @@
                                     <div class="text-xs font-bold text-ink-primary tabular-nums"><?php echo e($sinhvien->user?->phone ?? 'Chưa có'); ?></div>
                                     <div class="text-[10px] font-medium text-ink-secondary/40 uppercase tracking-widest mt-0.5">Liên lạc</div>
                                 </div>
-                                <a href="<?php echo e(route('admin.quanlysinhvien', ['q' => $sinhvien->ma_sinh_vien ?? $sinhvien->masinhvien])); ?>" class="flex h-9 w-9 items-center justify-center rounded-xl bg-ui-bg text-ink-secondary hover:text-ink-primary ring-1 ring-ui-border transition-colors">
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                </a>
                             </div>
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -180,7 +177,7 @@
             <article class="rounded-3xl bg-ui-card border border-ui-border shadow-sm overflow-hidden">
                 <div class="bg-ui-bg/50 border-b border-ui-border px-8 py-4 flex items-center justify-between gap-4">
                     <h3 class="text-[10px] font-bold uppercase tracking-widest text-ink-secondary">Danh mục tài sản trong phòng</h3>
-                    <button type="button" data-modal-target="modal-themtaisan" data-modal-toggle="modal-themtaisan" class="saas-btn-primary h-9 px-4 text-[10px] uppercase font-bold tracking-widest shadow-sm shadow-blue-500/15">
+                    <button type="button" data-modal-target="modal-themtaisan" data-modal-toggle="modal-themtaisan" class="saas-btn-primary h-9 px-4 text-[10px] uppercase font-bold tracking-widest shadow-sm shadow-emerald-500/15">
                         <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                         Thêm tài sản
                     </button>
@@ -196,7 +193,7 @@
                                             <div class="text-xs font-bold text-ink-primary truncate" title="<?php echo e($ts->ten_tai_san); ?>"><?php echo e($ts->ten_tai_san); ?></div>
                                         </div>
                                         <div class="flex items-center gap-1">
-                                            <button type="button" data-modal-target="modal-capnhat-taisan-<?php echo e($ts->id); ?>" data-modal-toggle="modal-capnhat-taisan-<?php echo e($ts->id); ?>" class="h-8 w-8 inline-flex items-center justify-center text-ink-secondary/60 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-lg transition-all" title="Chỉnh sửa">
+                                            <button type="button" data-modal-target="modal-capnhat-taisan-<?php echo e($ts->id); ?>" data-modal-toggle="modal-capnhat-taisan-<?php echo e($ts->id); ?>" class="h-8 w-8 inline-flex items-center justify-center text-ink-secondary/60 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-lg transition-all" title="Chỉnh sửa">
                                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                             </button>
                                             <form method="POST" action="<?php echo e(route('admin.taisan.xoa', ['id' => $phong->id, 'taisanId' => $ts->id])); ?>" onsubmit="return confirm('Xác nhận xóa tài sản này khỏi phòng?')">
@@ -219,7 +216,7 @@
                                     </div>
                                 </div>
 
-                                <div id="modal-capnhat-taisan-<?php echo e($ts->id); ?>" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+                                <div id="modal-capnhat-taisan-<?php echo e($ts->id); ?>" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
                                     <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
                                         <div class="mb-8 flex items-center justify-between">
                                             <div>
@@ -265,7 +262,7 @@
                 </div>
             </article>
 
-            <div id="modal-themtaisan" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div id="modal-themtaisan" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
                 <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
                     <div class="mb-8 flex items-center justify-between">
                         <div>

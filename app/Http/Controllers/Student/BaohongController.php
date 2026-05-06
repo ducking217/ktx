@@ -52,4 +52,36 @@ class BaohongController extends Controller
             'toast_noidung' => $result['toast_noidung'] ?? 'Đã có lỗi xảy ra.',
         ]);
     }
+
+    public function capNhatBaoHong(Request $request, int $id)
+    {
+        $dulieu = $request->validate([
+            'mota'       => ['required', 'string', 'min:10', 'max:2000'],
+            'taisan_id'  => ['nullable', 'integer', 'exists:taisan,id'],
+            'anhminhhoa' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ], [
+            'mota.required' => 'Mô tả lỗi không được để trống.',
+            'mota.min'      => 'Mô tả lỗi phải có ít nhất 10 ký tự.',
+            'mota.max'      => 'Mô tả lỗi không được vượt quá 2000 ký tự.',
+            'anhminhhoa.image' => 'Tệp đính kèm phải là hình ảnh.',
+            'anhminhhoa.mimes' => 'Ảnh chỉ chấp nhận định dạng jpg, jpeg, png, webp.',
+            'anhminhhoa.max'   => 'Ảnh tối đa 4MB.',
+        ]);
+
+        $result = $this->baohongService->updateStudentMaintenance($id, $dulieu, $request->file('anhminhhoa'));
+
+        $isSuccess = ($result['toast_loai'] ?? '') === 'thanhcong';
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => $isSuccess,
+                'message' => $result['toast_noidung'] ?? '',
+            ], $isSuccess ? 200 : 400);
+        }
+
+        return redirect()->back()->with([
+            'toast_loai'   => $result['toast_loai'] ?? 'loi',
+            'toast_noidung' => $result['toast_noidung'] ?? 'Đã có lỗi xảy ra.',
+        ]);
+    }
 }

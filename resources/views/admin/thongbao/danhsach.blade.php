@@ -80,13 +80,23 @@
                     <input name="tieu_de" id="tieu_de_new" type="text" placeholder="Ví dụ: Thông báo lịch vệ sinh học kỳ mới..." value="{{ old('tieu_de') }}" class="saas-input font-bold" required>
                 </div>
                 <div class="space-y-2">
+                    <label for="loai_thong_bao_new" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phân loại</label>
+                    <select name="loai_thong_bao" id="loai_thong_bao_new" class="saas-input font-bold h-12">
+                        <option value="general" @selected(old('loai_thong_bao') === 'general')>Chung</option>
+                        <option value="system" @selected(old('loai_thong_bao') === 'system')>Hệ thống</option>
+                        <option value="finance" @selected(old('loai_thong_bao') === 'finance')>Tài chính</option>
+                        <option value="maintenance" @selected(old('loai_thong_bao') === 'maintenance')>Bảo trì</option>
+                        <option value="discipline" @selected(old('loai_thong_bao') === 'discipline')>Kỷ luật</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
                     <label for="noidung_new" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Nội dung văn bản</label>
                     <textarea name="noi_dung" id="noidung_new" placeholder="Nhập nội dung chi tiết tại đây..." rows="8" class="saas-input !h-auto !py-4 font-medium leading-relaxed min-h-[200px] resize-none" required>{{ old('noi_dung') }}</textarea>
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="button" data-modal-hide="modal-themthongbao" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                     <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-emerald-500/20">Phát hành thông báo</button>
+                    <button type="button" data-modal-hide="modal-themthongbao" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                 </div>
             </form>
         </x-modal>
@@ -99,6 +109,16 @@
                         <label for="tieu_de_{{ $item->id }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Tiêu đề bài đăng</label>
                         <input name="tieu_de" id="tieu_de_{{ $item->id }}" type="text" value="{{ $item->tieu_de }}" class="saas-input font-bold" required>
                     </div>
+                    <div class="space-y-2">
+                        <label for="loai_thong_bao_{{ $item->id }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phân loại</label>
+                        <select name="loai_thong_bao" id="loai_thong_bao_{{ $item->id }}" class="saas-input font-bold h-12">
+                            <option value="general" @selected($item->loai_thong_bao === 'general')>Chung</option>
+                            <option value="system" @selected($item->loai_thong_bao === 'system')>Hệ thống</option>
+                            <option value="finance" @selected($item->loai_thong_bao === 'finance')>Tài chính</option>
+                            <option value="maintenance" @selected($item->loai_thong_bao === 'maintenance')>Bảo trì</option>
+                            <option value="discipline" @selected($item->loai_thong_bao === 'discipline')>Kỷ luật</option>
+                        </select>
+                    </div>
 
                     <div class="space-y-2">
                         <label for="noidung_{{ $item->id }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Nội dung chi tiết</label>
@@ -106,8 +126,8 @@
                     </div>
 
                     <div class="flex gap-3 pt-4">
-                        <button type="button" data-modal-hide="modal-suathongbao-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                         <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-emerald-500/20">Lưu thay đổi</button>
+                        <button type="button" data-modal-hide="modal-suathongbao-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                     </div>
                 </form>
             </x-modal>

@@ -17,6 +17,11 @@ interface BaohongServiceInterface
     public function storeMaintenance(array $data, ?object $file): array;
 
     /**
+     * Cập nhật báo hỏng (Student).
+     */
+    public function updateStudentMaintenance(int $id, array $data, ?object $file): array;
+
+    /**
      * Lấy danh sách báo hỏng cho Admin.
      */
     public function listMaintenanceRequestsAdmin(Request $request): array;

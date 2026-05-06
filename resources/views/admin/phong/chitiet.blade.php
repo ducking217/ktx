@@ -188,7 +188,7 @@
                                     </div>
                                 </div>
 
-                                <div id="modal-capnhat-taisan-{{ $ts->id }}" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+                                <div id="modal-capnhat-taisan-{{ $ts->id }}" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
                                     <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
                                         <div class="mb-8 flex items-center justify-between">
                                             <div>
@@ -234,7 +234,7 @@
                 </div>
             </article>
 
-            <div id="modal-themtaisan" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div id="modal-themtaisan" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
                 <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
                     <div class="mb-8 flex items-center justify-between">
                         <div>

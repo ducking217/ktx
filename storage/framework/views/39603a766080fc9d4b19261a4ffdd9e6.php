@@ -24,19 +24,58 @@
 <?php endif; ?>
 
         <?php if(!$coPhong): ?>
-            
-            <div class="saas-card p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
-                <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-50 text-slate-300 border border-slate-100 border-dashed">
-                    <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <?php
+                $dangkyPhongGanNhat = $dangkyPhongGanNhat ?? null;
+                $trangThaiDangKy = $dangkyPhongGanNhat?->trang_thai?->value ?? $dangkyPhongGanNhat?->trang_thai ?? null;
+                $isPending = $trangThaiDangKy === \App\Enums\RegistrationStatus::Pending->value;
+                $phongDaChon = $dangkyPhongGanNhat?->phong?->ten_phong ?? null;
+                $toaDaChon = $dangkyPhongGanNhat?->toanha?->ten_toa_nha ?? $dangkyPhongGanNhat?->phong?->toanha?->ten_toa_nha ?? null;
+                $loaiPhongDaChon = $dangkyPhongGanNhat?->loaiphong?->ten_loai ?? $dangkyPhongGanNhat?->phong?->loaiphong?->ten_loai ?? null;
+            ?>
+
+            <div class="grid gap-6 lg:grid-cols-12 items-start">
+                <div class="lg:col-span-8 space-y-6">
+                    <?php if($dangkyPhongGanNhat && $isPending): ?>
+                        <div class="saas-card p-8 bg-brand-emerald/5 border-brand-emerald/15">
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-emerald/10 text-brand-emerald ring-1 ring-brand-emerald/20">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-semibold text-slate-900">Đang chờ duyệt đăng ký phòng</div>
+                                    <div class="mt-1 text-sm text-slate-600">
+                                        Bạn đã chọn <span class="font-semibold"><?php echo e($phongDaChon ?? 'một phòng'); ?></span>
+                                        <?php if($toaDaChon): ?> (<?php echo e($toaDaChon); ?>) <?php endif; ?>
+                                        <?php if($loaiPhongDaChon): ?> • <?php echo e($loaiPhongDaChon); ?> <?php endif; ?>.
+                                    </div>
+                                    <div class="mt-4 text-xs text-slate-500">Ban quản lý sẽ xét duyệt và phản hồi trong thời gian sớm nhất.</div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="saas-card p-12 text-center flex flex-col items-center justify-center min-h-[360px] border-dashed">
+                            <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-50 text-slate-300 border border-slate-100 border-dashed">
+                                <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2 tracking-tight">Bạn chưa có hồ sơ lưu trú</h3>
+                            <p class="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">Chọn một phòng trống phù hợp và gửi đăng ký để Ban quản lý xét duyệt.</p>
+                            <div class="mt-8">
+                                <a href="<?php echo e(route('student.phong.index')); ?>" class="saas-btn-primary h-11 px-5 text-sm font-semibold">Xem phòng trống</a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 mb-2 tracking-tight">Bạn chưa có hồ sơ lưu trú</h3>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-10 max-w-sm mx-auto leading-relaxed">Hãy đăng ký phòng để bắt đầu sử dụng các dịch vụ tại Ký túc xá PDU.</p>
-                
-                <div class="mt-10">
-                    <div class="text-xs text-slate-500 font-medium">
-                        Để đăng ký phòng, vui lòng vào mục <span class="font-semibold text-slate-900">Xem phòng trống</span> ở thanh điều hướng.
+
+                <aside class="lg:col-span-4 space-y-6">
+                    <div class="saas-card p-6 bg-slate-50/50 border-dashed">
+                        <div class="text-sm font-semibold text-slate-900">Gợi ý để xét duyệt nhanh</div>
+                        <ul class="mt-3 space-y-2 text-sm text-slate-600">
+                            <li>Chọn phòng đúng giới tính theo quy định.</li>
+                            <li>Kiểm tra còn giường trống trước khi gửi.</li>
+                            <li>Giữ liên lạc để nhận thông báo khi có kết quả.</li>
+                        </ul>
                     </div>
-                </div>
+                </aside>
             </div>
         <?php else: ?>
             

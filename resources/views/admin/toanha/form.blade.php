@@ -52,10 +52,10 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-5 pt-4">
-                    <a href="{{ route('admin.toanha.index') }}" class="text-[11px] font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest px-6 py-3 transition-all">Hủy bỏ thao tác</a>
                     <button type="submit" class="saas-btn-primary h-14 px-12 shadow-2xl shadow-emerald-500/30 text-xs font-black uppercase tracking-widest">
                         {{ isset($toaNha) ? 'Lưu cấu hình hệ thống' : 'Khởi tạo thực thể' }}
                     </button>
+                    <a href="{{ route('admin.toanha.index') }}" class="text-[11px] font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest px-6 py-3 transition-all">Hủy bỏ thao tác</a>
                 </div>
             </div>
 

@@ -14,7 +14,7 @@ interface DangkyServiceInterface
     /**
      * Gửi yêu cầu trả phòng (Sinh viên).
      */
-    public function yeuCauTraPhong(): array;
+    public function yeuCauTraPhong(?string $reason = null): array;
 
     /**
      * Lấy danh sách đăng ký cho Admin.

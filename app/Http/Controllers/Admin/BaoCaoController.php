@@ -26,9 +26,29 @@ class BaoCaoController extends Controller
     {
         $filters = $request->only(['thang', 'nam', 'quy']);
         $data = $this->baoCaoService->layDuLieuExport($filters);
-        
-        $fileName = 'Bao-cao-tai-chinh-' . now()->format('Y-m-d') . '.xlsx';
-        
-        return Excel::download(new BaoCaoTaiChinhExport($data), $fileName);
+
+        $baseName = 'Bao-cao-tai-chinh-' . now()->format('Y-m-d');
+
+        try {
+            return Excel::download(new BaoCaoTaiChinhExport($data), $baseName . '.xlsx');
+        } catch (\Throwable $e) {
+            return response()->streamDownload(function () use ($data) {
+                echo "\xEF\xBB\xBF";
+                $out = fopen('php://output', 'w');
+                fputcsv($out, ['Tháng', 'Năm', 'Số hóa đơn', 'Tổng doanh thu', 'Trung bình/HĐ']);
+                foreach ($data as $row) {
+                    fputcsv($out, [
+                        $row['thang'] ?? null,
+                        $row['nam'] ?? null,
+                        $row['so_luong'] ?? null,
+                        $row['tong'] ?? null,
+                        $row['trung_binh'] ?? null,
+                    ]);
+                }
+                fclose($out);
+            }, $baseName . '.csv', [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
     }
 }

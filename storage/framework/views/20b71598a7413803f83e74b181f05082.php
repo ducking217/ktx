@@ -109,16 +109,28 @@
                             </span>
                         </td>
                         <td class="py-5 text-right">
-                            <div class="flex items-center justify-end gap-1">
+                            <div class="flex items-center justify-end gap-2">
                                 <?php if($item->trang_thai->value === 'pending'): ?>
-                                    <button type="button" data-modal-target="modal-approve-<?php echo e($item->id); ?>" data-modal-toggle="modal-approve-<?php echo e($item->id); ?>" class="p-2 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors" title="Chấp thuận gia hạn">
-                                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <button
+                                        type="button"
+                                        data-modal-target="modal-approve-<?php echo e($item->id); ?>"
+                                        data-modal-toggle="modal-approve-<?php echo e($item->id); ?>"
+                                        class="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200/70 shadow-sm hover:bg-emerald-100 hover:ring-emerald-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+                                        title="Chấp thuận gia hạn"
+                                    >
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                     </button>
-                                    <button type="button" data-modal-target="modal-reject-<?php echo e($item->id); ?>" data-modal-toggle="modal-reject-<?php echo e($item->id); ?>" class="p-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors" title="Từ chối yêu cầu">
-                                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <button
+                                        type="button"
+                                        data-modal-target="modal-reject-<?php echo e($item->id); ?>"
+                                        data-modal-toggle="modal-reject-<?php echo e($item->id); ?>"
+                                        class="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-200/70 shadow-sm hover:bg-rose-100 hover:ring-rose-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40"
+                                        title="Từ chối yêu cầu"
+                                    >
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </button>
                                 <?php else: ?>
-                                    <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-2">Xử lý xong</span>
+                                    <span class="inline-flex items-center h-9 px-3 rounded-xl bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-widest ring-1 ring-inset ring-slate-200/70 whitespace-nowrap">Xử lý xong</span>
                                 <?php endif; ?>
                             </div>
                         </td>

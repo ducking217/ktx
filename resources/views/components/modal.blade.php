@@ -68,7 +68,7 @@ $maxWidth = [
 
     <div
         x-show="show"
-        class="linear-modal-card mb-6 overflow-hidden transform transition-all sm:mx-auto sm:w-full {{ $maxWidth }} {{ $title ? 'rounded-2xl bg-ui-card ring-1 ring-ui-border shadow-xl' : '' }}"
+        class="linear-modal-card mb-6 overflow-hidden transform transition-all sm:mx-auto sm:w-full text-left {{ $maxWidth }} {{ $title ? 'rounded-2xl bg-ui-card ring-1 ring-ui-border shadow-xl' : '' }}"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"

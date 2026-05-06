@@ -192,6 +192,60 @@
 - `tests/Feature/StudentInvoiceDetailTest.php`
 - `resources/views/student/kyluat/index.blade.php`
 
+## 2026-05-06 - Student Phòng trống: Bỏ vật tư (UI)
+
+### Hoàn thành ✅
+- Danh sách phòng trống và phòng sắp trống: chỉ hiển thị “Tài sản trong phòng”, bỏ toàn bộ phần “Vật tư”.
+- Giữ nguyên backend/routes liên quan vật tư (không xóa, chỉ không dùng trong UI Student).
+
+## 2026-05-06 - Admin Bảo trì: Thu gọn nút thao tác (Impeccable)
+
+### Hoàn thành ✅
+- Thu gọn cụm thao tác theo hàng (Cập nhật / Hoàn tất / Xóa) để giảm cảm giác “quá to”, giữ bố cục table gọn và dễ quét.
+
+### Files Updated
+- `resources/views/admin/baotri/danhsach.blade.php`
+
+## 2026-05-06 - Admin Cấu hình: Chuẩn hoá nút “Lưu cấu hình” (Impeccable)
+
+### Hoàn thành ✅
+- Đồng bộ kích thước/spacing của nút submit về chuẩn admin (h-11, padding gọn), responsive tốt hơn trên mobile (full-width).
+
+### Files Updated
+- `resources/views/admin/cauhinh/index.blade.php`
+
+## 2026-05-06 - Admin Modals: Fix hiển thị “ngược” (text-align + centering)
+
+### Hoàn thành ✅
+- Fix confirmation modal bị inherit `text-right` từ cột “Thao tác”, làm tiêu đề/nội dung bị canh phải gây cảm giác “ngược”.
+- Chuẩn hoá wrapper của raw modals (Admin phòng chi tiết) về `flex` để centering hoạt động ổn định khi toggle `hidden`.
+- Đảo vị trí nút: “Xác nhận” đứng trước “Hủy” theo chuẩn thao tác Admin.
+- Đảo vị trí nút cho modal “Phòng” (Thêm/Cập nhật/Gán tài sản): CTA chính đứng trước, nút Hủy nằm bên phải.
+- Đồng bộ cùng quy ước cho các modal Admin còn lại (Bảo trì, Gia hạn, Thông báo, Hóa đơn, Kỷ luật, Hợp đồng, Sinh viên).
+- Đồng bộ trang Tòa nhà (form tạo/sửa): CTA chính đứng trước, “Hủy bỏ thao tác” nằm bên phải.
+- Soát modal ở Student + Profile: đảo thứ tự CTA theo chuẩn (CTA chính trước, Hủy/Đóng sau), và fix raw modal wrapper dùng `hidden` để centering ổn định.
+
+### Files Updated
+- `resources/views/components/confirmation-modal.blade.php`
+- `resources/views/components/modal.blade.php`
+- `resources/views/admin/phong/chitiet.blade.php`
+- `resources/views/admin/phong/danhsach.blade.php`
+- `resources/views/admin/baotri/danhsach.blade.php`
+- `resources/views/admin/giahan/danhsach.blade.php`
+- `resources/views/admin/thongbao/danhsach.blade.php`
+- `resources/views/admin/hoadon/danhsach.blade.php`
+- `resources/views/admin/kyluat/danhsach.blade.php`
+- `resources/views/admin/hopdong/danhsach.blade.php`
+- `resources/views/admin/sinhvien/chitiet.blade.php`
+- `resources/views/admin/toanha/form.blade.php`
+- `resources/views/student/baohong/danhsach.blade.php`
+- `resources/views/student/hopdong/index.blade.php`
+- `resources/views/student/hoadon/danhsach.blade.php`
+- `resources/views/profile/partials/delete-user-form.blade.php`
+
+### Files Updated
+- `resources/views/student/phong/danhsach.blade.php`
+
 ## 2026-05-06 - Admin IA: Giảm phân mảnh điều hướng (Dashboard là hub duy nhất)
 
 ### Hoàn thành ✅
@@ -305,6 +359,58 @@
 - `resources/views/auth/forgot-password.blade.php`
 - `resources/views/auth/reset-password.blade.php`
 - `resources/views/emails/payment-request.blade.php`
+
+## 2026-05-06 - Student UI: Hoàn thiện luồng cư trú (không phá backend)
+
+### Hoàn thành ✅
+- Trả phòng: form yêu cầu trả phòng bắt buộc nhập lý do; `dangky.ghi_chu` lưu dạng `TRA_PHONG|<ly_do>` để Admin dễ xét duyệt.
+- Gia hạn: UI chuyển sang chọn gói số tháng (3/5/6/12), vẫn gửi `ngay_ket_thuc_moi` đúng contract backend.
+- Báo hỏng: cho phép sinh viên chỉnh sửa báo hỏng của mình khi trạng thái còn `pending/processing` (không sửa khi đã hoàn thành).
+- Thông báo: hỗ trợ phân loại theo `loai_thong_bao` và lọc theo loại ở UI Student; Admin có thể chọn phân loại khi phát hành thông báo.
+- Dọn accent: loại bỏ toàn bộ `blue-*` trong Student UI, đồng bộ về emerald/slate/rose theo token.
+
+### Files Updated
+- `routes/web.php`
+- `app/Contracts/Admin/DangkyServiceInterface.php`
+- `app/Services/Admin/DangkyService.php`
+- `app/Http/Controllers/Student/DangkyController.php`
+- `resources/views/student/hopdong/index.blade.php`
+- `app/Contracts/Student/BaohongServiceInterface.php`
+- `app/Services/Student/BaohongService.php`
+- `app/Http/Controllers/Student/BaohongController.php`
+- `resources/views/student/baohong/danhsach.blade.php`
+- `app/Services/Shared/ThongbaoService.php`
+- `resources/views/student/thongbao/danhsach.blade.php`
+- `resources/views/student/thongbao/chitiet.blade.php`
+- `resources/views/admin/thongbao/danhsach.blade.php`
+- `resources/views/student/trangchu.blade.php`
+- `resources/views/student/hoadon/danhsach.blade.php`
+
+## 2026-05-06 - Student UI: Căn chỉnh form gia hạn
+
+### Hoàn thành ✅
+- Căn lại 2 cột “Gói gia hạn” và “Ngày kết thúc mới”: label đồng nhất trên từng field để không bị lệch hàng.
+
+### Files Updated
+- `resources/views/student/hopdong/index.blade.php`
+
+## 2026-05-06 - Admin UI: Gia hạn & Xuất dữ liệu (Báo cáo/Bảo trì)
+
+### Hoàn thành ✅
+- Trang “Yêu cầu gia hạn”: nút hành động (duyệt/từ chối) tăng tương phản, dễ nhận biết hơn.
+- Báo cáo tài chính: xuất dữ liệu bền vững hơn, tự fallback sang CSV khi môi trường không hỗ trợ tạo Excel.
+- Lịch bảo trì: bổ sung “Xuất dữ liệu” và đồng bộ field names theo schema (`ngay_bao_tri/noi_dung/nguoi_thuc_hien/trang_thai`) để form + hiển thị đúng.
+- Tối ưu responsive header actions (mobile): nút “Xuất dữ liệu/Lập lịch” không còn bị xuống dòng khó đọc.
+- Tối ưu UI lịch bảo trì: thêm ô tìm nhanh, chuẩn hóa modal (nhãn/spacing), tăng rõ ràng cụm thao tác trong bảng.
+- Tối ưu bảng lịch bảo trì: giảm chiều cao hàng, khóa độ rộng cột (colgroup), giảm “trống” ở cột thao tác và tăng khả năng quét.
+
+### Files Updated
+- `resources/views/admin/giahan/danhsach.blade.php`
+- `resources/views/admin/baocao/taichinh.blade.php`
+- `app/Http/Controllers/Admin/BaoCaoController.php`
+- `resources/views/admin/baotri/danhsach.blade.php`
+- `app/Http/Controllers/Admin/LichsubaotriController.php`
+- `routes/web.php`
 
 ## 2026-05-05 - Chuẩn hóa canonical URL Sinh viên (Gia hạn)
 

@@ -188,8 +188,8 @@
                 </div>
 
                 <div class="flex gap-4 pt-2">
-                    <button type="button" data-modal-hide="modal-themkyluat" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                     <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Lưu vi phạm</button>
+                    <button type="button" data-modal-hide="modal-themkyluat" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                 </div>
             </form>
         </x-modal>
@@ -238,8 +238,8 @@
                     </div>
 
                     <div class="flex gap-4 pt-2">
-                        <button type="button" data-modal-hide="modal-suakyluat-{{ $item->id }}" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                         <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Lưu thay đổi</button>
+                        <button type="button" data-modal-hide="modal-suakyluat-{{ $item->id }}" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                     </div>
                 </form>
             </x-modal>

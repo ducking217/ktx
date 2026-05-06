@@ -25,7 +25,7 @@
                 <div class="relative group">
                     <select name="nam" class="saas-input h-11 px-5 pr-10 text-[11px] font-black uppercase tracking-[0.2em] bg-white border-slate-200 focus:ring-slate-900/5 appearance-none cursor-pointer">
                         <?php for($i = date('Y'); $i >= date('Y') - 2; $i--): ?>
-                            <option value="<?php echo e($i); ?>">Năm <?php echo e($i); ?></option>
+                            <option value="<?php echo e($i); ?>" <?php if((int) request()->query('nam', date('Y')) === (int) $i): echo 'selected'; endif; ?>>Năm <?php echo e($i); ?></option>
                         <?php endfor; ?>
                     </select>
                     <div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-slate-400">

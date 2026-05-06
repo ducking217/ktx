@@ -47,7 +47,7 @@ $style = $typeStyles[$type] ?? $typeStyles['warning'];
     x-transition:leave="transition ease-in duration-150"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm text-left"
     @click.self="showConfirm = false"
     style="display: none;"
 >
@@ -59,7 +59,7 @@ $style = $typeStyles[$type] ?? $typeStyles['warning'];
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-        class="linear-modal-card max-w-md w-full bg-ui-card rounded-2xl shadow-2xl overflow-hidden ring-1 ring-ui-border"
+        class="linear-modal-card max-w-md w-full bg-ui-card rounded-2xl shadow-2xl overflow-hidden ring-1 ring-ui-border text-left"
     >
         <div class="p-6">
             <div class="flex items-start gap-4">
@@ -85,18 +85,18 @@ $style = $typeStyles[$type] ?? $typeStyles['warning'];
             <div class="mt-6 flex justify-end gap-3">
                 <button
                     type="button"
-                    @click="showConfirm = false"
-                    class="linear-btn-secondary"
-                >
-                    <?php echo e($cancelText); ?>
-
-                </button>
-                <button
-                    type="button"
                     @click="$dispatch('confirmed'); showConfirm = false"
                     class="<?php echo e($style['button']); ?>"
                 >
                     <?php echo e($confirmText); ?>
+
+                </button>
+                <button
+                    type="button"
+                    @click="showConfirm = false"
+                    class="linear-btn-secondary"
+                >
+                    <?php echo e($cancelText); ?>
 
                 </button>
             </div>

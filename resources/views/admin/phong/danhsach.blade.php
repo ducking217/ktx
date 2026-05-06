@@ -288,8 +288,8 @@
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <button type="button" data-modal-hide="modal-themphong" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                     <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-emerald-500/20">Khởi tạo phòng ngay</button>
+                    <button type="button" data-modal-hide="modal-themphong" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                 </div>
             </form>
         </x-modal>
@@ -370,8 +370,8 @@
                 </label>
 
                 <div class="flex gap-4 pt-2">
-                    <button type="button" data-modal-hide="modal-gan-taisan" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                     <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-emerald-500/20">Gán tài sản</button>
+                    <button type="button" data-modal-hide="modal-gan-taisan" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                 </div>
             </form>
         </x-modal>
@@ -419,8 +419,8 @@
                     </div>
 
                     <div class="flex gap-4 pt-4">
-                        <button type="button" data-modal-hide="modal-capnhatphong-{{ $phong->id }}" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                         <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-emerald-500/20">Lưu thay đổi</button>
+                        <button type="button" data-modal-hide="modal-capnhatphong-{{ $phong->id }}" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                     </div>
                 </form>
             </x-modal>

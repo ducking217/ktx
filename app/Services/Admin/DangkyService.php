@@ -179,7 +179,7 @@ class DangkyService implements DangkyServiceInterface
     /**
      * Sinh viên yêu cầu trả phòng.
      */
-    public function yeuCauTraPhong(): array
+    public function yeuCauTraPhong(?string $reason = null): array
     {
         try {
             $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
@@ -203,17 +203,19 @@ class DangkyService implements DangkyServiceInterface
             if (Dangky::where('user_id', $sinhvien->user_id)
                 ->where('trang_thai', RegistrationStatus::Pending)
                 ->whereNotNull('user_id') // phân biệt đơn trả phòng
-                ->where('ghi_chu', 'TRA_PHONG')
+                ->where('ghi_chu', 'like', 'TRA_PHONG%')
                 ->exists()) {
                 return $this->traVeLoi('Bạn đã gửi yêu cầu trả phòng, đang chờ xử lý.');
             }
+
+            $note = trim((string) $reason);
 
             Dangky::create([
                 'user_id'      => $sinhvien->user_id,
                 'toa_nha_id'   => $hopdongHienTai->giuong->phong->toa_nha_id,
                 'loai_phong_id' => $hopdongHienTai->giuong->phong->loai_phong_id,
                 'trang_thai'   => RegistrationStatus::Pending,
-                'ghi_chu'      => 'TRA_PHONG',
+                'ghi_chu'      => $note !== '' ? "TRA_PHONG|{$note}" : 'TRA_PHONG|',
                 'lookup_token' => Str::random(32),
             ]);
 

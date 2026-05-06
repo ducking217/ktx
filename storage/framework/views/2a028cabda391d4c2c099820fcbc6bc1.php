@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Hợp đồng <?php echo e($hopdong->ma_hd); ?></title>
+    <title>Hợp đồng <?php echo e($hopdong->ma_hd ?? ('HD-' . str_pad((string) ($hopdong->id ?? 0), 6, '0', STR_PAD_LEFT))); ?></title>
     <style>
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -67,12 +67,25 @@
     </style>
 </head>
 <body>
+    <?php
+        $maHopDong = $hopdong->ma_hd ?? ('HD-' . str_pad((string) ($hopdong->id ?? 0), 6, '0', STR_PAD_LEFT));
+        $sinhvien = $hopdong->sinhvien;
+        $user = $sinhvien?->user;
+
+        $ngaySinh = $user?->dob;
+        $ngaySinhHienThi = $ngaySinh?->format('d/m/Y') ?? '........';
+
+        $soGiayTo = $user?->id_card ?? '................';
+        $soDienThoai = $user?->phone ?? '................';
+        $diaChi = $user?->address ?? null;
+    ?>
+
     <div class="header">
         <h2>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h2>
         <h3>Độc lập - Tự do - Hạnh phúc</h3>
         <hr style="width: 30%; margin: 10px auto;">
         <h1>HỢP ĐỒNG THUÊ CHỖ Ở NỘI TRÚ</h1>
-        <p>Số: <?php echo e($hopdong->ma_hd); ?></p>
+        <p>Số: <?php echo e($maHopDong); ?></p>
     </div>
 
     <div class="terms">
@@ -86,51 +99,35 @@
             <tr>
                 <td class="label">Họ và tên:</td>
                 <td>
-                    <?php if(isset($hopdong->sinhvien->taikhoan)): ?>
-                        <?php echo e($hopdong->sinhvien->taikhoan->name); ?>
+                    <?php echo e($user?->name ?? '........'); ?>
 
-                    <?php else: ?>
-                        ........
-                    <?php endif; ?>
                 </td>
             </tr>
             <tr>
                 <td class="label">Mã sinh viên:</td>
                 <td>
-                    <?php if(isset($hopdong->sinhvien)): ?>
-                        <?php echo e($hopdong->sinhvien->masinhvien ?? '........'); ?>
+                    <?php echo e($sinhvien?->ma_sinh_vien ?? '........'); ?>
 
-                    <?php else: ?>
-                        ........
-                    <?php endif; ?>
                 </td>
             </tr>
             <tr>
                 <td class="label">Ngày sinh:</td>
-                <td><?php echo e($hopdong->sinhvien->ngaysinh ? date('d/m/Y', strtotime($hopdong->sinhvien->ngaysinh)) : '........'); ?></td>
+                <td><?php echo e($ngaySinhHienThi); ?></td>
             </tr>
             <tr>
                 <td class="label">Số CMND/CCCD:</td>
-                <td>
-                    <?php if(isset($hopdong->sinhvien)): ?>
-                        <?php echo e($hopdong->sinhvien->so_cccd ?? '................'); ?>
-
-                    <?php else: ?>
-                        ................
-                    <?php endif; ?>
-                </td>
+                <td><?php echo e($soGiayTo); ?></td>
             </tr>
             <tr>
                 <td class="label">Số điện thoại:</td>
-                <td>
-                    <?php if(isset($hopdong->sinhvien)): ?>
-                        <?php echo e($hopdong->sinhvien->sodienthoai ?? '................'); ?>
-
-                    <?php else: ?>
-                        ................
-                    <?php endif; ?>
-                </td>
+                <td><?php echo e($soDienThoai); ?></td>
             </tr>
+            <?php if(is_string($diaChi) && trim($diaChi) !== ''): ?>
+                <tr>
+                    <td class="label">Địa chỉ:</td>
+                    <td><?php echo e($diaChi); ?></td>
+                </tr>
+            <?php endif; ?>
         </table>
 
         <div class="section-title">ĐIỀU 1: NỘI DUNG HỢP ĐỒNG</div>
@@ -139,12 +136,8 @@
             <tr>
                 <td class="label">Phòng:</td>
                 <td>
-                    <?php if(isset($hopdong->phong)): ?>
-                        <?php echo e($hopdong->phong->tenphong); ?>
+                    <?php echo e($hopdong->phong?->ten_phong ?? $hopdong->phong?->tenphong ?? '........'); ?>
 
-                    <?php else: ?>
-                        ........
-                    <?php endif; ?>
                 </td>
             </tr>
             <tr>
@@ -169,10 +162,10 @@
             <tr>
                 <td class="label">Giá thuê:</td>
                 <td>
-                    <?php if(!is_null($hopdong->giaphong_luc_ky)): ?>
-                        <?php echo e(number_format($hopdong->giaphong_luc_ky)); ?> VNĐ/tháng
-                    <?php elseif(isset($hopdong->phong)): ?>
-                        <?php echo e(number_format($hopdong->phong->giaphong)); ?> VNĐ/tháng
+                    <?php if(!is_null($hopdong->gia_thuc_te)): ?>
+                        <?php echo e(number_format((int) $hopdong->gia_thuc_te)); ?> VNĐ/tháng
+                    <?php elseif($hopdong->phong): ?>
+                        <?php echo e(number_format((int) $hopdong->phong->giaphong)); ?> VNĐ/tháng
                     <?php else: ?>
                         ........
                     <?php endif; ?>
@@ -198,14 +191,7 @@
         <div class="signature-box right">
             <p style="font-weight: bold;">ĐẠI DIỆN BÊN B</p>
             <br><br><br><br>
-            <p>
-                <?php if(isset($hopdong->sinhvien->taikhoan)): ?>
-                    <?php echo e($hopdong->sinhvien->taikhoan->name); ?>
-
-                <?php else: ?>
-                    ........
-                <?php endif; ?>
-            </p>
+            <p><?php echo e($user?->name ?? '........'); ?></p>
         </div>
         <div class="clear"></div>
     </div>

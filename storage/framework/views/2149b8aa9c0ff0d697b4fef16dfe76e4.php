@@ -226,15 +226,11 @@
                                                     <td class="px-6 py-4 text-xs font-bold text-slate-900 tabular-nums tracking-tight"><?php echo e(number_format((int) $hoadon->tong_tien)); ?>đ</td>
                                                     <td class="px-6 py-4">
                                                         <?php
-                                                            $billBadgeClass = match($hoadon->trang_thai) {
-                                                                \App\Enums\InvoiceStatus::Paid => 'saas-badge-success',
-                                                                \App\Enums\InvoiceStatus::Unpaid => 'saas-badge-warning',
-                                                                \App\Enums\InvoiceStatus::Overdue => 'saas-badge-error',
-                                                                default => 'saas-badge-info',
-                                                            };
+                                                            $invoiceType = (string) ($hoadon->loai_hoadon ?? '');
+                                                            $billBadgeClass = $hoadon->trang_thai->badgeClass($invoiceType);
                                                         ?>
                                                         <span class="saas-badge <?php echo e($billBadgeClass); ?>">
-                                                            <?php echo e($hoadon->trang_thai->label()); ?>
+                                                            <?php echo e($hoadon->trang_thai->displayLabel($invoiceType)); ?>
 
                                                         </span>
                                                     </td>

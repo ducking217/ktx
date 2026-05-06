@@ -93,16 +93,15 @@
                             <div class="text-sm font-semibold text-slate-900">Kết thúc hợp đồng</div>
                             <div class="text-xs text-slate-600">Gửi yêu cầu trả phòng, Ban quản lý sẽ xem xét trước khi thanh lý.</div>
                         </div>
-                        <form action="<?php echo e(route('student.yeucautraphong')); ?>" method="POST" onsubmit="return confirm('Gửi yêu cầu trả phòng và thanh lý hợp đồng? Ban quản lý sẽ xem xét trước khi thực hiện.')">
-                            <?php echo csrf_field(); ?>
-                            <button
-                                type="submit"
-                                class="saas-btn-danger h-10 px-4 text-xs font-semibold"
-                                <?php if($trangThaiTraPhong === \App\Enums\RegistrationStatus::Pending->value): ?> disabled <?php endif; ?>
-                            >
-                                Yêu cầu trả phòng
-                            </button>
-                        </form>
+                        <button
+                            type="button"
+                            data-modal-target="modal-traphong"
+                            data-modal-toggle="modal-traphong"
+                            class="saas-btn-danger h-10 px-4 text-xs font-semibold"
+                            <?php if($trangThaiTraPhong === \App\Enums\RegistrationStatus::Pending->value): ?> disabled <?php endif; ?>
+                        >
+                            Yêu cầu trả phòng
+                        </button>
                     </div>
 
                     <?php if($trangThaiTraPhong === \App\Enums\RegistrationStatus::Pending->value): ?>
@@ -145,9 +144,9 @@
                         <?php endif; ?>
                     </div>
 
-                    <div class="saas-card p-6 bg-blue-50 border-blue-100 flex gap-3">
-                        <svg class="h-5 w-5 shrink-0 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <p class="text-sm text-blue-700">
+                    <div class="saas-card p-6 bg-brand-emerald/5 border-brand-emerald/15 flex gap-3">
+                        <svg class="h-5 w-5 shrink-0 text-brand-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-sm text-slate-700">
                             Yêu cầu gia hạn sẽ được Ban quản lý xét duyệt. Kết quả sẽ được thông báo khi xử lý xong.
                         </p>
                     </div>
@@ -163,7 +162,11 @@
                             if (is_string($ngayKetThuc)) {
                                 $ngayKetThuc = \Illuminate\Support\Carbon::parse($ngayKetThuc);
                             }
-                            $ngayMacDinh = $ngayKetThuc?->copy()->addMonths(5) ?? now()->addMonths(5);
+                            $goiMacDinh = (int) (old('goi_thang') ?: 5);
+                            if (!in_array($goiMacDinh, [3, 5, 6, 12], true)) {
+                                $goiMacDinh = 5;
+                            }
+                            $ngayMacDinh = $ngayKetThuc?->copy()->addMonths($goiMacDinh) ?? now()->addMonths($goiMacDinh);
                         ?>
 
                         <form action="<?php echo e(route('student.giahan.store')); ?>" method="POST" class="mt-6 space-y-6" <?php if(!$hasActiveContract): ?> data-no-loading="true" <?php endif; ?>>
@@ -171,16 +174,40 @@
                             <input type="hidden" name="hopdong_id" value="<?php echo e($hopdongHieuLuc?->id); ?>">
 
                             <div class="space-y-2">
-                                <label for="ngay_ket_thuc_moi" class="saas-label">Ngày kết thúc mới</label>
+                                <div class="grid gap-4 sm:grid-cols-2">
+                                    <div class="space-y-1">
+                                        <label for="goi_thang" class="saas-label">Gói gia hạn</label>
+                                        <select
+                                            id="goi_thang"
+                                            name="goi_thang"
+                                            class="saas-input h-11 font-semibold"
+                                            <?php if(!$hasActiveContract): ?> disabled <?php else: ?> required <?php endif; ?>
+                                        >
+                                            <option value="3" <?php if($goiMacDinh === 3): echo 'selected'; endif; ?>>3 tháng</option>
+                                            <option value="5" <?php if($goiMacDinh === 5): echo 'selected'; endif; ?>>5 tháng (01 học kỳ)</option>
+                                            <option value="6" <?php if($goiMacDinh === 6): echo 'selected'; endif; ?>>6 tháng</option>
+                                            <option value="12" <?php if($goiMacDinh === 12): echo 'selected'; endif; ?>>12 tháng</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label for="ngay_ket_thuc_moi_preview" class="saas-label">Ngày kết thúc mới</label>
+                                        <input
+                                            type="date"
+                                            id="ngay_ket_thuc_moi_preview"
+                                            value="<?php echo e(old('ngay_ket_thuc_moi', $ngayMacDinh->format('Y-m-d'))); ?>"
+                                            class="saas-input h-11 font-semibold tabular-nums"
+                                            disabled
+                                        >
+                                    </div>
+                                </div>
                                 <input
-                                    type="date"
+                                    type="hidden"
                                     name="ngay_ket_thuc_moi"
                                     id="ngay_ket_thuc_moi"
                                     value="<?php echo e(old('ngay_ket_thuc_moi', $ngayMacDinh->format('Y-m-d'))); ?>"
-                                    class="saas-input h-11 font-semibold tabular-nums"
-                                    <?php if(!$hasActiveContract): ?> disabled <?php else: ?> required <?php endif; ?>
                                 >
-                                <div class="text-xs text-slate-500">Gợi ý: mặc định gia hạn thêm 01 học kỳ (5 tháng).</div>
+                                <div class="text-xs text-slate-500">Hệ thống sẽ tự tính ngày kết thúc theo gói bạn chọn.</div>
                             </div>
 
                             <div class="space-y-2">
@@ -202,6 +229,42 @@
                                 </button>
                             </div>
                         </form>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const select = document.getElementById('goi_thang');
+                                const hidden = document.getElementById('ngay_ket_thuc_moi');
+                                const preview = document.getElementById('ngay_ket_thuc_moi_preview');
+                                if (!select || !hidden || !preview) return;
+
+                                const base = <?php echo \Illuminate\Support\Js::from(($ngayKetThuc?->format('Y-m-d')) ?: now()->format('Y-m-d'))->toHtml() ?>;
+
+                                function addMonths(baseDate, months) {
+                                    const parts = baseDate.split('-').map(Number);
+                                    const year = parts[0], month = parts[1] - 1, day = parts[2];
+                                    const d = new Date(Date.UTC(year, month, day));
+                                    const targetMonth = d.getUTCMonth() + months;
+                                    d.setUTCMonth(targetMonth);
+                                    if (d.getUTCMonth() !== ((targetMonth % 12) + 12) % 12) {
+                                        d.setUTCDate(0);
+                                    }
+                                    const yyyy = d.getUTCFullYear();
+                                    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+                                    const dd = String(d.getUTCDate()).padStart(2, '0');
+                                    return `${yyyy}-${mm}-${dd}`;
+                                }
+
+                                function sync() {
+                                    const months = parseInt(select.value || '5', 10);
+                                    const next = addMonths(base, months);
+                                    hidden.value = next;
+                                    preview.value = next;
+                                }
+
+                                select.addEventListener('change', sync);
+                                sync();
+                            });
+                        </script>
                     </article>
 
                     <article class="saas-card overflow-hidden">
@@ -270,6 +333,49 @@
                     </article>
                 </main>
             </div>
+            
+            <?php $__env->startPush('modals'); ?>
+                <?php if (isset($component)) { $__componentOriginal9f64f32e90b9102968f2bc548315018c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9f64f32e90b9102968f2bc548315018c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modal','data' => ['id' => 'modal-traphong','title' => 'Yêu cầu trả phòng','subtitle' => 'Nhập lý do trả phòng để Ban quản lý xem xét trước khi thanh lý hợp đồng.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'modal-traphong','title' => 'Yêu cầu trả phòng','subtitle' => 'Nhập lý do trả phòng để Ban quản lý xem xét trước khi thanh lý hợp đồng.']); ?>
+                    <form action="<?php echo e(route('student.yeucautraphong')); ?>" method="POST" class="space-y-6" onsubmit="return confirm('Gửi yêu cầu trả phòng? Ban quản lý sẽ xem xét trước khi thực hiện thanh lý.')">
+                        <?php echo csrf_field(); ?>
+                        <div class="space-y-2">
+                            <label for="ly_do_traphong" class="saas-label">Lý do trả phòng</label>
+                            <textarea
+                                name="ly_do"
+                                id="ly_do_traphong"
+                                rows="4"
+                                class="saas-input p-3 text-sm"
+                                placeholder="Ví dụ: đã hoàn tất học kỳ, chuyển nơi ở..."
+                                required
+                            ><?php echo e(old('ly_do')); ?></textarea>
+                            <div class="text-xs text-slate-500">Vui lòng mô tả ngắn gọn để hỗ trợ xét duyệt.</div>
+                        </div>
+
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" data-modal-hide="modal-traphong" class="saas-btn-secondary flex-1 h-11">Hủy</button>
+                            <button type="submit" class="saas-btn-danger flex-[2] h-11">Gửi yêu cầu</button>
+                        </div>
+                    </form>
+                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9f64f32e90b9102968f2bc548315018c)): ?>
+<?php $attributes = $__attributesOriginal9f64f32e90b9102968f2bc548315018c; ?>
+<?php unset($__attributesOriginal9f64f32e90b9102968f2bc548315018c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9f64f32e90b9102968f2bc548315018c)): ?>
+<?php $component = $__componentOriginal9f64f32e90b9102968f2bc548315018c; ?>
+<?php unset($__componentOriginal9f64f32e90b9102968f2bc548315018c); ?>
+<?php endif; ?>
+            <?php $__env->stopPush(); ?>
         </div>
     <?php else: ?>
         <div class="saas-card overflow-hidden">
@@ -293,7 +399,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-emerald/10 text-brand-emerald ring-1 ring-brand-emerald/20">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                                         </div>
                                         <div>

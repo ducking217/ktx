@@ -17,7 +17,7 @@
             <?php
                 $back = request()->query('back', 'public');
                 $backUrl = $back === 'student'
-                    ? route('student.danhsachphong')
+                    ? route('student.phong.index')
                     : route('public.danhsachphong');
 
                 $gioiTinhLabel = $phong->gioitinh === 'Nu' ? 'Nữ' : ($phong->gioitinh === 'Nam' ? 'Nam' : $phong->gioitinh);

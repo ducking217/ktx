@@ -129,6 +129,7 @@ Route::prefix('admin')
         });
         Route::prefix('bao-tri')->name('baotri.')->controller('LichsubaotriController')->group(function () {
             Route::get('/', 'index')->name('index');
+            Route::get('/xuat-excel', 'xuatExcel')->name('xuat_excel');
             Route::post('/', 'store')->name('store');
             Route::post('/{id}', 'update')->name('capnhat');
             Route::post('/{id}/xoa', 'destroy')->name('xoa');
@@ -237,6 +238,7 @@ Route::prefix('student')
         // Bảo hỏng & Tài sản
         Route::get('/baohong', 'BaohongController@lietKeBaoHongSinhVien')->name('danhsachbaohong');
         Route::post('/baohong', 'BaohongController@luuBaoHong')->name('thembaohong');
+        Route::patch('/baohong/{id}', 'BaohongController@capNhatBaoHong')->whereNumber('id')->name('baohong.update');
         Route::redirect('/taisanphong', '/student/phongcuatoi')->name('taisanphong');
 
         // Kỷ luật & Đánh giá

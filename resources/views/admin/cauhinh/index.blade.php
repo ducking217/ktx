@@ -66,9 +66,9 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end pt-10 border-t border-slate-100">
-                        <button type="submit" class="saas-btn-primary h-12 px-10 shadow-xl shadow-emerald-500/20 group">
-                            <svg class="h-4.5 w-4.5 mr-2.5 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    <div class="flex flex-col gap-3 pt-10 border-t border-slate-100 sm:flex-row sm:justify-end">
+                        <button type="submit" class="saas-btn-primary h-11 px-6 text-xs font-semibold shadow-lg shadow-emerald-500/20 group whitespace-nowrap w-full sm:w-auto justify-center">
+                            <svg class="h-4 w-4 mr-2.5 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             Lưu cấu hình
                         </button>
                     </div>

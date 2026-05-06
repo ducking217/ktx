@@ -72,16 +72,30 @@
                             </span>
                         </td>
                         <td class="py-5 text-right">
-                            <div class="flex items-center justify-end gap-1">
+                            <div class="inline-flex items-center gap-1 rounded-2xl bg-slate-50 ring-1 ring-inset ring-slate-200/70 p-1">
                                 @if($item->trang_thai->value === 'pending')
-                                    <button type="button" data-modal-target="modal-approve-{{ $item->id }}" data-modal-toggle="modal-approve-{{ $item->id }}" class="p-2 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors" title="Chấp thuận gia hạn">
-                                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <button
+                                        type="button"
+                                        data-modal-target="modal-approve-{{ $item->id }}"
+                                        data-modal-toggle="modal-approve-{{ $item->id }}"
+                                        class="h-11 w-11 inline-flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200/70 shadow-sm hover:bg-emerald-100 hover:ring-emerald-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+                                        title="Chấp thuận gia hạn"
+                                        aria-label="Chấp thuận gia hạn"
+                                    >
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                     </button>
-                                    <button type="button" data-modal-target="modal-reject-{{ $item->id }}" data-modal-toggle="modal-reject-{{ $item->id }}" class="p-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors" title="Từ chối yêu cầu">
-                                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <button
+                                        type="button"
+                                        data-modal-target="modal-reject-{{ $item->id }}"
+                                        data-modal-toggle="modal-reject-{{ $item->id }}"
+                                        class="h-11 w-11 inline-flex items-center justify-center rounded-xl bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-200/70 shadow-sm hover:bg-rose-100 hover:ring-rose-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40"
+                                        title="Từ chối yêu cầu"
+                                        aria-label="Từ chối yêu cầu"
+                                    >
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </button>
                                 @else
-                                    <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-2">Xử lý xong</span>
+                                    <span class="inline-flex items-center h-11 px-4 rounded-xl bg-white text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200/70 whitespace-nowrap">Xử lý xong</span>
                                 @endif
                             </div>
                         </td>
@@ -129,8 +143,8 @@
                         <textarea id="ghi_chu_admin_approve_{{ $item->id }}" name="ghi_chu_admin" rows="4" class="saas-input !h-auto !py-4 resize-none" placeholder="Ví dụ: Đã phê duyệt gia hạn. Vui lòng hoàn tất nghĩa vụ tài chính trước ngày ghi nhận..."></textarea>
                     </div>
                     <div class="flex gap-3 pt-2">
-                        <button type="button" data-modal-hide="modal-approve-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                         <button type="submit" class="saas-btn-primary flex-1 h-12 shadow-lg shadow-emerald-500/20 !bg-emerald-600 hover:!bg-emerald-700">Xác nhận phê duyệt</button>
+                        <button type="button" data-modal-hide="modal-approve-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                     </div>
                 </form>
             </x-modal>
@@ -144,8 +158,8 @@
                         <textarea id="ghi_chu_admin_reject_{{ $item->id }}" name="ghi_chu_admin" rows="4" required class="saas-input !h-auto !py-4 border-rose-100 focus:border-rose-500 resize-none" placeholder="Vui lòng nêu rõ lý do không gia hạn (Vi phạm kỷ luật, không thuộc đối tượng ưu tiên...)"></textarea>
                     </div>
                     <div class="flex gap-3 pt-2">
-                        <button type="button" data-modal-hide="modal-reject-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Quay lại</button>
                         <button type="submit" class="saas-btn-primary flex-1 h-12 shadow-lg shadow-rose-500/20 !bg-rose-600 hover:!bg-rose-700">Xác nhận từ chối</button>
+                        <button type="button" data-modal-hide="modal-reject-{{ $item->id }}" class="saas-btn-secondary flex-1 h-12">Quay lại</button>
                     </div>
                 </form>
             </x-modal>

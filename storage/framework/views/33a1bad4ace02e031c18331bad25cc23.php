@@ -803,11 +803,11 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
-                    <button type="button" data-modal-hide="modal-edit-<?php echo e($sinhvien->id); ?>" class="saas-btn-secondary h-11 px-6">
-                        Hủy bỏ
-                    </button>
                     <button type="submit" class="saas-btn-primary h-11 px-6 shadow-lg shadow-emerald-500/20">
                         Lưu thay đổi
+                    </button>
+                    <button type="button" data-modal-hide="modal-edit-<?php echo e($sinhvien->id); ?>" class="saas-btn-secondary h-11 px-6">
+                        Hủy bỏ
                     </button>
                 </div>
             </form>

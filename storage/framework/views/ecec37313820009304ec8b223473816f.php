@@ -183,7 +183,7 @@
                 </article>
 
                 <article class="saas-card bg-slate-900 border-slate-800 p-6 text-white relative overflow-hidden group">
-                    <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-slate-800/30 blur-3xl group-hover:bg-blue-500/10 transition-colors duration-700"></div>
+                    <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-slate-800/30 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
                     <div class="relative z-10">
                         <div class="flex items-center gap-3 mb-6 border-b border-slate-800 pb-5">
                             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-slate-400 ring-1 ring-slate-700">

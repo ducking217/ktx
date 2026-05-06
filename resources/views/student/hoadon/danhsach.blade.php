@@ -36,7 +36,7 @@
         </article>
         <article class="saas-card p-6 border-slate-200 md:col-span-2">
             <div class="flex items-center gap-4">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08-.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div>
@@ -67,7 +67,7 @@
                     </td>
                     <td class="py-4">
                         <div class="flex items-center gap-3">
-                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-500/20">
+                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-emerald/10 text-brand-emerald ring-1 ring-inset ring-brand-emerald/20">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             </div>
                             <span class="text-sm font-bold text-slate-900">Hóa đơn điện nước</span>
@@ -96,7 +96,7 @@
                         </span>
                     </td>
                     <td class="py-4 text-right">
-                        <button type="button" data-modal-target="modal-bienlai-{{ $item->id }}" data-modal-toggle="modal-bienlai-{{ $item->id }}" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Chi tiết">
+                        <button type="button" data-modal-target="modal-bienlai-{{ $item->id }}" data-modal-toggle="modal-bienlai-{{ $item->id }}" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Chi tiết">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </button>
                     </td>
@@ -127,7 +127,7 @@
             $phong = $item->hopdong?->giuong?->phong;
         @endphp
         <div id="modal-bienlai-{{ $item->id }}" tabindex="-1" aria-hidden="true" 
-             class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+             class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm text-left">
             <div class="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-xl border border-slate-200">
                 <div class="mb-8 flex items-start justify-between">
                     <div>
@@ -171,7 +171,7 @@
                             </div>
                             <div class="pt-4 mt-2 border-t border-slate-200 flex justify-between items-end">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tổng cộng</span>
-                                <span class="text-2xl font-bold text-blue-600 tabular-nums tracking-tight">{{ number_format($item->tong_tien) }}đ</span>
+                                <span class="text-2xl font-bold text-brand-emerald tabular-nums tracking-tight">{{ number_format($item->tong_tien) }}đ</span>
                             </div>
                         </div>
                     </div>
@@ -188,12 +188,12 @@
                 </div>
 
                 <div class="flex gap-4">
+                    <button class="flex-1 saas-btn-primary h-12 shadow-lg shadow-emerald-500/20">
+                        Xác nhận đã chuyển
+                    </button>
                     <button class="flex-1 saas-btn-secondary h-12">
                         <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         Tải hóa đơn (PDF)
-                    </button>
-                    <button class="flex-1 saas-btn-primary h-12 shadow-lg shadow-blue-500/20">
-                        Xác nhận đã chuyển
                     </button>
                 </div>
             </div>

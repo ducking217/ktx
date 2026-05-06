@@ -27,7 +27,7 @@
                     'Tất cả' => 'Tất cả',
                     \App\Models\Lienhe::TRANG_THAI_CHUA_XU_LY => \App\Models\Lienhe::TRANG_THAI_CHUA_XU_LY,
                     \App\Models\Lienhe::TRANG_THAI_DA_XU_LY => \App\Models\Lienhe::TRANG_THAI_DA_XU_LY,
-                ],'active' => $status ?? null,'route' => 'admin.quanlylienhe','param' => 'status','defaultValue' => 'Tất cả']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+                ],'active' => $status ?? null,'route' => 'admin.lienhe.index','param' => 'status','defaultValue' => 'Tất cả']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('admin.status-tabs'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -38,7 +38,7 @@
                     'Tất cả' => 'Tất cả',
                     \App\Models\Lienhe::TRANG_THAI_CHUA_XU_LY => \App\Models\Lienhe::TRANG_THAI_CHUA_XU_LY,
                     \App\Models\Lienhe::TRANG_THAI_DA_XU_LY => \App\Models\Lienhe::TRANG_THAI_DA_XU_LY,
-                ]),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($status ?? null),'route' => 'admin.quanlylienhe','param' => 'status','defaultValue' => 'Tất cả']); ?>
+                ]),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($status ?? null),'route' => 'admin.lienhe.index','param' => 'status','defaultValue' => 'Tất cả']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalca9a59ffed06600c602f2637b0b34f87)): ?>
@@ -84,12 +84,12 @@
                 <?php $__empty_1 = true; $__currentLoopData = $danhsachlienhe; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lienhe): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-6">
-                            <div class="text-[13px] font-black text-slate-900 leading-none group-hover:text-blue-600 transition-colors"><?php echo e($lienhe->ho_ten); ?></div>
+                            <div class="text-[13px] font-black text-slate-900 leading-none group-hover:text-brand-emerald transition-colors"><?php echo e($lienhe->ho_ten); ?></div>
                             <div class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mt-2.5">Người gửi</div>
                         </td>
                         <td class="py-6">
                             <div class="flex items-center gap-3 text-[12px] font-black text-slate-600 tabular-nums">
-                                <div class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-200/60 shadow-sm group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                                <div class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-200/60 shadow-sm group-hover:bg-brand-emerald/10 group-hover:text-brand-emerald transition-all">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                 </div>
                                 <?php echo e($lienhe->email); ?>
@@ -120,13 +120,13 @@
                                 <button
                                     type="button"
                                     @click="openId = openId === <?php echo e((int) $lienhe->id); ?> ? null : <?php echo e((int) $lienhe->id); ?>"
-                                    class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md"
+                                    class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md"
                                     title="Xem và phản hồi"
                                 >
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 8h10M7 12h6m-6 4h8M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 </button>
                                 <?php if(!$isProcessedContact): ?>
-                                    <form method="POST" action="<?php echo e(route('admin.capnhattrangthailienhe', ['id' => $lienhe->id])); ?>" x-data="{ showConfirm: false }" @confirmed="$el.submit()" class="inline">
+                                    <form method="POST" action="<?php echo e(route('admin.lienhe.capnhattrangthai', ['id' => $lienhe->id])); ?>" x-data="{ showConfirm: false }" @confirmed="$el.submit()" class="inline">
                                         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="trang_thai" value="Đã xử lý">
                                         <button type="button" @click="showConfirm = true" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Đánh dấu đã xử lý">
@@ -178,7 +178,7 @@
                                         <div class="w-full lg:w-[420px]">
                                             <form
                                                 method="POST"
-                                                action="<?php echo e(route('admin.capnhattrangthailienhe', ['id' => $lienhe->id])); ?>"
+                                                action="<?php echo e(route('admin.lienhe.capnhattrangthai', ['id' => $lienhe->id])); ?>"
                                                 x-data="{
                                                     showConfirm: false,
                                                     guiEmail: 0,
@@ -195,7 +195,7 @@
 
                                                 <div>
                                                     <label class="block text-xs font-semibold text-slate-600">Phản hồi của Ban quản lý</label>
-                                                    <textarea name="ghi_chu_admin" rows="5" class="mt-2 w-full rounded-xl border border-slate-200/60 bg-ui-bg px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" placeholder="Soạn phản hồi để gửi qua thư điện tử, hoặc ghi chú nội bộ..."><?php echo e(old('ghi_chu_admin', $lienhe->ghi_chu_admin)); ?></textarea>
+                                                    <textarea name="ghi_chu_admin" rows="5" class="mt-2 w-full rounded-xl border border-slate-200/60 bg-ui-bg px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-brand-emerald focus:ring-4 focus:ring-emerald-500/10" placeholder="Soạn phản hồi để gửi qua thư điện tử, hoặc ghi chú nội bộ..."><?php echo e(old('ghi_chu_admin', $lienhe->ghi_chu_admin)); ?></textarea>
                                                     <?php $__errorArgs = ['ghi_chu_admin'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -212,7 +212,7 @@ unset($__errorArgs, $__bag); ?>
                                                     <button type="submit" @click="datGhiChu()" class="h-10 rounded-xl px-4 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
                                                         Lưu ghi chú
                                                     </button>
-                                                    <button type="button" @click="datGuiPhanHoi()" class="h-10 rounded-xl px-4 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                                                    <button type="button" @click="datGuiPhanHoi()" class="h-10 rounded-xl px-4 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors">
                                                         Gửi phản hồi
                                                     </button>
                                                 </div>

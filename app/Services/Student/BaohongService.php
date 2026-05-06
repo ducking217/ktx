@@ -106,6 +106,76 @@ class BaohongService implements BaohongServiceInterface
         }
     }
 
+    public function updateStudentMaintenance(int $id, array $data, ?object $file): array
+    {
+        try {
+            return DB::transaction(function () use ($id, $data, $file) {
+                $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
+                if (!$sinhvien) {
+                    return $this->traVeLoi('Không tìm thấy thông tin sinh viên.');
+                }
+
+                $baohong = Baohong::where('id', $id)->where('sinhvien_id', $sinhvien->id)->first();
+                if (!$baohong) {
+                    return $this->traVeLoi('Không tìm thấy báo hỏng.');
+                }
+
+                $status = $baohong->trang_thai instanceof BaohongStatus ? $baohong->trang_thai->value : (string) $baohong->trang_thai;
+                if (!in_array($status, [BaohongStatus::Pending->value, BaohongStatus::Processing->value], true)) {
+                    return $this->traVeLoi('Không thể chỉnh sửa báo hỏng ở trạng thái hiện tại.');
+                }
+
+                $hopdong = $sinhvien->current_hopdong;
+                if (!$hopdong || !$hopdong->phong_id) {
+                    return $this->traVeLoi('Không xác định được phòng hiện tại.');
+                }
+
+                $phongId = (int) $hopdong->phong_id;
+                $taisanId = isset($data['taisan_id']) ? (int) $data['taisan_id'] : null;
+                if ($taisanId) {
+                    $taisanHopLe = Taisan::where('id', $taisanId)->where('phong_id', $phongId)->exists();
+                    if (!$taisanHopLe) {
+                        return $this->traVeLoi('Tài sản không hợp lệ hoặc không thuộc phòng của bạn.');
+                    }
+                }
+
+                $newImagePath = $file ? $this->handleImageUpload($file) : null;
+                if ($newImagePath) {
+                    $oldPath = (string) ($baohong->hinh_anh_path ?? '');
+                    if ($oldPath !== '') {
+                        $fullOldPath = public_path(ltrim($oldPath, '/'));
+                        if (File::exists($fullOldPath)) {
+                            File::delete($fullOldPath);
+                        }
+                    }
+                }
+
+                $payload = [
+                    'mo_ta' => $data['mota'],
+                ];
+
+                if (Schema::hasColumn('baohong', 'taisan_id')) {
+                    $payload['taisan_id'] = $taisanId ?: null;
+                }
+
+                if ($newImagePath) {
+                    $payload['hinh_anh_path'] = $newImagePath;
+                }
+
+                $baohong->update($payload);
+
+                return $this->traVeThanhCong('Cập nhật báo hỏng thành công.', ['baohong' => $baohong]);
+            });
+        } catch (\Throwable $e) {
+            Log::error('BaohongService::updateStudentMaintenance thất bại', [
+                'user_id' => Auth::id(),
+                'baohong_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->traVeLoi('Đã có lỗi xảy ra khi cập nhật báo hỏng.');
+        }
+    }
+
     public function listMaintenanceRequestsAdmin(Request $request): array
     {
         $status = $request->query('status', '');

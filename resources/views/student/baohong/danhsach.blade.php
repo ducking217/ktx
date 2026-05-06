@@ -21,12 +21,12 @@
             subtitle="Ghi nhận và theo dõi tiến độ khắc phục sự cố tại phòng."
         >
             @if($sinhvien?->current_hopdong)
-                <button type="button" data-modal-target="modal-thembaohong" data-modal-toggle="modal-thembaohong" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+                <button type="button" data-modal-target="modal-thembaohong" data-modal-toggle="modal-thembaohong" class="saas-btn-primary h-11 px-6 shadow-lg shadow-emerald-500/20">
                     <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                     Gửi yêu cầu mới
                 </button>
             @else
-                <button type="button" disabled class="saas-btn-primary opacity-50 cursor-not-allowed h-11 px-6 shadow-lg shadow-blue-500/20">
+                <button type="button" disabled class="saas-btn-primary opacity-50 cursor-not-allowed h-11 px-6 shadow-lg shadow-emerald-500/20">
                     <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                     Chưa có phòng để báo hỏng
                 </button>
@@ -37,7 +37,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <article class="saas-card p-6 relative overflow-hidden group">
                 <div class="relative flex items-center gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-500/10">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 ring-1 ring-slate-500/10">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                     </div>
                     <div>
@@ -111,6 +111,7 @@
                                     \App\Enums\BaohongStatus::Rejected->value => 'saas-badge-error',
                                     default => 'saas-badge-info',
                                 };
+                                $canEdit = in_array($status, [\App\Enums\BaohongStatus::Pending->value, \App\Enums\BaohongStatus::Processing->value], true);
                             @endphp
                             <span class="saas-badge {{ $badgeClass }}">
                                 {{ $baohong->trang_thai?->label() ?? 'Không xác định' }}
@@ -119,6 +120,18 @@
                         <td class="px-8 py-5 text-right">
                             <div class="text-sm font-bold text-slate-900">{{ $baohong->updated_at?->format('d/m/Y') ?? '-' }}</div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ $baohong->updated_at?->format('H:i') ?? '-' }}</div>
+                            @if($canEdit)
+                                <div class="mt-3">
+                                    <button
+                                        type="button"
+                                        data-modal-target="modal-suabaohong-{{ $baohong->id }}"
+                                        data-modal-toggle="modal-suabaohong-{{ $baohong->id }}"
+                                        class="saas-btn-secondary h-9 px-3 text-xs font-semibold"
+                                    >
+                                        Chỉnh sửa
+                                    </button>
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -165,10 +178,51 @@
                 </div>
 
                 <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-emerald-500/20" data-no-loading="true">Gửi yêu cầu ngay</button>
                     <button type="button" data-modal-hide="modal-thembaohong" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
-                    <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-blue-500/20" data-no-loading="true">Gửi yêu cầu ngay</button>
                 </div>
             </form>
         </x-modal>
+
+        @foreach ($danhsachbaohong as $baohong)
+            @php
+                $status = $baohong->trang_thai?->value ?? $baohong->trang_thai;
+                $canEdit = in_array($status, [\App\Enums\BaohongStatus::Pending->value, \App\Enums\BaohongStatus::Processing->value], true);
+            @endphp
+            @if($canEdit)
+                <x-modal id="modal-suabaohong-{{ $baohong->id }}" title="Chỉnh sửa báo hỏng" subtitle="Cập nhật mô tả và hình ảnh minh họa cho yêu cầu #REP-{{ str_pad((string)$baohong->id, 5, '0', STR_PAD_LEFT) }}.">
+                    <form action="{{ route('student.baohong.update', ['id' => $baohong->id]) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
+                        @csrf
+                        @method('PATCH')
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Tài sản trong phòng</label>
+                            <select name="taisan_id" class="saas-input font-bold h-12">
+                                <option value="">-- Không chọn tài sản --</option>
+                                @foreach(($taisanTrongPhong ?? collect()) as $ts)
+                                    <option value="{{ $ts->id }}" @selected((string) ($baohong->taisan_id ?? '') === (string) $ts->id)>
+                                        {{ $ts->ten_tai_san }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Mô tả sự cố</label>
+                            <textarea name="mota" rows="4" class="saas-input !h-auto !py-4 resize-none font-medium" required>{{ old('mota', $baohong->mo_ta) }}</textarea>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Cập nhật hình ảnh (Tùy chọn)</label>
+                            <input type="file" name="anhminhhoa" class="saas-input h-auto py-2.5 px-3">
+                        </div>
+
+                        <div class="flex gap-4 pt-4">
+                            <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-emerald-500/20" data-no-loading="true">Lưu thay đổi</button>
+                            <button type="button" data-modal-hide="modal-suabaohong-{{ $baohong->id }}" class="flex-1 saas-btn-secondary h-12">Hủy</button>
+                        </div>
+                    </form>
+                </x-modal>
+            @endif
+        @endforeach
     @endpush
 @endsection

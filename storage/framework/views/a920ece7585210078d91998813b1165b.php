@@ -21,7 +21,7 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['title' => 'Bảng tin KTX','subtitle' => 'Phát hành, quản lý và lưu trữ các thông báo quan trọng tới toàn thể cộng đồng cư dân.']); ?>
-            <button type="button" data-modal-target="modal-themthongbao" data-modal-toggle="modal-themthongbao" class="saas-btn-primary h-11 px-6 shadow-lg shadow-blue-500/20">
+            <button type="button" data-modal-target="modal-themthongbao" data-modal-toggle="modal-themthongbao" class="saas-btn-primary h-11 px-6 shadow-lg shadow-emerald-500/20">
                 <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                 Tạo thông báo mới
             </button>
@@ -57,21 +57,21 @@
                 <?php $__empty_1 = true; $__currentLoopData = $thongbao; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="py-5 max-w-xs">
-                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors"><?php echo e($item->tieu_de); ?></div>
+                            <div class="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-emerald transition-colors"><?php echo e($item->tieu_de); ?></div>
                             <div class="flex items-center gap-1.5 mt-2">
                                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Đã phát hành</span>
                             </div>
                         </td>
                         <td class="py-5 max-w-md">
-                            <div class="text-xs font-medium leading-relaxed text-slate-600 line-clamp-2 border-l-2 border-slate-100 pl-3">
+                            <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs font-medium leading-relaxed text-slate-600 line-clamp-2 ring-1 ring-inset ring-slate-200/60">
                                 <?php echo e(Str::limit($item->noi_dung, 120)); ?>
 
                             </div>
                         </td>
                         <td class="py-5 text-right">
                             <div class="flex items-center justify-end gap-1">
-                                <button type="button" data-modal-target="modal-suathongbao-<?php echo e($item->id); ?>" data-modal-toggle="modal-suathongbao-<?php echo e($item->id); ?>" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Chỉnh sửa nội dung">
+                                <button type="button" data-modal-target="modal-suathongbao-<?php echo e($item->id); ?>" data-modal-toggle="modal-suathongbao-<?php echo e($item->id); ?>" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Chỉnh sửa nội dung">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 </button>
 
@@ -152,13 +152,23 @@
                     <input name="tieu_de" id="tieu_de_new" type="text" placeholder="Ví dụ: Thông báo lịch vệ sinh học kỳ mới..." value="<?php echo e(old('tieu_de')); ?>" class="saas-input font-bold" required>
                 </div>
                 <div class="space-y-2">
+                    <label for="loai_thong_bao_new" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phân loại</label>
+                    <select name="loai_thong_bao" id="loai_thong_bao_new" class="saas-input font-bold h-12">
+                        <option value="general" <?php if(old('loai_thong_bao') === 'general'): echo 'selected'; endif; ?>>Chung</option>
+                        <option value="system" <?php if(old('loai_thong_bao') === 'system'): echo 'selected'; endif; ?>>Hệ thống</option>
+                        <option value="finance" <?php if(old('loai_thong_bao') === 'finance'): echo 'selected'; endif; ?>>Tài chính</option>
+                        <option value="maintenance" <?php if(old('loai_thong_bao') === 'maintenance'): echo 'selected'; endif; ?>>Bảo trì</option>
+                        <option value="discipline" <?php if(old('loai_thong_bao') === 'discipline'): echo 'selected'; endif; ?>>Kỷ luật</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
                     <label for="noidung_new" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Nội dung văn bản</label>
                     <textarea name="noi_dung" id="noidung_new" placeholder="Nhập nội dung chi tiết tại đây..." rows="8" class="saas-input !h-auto !py-4 font-medium leading-relaxed min-h-[200px] resize-none" required><?php echo e(old('noi_dung')); ?></textarea>
                 </div>
 
                 <div class="flex gap-3 pt-4">
                     <button type="button" data-modal-hide="modal-themthongbao" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
-                    <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-blue-500/20">Phát hành thông báo</button>
+                    <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-emerald-500/20">Phát hành thông báo</button>
                 </div>
             </form>
          <?php echo $__env->renderComponent(); ?>
@@ -189,6 +199,16 @@
                         <label for="tieu_de_<?php echo e($item->id); ?>" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Tiêu đề bài đăng</label>
                         <input name="tieu_de" id="tieu_de_<?php echo e($item->id); ?>" type="text" value="<?php echo e($item->tieu_de); ?>" class="saas-input font-bold" required>
                     </div>
+                    <div class="space-y-2">
+                        <label for="loai_thong_bao_<?php echo e($item->id); ?>" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phân loại</label>
+                        <select name="loai_thong_bao" id="loai_thong_bao_<?php echo e($item->id); ?>" class="saas-input font-bold h-12">
+                            <option value="general" <?php if($item->loai_thong_bao === 'general'): echo 'selected'; endif; ?>>Chung</option>
+                            <option value="system" <?php if($item->loai_thong_bao === 'system'): echo 'selected'; endif; ?>>Hệ thống</option>
+                            <option value="finance" <?php if($item->loai_thong_bao === 'finance'): echo 'selected'; endif; ?>>Tài chính</option>
+                            <option value="maintenance" <?php if($item->loai_thong_bao === 'maintenance'): echo 'selected'; endif; ?>>Bảo trì</option>
+                            <option value="discipline" <?php if($item->loai_thong_bao === 'discipline'): echo 'selected'; endif; ?>>Kỷ luật</option>
+                        </select>
+                    </div>
 
                     <div class="space-y-2">
                         <label for="noidung_<?php echo e($item->id); ?>" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Nội dung chi tiết</label>
@@ -197,7 +217,7 @@
 
                     <div class="flex gap-3 pt-4">
                         <button type="button" data-modal-hide="modal-suathongbao-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
-                        <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-blue-500/20">Lưu thay đổi</button>
+                        <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-emerald-500/20">Lưu thay đổi</button>
                     </div>
                 </form>
              <?php echo $__env->renderComponent(); ?>
