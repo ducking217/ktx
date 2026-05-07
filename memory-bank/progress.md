@@ -15,6 +15,35 @@
 - [x] Fix lỗi logic tính toán hóa đơn điện nước.
 - [x] Đảm bảo tính nhất quán của dữ liệu (Database Constraints & Logic).
 
+## 2026-05-07 - Hóa đơn: Admin từ chối xác nhận thanh toán
+
+### Hoàn thành ✅
+- Thêm hành động “Từ chối” cho hóa đơn đang ở trạng thái `pending_confirmation` để xử lý trường hợp đối soát giao dịch không khớp.
+- Khi từ chối: cập nhật trạng thái hóa đơn về `unpaid/overdue` theo hạn, và lưu lý do (nếu nhập) vào `thanh_toan.ghi_chu`.
+- Student UI hiển thị rõ “Bị từ chối” ở danh sách hóa đơn và chi tiết hóa đơn (kèm lý do nếu có).
+
+### Files Updated
+- `routes/web.php`
+- `app/Contracts/Admin/HoadonServiceInterface.php`
+- `app/Services/Admin/HoadonService.php`
+- `app/Http/Controllers/Admin/HoadonController.php`
+- `resources/views/admin/hoadon/danhsach.blade.php`
+- `app/Models/Hoadon.php`
+- `resources/views/student/phongcuatoi/lichSuHoaDon.blade.php`
+- `resources/views/student/phongcuatoi/chiTietHoaDon.blade.php`
+
+## 2026-05-07 - Trả phòng: Xác nhận phí hư hại (cấn trừ cọc) khi có báo hỏng
+
+### Hoàn thành ✅
+- Admin khi xử lý yêu cầu trả phòng: nếu sinh viên có báo hỏng (người chịu phí = sinh viên) thì bắt buộc nhập phí hư hại để cấn trừ vào cọc trước khi duyệt thanh lý.
+- Nếu sinh viên không có báo hỏng thuộc diện sinh viên chịu phí thì không yêu cầu nhập phí hư hại (mặc định 0).
+
+### Files Updated
+- `app/Contracts/Admin/DangkyServiceInterface.php`
+- `app/Http/Controllers/Admin/DangkyController.php`
+- `app/Services/Admin/DangkyService.php`
+- `resources/views/admin/dangky/danhsach.blade.php`
+
 ## 2026-05-06 - Hóa đơn: Chuẩn hóa hiển thị trạng thái (Admin/Student)
 
 ### Hoàn thành ✅

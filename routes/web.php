@@ -119,6 +119,7 @@ Route::prefix('admin')
             Route::post('/dien-nuoc/luu-hang-loat', 'luuHangLoat')->name('luu_hang_loat');
             Route::post('/{id}/nhac-no', 'nhacNoHoaDon')->whereNumber('id')->name('nhacno');
             Route::post('/{id}/xac-nhan', 'xacNhanThanhToan')->whereNumber('id')->name('xacnhan');
+            Route::post('/{id}/tu-choi-xac-nhan', 'tuChoiXacNhanThanhToan')->whereNumber('id')->name('tuchoi_xacnhan');
             Route::get('/{id}/pdf', 'downloadInvoicePDF')->whereNumber('id')->name('pdf');
         });
 

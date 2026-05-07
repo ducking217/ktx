@@ -199,8 +199,14 @@
                             <div class="flex justify-end items-center gap-1">
                                 <?php if($dangky->trang_thai === \App\Enums\RegistrationStatus::Pending): ?>
                                     <?php if(\Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG')): ?>
-                                        <form method="POST" action="<?php echo e(route('admin.dangky.traphong.xuly', ['id' => $dangky->id])); ?>" onsubmit="return confirm('Xác nhận xử lý yêu cầu trả phòng này?')">
+                                        <?php
+                                            $coBaoHong = (bool) ($dangky->co_bao_hong ?? false);
+                                            $soBaoHong = (int) ($dangky->so_bao_hong ?? 0);
+                                            $phiGoiY = (int) ($dangky->phi_hu_hai_goi_y ?? 0);
+                                        ?>
+                                        <form method="POST" action="<?php echo e(route('admin.dangky.traphong.xuly', ['id' => $dangky->id])); ?>" data-co-bao-hong="<?php echo e($coBaoHong ? '1' : '0'); ?>" data-so-bao-hong="<?php echo e($soBaoHong); ?>" data-phi-goi-y="<?php echo e($phiGoiY); ?>" onsubmit="if (this.dataset.coBaoHong === '1') { const raw = prompt('Sinh viên có ' + this.dataset.soBaoHong + ' báo hỏng. Nhập phí hư hại để cấn trừ vào cọc (VNĐ):', this.dataset.phiGoiY); if (raw === null) return false; const fee = parseInt(String(raw).replace(/[^\d]/g, ''), 10); if (!Number.isFinite(fee) || fee < 0) { alert('Phí hư hại không hợp lệ.'); return false; } this.querySelector('input[name=phi_hu_hai]').value = String(fee); return confirm('Xác nhận trả phòng và cấn trừ ' + fee.toLocaleString('vi-VN') + 'đ vào tiền cọc?'); } return confirm('Xác nhận xử lý yêu cầu trả phòng này?');">
                                             <?php echo csrf_field(); ?>
+                                            <input type="hidden" name="phi_hu_hai" value="" />
                                             <button type="submit" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Xử lý trả phòng">
                                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                             </button>

@@ -66,6 +66,14 @@ class Hoadon extends Model
         return $this->hasOne(ThanhToan::class, 'hoadon_id')->latestOfMany('ngay_giao_dich');
     }
 
+    public function giao_dich_tu_choi_gan_nhat()
+    {
+        return $this->hasOne(ThanhToan::class, 'hoadon_id')
+            ->whereNotNull('nguoi_xac_nhan')
+            ->where('ghi_chu', 'like', '%Từ chối:%')
+            ->latestOfMany('ngay_giao_dich');
+    }
+
     public function getLoaiHoadonLabelAttribute(): string
     {
         return match ((string) $this->loai_hoadon) {

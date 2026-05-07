@@ -59,6 +59,11 @@ interface HoadonServiceInterface
     public function xacNhanThanhToan(int $id): array;
 
     /**
+     * Từ chối xác nhận thanh toán (khi đối soát giao dịch không đúng).
+     */
+    public function tuChoiXacNhanThanhToan(int $id, ?string $lyDo = null): array;
+
+    /**
      * Sinh viên xác nhận lỗi/phạt.
      */
     public function xacNhanViPham(int $id): array;

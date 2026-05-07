@@ -227,8 +227,8 @@ unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <button type="button" data-modal-hide="modal-thembaohong" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                     <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-emerald-500/20" data-no-loading="true">Gửi yêu cầu ngay</button>
+                    <button type="button" data-modal-hide="modal-thembaohong" class="flex-1 saas-btn-secondary h-12">Hủy bỏ</button>
                 </div>
             </form>
          <?php echo $__env->renderComponent(); ?>
@@ -285,8 +285,8 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="flex gap-4 pt-4">
-                            <button type="button" data-modal-hide="modal-suabaohong-<?php echo e($baohong->id); ?>" class="flex-1 saas-btn-secondary h-12">Hủy</button>
                             <button type="submit" class="flex-[2] saas-btn-primary h-12 shadow-lg shadow-emerald-500/20" data-no-loading="true">Lưu thay đổi</button>
+                            <button type="button" data-modal-hide="modal-suabaohong-<?php echo e($baohong->id); ?>" class="flex-1 saas-btn-secondary h-12">Hủy</button>
                         </div>
                     </form>
                  <?php echo $__env->renderComponent(); ?>

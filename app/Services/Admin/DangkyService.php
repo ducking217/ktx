@@ -14,6 +14,7 @@ use App\Contracts\Admin\HoanTienServiceInterface;
 use App\Contracts\Admin\HopdongServiceInterface;
 use App\Mail\DangkyDaDuyetMail;
 use App\Mail\DangkyKhachThanhCongMail;
+use App\Models\Baohong;
 use App\Models\Dangky;
 use App\Models\Giuong;
 use App\Models\Hoadon;
@@ -27,6 +28,7 @@ use App\Models\User;
 use App\Traits\HoTroNghiepVu;
 use App\Traits\PhanHoiService;
 use App\Traits\KiemtraKyluat;
+use App\Enums\BaohongStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -98,10 +100,10 @@ class DangkyService implements DangkyServiceInterface
         }
     }
 
-    public function xuLyYeuCauTraPhong(int $dangkyId): array
+    public function xuLyYeuCauTraPhong(int $dangkyId, ?int $phiHuHai = null): array
     {
         try {
-            return DB::transaction(function () use ($dangkyId) {
+            return DB::transaction(function () use ($dangkyId, $phiHuHai) {
                 $dangky = Dangky::lockForUpdate()->find($dangkyId);
                 if (! $dangky) return $this->traVeLoi('Không tìm thấy yêu cầu.');
 
@@ -135,7 +137,21 @@ class DangkyService implements DangkyServiceInterface
                     return $this->traVeLoi('Sinh viên còn hóa đơn chưa thanh toán. Không thể xử lý trả phòng.');
                 }
 
-                $ketQuaThanhLy = $this->hopdongService->thanhLyHopDong($hopdong->id, 0);
+                $phongId = (int) ($hopdong->phong_id ?? 0);
+                $coBaoHongSinhVien = Baohong::query()
+                    ->where('sinhvien_id', $sinhvien->id)
+                    ->where('phong_id', $phongId)
+                    ->where('nguoi_chiu_phi', 'sinhvien')
+                    ->whereIn('trang_thai', [BaohongStatus::Pending->value, BaohongStatus::Processing->value, BaohongStatus::Done->value])
+                    ->exists();
+
+                if ($coBaoHongSinhVien && $phiHuHai === null) {
+                    return $this->traVeLoi('Sinh viên có báo hỏng. Vui lòng xác nhận phí hư hại trước khi duyệt trả phòng.');
+                }
+
+                $phiHuHaiSuDung = $coBaoHongSinhVien ? max(0, (int) $phiHuHai) : 0;
+
+                $ketQuaThanhLy = $this->hopdongService->thanhLyHopDong($hopdong->id, $phiHuHaiSuDung);
                 if (($ketQuaThanhLy['toast_loai'] ?? null) === 'loi') {
                     return $ketQuaThanhLy;
                 }
@@ -329,6 +345,55 @@ class DangkyService implements DangkyServiceInterface
             ->orderByDesc('created_at')
             ->paginate(15)
             ->withQueryString();
+
+        if ($type === 'tra-phong') {
+            $banGhi = $registrations->getCollection();
+
+            $pairs = $banGhi
+                ->map(function ($dangky) {
+                    $sinhvienId = (int) ($dangky->user?->sinhvien?->id ?? 0);
+                    $phongId = (int) ($dangky->user?->sinhvien?->current_hopdong?->phong_id ?? 0);
+                    return [
+                        'dangky' => $dangky,
+                        'sinhvien_id' => $sinhvienId,
+                        'phong_id' => $phongId,
+                    ];
+                })
+                ->filter(fn ($row) => $row['sinhvien_id'] > 0 && $row['phong_id'] > 0)
+                ->values();
+
+            $sinhvienIds = $pairs->pluck('sinhvien_id')->unique()->values()->all();
+            $phongIds = $pairs->pluck('phong_id')->unique()->values()->all();
+
+            $agg = [];
+            if (! empty($sinhvienIds) && ! empty($phongIds)) {
+                $rows = Baohong::query()
+                    ->selectRaw('sinhvien_id, phong_id, COUNT(*) as so_bao_hong, COALESCE(SUM(chi_phi_du_kien), 0) as tong_chi_phi')
+                    ->whereIn('sinhvien_id', $sinhvienIds)
+                    ->whereIn('phong_id', $phongIds)
+                    ->where('nguoi_chiu_phi', 'sinhvien')
+                    ->whereIn('trang_thai', [BaohongStatus::Pending->value, BaohongStatus::Processing->value, BaohongStatus::Done->value])
+                    ->groupBy('sinhvien_id', 'phong_id')
+                    ->get();
+
+                foreach ($rows as $row) {
+                    $key = (int) $row->sinhvien_id . ':' . (int) $row->phong_id;
+                    $agg[$key] = [
+                        'so_bao_hong' => (int) $row->so_bao_hong,
+                        'tong_chi_phi' => (int) $row->tong_chi_phi,
+                    ];
+                }
+            }
+
+            foreach ($pairs as $row) {
+                $key = (int) $row['sinhvien_id'] . ':' . (int) $row['phong_id'];
+                $info = $agg[$key] ?? ['so_bao_hong' => 0, 'tong_chi_phi' => 0];
+
+                $row['dangky']->co_bao_hong = $info['so_bao_hong'] > 0;
+                $row['dangky']->so_bao_hong = $info['so_bao_hong'];
+                $row['dangky']->phi_hu_hai_goi_y = max(0, $info['tong_chi_phi']);
+            }
+        }
 
         return [
             'danhsachdangky' => $registrations,

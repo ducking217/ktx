@@ -61,9 +61,13 @@ class DangkyController extends Controller
     /**
      * Xử lý yêu cầu trả phòng.
      */
-    public function xuLyTraPhong(int $id)
+    public function xuLyTraPhong(Request $request, int $id)
     {
-        $result = $this->dangkyService->xuLyYeuCauTraPhong($id);
+        $duLieu = $request->validate([
+            'phi_hu_hai' => ['nullable', 'integer', 'min:0', 'max:2000000000'],
+        ]);
+
+        $result = $this->dangkyService->xuLyYeuCauTraPhong($id, isset($duLieu['phi_hu_hai']) ? (int) $duLieu['phi_hu_hai'] : null);
         return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
     }
 

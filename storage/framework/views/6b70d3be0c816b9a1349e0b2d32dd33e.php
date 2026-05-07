@@ -361,8 +361,8 @@
                         </div>
 
                         <div class="flex gap-3 pt-4">
-                            <button type="button" data-modal-hide="modal-traphong" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                             <button type="submit" class="saas-btn-danger flex-[2] h-11">Gửi yêu cầu</button>
+                            <button type="button" data-modal-hide="modal-traphong" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                         </div>
                     </form>
                  <?php echo $__env->renderComponent(); ?>

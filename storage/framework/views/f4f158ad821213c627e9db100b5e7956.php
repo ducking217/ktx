@@ -86,6 +86,26 @@
                     Hạn thanh toán: <?php echo e($hoadon->ngay_het_han?->format('d/m/Y') ?? 'Chưa có'); ?>
 
                 </div>
+                <?php if($hoadon->giao_dich_tu_choi_gan_nhat): ?>
+                    <?php
+                        $lyDoTuChoi = trim((string) ($hoadon->giao_dich_tu_choi_gan_nhat->ghi_chu ?? ''));
+                        if (preg_match('/Từ chối:\s*(.+)$/u', $lyDoTuChoi, $m)) {
+                            $lyDoTuChoi = trim((string) $m[1]);
+                        }
+                        $lyDoTuChoi = $lyDoTuChoi !== '' ? $lyDoTuChoi : 'Giao dịch chưa khớp. Vui lòng kiểm tra lại và gửi lại yêu cầu.';
+                    ?>
+                    <div class="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+                        <div class="font-semibold text-rose-800">Yêu cầu xác nhận trước đó đã bị từ chối</div>
+                        <div class="mt-1">
+                            <?php echo e($lyDoTuChoi); ?>
+
+                        </div>
+                        <div class="mt-2 text-[11px] font-semibold text-rose-700/80">
+                            Thời gian đối soát: <?php echo e($hoadon->giao_dich_tu_choi_gan_nhat->updated_at?->format('d/m/Y H:i') ?? ($hoadon->giao_dich_tu_choi_gan_nhat->ngay_giao_dich?->format('d/m/Y H:i') ?? '—')); ?>
+
+                        </div>
+                    </div>
+                <?php endif; ?>
                 <?php if($hoadon->trang_thai === \App\Enums\InvoiceStatus::Overdue): ?>
                     <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
                         Hóa đơn quá hạn sẽ được hệ thống nhắc định kỳ. Vui lòng chuyển khoản để tránh phát sinh công nợ.

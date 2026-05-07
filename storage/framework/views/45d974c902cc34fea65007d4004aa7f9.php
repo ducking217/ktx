@@ -303,8 +303,8 @@
                     </div>
 
                     <div class="flex gap-4 pt-2">
-                        <button type="button" data-modal-hide="modal-gia-han-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                         <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Xác nhận gia hạn</button>
+                        <button type="button" data-modal-hide="modal-gia-han-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                     </div>
                 </form>
              <?php echo $__env->renderComponent(); ?>
@@ -364,8 +364,8 @@
                     </div>
 
                     <div class="flex gap-4 pt-2">
-                        <button type="button" data-modal-hide="modal-thanh-ly-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                         <button type="submit" class="saas-btn-primary !bg-rose-900 flex-1 h-11 shadow-lg shadow-rose-900/20">Xác nhận thanh lý</button>
+                        <button type="button" data-modal-hide="modal-thanh-ly-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                     </div>
                 </form>
              <?php echo $__env->renderComponent(); ?>

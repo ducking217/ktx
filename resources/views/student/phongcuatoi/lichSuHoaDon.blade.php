@@ -93,6 +93,18 @@
                         </td>
                         <td class="text-center">
                             <span class="saas-badge {{ $statusBadge }}">{{ $statusLabel }}</span>
+                            @if(!$isRefund && in_array($item->trang_thai, [\App\Enums\InvoiceStatus::Unpaid, \App\Enums\InvoiceStatus::Overdue], true) && $item->giao_dich_tu_choi_gan_nhat)
+                                @php
+                                    $lyDoTuChoi = trim((string) ($item->giao_dich_tu_choi_gan_nhat->ghi_chu ?? ''));
+                                    if (preg_match('/Từ chối:\s*(.+)$/u', $lyDoTuChoi, $m)) {
+                                        $lyDoTuChoi = trim((string) $m[1]);
+                                    }
+                                    $lyDoTuChoi = $lyDoTuChoi !== '' ? $lyDoTuChoi : 'Giao dịch chưa khớp. Vui lòng kiểm tra lại và gửi lại yêu cầu.';
+                                @endphp
+                                <div class="mt-1 text-[10px] font-semibold text-rose-600 leading-snug">
+                                    Bị từ chối: {{ \Illuminate\Support\Str::limit($lyDoTuChoi, 80) }}
+                                </div>
+                            @endif
                         </td>
                         <td class="text-slate-600">
                             <div class="tabular-nums">{{ $item->ngay_het_han?->format('d/m/Y') ?? '—' }}</div>

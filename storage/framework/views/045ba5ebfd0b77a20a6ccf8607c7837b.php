@@ -244,6 +244,18 @@
 
                                         </button>
                                     </form>
+                                    <?php if($isPendingConfirmation): ?>
+                                        <?php
+                                            $rejectText = 'Từ chối xác nhận thanh toán cho hóa đơn ' . $maHoaDon . '?';
+                                        ?>
+                                        <form action="<?php echo e(route('admin.hoadon.tuchoi_xacnhan', $hoadon->id)); ?>" method="POST" data-confirm="<?php echo e(e($rejectText)); ?>" onsubmit="const reason = prompt('Nhập lý do từ chối (tùy chọn):'); if (reason === null) return false; this.querySelector('input[name=ly_do]').value = String(reason).trim(); return confirm(this.dataset.confirm)">
+                                            <?php echo csrf_field(); ?>
+                                            <input type="hidden" name="ly_do" value="" />
+                                            <button type="submit" class="saas-btn-danger h-9 px-3 text-xs font-semibold">
+                                                Từ chối
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
                                 <?php endif; ?>
 
                                 <a href="<?php echo e(route('admin.hoadon.pdf', $hoadon->id)); ?>" class="saas-btn-secondary h-9 px-3 text-xs font-semibold">
@@ -385,8 +397,8 @@
                 </div>
 
                 <div class="flex gap-4 pt-2">
-                    <button type="button" data-modal-hide="modal-xulyhoadon" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                     <button type="submit" class="saas-btn-primary flex-1 h-11 shadow-lg shadow-emerald-500/20">Tạo hóa đơn</button>
+                    <button type="button" data-modal-hide="modal-xulyhoadon" class="saas-btn-secondary flex-1 h-11">Hủy</button>
                 </div>
             </form>
          <?php echo $__env->renderComponent(); ?>

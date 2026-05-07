@@ -59,7 +59,7 @@ interface DangkyServiceInterface
     /**
      * Xử lý yêu cầu trả phòng (Admin) - Thanh lý hợp đồng và giải phóng giường.
      */
-    public function xuLyYeuCauTraPhong(int $dangkyId): array;
+    public function xuLyYeuCauTraPhong(int $dangkyId, ?int $phiHuHai = null): array;
 
     /**
      * Từ chối yêu cầu trả phòng (Admin).

@@ -204,6 +204,18 @@
                                             {{ $isRefund ? 'Xác nhận hoàn' : ($isPendingConfirmation ? 'Xác nhận CK' : 'Ghi nhận thu') }}
                                         </button>
                                     </form>
+                                    @if ($isPendingConfirmation)
+                                        @php
+                                            $rejectText = 'Từ chối xác nhận thanh toán cho hóa đơn ' . $maHoaDon . '?';
+                                        @endphp
+                                        <form action="{{ route('admin.hoadon.tuchoi_xacnhan', $hoadon->id) }}" method="POST" data-confirm="{{ e($rejectText) }}" onsubmit="const reason = prompt('Nhập lý do từ chối (tùy chọn):'); if (reason === null) return false; this.querySelector('input[name=ly_do]').value = String(reason).trim(); return confirm(this.dataset.confirm)">
+                                            @csrf
+                                            <input type="hidden" name="ly_do" value="" />
+                                            <button type="submit" class="saas-btn-danger h-9 px-3 text-xs font-semibold">
+                                                Từ chối
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
 
                                 <a href="{{ route('admin.hoadon.pdf', $hoadon->id) }}" class="saas-btn-secondary h-9 px-3 text-xs font-semibold">

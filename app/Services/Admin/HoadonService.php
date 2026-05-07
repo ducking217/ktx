@@ -159,6 +159,7 @@ class HoadonService implements HoadonServiceInterface
         };
 
         $lichSu = $lichSuQuery
+            ->with('giao_dich_tu_choi_gan_nhat')
             ->orderByDesc('created_at')
             ->paginate(12)
             ->withQueryString();
@@ -189,7 +190,7 @@ class HoadonService implements HoadonServiceInterface
 
         $hoadon = Hoadon::where('id', $id)
             ->whereIn('hopdong_id', $hopdongIds)
-            ->with('hopdong.giuong.phong')
+            ->with(['hopdong.giuong.phong', 'giao_dich_tu_choi_gan_nhat'])
             ->first();
 
         if (! $hoadon) {
@@ -365,6 +366,54 @@ class HoadonService implements HoadonServiceInterface
         }
 
         return $this->traVeThanhCong('Đã xác nhận thanh toán.');
+    }
+
+    public function tuChoiXacNhanThanhToan(int $id, ?string $lyDo = null): array
+    {
+        try {
+            DB::transaction(function () use ($id, $lyDo) {
+                $hoadon = Hoadon::lockForUpdate()->find($id);
+                if (! $hoadon) {
+                    throw new \Exception('Không tìm thấy hóa đơn.');
+                }
+
+                if ($hoadon->trang_thai !== InvoiceStatus::PendingConfirmation) {
+                    throw new \Exception('Hóa đơn này không ở trạng thái chờ xác nhận.');
+                }
+
+                $thanhToan = ThanhToan::where('hoadon_id', $hoadon->id)
+                    ->whereNull('nguoi_xac_nhan')
+                    ->orderByDesc('ngay_giao_dich')
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($thanhToan) {
+                    $ghiChu = trim((string) ($thanhToan->ghi_chu ?? ''));
+                    $lyDoGon = trim((string) ($lyDo ?? ''));
+                    $ghiChuMoi = $ghiChu;
+                    if ($lyDoGon !== '') {
+                        $ghiChuMoi = trim($ghiChuMoi !== '' ? ($ghiChuMoi . ' | Từ chối: ' . $lyDoGon) : ('Từ chối: ' . $lyDoGon));
+                    }
+
+                    $thanhToan->update([
+                        'nguoi_xac_nhan' => Auth::id(),
+                        'ghi_chu' => $ghiChuMoi !== '' ? $ghiChuMoi : $thanhToan->ghi_chu,
+                    ]);
+                }
+
+                $trangThaiMoi = ($hoadon->ngay_het_han && $hoadon->ngay_het_han->isPast())
+                    ? InvoiceStatus::Overdue
+                    : InvoiceStatus::Unpaid;
+
+                if (! $hoadon->transitionTo($trangThaiMoi->value)) {
+                    throw new \Exception('Không thể cập nhật trạng thái hóa đơn.');
+                }
+            });
+        } catch (\Throwable $e) {
+            return $this->traVeLoi($e->getMessage());
+        }
+
+        return $this->traVeThanhCong('Đã từ chối xác nhận thanh toán. Hóa đơn đã được đưa về trạng thái cần thanh toán.');
     }
 
     /**

@@ -67,6 +67,20 @@ class HoadonController extends Controller
         return redirect()->back()->with(['toast_loai' => $result['toast_loai'], 'toast_noidung' => $result['toast_noidung']]);
     }
 
+    public function tuChoiXacNhanThanhToan(Request $request, int $id)
+    {
+        $duLieu = $request->validate([
+            'ly_do' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $result = $this->hoadonService->tuChoiXacNhanThanhToan($id, $duLieu['ly_do'] ?? null);
+
+        return redirect()->back()->with([
+            'toast_loai' => $result['toast_loai'],
+            'toast_noidung' => $result['toast_noidung'],
+        ]);
+    }
+
     public function nhacNoHoaDon(int $id)
     {
         $result = $this->taiChinhService->nhacNo($id);
