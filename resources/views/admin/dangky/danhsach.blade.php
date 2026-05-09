@@ -159,7 +159,14 @@
                                 @endif
 
                                 @if (in_array($dangky->trang_thai, [\App\Enums\RegistrationStatus::Pending, \App\Enums\RegistrationStatus::ApprovedPendingPayment]))
-                                    <form method="POST" action="{{ \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG') ? route('admin.dangky.traphong.tuchoi', ['id' => $dangky->id]) : route('admin.dangky.tuchoi', ['id' => $dangky->id]) }}" onsubmit="return confirm('{{ \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG') ? 'Từ chối yêu cầu trả phòng này?' : 'Từ chối hồ sơ đăng ký này?' }}')">
+                                    @php
+                                        $isTraPhong = \Illuminate\Support\Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG');
+                                        $rejectAction = $isTraPhong
+                                            ? route('admin.dangky.traphong.tuchoi', ['id' => $dangky->id])
+                                            : route('admin.dangky.tuchoi', ['id' => $dangky->id]);
+                                        $rejectConfirmMessage = $isTraPhong ? 'Từ chối yêu cầu trả phòng này?' : 'Từ chối hồ sơ đăng ký này?';
+                                    @endphp
+                                    <form method="POST" action="{{ $rejectAction }}" data-confirm-message="{{ $rejectConfirmMessage }}" onsubmit="return confirm(this.dataset.confirmMessage)">
                                         @csrf
                                         <button type="submit" class="h-9 w-9 inline-flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all shadow-sm hover:shadow-md" title="Từ chối">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>

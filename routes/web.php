@@ -189,7 +189,7 @@ Route::prefix('admin')
             Route::get('/xuat-excel', [App\Http\Controllers\Admin\BaoCaoController::class, 'xuatExcel'])->name('xuat_excel');
         });
 
-        // Quản lý tài khoản (Super Admin only)
+        // Quản lý tài khoản 
         Route::prefix('accounts')->name('accounts.')->middleware('can:accounts.manage')->controller(App\Http\Controllers\Admin\AccountController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/tao', 'taoMoi')->name('tao');

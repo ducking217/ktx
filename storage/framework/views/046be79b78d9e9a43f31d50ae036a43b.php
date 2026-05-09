@@ -74,12 +74,12 @@
             </div>
 
             <div class="mt-8 flex justify-end gap-3">
-                <button type="button" x-on:click="$dispatch('close')" class="saas-btn-secondary h-11 px-6">
-                    Hủy bỏ
-                </button>
-
                 <button type="submit" class="flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-6 h-11 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-rose-700 transition-colors">
                     Xác nhận xóa
+                </button>
+
+                <button type="button" x-on:click="$dispatch('close')" class="saas-btn-secondary h-11 px-6">
+                    Hủy bỏ
                 </button>
             </div>
         </form>

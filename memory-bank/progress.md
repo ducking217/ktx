@@ -15,6 +15,14 @@
 - [x] Fix lỗi logic tính toán hóa đơn điện nước.
 - [x] Đảm bảo tính nhất quán của dữ liệu (Database Constraints & Logic).
 
+## 2026-05-07 - Student Sidebar: Đổi icon “Phòng của tôi”
+
+### Hoàn thành ✅
+- Đổi icon menu “Phòng của tôi” trong sidebar Sinh viên sang icon home để dễ nhận biết.
+
+### Files Updated
+- `resources/views/student/layouts/chinh.blade.php`
+
 ## 2026-05-07 - Hóa đơn: Admin từ chối xác nhận thanh toán
 
 ### Hoàn thành ✅
@@ -43,6 +51,15 @@
 - `app/Http/Controllers/Admin/DangkyController.php`
 - `app/Services/Admin/DangkyService.php`
 - `resources/views/admin/dangky/danhsach.blade.php`
+
+## 2026-05-07 - Ổn định: Bắt dấu lỗi 500 (Request ID + Fallback Log)
+
+### Hoàn thành ✅
+- Khi phát sinh lỗi 500, response trả về header `X-Request-Id` để đối chiếu nhanh với log.
+- Bổ sung log ngữ cảnh (URL/method/route/user) cho exception 5xx; nếu logger lỗi thì ghi fallback vào `storage/logs/fallback-exceptions.log`.
+
+### Files Updated
+- `app/Exceptions/Handler.php`
 
 ## 2026-05-06 - Hóa đơn: Chuẩn hóa hiển thị trạng thái (Admin/Student)
 
