@@ -8,6 +8,14 @@ use App\Models\Hopdong;
 use App\Traits\PhanHoiService;
 use Illuminate\Support\Facades\Log;
 
+/**
+
+ * Khu vực: Shared / Nghiệp vụ phòng
+ 
+ * Vai trò: Logic dùng chung liên quan điều phối phòng/giường phục vụ nhiều module.
+
+ */
+
 class NghiepVuPhongService implements NghiepVuPhongServiceInterface
 {
     use PhanHoiService;

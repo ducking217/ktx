@@ -7,6 +7,14 @@ use App\Contracts\Admin\BaoTriServiceInterface;
 use App\Models\Lichsubaotri;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Bảo trì
+ 
+ * Vai trò: Quản lý lịch sử bảo trì và thao tác cập nhật/xuất dữ liệu.
+
+ */
+
 class LichsubaotriController extends Controller
 {
     public function __construct(

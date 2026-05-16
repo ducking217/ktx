@@ -6,6 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Gửi lại email xác minh.
+
+ */
+
 class EmailVerificationNotificationController extends Controller
 {
     /**

@@ -10,6 +10,14 @@ use App\Enums\ContractStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+
+ * Khu vực: Admin / Gia hạn
+ 
+ * Vai trò: Duyệt/từ chối yêu cầu gia hạn hợp đồng.
+
+ */
+
 class GiaHanController extends Controller
 {
     public function __construct(

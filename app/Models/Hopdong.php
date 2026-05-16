@@ -36,6 +36,16 @@ class Hopdong extends Model
         'trang_thai' => ContractStatus::class,
     ];
 
+    public function getGhichuAttribute(): ?string
+    {
+        return $this->attributes['ghi_chu'] ?? null;
+    }
+
+    public function setGhichuAttribute(mixed $value): void
+    {
+        $this->attributes['ghi_chu'] = $value;
+    }
+
     public function getMaHdAttribute(): ?string
     {
         if (!$this->id) {

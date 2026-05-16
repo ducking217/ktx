@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Đổi mật khẩu khi đã đăng nhập.
+
+ */
+
 class PasswordController extends Controller
 {
     /**

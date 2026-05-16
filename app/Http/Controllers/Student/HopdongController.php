@@ -7,6 +7,14 @@ use App\Contracts\Admin\HopdongServiceInterface;
 use App\Contracts\Shared\GiaHanServiceInterface;
 use App\Models\Dangky;
 
+/**
+
+ * Khu vực: Admin / Hợp đồng
+ 
+ * Vai trò: Điểm vào route Admin, validate request và gọi HopdongService (kèm xuất PDF).
+
+ */
+
 class HopdongController extends Controller
 {
     public function __construct(

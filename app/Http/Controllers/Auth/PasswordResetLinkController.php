@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Gửi link đặt lại mật khẩu.
+
+ */
+
 class PasswordResetLinkController extends Controller
 {
     /**

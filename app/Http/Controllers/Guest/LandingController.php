@@ -8,6 +8,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Class
+ 
+ * Vai trò: Mô tả chức năng chính của lớp trong module tương ứng.
+
+ */
+
 class LandingController extends Controller
 {
     public function __construct(

@@ -6,6 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Contracts\Core\TruyVanPhongServiceInterface;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Phòng
+ 
+ * Vai trò: Điều phối CRUD phòng, hiển thị danh sách/chi tiết và gọi service truy vấn phòng.
+
+ */
+
 class PhongController extends Controller
 {
     public function __construct(
@@ -13,7 +21,7 @@ class PhongController extends Controller
     ) {}
 
     /**
-     * Danh sách phòng công khai cho khách vãng lai.
+     * Danh sách phòng công khai cho khách 
      */
     public function index(Request $request)
     {

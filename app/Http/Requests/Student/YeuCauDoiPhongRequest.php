@@ -30,14 +30,13 @@ class YeuCauDoiPhongRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'phong_moi_id.required' => 'Vui long chon phong moi.',
-            'phong_moi_id.numeric' => 'Phong khong hop le.',
-            'phong_moi_id.exists' => 'Phong khong ton tai.',
-            'lydo.required' => 'Vui long nhap ly do doi phong.',
-            'lydo.string' => 'Ly do phai la van ban.',
-            'lydo.max' => 'Ly do khong duoc vuot qua 500 ky tu.',
+            'phong_moi_id.required' => 'Vui lòng chọn phòng mới.',
+            'phong_moi_id.numeric' => 'Phòng không hợp lệ.',
+            'phong_moi_id.exists' => 'Phòng không tồn tại.',
+            'lydo.required' => 'Vui lòng nhập lý do đổi phòng.',
+            'lydo.string' => 'Lý do phải là văn bản.',
+            'lydo.max' => 'Lý do không được vượt quá 500 ký tự.',
         ];
     }
 }
-
 

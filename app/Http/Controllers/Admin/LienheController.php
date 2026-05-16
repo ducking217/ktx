@@ -9,6 +9,14 @@ use App\Models\Lienhe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
+/**
+
+ * Khu vực: Admin / Liên hệ
+ 
+ * Vai trò: Quản lý liên hệ từ Landing (xem chi tiết, cập nhật trạng thái, phản hồi).
+
+ */
+
 class LienheController extends Controller
 {
     public function __construct(

@@ -11,7 +11,7 @@ interface BaoCaoServiceInterface
     /**
      * Lấy dữ liệu tổng hợp cho dashboard báo cáo tài chính.
      */
-    public function layDuLieuTaiChinh(): array;
+    public function layDuLieuTaiChinh(?int $nam = null): array;
 
     /**
      * Lấy dữ liệu chi tiết để xuất Excel.

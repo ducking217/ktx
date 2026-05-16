@@ -9,6 +9,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/**
+
+ * Khu vực: Admin / Sinh viên
+ 
+ * Vai trò: Danh sách/chi tiết sinh viên, cập nhật hồ sơ, và thao tác chuyển phòng.
+
+ */
+
 class SinhvienController extends Controller
 {
     public function __construct(

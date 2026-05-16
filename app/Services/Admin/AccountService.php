@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+/**
+
+ * Khu vực: Admin / Tài khoản
+ 
+ * Vai trò: Quản trị tài khoản vận hành (tạo/sửa/xóa/khôi phục).
+
+ */
+
 class AccountService implements AccountServiceInterface
 {
     use PhanHoiService;

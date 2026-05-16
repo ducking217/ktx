@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
+/**
+
+ * Khu vực: Student / Báo hỏng
+ 
+ * Vai trò: Nghiệp vụ tạo/cập nhật báo hỏng theo tài sản phòng của sinh viên.
+
+ */
+
 class BaohongService implements BaohongServiceInterface
 {
     use PhanHoiService;
@@ -205,7 +213,7 @@ class BaohongService implements BaohongServiceInterface
                     'trang_thai' => $data['trang_thai'],
                 ]);
 
-                $this->auditLog('Cap nhat trang thai bao hong', 'Baohong', $baohong->id, $oldData, $baohong->toArray());
+                $this->auditLog('Cập nhật trạng thái báo hỏng', 'Baohong', $baohong->id, $oldData, $baohong->toArray());
 
                 $this->notifyStudent($baohong);
 

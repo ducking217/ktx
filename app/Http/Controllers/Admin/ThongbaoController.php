@@ -6,6 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Contracts\Shared\ThongbaoServiceInterface;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Thông báo
+ 
+ * Vai trò: CRUD thông báo và điều phối hiển thị danh sách.
+
+ */
+
 class ThongbaoController extends Controller
 {
     public function __construct(

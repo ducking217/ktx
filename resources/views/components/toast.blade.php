@@ -21,10 +21,17 @@
 
     <div class="fixed bottom-5 right-5 z-50 animate-pop-in">
         <div id="toast-thongbao" class="linear-panel flex w-full max-w-sm items-start gap-3 p-3" role="alert" aria-live="assertive">
-            <div class="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border text-xs font-semibold {{ $mau }}">
-                {{ $tieude }}
+            <div class="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border {{ $mau }}" aria-hidden="true">
+                @if ($toast_loai === 'thanhcong' || $toast_loai === 'success')
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                @else
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M12 9v4m0 4h.01M10.29 3.86l-7.17 12.4A2 2 0 004.85 19h14.3a2 2 0 001.73-2.74l-7.17-12.4a2 2 0 00-3.46 0z"/></svg>
+                @endif
             </div>
-            <div class="flex-1 text-sm text-slate-600">{{ $toast_noidung }}</div>
+            <div class="min-w-0 flex-1">
+                <div class="text-xs font-bold tracking-wide text-slate-900">{{ $tieude }}</div>
+                <div class="mt-0.5 text-sm text-slate-600">{{ $toast_noidung }}</div>
+            </div>
             <button type="button"
                     class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-slate-400 transition hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900"
                     data-dismiss-target="#toast-thongbao"
@@ -37,4 +44,3 @@
         </div>
     </div>
 @endif
-

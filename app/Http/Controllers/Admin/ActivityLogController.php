@@ -7,6 +7,15 @@ use App\Models\NhatKy;
 use App\Models\User;
 use App\Enums\UserRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
+/**
+
+ * Khu vực: Admin / Nhật ký hoạt động
+ 
+ * Vai trò: Render danh sách log và chuẩn bị dữ liệu filter phục vụ tra cứu.
+
+ */
 
 class ActivityLogController extends Controller
 {
@@ -46,10 +55,23 @@ class ActivityLogController extends Controller
         $logs = $query->orderByDesc('created_at')->paginate(50)->withQueryString();
 
         // Lấy danh sách để fill vào filter dropdowns
-        $models = NhatKy::distinct()->pluck('ten_model');
-        $admins = User::whereIn('vaitro', [UserRole::Admin])->get();
-        $actions = NhatKy::distinct()->pluck('hanh_dong');
+        $filterData = Cache::remember('admin.activity-log:filters:v1', now()->addMinutes(10), function (): array {
+            return [
+                'models' => NhatKy::query()->distinct()->pluck('ten_model')->filter()->values(),
+                'actions' => NhatKy::query()->distinct()->pluck('hanh_dong')->filter()->values(),
+                'admins' => User::query()
+                    ->whereIn('vaitro', [UserRole::Admin])
+                    ->select(['id', 'name', 'vaitro'])
+                    ->orderBy('name')
+                    ->get(),
+            ];
+        });
 
-        return view('admin.activity-log', compact('logs', 'models', 'admins', 'actions'));
+        return view('admin.activity-log', [
+            'logs' => $logs,
+            'models' => $filterData['models'],
+            'admins' => $filterData['admins'],
+            'actions' => $filterData['actions'],
+        ]);
     }
 }

@@ -6,6 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Contracts\Core\TienIchServiceInterface;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Class
+ 
+ * Vai trò: Mô tả chức năng chính của lớp trong module tương ứng.
+
+ */
+
 class CauhinhController extends Controller
 {
     public function __construct(
@@ -24,7 +32,7 @@ class CauhinhController extends Controller
 
         return redirect()->back()->with([
             'toast_loai' => 'thanhcong',
-            'toast_noidung' => 'Cap nhat cau hinh thanh cong.',
+            'toast_noidung' => 'Cập nhật cấu hình thành công.',
         ]);
     }
 }

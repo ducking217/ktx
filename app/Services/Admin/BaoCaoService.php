@@ -12,73 +12,82 @@ use App\Models\Hoadon;
 use App\Models\Hopdong;
 use App\Models\Phong;
 use App\Models\Sinhvien;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+
+/**
+
+ * Khu vực: Admin / Báo cáo
+ 
+ * Vai trò: Tổng hợp số liệu báo cáo (đặc biệt báo cáo tài chính) và tối ưu truy vấn aggregate theo năm.
+
+ */
 
 class BaoCaoService implements BaoCaoServiceInterface
 {
-    public function layDuLieuTaiChinh(): array
+    public function layDuLieuTaiChinh(?int $nam = null): array
     {
-        // 1. Doanh thu 12 tháng gần nhất (dựa trên ngày thanh toán thực tế)
-        $doanhThuTheoThang = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, SUM(tong_tien) as tong, COUNT(*) as so_luong')
-            ->where('trang_thai', InvoiceStatus::Paid)
-            ->whereNotNull('ngay_thanh_toan')
-            ->where('ngay_thanh_toan', '>=', now()->subMonths(12))
-            ->groupBy(DB::raw('YEAR(ngay_thanh_toan)'), DB::raw('MONTH(ngay_thanh_toan)'))
-            ->orderBy(DB::raw('YEAR(ngay_thanh_toan)'))
-            ->orderBy(DB::raw('MONTH(ngay_thanh_toan)'))
-            ->get();
+        $nam = $nam ?: now()->year;
 
-        // 2. Tổng cọc đang giữ (Hóa đơn LOAI_DEPOSIT đã thanh toán)
-        $tongCocHienTai = (float) Hoadon::where('loai_hoadon', 'deposit')
-            ->where('trang_thai', InvoiceStatus::Paid)
-            ->sum('tong_tien');
+        return Cache::remember("admin.baocao.taichinh:v1:{$nam}", now()->addMinutes(5), function () use ($nam): array {
+            $doanhThuTheoThang = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, SUM(tong_tien) as tong, COUNT(*) as so_luong')
+                ->where('trang_thai', InvoiceStatus::Paid)
+                ->whereNotNull('ngay_thanh_toan')
+                ->whereYear('ngay_thanh_toan', $nam)
+                ->groupBy(DB::raw('YEAR(ngay_thanh_toan)'), DB::raw('MONTH(ngay_thanh_toan)'))
+                ->orderBy(DB::raw('YEAR(ngay_thanh_toan)'))
+                ->orderBy(DB::raw('MONTH(ngay_thanh_toan)'))
+                ->get();
 
-        // 3. Số phòng đang thuê vs tổng phòng
-        $tongPhong = Phong::count();
-        $phongDangThue = Phong::whereHas('giuongs', function ($query) {
-            $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
-        })->count();
-        $tyLeLapDay = $tongPhong > 0 ? round(($phongDangThue / $tongPhong) * 100, 1) : 0;
+            $tongCocHienTai = (float) Hoadon::where('loai_hoadon', 'deposit')
+                ->where('trang_thai', InvoiceStatus::Paid)
+                ->sum('tong_tien');
 
-        // 4. Top 5 phòng doanh thu cao nhất
-        $topPhong = Hoadon::selectRaw('phong_id, SUM(tong_tien) as tong')
-            ->where('trang_thai', InvoiceStatus::Paid)
-            ->with('phong')
-            ->groupBy('phong_id')
-            ->orderByDesc('tong')
-            ->limit(5)
-            ->get();
+            $tongPhong = Phong::count();
+            $phongDangThue = Phong::whereHas('giuongs', function ($query) {
+                $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+            })->count();
+            $tyLeLapDay = $tongPhong > 0 ? round(($phongDangThue / $tongPhong) * 100, 1) : 0;
 
-        // 5. Tăng trưởng doanh thu tháng này so với tháng trước
-        $thangNay = now()->month;
-        $namNay = now()->year;
-        $doanhThuThangNay = (float) Hoadon::where('trang_thai', InvoiceStatus::Paid)
-            ->whereMonth('ngay_thanh_toan', $thangNay)
-            ->whereYear('ngay_thanh_toan', $namNay)
-            ->sum('tong_tien');
+            $topPhong = Hoadon::selectRaw('phong_id, SUM(tong_tien) as tong')
+                ->where('trang_thai', InvoiceStatus::Paid)
+                ->whereNotNull('ngay_thanh_toan')
+                ->whereYear('ngay_thanh_toan', $nam)
+                ->with('phong')
+                ->groupBy('phong_id')
+                ->orderByDesc('tong')
+                ->limit(5)
+                ->get();
 
-        $thangTruoc = now()->subMonth()->month;
-        $namTruoc = now()->subMonth()->year;
-        $doanhThuThangTruoc = (float) Hoadon::where('trang_thai', InvoiceStatus::Paid)
-            ->whereMonth('ngay_thanh_toan', $thangTruoc)
-            ->whereYear('ngay_thanh_toan', $namTruoc)
-            ->sum('tong_tien');
+            $thangNay = now()->month;
+            $doanhThuThangNay = (float) Hoadon::where('trang_thai', InvoiceStatus::Paid)
+                ->whereMonth('ngay_thanh_toan', $thangNay)
+                ->whereYear('ngay_thanh_toan', $nam)
+                ->sum('tong_tien');
 
-        $tangTruong = 0;
-        if ($doanhThuThangTruoc > 0) {
-            $tangTruong = round((($doanhThuThangNay - $doanhThuThangTruoc) / $doanhThuThangTruoc) * 100, 1);
-        }
+            $thangTruoc = $thangNay === 1 ? 12 : ($thangNay - 1);
+            $namTruoc = $thangNay === 1 ? ($nam - 1) : $nam;
+            $doanhThuThangTruoc = (float) Hoadon::where('trang_thai', InvoiceStatus::Paid)
+                ->whereMonth('ngay_thanh_toan', $thangTruoc)
+                ->whereYear('ngay_thanh_toan', $namTruoc)
+                ->sum('tong_tien');
 
-        return [
-            'doanhThuTheoThang' => $doanhThuTheoThang,
-            'tongCocHienTai' => $tongCocHienTai,
-            'tongPhong' => $tongPhong,
-            'phongDangThue' => $phongDangThue,
-            'tyLeLapDay' => $tyLeLapDay,
-            'topPhong' => $topPhong,
-            'doanhThuThangNay' => $doanhThuThangNay,
-            'tangTruong' => $tangTruong,
-        ];
+            $tangTruong = 0;
+            if ($doanhThuThangTruoc > 0) {
+                $tangTruong = round((($doanhThuThangNay - $doanhThuThangTruoc) / $doanhThuThangTruoc) * 100, 1);
+            }
+
+            return [
+                'doanhThuTheoThang' => $doanhThuTheoThang,
+                'tongCocHienTai' => $tongCocHienTai,
+                'tongPhong' => $tongPhong,
+                'phongDangThue' => $phongDangThue,
+                'tyLeLapDay' => $tyLeLapDay,
+                'topPhong' => $topPhong,
+                'doanhThuThangNay' => $doanhThuThangNay,
+                'tangTruong' => $tangTruong,
+            ];
+        });
     }
 
     public function layDuLieuExport(array $filters): array

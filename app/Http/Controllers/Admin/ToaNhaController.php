@@ -14,6 +14,14 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
+/**
+
+ * Khu vực: Admin / Tòa nhà
+ 
+ * Vai trò: CRUD tòa nhà (danh mục cơ sở vật chất).
+
+ */
+
 class ToaNhaController extends Controller
 {
     public function __construct(

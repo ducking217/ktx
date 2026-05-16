@@ -283,7 +283,7 @@
                         <div class="space-y-3 pt-6 border-t border-slate-100">
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">MSSV</span>
-                                <span class="text-xs font-bold text-slate-900 tabular-nums"><?php echo e($user->sinhvien->masinhvien); ?></span>
+                                <span class="text-xs font-bold text-slate-900 tabular-nums"><?php echo e($user->sinhvien->ma_sinh_vien ?? 'Chưa có'); ?></span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hợp đồng</span>

@@ -128,15 +128,6 @@ Route::prefix('admin')
             Route::get('/', 'lietKeBaoHongAdmin')->name('index');
             Route::post('/{id}', 'capNhatBaoHong')->name('capnhat');
         });
-        Route::prefix('bao-tri')->name('baotri.')->controller('LichsubaotriController')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/xuat-excel', 'xuatExcel')->name('xuat_excel');
-            Route::post('/', 'store')->name('store');
-            Route::post('/{id}', 'update')->name('capnhat');
-            Route::post('/{id}/xoa', 'destroy')->name('xoa');
-            Route::post('/{id}/hoan-thanh', 'hoanThanh')->name('hoanthanh');
-        });
-        Route::post('/vattu/{id}/baotri', 'LichsubaotriController@store')->name('vattu.baotri');
 
         // Quản lý Kỷ luật
         Route::prefix('ky-luat')->name('kyluat.')->controller('KyluatController')->middleware('can:kyluat.manage')->group(function () {

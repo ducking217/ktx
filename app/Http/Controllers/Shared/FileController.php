@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+
+ * Khu vực: Class
+ 
+ * Vai trò: Mô tả chức năng chính của lớp trong module tương ứng.
+
+ */
+
 class FileController extends Controller
 {
     /**

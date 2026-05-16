@@ -30,7 +30,7 @@
                         <span class="text-sm font-bold text-slate-300">%</span>
                     </div>
                     <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200/50">
-                        <div class="h-full rounded-full bg-brand-emerald transition-all duration-700" style="width: {{ $tyLeLapDay }}%"></div>
+                        <div class="h-full rounded-full bg-brand-emerald transition-all duration-700" style="--width: {{ $tyLeLapDay }}%; width: var(--width);"></div>
                     </div>
                 </div>
                 <div class="space-y-3">
@@ -75,7 +75,7 @@
             <div class="mt-6">
                 <div class="flex items-end gap-1.5 h-16 mb-3">
                     @foreach($xuHuongDoanhThu as $item)
-                        <div class="flex-1 rounded-md bg-slate-100 hover:bg-slate-800 transition-all cursor-default relative group/bar" style="height: {{ $item['height'] }}%">
+                        <div class="flex-1 rounded-md bg-slate-100 hover:bg-slate-800 transition-all cursor-default relative group/bar" style="--height: {{ $item['height'] }}%; height: var(--height);">
                             <div class="invisible absolute -top-9 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] px-2 py-1 rounded-lg opacity-0 group-hover/bar:visible group-hover/bar:opacity-100 transition-all whitespace-nowrap z-20 font-bold tabular-nums">
                                 {{ number_format($item['value']) }}đ
                             </div>
@@ -223,7 +223,7 @@
                                 <span class="text-[9px] font-bold text-slate-500 tabular-nums bg-slate-50 px-2 py-0.5 rounded border border-slate-100">{{ $toa['percentage'] }}%</span>
                             </div>
                             <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-slate-800 group-hover:bg-brand-emerald transition-all duration-500 rounded-full" style="width: {{ $toa['percentage'] }}%"></div>
+                                <div class="h-full bg-slate-800 group-hover:bg-brand-emerald transition-all duration-500 rounded-full" style="--width: {{ $toa['percentage'] }}%; width: var(--width);"></div>
                             </div>
                         </div>
                     @endforeach

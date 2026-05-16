@@ -9,6 +9,15 @@ use App\Contracts\Shared\NghiepVuPhongServiceInterface;
 use App\Http\Requests\Admin\LuuPhongRequest;
 use App\Http\Requests\Admin\CapNhatPhongRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
+/**
+
+ * Khu vực: Admin / Phòng
+ 
+ * Vai trò: Điều phối CRUD phòng, hiển thị danh sách/chi tiết và gọi service truy vấn phòng.
+
+ */
 
 class PhongController extends Controller
 {
@@ -21,15 +30,30 @@ class PhongController extends Controller
     public function index(Request $request)
     {
         $data = $this->truyVanPhongService->lietKePhongChoAdmin($request);
-        $data['toanhis'] = \App\Models\ToaNha::orderBy('ten_toa_nha')->get();
-        $data['loaiphongs'] = \App\Models\LoaiPhong::orderBy('ten_loai')->get();
+        $data['toanhis'] = Cache::remember('admin.rooms:buildings:v1', now()->addMinutes(10), function () {
+            return \App\Models\ToaNha::query()
+                ->select(['id', 'ten_toa_nha'])
+                ->orderBy('ten_toa_nha')
+                ->get();
+        });
+        $data['loaiphongs'] = Cache::remember('admin.rooms:room-types:v1', now()->addMinutes(10), function () {
+            return \App\Models\LoaiPhong::query()
+                ->select(['id', 'ten_loai', 'suc_chua', 'gia_thang'])
+                ->orderBy('ten_loai')
+                ->get();
+        });
 
         $taiSanPhongId = (int) $request->query('taisan_phong_id', 0);
         $data['taiSanPhongId'] = $taiSanPhongId > 0 ? $taiSanPhongId : null;
         $data['phongTaiSan'] = $taiSanPhongId > 0
             ? \App\Models\Phong::with(['taisans' => fn($q) => $q->orderBy('ten_tai_san')])->find($taiSanPhongId)
             : null;
-        $data['tatCaPhongChoChon'] = \App\Models\Phong::select(['id', 'toa_nha_id', 'ten_phong'])->orderBy('ten_phong')->get();
+        $data['tatCaPhongChoChon'] = Cache::remember('admin.rooms:all-for-picker:v1', now()->addMinutes(10), function () {
+            return \App\Models\Phong::query()
+                ->select(['id', 'toa_nha_id', 'ten_phong'])
+                ->orderBy('ten_phong')
+                ->get();
+        });
         
         return view('admin.phong.danhsach', $data);
     }

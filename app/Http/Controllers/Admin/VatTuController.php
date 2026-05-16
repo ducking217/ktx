@@ -6,6 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Contracts\Shared\VatTuPhongServiceInterface;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Vật tư
+ 
+ * Vai trò: CRUD/gắn vật tư theo phòng và thao tác hàng loạt.
+
+ */
+
 class VatTuController extends Controller
 {
     public function __construct(

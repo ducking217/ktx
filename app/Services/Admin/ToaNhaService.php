@@ -9,6 +9,14 @@ use App\Models\ToaNha;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+
+ * Khu vực: Admin / Tòa nhà
+ 
+ * Vai trò: CRUD tòa nhà và dữ liệu danh mục liên quan.
+
+ */
+
 class ToaNhaService implements ToaNhaServiceInterface
 {
     public function __construct(

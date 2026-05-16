@@ -107,7 +107,7 @@
                                     $total = max(1, $end - $start);
                                     $progress = min(100, max(0, (($now - $start) / $total) * 100));
                                 ?>
-                                <div class="bg-brand-emerald h-full transition-all duration-1000 rounded-full" style="width: <?php echo e($progress); ?>%"></div>
+                                <div class="bg-brand-emerald h-full transition-all duration-1000 rounded-full" style="<?php echo \Illuminate\Support\Arr::toCssStyles(['width' => $progress . '%']) ?>"></div>
                             </div>
                         </td>
                         <td class="py-5 text-center">
@@ -332,11 +332,7 @@
                 <form action="<?php echo e(route('admin.hopdong.thanhly', $item->id)); ?>" method="POST" class="space-y-6">
                     <?php echo csrf_field(); ?>
                     <?php
-                        $hoadonCoc = \App\Models\Hoadon::where('hopdong_id', $item->id)
-                            ->where('loai_hoadon', \App\Models\Hoadon::LOAI_DEPOSIT)
-                            ->where('trang_thai', \App\Enums\InvoiceStatus::Paid->value)
-                            ->first();
-                        $tienCoc = $hoadonCoc?->tong_tien ?? 0;
+                        $tienCoc = (int) ($item->tien_coc ?? 0);
                     ?>
 
                     <div class="space-y-2">

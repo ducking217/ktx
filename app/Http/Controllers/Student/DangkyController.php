@@ -8,6 +8,14 @@ use App\Http\Requests\Student\LuuDangKyMoiRequest;
 use App\Http\Requests\Student\YeuCauDoiPhongRequest;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Đăng ký cư trú
+ 
+ * Vai trò: Điểm vào route Admin, nhận request, gọi DangkyService và trả về view/redirect.
+
+ */
+
 class DangkyController extends Controller
 {
     public function __construct(

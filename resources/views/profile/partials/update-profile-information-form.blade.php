@@ -59,9 +59,23 @@
 
                 {{-- Lớp --}}
                 <div class="space-y-2">
-                    <label for="lop" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Lớp / Khóa học</label>
+                    <label for="lop" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Lớp</label>
                     <input id="lop" name="lop" type="text" class="saas-input" value="{{ old('lop', optional($user->sinhvien)->lop) }}" placeholder="Ví dụ: CNTT K15" />
                     <x-input-error class="mt-1 ml-1" :messages="$errors->get('lop')" />
+                </div>
+
+                {{-- Khoa --}}
+                <div class="space-y-2">
+                    <label for="khoa" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Khoa</label>
+                    <input id="khoa" name="khoa" type="text" class="saas-input" value="{{ old('khoa', optional($user->sinhvien)->khoa) }}" placeholder="Ví dụ: Công nghệ thông tin" />
+                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('khoa')" />
+                </div>
+
+                {{-- Ngày nhập học --}}
+                <div class="space-y-2">
+                    <label for="ngay_nhap_hoc" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Ngày nhập học</label>
+                    <input id="ngay_nhap_hoc" name="ngay_nhap_hoc" type="date" class="saas-input tabular-nums" value="{{ old('ngay_nhap_hoc', optional($user->sinhvien)->ngay_nhap_hoc?->format('Y-m-d')) }}" />
+                    <x-input-error class="mt-1 ml-1" :messages="$errors->get('ngay_nhap_hoc')" />
                 </div>
 
                 {{-- Số điện thoại --}}

@@ -7,6 +7,14 @@ use App\Models\Thongbao;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Shared / Thông báo
+ 
+ * Vai trò: Gửi/ghi nhận thông báo và truy vấn danh sách thông báo theo đối tượng.
+
+ */
+
 class ThongbaoService implements ThongbaoServiceInterface
 {
     use PhanHoiService;
@@ -58,7 +66,7 @@ class ThongbaoService implements ThongbaoServiceInterface
 
         $thongbao = $query->first();
         if (! $thongbao) {
-            return $this->traVeLoi('Khong tim thay thong bao.');
+            return $this->traVeLoi('Không tìm thấy thông báo.');
         }
 
         $thongbaoLienQuan = Thongbao::where('id', '<>', $id)
@@ -95,7 +103,7 @@ class ThongbaoService implements ThongbaoServiceInterface
                 'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? 'all',
             ])->save();
 
-            return $this->traVeThanhCong('Thao tac thanh cong.');
+            return $this->traVeThanhCong('Thao tác thành công.');
         } catch (\Throwable $throwable) {
             return $this->traVeLoi($throwable->getMessage());
         }
@@ -106,7 +114,7 @@ class ThongbaoService implements ThongbaoServiceInterface
         try {
             $thongbao = Thongbao::find($id);
             if (! $thongbao) {
-                return $this->traVeLoi('Khong tim thay thong bao.');
+                return $this->traVeLoi('Không tìm thấy thông báo.');
             }
 
             $thongbao->fill([
@@ -116,7 +124,7 @@ class ThongbaoService implements ThongbaoServiceInterface
                 'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? 'all',
             ])->save();
 
-            return $this->traVeThanhCong('Thao tac thanh cong.');
+            return $this->traVeThanhCong('Thao tác thành công.');
         } catch (\Throwable $throwable) {
             return $this->traVeLoi($throwable->getMessage());
         }
@@ -127,11 +135,11 @@ class ThongbaoService implements ThongbaoServiceInterface
         try {
             $thongbao = Thongbao::find($id);
             if (! $thongbao) {
-                return $this->traVeLoi('Khong tim thay thong bao.');
+                return $this->traVeLoi('Không tìm thấy thông báo.');
             }
 
             $thongbao->delete();
-            return $this->traVeThanhCong('Xoa thanh cong.');
+            return $this->traVeThanhCong('Xóa thành công.');
         } catch (\Throwable $throwable) {
             return $this->traVeLoi($throwable->getMessage());
         }

@@ -7,6 +7,14 @@ use App\Contracts\Student\BaohongServiceInterface;
 use App\Enums\BaohongStatus;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Báo hỏng
+ 
+ * Vai trò: Quản lý danh sách báo hỏng và cập nhật trạng thái xử lý.
+
+ */
+
 class BaohongController extends Controller
 {
     public function __construct(

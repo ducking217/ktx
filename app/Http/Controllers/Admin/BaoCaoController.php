@@ -10,15 +10,24 @@ use App\Exports\BaoCaoTaiChinhExport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
+/**
+
+ * Khu vực: Admin / Báo cáo
+ 
+ * Vai trò: Render báo cáo và gọi BaoCaoService để lấy dữ liệu/Excel export.
+
+ */
+
 class BaoCaoController extends Controller
 {
     public function __construct(
         private readonly BaoCaoServiceInterface $baoCaoService
     ) {}
 
-    public function taiChinh()
+    public function taiChinh(Request $request)
     {
-        $data = $this->baoCaoService->layDuLieuTaiChinh();
+        $nam = (int) $request->query('nam', now()->year);
+        $data = $this->baoCaoService->layDuLieuTaiChinh($nam);
         return view('admin.baocao.taichinh', $data);
     }
 

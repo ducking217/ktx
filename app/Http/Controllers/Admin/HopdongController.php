@@ -7,6 +7,14 @@ use App\Contracts\Admin\HopdongServiceInterface;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+/**
+
+ * Khu vực: Admin / Hợp đồng
+ 
+ * Vai trò: Điểm vào route Admin, validate request và gọi HopdongService (kèm xuất PDF).
+
+ */
+
 class HopdongController extends Controller
 {
     public function __construct(
@@ -50,7 +58,7 @@ class HopdongController extends Controller
 
         return redirect()->back()->with([
             'toast_loai' => ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi',
-            'toast_noidung' => $ketQua['message'] ?? 'Khong the tao hop dong.',
+            'toast_noidung' => $ketQua['message'] ?? 'Không thể tạo hợp đồng.',
         ]);
     }
 
@@ -77,7 +85,7 @@ class HopdongController extends Controller
         $ngayCu = $dulieu['ngay_ket_thuc_cu'] ?? optional($this->hopdongService->layChiTietHopDong($id)['hopdong'] ?? null)->ngay_ket_thuc;
 
         if (! $ngayMoi || ! $ngayCu) {
-            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => 'Thieu du lieu gia han hop dong.']);
+            return redirect()->back()->with(['toast_loai' => 'loi', 'toast_noidung' => 'Thiếu dữ liệu gia hạn hợp đồng.']);
         }
 
         $ketQua = $this->hopdongService->giaHanHopDong($id, $ngayMoi, $ngayCu);
@@ -89,7 +97,7 @@ class HopdongController extends Controller
         }
 
         $loai = ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi';
-        return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Khong the gia han hop dong.']);
+        return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Không thể gia hạn hợp đồng.']);
     }
 
     public function destroy(Request $request, int $id)
@@ -109,7 +117,7 @@ class HopdongController extends Controller
         }
 
         $loai = ($ketQua['success'] ?? false) ? 'thanhcong' : 'loi';
-        return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Khong the thanh ly hop dong.']);
+        return redirect()->back()->with(['toast_loai' => $loai, 'toast_noidung' => $ketQua['message'] ?? 'Không thể thanh lý hợp đồng.']);
     }
 
     public function downloadPDF(int $id)

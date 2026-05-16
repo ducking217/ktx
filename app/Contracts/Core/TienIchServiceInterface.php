@@ -7,32 +7,32 @@ use Illuminate\Http\Request;
 interface TienIchServiceInterface
 {
     /**
-     * Lay cau hinh he thong.
+     * Lấy cấu hình hệ thống.
      */
     public function layCauHinh(): array;
 
     /**
-     * Cap nhat cau hinh.
+     * Cập nhật cấu hình.
      */
     public function capNhatCauHinh(array $data): void;
 
     /**
-     * Lay danh sach thong bao.
+     * Lấy danh sách thông báo.
      */
     public function danhSachThongBao(string $target = 'all'): array;
 
     /**
-     * Gui thong bao.
+     * Gửi thông báo.
      */
     public function guiThongBao(array $data): void;
 
     /**
-     * Danh sach lien he (Admin).
+     * Danh sách liên hệ (Admin).
      */
     public function danhSachLienHe(Request $request): array;
 
     /**
-     * Cap nhat trang thai lien he.
+     * Cập nhật trạng thái liên hệ.
      */
     public function capNhatTrangThaiLienHe(int $id, string $status, ?string $note = null): void;
 }

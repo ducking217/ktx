@@ -10,56 +10,17 @@ use App\Models\Thongbao;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Tài chính
+ 
+ * Vai trò: Nghiệp vụ tài chính tổng hợp phục vụ màn quản trị/điều phối.
+
+ */
+
 class TaiChinhService implements TaiChinhServiceInterface
 {
     use PhanHoiService;
-
-    public function lietKeCongNo(Request $request): array
-    {
-        $tuKhoa = $request->query('q', '');
-
-        $data = Hoadon::where('trang_thai', InvoiceStatus::Overdue->value)
-            ->when($tuKhoa, function ($q) use ($tuKhoa) {
-                $q->whereHas('hopdong.sinhvien', fn ($sq) => $sq->where('ma_sinh_vien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
-            })
-            ->with(['hopdong.sinhvien.user', 'phong'])
-            ->orderByDesc('created_at')
-            ->paginate(20)
-            ->withQueryString();
-
-        return ['hoadons' => $data, 'tuKhoa' => $tuKhoa];
-    }
-
-    public function layBaoCaoNoDong(Request $request): array
-    {
-        $raw = $this->lietKeCongNo($request);
-        $hoaDons = collect($raw['hoadons']->items());
-
-        $grouped = $hoaDons->groupBy('phong_id')->map(function ($items, $phongId) {
-            $sinhviens = $items->pluck('hopdong.sinhvien')->filter()->unique('id')->values();
-            $phong = $items->first()->phong ?? null;
-
-            return [
-                'phong' => $phong,
-                'sinhvien' => $sinhviens,
-                'hoadon' => $items->values(),
-                'tong_tien' => (int) $items->sum('tong_tien'),
-            ];
-        });
-
-        $thongKe = [
-            'tong_phong_no' => $grouped->count(),
-            'tong_sinh_vien_no' => $grouped->pluck('sinhvien')->flatten(1)->unique('id')->count(),
-            'so_hoa_don_qua_han' => $hoaDons->count(),
-            'tong_tien_no' => (int) $hoaDons->sum('tong_tien'),
-        ];
-
-        return [
-            'congnoTheoPhong' => $grouped,
-            'thongke' => $thongKe,
-            'ngayQuaHan' => 0,
-        ];
-    }
 
     public function nhacNo(int $invoiceId): array
     {
@@ -84,23 +45,5 @@ class TaiChinhService implements TaiChinhServiceInterface
         } catch (\Throwable $e) {
             return $this->traVeLoi($e->getMessage());
         }
-    }
-
-    public function nhacNoTheoPhong(int $phongId): array
-    {
-        $invoiceIds = Hoadon::query()
-            ->where('phong_id', $phongId)
-            ->where('trang_thai', InvoiceStatus::Overdue->value)
-            ->pluck('id');
-
-        if ($invoiceIds->isEmpty()) {
-            return $this->traVeLoi('Không có hóa đơn quá hạn để gửi nhắc nợ.');
-        }
-
-        foreach ($invoiceIds as $invoiceId) {
-            $this->nhacNo((int) $invoiceId);
-        }
-
-        return $this->traVeThanhCong('Da gui thong bao nhac no cho phong.');
     }
 }

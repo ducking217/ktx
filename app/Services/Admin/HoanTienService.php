@@ -8,6 +8,14 @@ use App\Models\Hoadon;
 use App\Enums\InvoiceStatus;
 use Illuminate\Support\Facades\Log;
 
+/**
+
+ * Khu vực: Admin / Hoàn tiền
+ 
+ * Vai trò: Xử lý hoàn cọc/hoàn tiền khi thanh lý hợp đồng, kèm các điều kiện cấn trừ.
+
+ */
+
 class HoanTienService implements HoanTienServiceInterface
 {
     public function xuLyHoanTien(Hopdong $hopdong, int $phiHuHai = 0): array

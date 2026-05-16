@@ -7,6 +7,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Đăng nhập bằng magic link (1-click).
+
+ */
+
 class MagicLinkController extends Controller
 {
     public function login(Request $request, int $user_id)

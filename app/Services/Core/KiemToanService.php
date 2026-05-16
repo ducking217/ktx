@@ -6,6 +6,14 @@ use App\Contracts\Core\KiemToanServiceInterface;
 use App\Models\NhatKy;
 use Illuminate\Support\Facades\Auth;
 
+/**
+
+ * Khu vực: Core / Kiểm toán
+ 
+ * Vai trò: Ghi nhận nhật ký kiểm toán nghiệp vụ (gia hạn, thanh lý, thay đổi quan trọng).
+
+ */
+
 class KiemToanService implements KiemToanServiceInterface
 {
     /**

@@ -4,7 +4,7 @@
 - [x] **Cơ sở vật chất**: Tòa nhà, Phòng, Giường, Tài sản (Full CRUD).
 - [x] **Vận hành**: Đăng ký cư trú (Guest/Student), Hợp đồng, Gia hạn (Full Flow).
 - [x] **Tài chính**: Chỉ số điện nước, Hóa đơn (Bulk entry, PDF export), Doanh thu.
-- [x] **Tương tác**: Báo hỏng, Kỷ luật, Đánh giá, Thông báo.
+- [x] **Tương tác**: Báo hỏng, Kỷ luật, Thông báo.
 - [x] **Hệ thống**: Phân quyền (RBAC), Nhật ký hoạt động, Cấu hình.
 - [x] **UI/UX**: Thống nhất ngôn ngữ thiết kế @impeccable, Responsive, Empty States.
 
@@ -14,6 +14,113 @@
 - [x] Tối ưu hóa Dashboard Admin & Student.
 - [x] Fix lỗi logic tính toán hóa đơn điện nước.
 - [x] Đảm bảo tính nhất quán của dữ liệu (Database Constraints & Logic).
+
+## 2026-05-09 - Dọn module không dùng + chuẩn hóa chuỗi tiếng Việt có dấu
+
+### Hoàn thành ✅
+- Gỡ tính năng “Đánh giá”: xóa controllers/services và binding trong AppServiceProvider.
+- Gỡ tính năng “Công nợ”: xóa CongnoController, xóa 3 method công nợ trong TaiChinhService (và interface).
+- Gỡ tính năng “Trả phòng”: xóa TraPhongService và binding.
+- Xóa 2 view rác: `admin/phong/map.blade.php`, `student/hoadon/danhsach.blade.php`.
+- Chuẩn hóa chuỗi UI/email/validation bị viết không dấu (bao gồm fallback “Đang xử lý...” trên nút submit).
+
+### Files Updated
+- `app/Http/Controllers/Admin/CauhinhController.php`
+- `app/Http/Controllers/Admin/HopdongController.php`
+- `app/Http/Middleware/KiemTraVaiTro.php`
+- `app/Http/Requests/Admin/DuyetDangKyRequest.php`
+- `app/Http/Requests/Student/LuuDangKyMoiRequest.php`
+- `app/Http/Requests/Student/YeuCauDoiPhongRequest.php`
+- `app/Services/Shared/ThongbaoService.php`
+- `app/Services/Shared/TaiSanPhongService.php`
+- `app/Services/Shared/VatTuPhongService.php`
+- `app/Services/Student/BaohongService.php`
+- `app/Traits/KiemtraKyluat.php`
+- `app/Mail/DangkyDaDuyetMail.php`
+- `app/Contracts/Admin/DangkyServiceInterface.php`
+- `app/Contracts/Admin/TaiChinhServiceInterface.php`
+- `app/Contracts/Core/TienIchServiceInterface.php`
+- `resources/js/app.js`
+- `resources/views/layouts/guest.blade.php`
+- `resources/views/emails/dangky-da-duyet.blade.php`
+
+## 2026-05-09 - Admin Báo hỏng: Loading state nút icon gọn, không vỡ layout
+
+### Hoàn thành ✅
+- Nút “Lưu trạng thái” dạng icon-only khi submit hiển thị spinner thay vì text dài, tránh bị xuống dòng mất thẩm mỹ.
+
+### Files Updated
+- `resources/js/app.js`
+- `resources/views/admin/baohong/danhsach.blade.php`
+
+## 2026-05-09 - Admin Báo cáo tài chính: Tối ưu UI (giảm “busy”, tăng khả năng quét)
+
+### Hoàn thành ✅
+- Giảm uppercase/tracking và hiệu ứng hover quá mạnh; ưu tiên bố cục “Modern SaaS Tool”.
+- Chuẩn hóa nhóm KPI theo style đồng nhất, giảm nhiễu thị giác.
+- Tinh gọn khối biểu đồ và leaderboard; cải thiện responsive height.
+- Fix font Chart.js về Geist Sans (không dùng Inter).
+- Fix lọc theo năm: dropdown submit về trang báo cáo và backend áp dụng `nam` cho dữ liệu.
+
+### Files Updated
+- `resources/views/admin/baocao/taichinh.blade.php`
+- `app/Http/Controllers/Admin/BaoCaoController.php`
+- `app/Contracts/Admin/BaoCaoServiceInterface.php`
+- `app/Services/Admin/BaoCaoService.php`
+
+## 2026-05-09 - Performance: Cache nhẹ cho trang hay truy cập (Landing/Admin)
+
+### Hoàn thành ✅
+- Landing: cache dữ liệu trang chủ (stats/phòng/thông báo) 60s để giảm truy vấn lặp.
+- Admin Activity Log: cache danh sách filter (model/action/admins) 10 phút để giảm distinct query nặng.
+- Admin Báo cáo tài chính: cache dữ liệu tổng hợp theo năm 5 phút để giảm query aggregate lặp.
+
+### Files Updated
+- `app/Services/Core/TrangChuService.php`
+- `app/Http/Controllers/Admin/ActivityLogController.php`
+- `app/Services/Admin/BaoCaoService.php`
+
+## 2026-05-09 - Performance: Giảm query nặng trên các trang vận hành
+
+### Hoàn thành ✅
+- Student “Phòng của tôi”: tối ưu truy vấn gợi ý phòng trống, không load toàn bộ phòng rồi filter trong PHP.
+- Admin “Kỷ luật”: cache danh sách sinh viên cho dropdown filter và chỉ load cột cần thiết.
+- Admin “Hóa đơn”: cache danh sách phòng dùng cho modal ghi chỉ số, tránh query lặp mỗi request.
+
+### Files Updated
+- `app/Services/Student/PhongSinhvienService.php`
+- `app/Services/Student/KyluatService.php`
+- `app/Services/Admin/HoadonService.php`
+
+## 2026-05-09 - Performance: Admin Phòng & Admin Hồ sơ Sinh viên (giảm N+1/giảm payload)
+
+### Hoàn thành ✅
+- Admin “Phòng”: cache danh sách tòa nhà/loại phòng/toàn bộ phòng cho picker (TTL 10 phút).
+- Admin “Phòng”: tối ưu query list phòng (select cột cần thiết) + cache danh sách tầng (TTL 10 phút).
+- Admin “Chi tiết phòng”: bỏ query thừa khi dựng danh sách sinh viên đang ở (tận dụng eager-loaded giường/hợp đồng).
+- Admin “Chi tiết sinh viên”: bỏ eager-load “Đánh giá” đã bị gỡ; hóa đơn chỉ select cột cần thiết.
+
+### Files Updated
+- `app/Http/Controllers/Admin/PhongController.php`
+- `app/Services/Core/TruyVanPhongService.php`
+- `app/Services/Shared/SinhvienService.php`
+
+## 2026-05-09 - Performance: Admin Đăng ký & Admin Hợp đồng (giảm payload, tránh N+1)
+
+### Hoàn thành ✅
+- Admin “Đăng ký cư trú”: tách query count khỏi eager-load, chỉ select cột cần thiết cho list; eager-load theo đúng tab (thuê phòng / trả phòng) để tránh overfetch.
+- Admin “Hợp đồng”: bỏ N+1 query hóa đơn cọc trong modal thanh lý bằng cách preload `tien_coc` theo danh sách hợp đồng.
+
+### Files Updated
+- `app/Services/Admin/DangkyService.php`
+- `app/Services/Admin/HopdongService.php`
+- `resources/views/admin/hopdong/danhsach.blade.php`
+
+## 2026-05-09 - DevX: Chú thích khu vực chức năng (Services/Controllers)
+
+### Hoàn thành ✅
+- Thêm docblock tiếng Việt theo từng file trong `app/Services/**` và `app/Http/Controllers/**` để mô tả khu vực và vai trò chính, giúp đọc code nhanh hơn.
+- Chuẩn hóa encoding: loại bỏ UTF-8 BOM trên các file đã chỉnh để tránh lỗi PHP khi load namespace.
 
 ## 2026-05-07 - Student Sidebar: Đổi icon “Phòng của tôi”
 
@@ -90,6 +197,24 @@
 ### Files Updated
 - `app/Services/Core/TrangChuService.php`
 - `resources/views/landing/index.blade.php`
+
+## 2026-05-16 - Fix: Admin Hợp đồng lỗi cột ghi chú
+
+### Hoàn thành ✅
+- Sửa mismatch tên cột ghi chú hợp đồng: DB dùng `ghi_chu`, UI/legacy dùng `ghichu`.
+
+### Files Updated
+- `app/Services/Admin/HopdongService.php`
+- `app/Models/Hopdong.php`
+
+## 2026-05-16 - Tắt an toàn: Admin Lịch bảo trì
+
+### Hoàn thành ✅
+- Gỡ link khỏi sidebar và gỡ routes `admin.baotri.*` để tránh truy cập nhầm; không đụng DB/migration.
+
+### Files Updated
+- `routes/web.php`
+- `resources/views/admin/partials/sidebar.blade.php`
 
 ## 2026-05-06 - Layout System: Tokens + App Shell (Admin/Student/App)
 

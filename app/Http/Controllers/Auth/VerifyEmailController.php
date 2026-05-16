@@ -7,6 +7,14 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Xác minh email.
+
+ */
+
 class VerifyEmailController extends Controller
 {
     /**

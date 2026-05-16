@@ -22,7 +22,8 @@ const initSubmitLoadingStates = () => {
             return;
         }
 
-        const loadingText = submitter.dataset.loadingText || 'Dang xu ly...';
+        const loadingText = submitter.dataset.loadingText || 'Đang xử lý...';
+        const loadingMode = submitter.dataset.loading || 'text';
         submitter.disabled = true;
         submitter.setAttribute('aria-busy', 'true');
         submitter.classList.add('linear-btn-loading');
@@ -35,7 +36,11 @@ const initSubmitLoadingStates = () => {
             if (!submitter.dataset.originalText) {
                 submitter.dataset.originalText = submitter.innerHTML;
             }
-            submitter.innerHTML = `<span>${loadingText}</span>`;
+            if (loadingMode === 'spinner') {
+                submitter.innerHTML = `<span class="sr-only">${loadingText}</span><svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"></path></svg>`;
+            } else {
+                submitter.innerHTML = `<span class="whitespace-nowrap">${loadingText}</span>`;
+            }
         }
     });
 };

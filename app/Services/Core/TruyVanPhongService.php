@@ -6,12 +6,19 @@ use App\Contracts\Core\TruyVanPhongServiceInterface;
 use App\Enums\ContractStatus;
 use App\Models\Phong;
 use App\Models\Sinhvien;
-use App\Models\Dangky;
 use App\Models\Hopdong;
-use App\Enums\RegistrationStatus;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+
+/**
+
+ * Khu vực: Core / Truy vấn phòng
+ 
+ * Vai trò: Truy vấn danh sách/chi tiết phòng (Admin/Student/Public) và các số liệu phụ trợ (giường, sắp trống).
+
+ */
 
 class TruyVanPhongService implements TruyVanPhongServiceInterface
 {
@@ -24,9 +31,11 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         $toaNhaId = $request->query('toa_nha_id', '');
         $viewMode = $request->query('view', 'table');
 
-        $danhsachphong = Phong::with(['loaiphong', 'toanha'])
+        $danhsachphong = Phong::query()
+            ->select(['id', 'toa_nha_id', 'loai_phong_id', 'ten_phong', 'tang', 'gioi_tinh_han_che', 'trang_thai'])
+            ->with(['loaiphong', 'toanha'])
             ->withCount(['giuongs as so_nguoi_dang_o' => function ($query) {
-                $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+                $query->where('trang_thai', \App\Enums\BedStatus::Occupied->value);
             }])
             ->when($tuKhoa, function ($query, $tuKhoa) {
                 return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
@@ -44,7 +53,13 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
 
         $soluongdango_theophong = $danhsachphong->pluck('so_nguoi_dang_o', 'id')->toArray();
         $phongTheoTang = $danhsachphong->groupBy('tang');
-        $danhsachtang = Phong::select('tang')->distinct()->orderBy('tang')->pluck('tang');
+        $danhsachtang = Cache::remember('admin.rooms:distinct-floors:v1', now()->addMinutes(10), function () {
+            return Phong::query()
+                ->select('tang')
+                ->distinct()
+                ->orderBy('tang')
+                ->pluck('tang');
+        });
 
         return compact('danhsachphong', 'phongTheoTang', 'soluongdango_theophong', 'tuKhoa', 'tangLoc', 'danhsachtang', 'viewMode');
     }
@@ -178,11 +193,11 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
 
         return [
             'phong' => $phong,
-            'sinhviens' => $phong->giuongs()
+            'sinhviens' => $phong->giuongs
                 ->where('trang_thai', \App\Enums\BedStatus::Occupied)
-                ->get()
-                ->map(fn($g) => $g->current_hopdong->sinhvien)
-                ->filter(),
+                ->map(fn($g) => $g->current_hopdong?->sinhvien)
+                ->filter()
+                ->values(),
             'taisan' => $phong->taisans,
             'vattu' => $phong->vattus,
             'beds' => $beds,
@@ -207,7 +222,7 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         return $statuses;
     }
 
-    private function ganThongTinSapTrong($danhsachphong, int $days = 30): void
+    private function ganThongTinSapTrong(\Illuminate\Support\Collection $danhsachphong, int $days = 30): void
     {
         $phongIds = $danhsachphong->pluck('id')->all();
         $sapTrongMap = $this->layThongTinSapTrongTheoPhongIds($phongIds, $days);

@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Xác nhận mật khẩu trước hành động nhạy cảm.
+
+ */
+
 class ConfirmablePasswordController extends Controller
 {
     /**

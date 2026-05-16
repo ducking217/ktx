@@ -111,7 +111,7 @@
                     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="saas-card p-5 bg-slate-50/50">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Sức chứa</div>
-                            <div class="text-xl font-bold text-slate-900 tabular-nums"><?php echo e($banCungPhong->count() + 1); ?> / <?php echo e($phong->succhuamax); ?> <span class="text-[9px] text-slate-400">SV</span></div>
+                            <div class="text-xl font-bold text-slate-900 tabular-nums"><?php echo e($banCungPhong->count() + 1); ?> / <?php echo e($phong->succhuamax); ?> <span class="text-[9px] text-slate-400">Sinh viên</span></div>
                         </div>
                         <div class="saas-card p-5 bg-slate-50/50">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Trạng thái</div>

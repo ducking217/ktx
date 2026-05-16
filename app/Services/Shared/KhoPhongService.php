@@ -9,6 +9,14 @@ use App\Models\Dangky;
 use App\Enums\RegistrationStatus;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Shared / Kho phòng
+ 
+ * Vai trò: Quản lý kho theo phòng (vật tư/tài sản) phục vụ vận hành.
+
+ */
+
 class KhoPhongService implements KhoPhongServiceInterface
 {
     public function layBanDoKyTucXa(Request $request): array

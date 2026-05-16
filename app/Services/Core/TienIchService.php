@@ -8,6 +8,14 @@ use App\Models\Lienhe;
 use App\Models\Thongbao;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Core / Tiện ích
+ 
+ * Vai trò: Nghiệp vụ tiện ích dùng chung cho hệ thống.
+
+ */
+
 class TienIchService implements TienIchServiceInterface
 {
     public function layCauHinh(): array

@@ -7,6 +7,14 @@ use App\Contracts\Admin\DangkyServiceInterface;
 use App\Http\Requests\Admin\DuyetDangKyRequest;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Đăng ký cư trú
+ 
+ * Vai trò: Điểm vào route Admin, nhận request, gọi DangkyService và trả về view/redirect.
+
+ */
+
 class DangkyController extends Controller
 {
     public function __construct(

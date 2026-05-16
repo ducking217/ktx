@@ -11,6 +11,14 @@ use App\Http\Requests\Admin\CapNhatAccountRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Tài khoản
+ 
+ * Vai trò: Điều phối CRUD tài khoản vận hành và khôi phục.
+
+ */
+
 class AccountController extends Controller
 {
     public function __construct(

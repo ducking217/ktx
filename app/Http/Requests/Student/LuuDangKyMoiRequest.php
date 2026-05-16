@@ -29,11 +29,10 @@ class LuuDangKyMoiRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'phong_id.required' => 'Ban chua chon phong.',
-            'phong_id.numeric' => 'Phong khong hop le.',
-            'phong_id.exists' => 'Phong khong ton tai.',
+            'phong_id.required' => 'Bạn chưa chọn phòng.',
+            'phong_id.numeric' => 'Phòng không hợp lệ.',
+            'phong_id.exists' => 'Phòng không tồn tại.',
         ];
     }
 }
-
 

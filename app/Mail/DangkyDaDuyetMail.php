@@ -29,7 +29,7 @@ class DangkyDaDuyetMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Dang ky phong da duoc duyet',
+            subject: 'Đăng ký phòng đã được duyệt',
         );
     }
 

@@ -47,7 +47,7 @@ interface DangkyServiceInterface
     public function layDuLieuFormDangKyKhach(int $phongId): array;
 
     /**
-     * Tra cuu ho so dang ky theo token.
+     * Tra cứu hồ sơ đăng ký theo token.
      */
     public function layDuLieuTraCuuKhach(?string $token): array;
 

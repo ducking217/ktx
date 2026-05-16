@@ -9,6 +9,14 @@ use App\Models\Vattu;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Bảo trì
+ 
+ * Vai trò: Quản lý lịch sử bảo trì, cập nhật trạng thái và xuất dữ liệu khi cần.
+
+ */
+
 class BaoTriService implements BaoTriServiceInterface
 {
     use PhanHoiService;

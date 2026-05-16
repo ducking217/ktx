@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 class KiemTraVaiTro
 {
     /**
-     * Kiem tra vai tro dang nhap theo route middleware.
+     * Kiểm tra vai trò đăng nhập theo route middleware.
      * Logic đơn giản: Chỉ chấp nhận 3 role: admin, sinhvien, guest
      */
     public function handle(Request $request, Closure $next, string $vaitrobatbuoc): Response
@@ -42,7 +42,7 @@ class KiemTraVaiTro
             return redirect()
                 ->route('dashboard')
                 ->with('toast_loai', 'loi')
-                ->with('toast_noidung', 'Ban khong co quyen truy cap chuc nang nay.');
+                ->with('toast_noidung', 'Bạn không có quyền truy cập chức năng này.');
         }
 
         return $next($request);

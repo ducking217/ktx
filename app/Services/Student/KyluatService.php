@@ -8,6 +8,15 @@ use App\Models\Sinhvien;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+
+/**
+
+ * Khu vực: Student / Kỷ luật
+ 
+ * Vai trò: Truy vấn và hiển thị dữ liệu kỷ luật phục vụ sinh viên và/hoặc filter Admin.
+
+ */
 
 class KyluatService implements KyluatServiceInterface
 {
@@ -20,7 +29,15 @@ class KyluatService implements KyluatServiceInterface
             $q->whereHas('sinhvien', fn($sq) => $sq->where('ma_sinh_vien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%'));
         })->with(['sinhvien.user', 'sinhvien.current_hopdong.giuong.phong'])->orderByDesc('ngay_vi_pham')->paginate(20);
 
-        return ['kyluat' => $data, 'tuKhoa' => $tuKhoa, 'sinhviens' => Sinhvien::with('user')->get()];
+        $students = Cache::remember('admin.kyluat:students:v1', now()->addMinutes(10), function () {
+            return Sinhvien::query()
+                ->select(['id', 'user_id', 'ma_sinh_vien'])
+                ->with('user:id,name')
+                ->orderByDesc('id')
+                ->get();
+        });
+
+        return ['kyluat' => $data, 'tuKhoa' => $tuKhoa, 'sinhviens' => $students];
     }
 
     public function listKyluatStudent(): array

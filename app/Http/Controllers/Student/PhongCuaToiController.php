@@ -5,6 +5,14 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Contracts\Student\PhongSinhvienServiceInterface;
 
+/**
+
+ * Khu vực: Student / Phòng của tôi
+ 
+ * Vai trò: Render trang phòng hiện tại của sinh viên từ PhongSinhvienService.
+
+ */
+
 class PhongCuaToiController extends Controller
 {
     public function __construct(

@@ -18,6 +18,14 @@ use App\Models\Taisan;
 use App\Models\Thongbao;
 use Illuminate\Support\Facades\Auth;
 
+/**
+
+ * Khu vực: Admin / Dashboard
+ 
+ * Vai trò: Tổng hợp chỉ số vận hành cho bảng điều khiển Admin.
+
+ */
+
 class BangDieuKhienService implements BangDieuKhienServiceInterface
 {
     public function layDuLieuBangDieuKhienAdmin(): array

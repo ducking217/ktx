@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
+/**
+
+ * Khu vực: Admin / Báo hỏng
+ 
+ * Vai trò: Quản lý danh sách báo hỏng và cập nhật trạng thái xử lý.
+
+ */
+
 class BaohongController extends Controller
 {
     public function __construct(

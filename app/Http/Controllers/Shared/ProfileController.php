@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Class
+ 
+ * Vai trò: Mô tả chức năng chính của lớp trong module tương ứng.
+
+ */
+
 class ProfileController extends Controller
 {
     /**

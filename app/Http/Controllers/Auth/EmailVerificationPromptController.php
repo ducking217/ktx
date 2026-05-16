@@ -7,6 +7,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Màn hình nhắc xác minh email.
+
+ */
+
 class EmailVerificationPromptController extends Controller
 {
     /**

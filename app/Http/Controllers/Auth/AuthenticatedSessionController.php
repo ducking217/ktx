@@ -9,6 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Đăng nhập/đăng xuất (session-based).
+
+ */
+
 class AuthenticatedSessionController extends Controller
 {
     /**

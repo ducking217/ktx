@@ -7,6 +7,14 @@ use App\Contracts\Student\KyluatServiceInterface;
 use App\Enums\DisciplineLevel;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Kỷ luật
+ 
+ * Vai trò: CRUD kỷ luật và điều phối dữ liệu danh sách/filter.
+
+ */
+
 class KyluatController extends Controller
 {
     public function __construct(

@@ -6,9 +6,11 @@ namespace App\Services\Admin;
 
 use App\Enums\BedStatus;
 use App\Enums\ContractStatus;
+use App\Enums\InvoiceStatus;
 use App\Contracts\Admin\HopdongServiceInterface;
 use App\Contracts\Admin\HoanTienServiceInterface;
 use App\Models\Giuong;
+use App\Models\Hoadon;
 use App\Models\Hopdong;
 use App\Models\Sinhvien;
 use App\Traits\HoTroNghiepVu;
@@ -16,6 +18,14 @@ use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
+/**
+
+ * Khu vực: Admin / Hợp đồng
+ 
+ * Vai trò: Quản lý vòng đời hợp đồng (tạo, gia hạn, thanh lý) và trạng thái giường liên quan.
+
+ */
 
 class HopdongService implements HopdongServiceInterface
 {
@@ -27,17 +37,55 @@ class HopdongService implements HopdongServiceInterface
 
     public function lietKeHopDongAdmin(Request $request): array
     {
-        $tuKhoa  = $request->query('q', '');
-        $trangThai = $request->query('trangthai', 'Tất cả');
+        $tuKhoa = (string) $request->query('q', $request->query('search', ''));
+        $trangThai = (string) $request->query('trangthai', $request->query('status', 'Tất cả'));
+        if ($trangThai === '') {
+            $trangThai = 'Tất cả';
+        }
 
-        $contracts = Hopdong::with(['sinhvien.user', 'giuong.phong.toanha'])
+        $contracts = Hopdong::query()
+            ->select([
+                'id',
+                'sinhvien_id',
+                'giuong_id',
+                'phong_id',
+                'ngay_bat_dau',
+                'ngay_ket_thuc',
+                'gia_thuc_te',
+                'trang_thai',
+                'ghi_chu as ghichu',
+                'created_at',
+            ])
+            ->with([
+                'sinhvien:id,user_id,ma_sinh_vien',
+                'sinhvien.user:id,name',
+                'giuong:id,phong_id',
+                'giuong.phong:id,toa_nha_id,ten_phong',
+                'giuong.phong.toanha:id,ten_toa_nha',
+            ])
             ->when($tuKhoa, function ($q) use ($tuKhoa) {
                 $q->whereHas('sinhvien', fn($sq) => $sq->where('ma_sinh_vien', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%')
                     ->orWhereHas('user', fn($uq) => $uq->where('name', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike($tuKhoa) . '%')));
             })
             ->when($trangThai !== 'Tất cả', fn($q) => $q->where('trang_thai', $trangThai))
             ->orderByDesc('created_at')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
+
+        $contractIds = $contracts->getCollection()->pluck('id')->filter()->values()->all();
+        if (! empty($contractIds)) {
+            $depositMap = Hoadon::query()
+                ->selectRaw('hopdong_id, MAX(tong_tien) as tien_coc')
+                ->whereIn('hopdong_id', $contractIds)
+                ->where('loai_hoadon', Hoadon::LOAI_DEPOSIT)
+                ->where('trang_thai', InvoiceStatus::Paid->value)
+                ->groupBy('hopdong_id')
+                ->pluck('tien_coc', 'hopdong_id');
+
+            $contracts->getCollection()->each(function ($hopdong) use ($depositMap): void {
+                $hopdong->tien_coc = (int) ($depositMap[$hopdong->id] ?? 0);
+            });
+        }
 
         return ['hopdong' => $contracts, 'tuKhoa' => $tuKhoa, 'trangThai' => $trangThai];
     }

@@ -7,6 +7,14 @@ use App\Contracts\Core\TruyVanPhongServiceInterface;
 use App\Contracts\Student\PhongSinhvienServiceInterface;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Phòng
+ 
+ * Vai trò: Điều phối CRUD phòng, hiển thị danh sách/chi tiết và gọi service truy vấn phòng.
+
+ */
+
 class PhongController extends Controller
 {
     public function __construct(

@@ -9,6 +9,14 @@ use App\Models\Taisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Tài sản
+ 
+ * Vai trò: CRUD/gắn tài sản theo phòng và thao tác hàng loạt.
+
+ */
+
 class TaiSanController extends Controller
 {
     public function __construct(

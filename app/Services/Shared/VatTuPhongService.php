@@ -5,6 +5,14 @@ namespace App\Services\Shared;
 use App\Contracts\Shared\VatTuPhongServiceInterface;
 use App\Models\Vattu;
 
+/**
+
+ * Khu vực: Shared / Vật tư phòng
+ 
+ * Vai trò: CRUD/gắn vật tư theo phòng và hỗ trợ thao tác hàng loạt.
+
+ */
+
 class VatTuPhongService implements VatTuPhongServiceInterface
 {
     public function store(array $data, int $phongId): array
@@ -19,14 +27,14 @@ class VatTuPhongService implements VatTuPhongServiceInterface
             'thoi_gian_bao_hanh' => $data['thoi_gian_bao_hanh'] ?? null,
         ]);
 
-        return ['success' => true, 'message' => 'Them vat tu thanh cong.'];
+        return ['success' => true, 'message' => 'Thêm vật tư thành công.'];
     }
 
     public function update(array $data, int $phongId, int $vattuId): array
     {
         $vattu = Vattu::where('phong_id', $phongId)->find($vattuId);
         if (! $vattu) {
-            return ['success' => false, 'message' => 'Khong tim thay vat tu can cap nhat.'];
+            return ['success' => false, 'message' => 'Không tìm thấy vật tư cần cập nhật.'];
         }
 
         $vattu->update([
@@ -38,19 +46,18 @@ class VatTuPhongService implements VatTuPhongServiceInterface
             'thoi_gian_bao_hanh' => $data['thoi_gian_bao_hanh'] ?? $vattu->thoi_gian_bao_hanh,
         ]);
 
-        return ['success' => true, 'message' => 'Cap nhat vat tu thanh cong.'];
+        return ['success' => true, 'message' => 'Cập nhật vật tư thành công.'];
     }
 
     public function destroy(int $phongId, int $vattuId): array
     {
         $vattu = Vattu::where('phong_id', $phongId)->find($vattuId);
         if (! $vattu) {
-            return ['success' => false, 'message' => 'Khong tim thay vat tu can xoa.'];
+            return ['success' => false, 'message' => 'Không tìm thấy vật tư cần xóa.'];
         }
 
         $vattu->delete();
 
-        return ['success' => true, 'message' => 'Xoa vat tu thanh cong.'];
+        return ['success' => true, 'message' => 'Xóa vật tư thành công.'];
     }
 }
-

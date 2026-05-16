@@ -14,6 +14,14 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Đăng ký tài khoản.
+
+ */
+
 class RegisteredUserController extends Controller
 {
     /**

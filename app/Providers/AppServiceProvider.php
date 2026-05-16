@@ -6,9 +6,7 @@ use App\Contracts\Admin\DangkyServiceInterface;
 use App\Contracts\Core\TienIchServiceInterface;
 use App\Contracts\Core\KiemToanServiceInterface;
 use App\Contracts\Student\BaohongServiceInterface;
-use App\Contracts\Student\TraPhongServiceInterface;
 use App\Contracts\Admin\BangDieuKhienServiceInterface;
-use App\Contracts\Student\DanhgiaServiceInterface;
 use App\Contracts\Admin\HoadonServiceInterface;
 use App\Contracts\Core\TrangChuServiceInterface;
 use App\Contracts\Student\KyluatServiceInterface;
@@ -28,9 +26,7 @@ use App\Repositories\PhongRepository;
 use App\Repositories\SinhvienRepository;
 use App\Services\Core\KiemToanService;
 use App\Services\Student\BaohongService;
-use App\Services\Student\TraPhongService;
 use App\Services\Admin\BangDieuKhienService;
-use App\Services\Student\DanhgiaService;
 use App\Services\Admin\HoadonService;
 use App\Services\Core\TrangChuService;
 use App\Services\Student\KyluatService;
@@ -99,7 +95,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HoanTienServiceInterface::class, HoanTienService::class);
         // Repository bindings
         $this->app->bind(KiemToanServiceInterface::class, KiemToanService::class);
-        $this->app->bind(TraPhongServiceInterface::class, TraPhongService::class);
         $this->app->bind(TruyVanPhongServiceInterface::class, TruyVanPhongService::class);
         $this->app->bind(NghiepVuPhongServiceInterface::class, NghiepVuPhongService::class);
         $this->app->bind(KhoPhongServiceInterface::class, KhoPhongService::class);
@@ -107,7 +102,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(VatTuPhongServiceInterface::class, VatTuPhongService::class);
         $this->app->bind(BaohongServiceInterface::class, BaohongService::class);
         $this->app->bind(HoadonServiceInterface::class, HoadonService::class);
-        $this->app->bind(DanhgiaServiceInterface::class, DanhgiaService::class);
         $this->app->bind(SinhvienServiceInterface::class, SinhvienService::class);
         $this->app->bind(BangDieuKhienServiceInterface::class, BangDieuKhienService::class);
         $this->app->bind(PhongSinhvienServiceInterface::class, PhongSinhvienService::class);

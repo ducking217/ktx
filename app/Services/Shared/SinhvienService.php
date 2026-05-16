@@ -16,6 +16,14 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+/**
+
+ * Khu vực: Shared / Hồ sơ sinh viên
+ 
+ * Vai trò: Truy vấn + cập nhật hồ sơ sinh viên (Admin/Student) và tập hợp dữ liệu liên quan.
+
+ */
+
 class SinhvienService implements SinhvienServiceInterface
 {
     use PhanHoiService;
@@ -58,7 +66,6 @@ class SinhvienService implements SinhvienServiceInterface
             'current_hopdong.giuong.phong.toanha',
             'hopdongs.giuong.phong',
             'kyluats' => fn($q) => $q->orderByDesc('ngay_vi_pham'),
-            'danhgias' => fn($q) => $q->orderByDesc('created_at'),
         ]);
 
         $sinhvien = $baseQuery->find($id);
@@ -70,9 +77,13 @@ class SinhvienService implements SinhvienServiceInterface
 
         // Lấy hóa đơn của tất cả các hợp đồng (không chỉ hợp đồng hiện tại)
         $hopdongIds = $sinhvien->hopdongs->pluck('id');
-        $hoadons = \App\Models\Hoadon::whereIn('hopdong_id', $hopdongIds)
-            ->orderByDesc('created_at')
-            ->get();
+        $hoadons = $hopdongIds->isEmpty()
+            ? collect()
+            : \App\Models\Hoadon::query()
+                ->select(['id', 'hopdong_id', 'tong_tien', 'trang_thai', 'ngay_thanh_toan', 'created_at'])
+                ->whereIn('hopdong_id', $hopdongIds)
+                ->orderByDesc('created_at')
+                ->get();
 
         return [
             'sinhvien' => $sinhvien,

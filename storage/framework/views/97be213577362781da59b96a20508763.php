@@ -124,12 +124,6 @@
                             <span class="ml-auto saas-badge saas-badge-error"><?php echo e($soSuCoMo); ?></span>
                         <?php endif; ?>
                     </a>
-                    <a href="<?php echo e(route('admin.baotri.index')); ?>" class="saas-sidebar-link <?php echo e(request()->routeIs('admin.baotri.*') ? 'saas-sidebar-link-active' : ''); ?>">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        Lịch bảo trì
-                    </a>
                     <a href="<?php echo e(route('admin.lienhe.index')); ?>" class="saas-sidebar-link <?php echo e(request()->routeIs('admin.lienhe.*') ? 'saas-sidebar-link-active' : ''); ?>">
                         <div class="flex items-center gap-3">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>

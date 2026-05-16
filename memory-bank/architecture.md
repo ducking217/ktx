@@ -5,6 +5,7 @@
 - Tổ chức mã nguồn theo module: `Admin`, `Student`, `Guest`, `Shared`, `Core`.
 - Luồng chuẩn: Route -> Controller -> Contract -> Service -> Model/Repository -> DB.
 - Cross-cutting: Middleware phân quyền, Observer đồng bộ nghiệp vụ, Notification/Mail cho giao tiếp người dùng.
+- Performance baseline: ưu tiên cache nhẹ (TTL ngắn) cho các trang thống kê/aggregate và filter dropdowns để giảm truy vấn lặp; tránh query trong Blade loops/modals bằng cách preload dữ liệu ở Service; không cache các trang chứa dữ liệu cá nhân theo user nếu chưa tách cache key theo user.
 - Liên hệ từ Landing: `TrangChuService::guiLienHe()` tạo `lienhe` + thông báo admin; Admin quản lý tại `/admin/lien-he`, phản hồi qua email và lưu `ghi_chu_admin`.
 - Landing không tích hợp chatbot; hỗ trợ người dùng qua form Liên hệ và các kênh hotline/Zalo được hiển thị trên Landing.
 - Các trang Landing (danh sách phòng, chi tiết vật tư/tài sản) dùng `x-landing-layout` và token `ink/ui/brand` để giữ trải nghiệm nhất quán.
@@ -21,6 +22,8 @@
 - Quy ước hiển thị trạng thái hóa đơn: dùng `InvoiceStatus::badgeClass($invoiceType)` và `InvoiceStatus::displayLabel($invoiceType)` để đồng bộ badge/label giữa Admin/Student, đặc biệt với loại hóa đơn `refund`.
 - Quy ước UI list: ưu tiên dùng `x-admin.page-header` + `x-admin.table-card` cho các màn danh sách data-rich (kể cả Student) để đồng bộ spacing, typography và empty state.
 - Quy ước hiển thị mã hợp đồng: dùng `$hopdong->ma_hd` (accessor trên Model `Hopdong`) để thống nhất format `HD-000001` ở Admin/Student/PDF.
+- Quy ước ghi chú hợp đồng: cột DB là `hopdong.ghi_chu`; vẫn hỗ trợ alias/accessor `ghichu` để tương thích UI/logic cũ.
+- Quy ước đọc code nhanh: các lớp trong `app/Services/**` và `app/Http/Controllers/**` có docblock tiếng Việt nêu “Khu vực/Vai trò” để định vị module nhanh khi bảo trì.
 - Quy ước IA module Hóa đơn: ưu tiên tab “Chờ xác nhận” (PendingConfirmation) cho workflow đối soát, sau đó mới xử lý “Công nợ” (Unpaid/Overdue) và “Lịch sử thu” (Paid).
 - Workflow đối soát hóa đơn: khi Sinh viên gửi “Tôi đã chuyển khoản” → hóa đơn sang `pending_confirmation`; Admin có thể **Xác nhận** (→ `paid`) hoặc **Từ chối** (→ `unpaid/overdue` theo hạn), và có thể kèm lý do từ chối.
 - Thông tin từ chối đối soát được lưu trên bản ghi `thanh_toan.ghi_chu` (pattern “Từ chối: …”) và hiển thị lại cho Sinh viên ở danh sách/chi tiết hóa đơn.
@@ -89,7 +92,7 @@ Ghi chú IA Admin: màn “Quản lý Đăng ký Cư trú” tách luồng theo 
 ## 4) Cấu trúc Service + Contract
 ### 4.1 Service layer hiện hữu
 - `App\\Services\\Admin`: `DangkyService`, `HopdongService`, `HoadonService`, `BaoTriService`, `TaiChinhService`, `BaoCaoService`, `AccountService`, `ToaNhaService`, `HoanTienService`, `BangDieuKhienService`.
-- `App\\Services\\Student`: `PhongSinhvienService`, `BaohongService`, `DanhgiaService`, `KyluatService`, `TraPhongService`.
+- `App\\Services\\Student`: `PhongSinhvienService`, `BaohongService`, `KyluatService`.
 - `App\\Services\\Shared`: `NghiepVuPhongService`, `KhoPhongService`, `TaiSanPhongService`, `VatTuPhongService`, `ThongbaoService`, `GiaHanService`, `SinhvienService`.
 - `App\\Services\\Core`: `TrangChuService`, `TruyVanPhongService`, `TienIchService`, `KiemToanService`.
 

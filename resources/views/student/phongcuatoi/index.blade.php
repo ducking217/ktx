@@ -9,6 +9,7 @@
             subtitle="Thông tin chi tiết về phòng lưu trú, thành viên cùng phòng và các tiện ích liên quan."
         />
 
+        {{-- Nhánh 1: Chưa được xếp phòng (hiển thị đăng ký gần nhất + gợi ý phòng phù hợp) --}}
         @if(!$coPhong)
             @php
                 $dangkyPhongGanNhat = $dangkyPhongGanNhat ?? null;
@@ -64,7 +65,7 @@
                 </aside>
             </div>
         @else
-            {{-- Có phòng --}}
+            {{-- Nhánh 2: Đang có phòng (tổng quan phòng hiện tại + cảnh báo hết hạn + bạn cùng phòng + kiểm kê) --}}
             <div class="grid gap-8 lg:grid-cols-12">
                 {{-- MAIN COLUMN --}}
                 <div class="lg:col-span-8 space-y-8">
@@ -97,7 +98,7 @@
                     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="saas-card p-5 bg-slate-50/50">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Sức chứa</div>
-                            <div class="text-xl font-bold text-slate-900 tabular-nums">{{ $banCungPhong->count() + 1 }} / {{ $phong->succhuamax }} <span class="text-[9px] text-slate-400">SV</span></div>
+                            <div class="text-xl font-bold text-slate-900 tabular-nums">{{ $banCungPhong->count() + 1 }} / {{ $phong->succhuamax }} <span class="text-[9px] text-slate-400">Sinh viên</span></div>
                         </div>
                         <div class="saas-card p-5 bg-slate-50/50">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Trạng thái</div>
@@ -125,7 +126,7 @@
                     @if($banCungPhong->count() > 0)
                         <article class="saas-card overflow-hidden">
                             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/30">
-                                <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Thành viên phòng</h3>
+                                <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Thành viên cùng phòng</h3>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-50">
                                 @foreach($banCungPhong as $ban)
@@ -151,7 +152,7 @@
                 {{-- SIDEBAR --}}
                 <aside class="lg:col-span-4 space-y-8">
                     
-                    {{-- Room Assets --}}
+                    {{-- Sidebar: Kiểm kê nhanh tài sản/vật tư trong phòng (preview một phần, chi tiết xem ở menu tương ứng) --}}
                     <article class="saas-card overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
                             <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Kiểm kê vật tư</h3>

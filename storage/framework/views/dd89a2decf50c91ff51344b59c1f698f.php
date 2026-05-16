@@ -136,7 +136,7 @@
                                         <option value="<?php echo e($ms->value); ?>" <?php echo e($baohong->trang_thai === $ms ? 'selected' : ''); ?>><?php echo e($ms->label()); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
-                                <button type="submit" class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Lưu trạng thái">
+                                <button type="submit" data-loading="spinner" class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 border border-transparent hover:border-brand-emerald/20 rounded-xl transition-all shadow-sm hover:shadow-md" title="Lưu trạng thái">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                 </button>
                             </form>

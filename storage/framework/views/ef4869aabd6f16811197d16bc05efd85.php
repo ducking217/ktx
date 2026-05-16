@@ -298,8 +298,8 @@
                 </div>
 
                 <div class="flex flex-col-reverse gap-3 pt-4 border-t border-slate-100 sm:flex-row sm:justify-end">
-                    <button type="button" data-modal-hide="modal-thembaotri" class="saas-btn-secondary h-11 px-5 text-xs font-semibold">Hủy</button>
                     <button type="submit" class="saas-btn-primary h-11 px-6 text-xs font-semibold shadow-xl shadow-emerald-500/20">Tạo lịch bảo trì</button>
+                    <button type="button" data-modal-hide="modal-thembaotri" class="saas-btn-secondary h-11 px-5 text-xs font-semibold">Hủy</button>
                 </div>
             </form>
          <?php echo $__env->renderComponent(); ?>
@@ -372,8 +372,8 @@
                     </div>
 
                     <div class="flex flex-col-reverse gap-3 pt-4 border-t border-slate-100 sm:flex-row sm:justify-end">
-                        <button type="button" data-modal-hide="modal-suabaotri-<?php echo e($item->id); ?>" class="saas-btn-secondary h-11 px-5 text-xs font-semibold">Hủy</button>
                         <button type="submit" class="saas-btn-primary h-11 px-6 text-xs font-semibold shadow-xl shadow-emerald-500/20">Lưu thay đổi</button>
+                        <button type="button" data-modal-hide="modal-suabaotri-<?php echo e($item->id); ?>" class="saas-btn-secondary h-11 px-5 text-xs font-semibold">Hủy</button>
                     </div>
                 </form>
              <?php echo $__env->renderComponent(); ?>

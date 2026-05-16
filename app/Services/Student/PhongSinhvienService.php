@@ -9,11 +9,17 @@ use App\Models\Hoadon;
 use App\Models\Hopdong;
 use App\Models\Phong;
 use App\Models\Sinhvien;
-use App\Models\Taisan;
 use App\Models\Thongbao;
-use App\Models\Vattu;
 use App\Enums\RegistrationStatus;
 use Illuminate\Support\Facades\Auth;
+
+/**
+
+ * Khu vực: Student / Phòng của tôi
+ 
+ * Vai trò: Dựng dữ liệu trang phòng hiện tại, bạn cùng phòng, công nợ và cảnh báo hết hạn.
+
+ */
 
 class PhongSinhvienService implements PhongSinhvienServiceInterface
 {
@@ -49,7 +55,11 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
         $banCungPhong = Sinhvien::whereHas('hopdongs', function ($q) use ($phongId) {
             $q->where('trang_thai', \App\Enums\ContractStatus::Active->value)
               ->whereHas('giuong', fn($g) => $g->where('phong_id', $phongId));
-        })->where('id', '<>', $sinhvien->id)->with('user')->get();
+        })
+            ->where('id', '<>', $sinhvien->id)
+            ->select(['id', 'user_id', 'ma_sinh_vien'])
+            ->with('user:id,name')
+            ->get();
 
         $hoadon = Hoadon::where('hopdong_id', $hopdong->id)
             ->where('trang_thai', \App\Enums\InvoiceStatus::Unpaid->value)
@@ -83,7 +93,7 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
         ];
     }
 
-    private function layCanhBaoHetHan($hopdong)
+    private function layCanhBaoHetHan(?Hopdong $hopdong): ?array
     {
         if (!$hopdong || !$hopdong->ngay_ket_thuc) return null;
         $diff = now()->diffInDays(\Illuminate\Support\Carbon::parse($hopdong->ngay_ket_thuc), false);
@@ -95,10 +105,14 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
         ];
     }
 
-    private function layDanhSachPhongPhuHop($sinhvien)
+    private function layDanhSachPhongPhuHop(Sinhvien $sinhvien): \Illuminate\Database\Eloquent\Collection
     {
-        $gioitinh = $sinhvien->user->gender ?? null;
-        return Phong::when($gioitinh, fn($q) => $q->where('gioi_tinh_han_che', $gioitinh))
+        $gioitinh = $sinhvien->user?->gender?->value ?? $sinhvien->user?->gender ?? null;
+        return Phong::query()
+            ->when($gioitinh, fn($q) => $q->where('gioi_tinh_han_che', $gioitinh))
+            ->whereHas('giuongs', function ($query) {
+                $query->where('trang_thai', \App\Enums\BedStatus::Available->value);
+            })
             ->with([
                 'loaiphong',
                 'toanha',
@@ -106,10 +120,10 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
                 'vattus:id,phong_id,ten_vat_tu,so_luong',
             ])
             ->withCount(['giuongs as so_nguoi_dang_o' => function ($query) {
-                $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+                $query->where('trang_thai', \App\Enums\BedStatus::Occupied->value);
             }])
-            ->get()
-            ->filter(fn($p) => $p->so_nguoi_dang_o < (int)($p->loaiphong->suc_chua ?? 0))
-            ->take(5);
+            ->orderBy('ten_phong')
+            ->limit(5)
+            ->get();
     }
 }

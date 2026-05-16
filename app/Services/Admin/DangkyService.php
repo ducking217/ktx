@@ -37,6 +37,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+
+ * Khu vực: Admin / Đăng ký cư trú
+ 
+ * Vai trò: Nghiệp vụ duyệt hồ sơ, thu phí, cấp phòng và xử lý trả phòng.
+
+ */
+
 class DangkyService implements DangkyServiceInterface
 {
     use HoTroNghiepVu, PhanHoiService, KiemtraKyluat;
@@ -319,20 +327,29 @@ class DangkyService implements DangkyServiceInterface
         $status = $request->query('status', 'Tất cả');
         $type = $request->query('type', 'thue-phong');
 
-        $baseQuery = Dangky::with([
-            'user.sinhvien.current_hopdong.giuong.phong',
-            'toanha',
-            'loaiphong',
-            'phong',
-        ])->when($status && $status !== 'Tất cả', fn ($q) => $q->where('trang_thai', $status));
+        $filteredQuery = Dangky::query()
+            ->when($status && $status !== 'Tất cả', fn ($q) => $q->where('trang_thai', $status));
 
-        $countTraPhong = (clone $baseQuery)->where('ghi_chu', 'like', 'TRA_PHONG%')->count();
-        $countThuePhong = (clone $baseQuery)->where(function ($query) {
+        $countTraPhong = (clone $filteredQuery)->where('ghi_chu', 'like', 'TRA_PHONG%')->count();
+        $countThuePhong = (clone $filteredQuery)->where(function ($query) {
             $query->whereNull('ghi_chu')
                 ->orWhere('ghi_chu', 'not like', 'TRA_PHONG%');
         })->count();
 
-        $registrations = $baseQuery
+        $registrationsQuery = (clone $filteredQuery)
+            ->select([
+                'id',
+                'user_id',
+                'phong_id',
+                'ho_ten',
+                'email',
+                'phone_encrypted',
+                'ghi_chu',
+                'trang_thai',
+                'token_expires_at',
+                'anh_cccd_path',
+                'created_at',
+            ])
             ->when($type === 'tra-phong', function ($query) {
                 return $query->where('ghi_chu', 'like', 'TRA_PHONG%');
             })
@@ -342,9 +359,24 @@ class DangkyService implements DangkyServiceInterface
                         ->orWhere('ghi_chu', 'not like', 'TRA_PHONG%');
                 });
             })
-            ->orderByDesc('created_at')
-            ->paginate(15)
-            ->withQueryString();
+            ->orderByDesc('created_at');
+
+        if ($type === 'tra-phong') {
+            $registrationsQuery->with([
+                'user:id,name,email,phone',
+                'user.sinhvien:id,user_id',
+                'user.sinhvien.current_hopdong:id,sinhvien_id,giuong_id,phong_id',
+                'user.sinhvien.current_hopdong.giuong:id,phong_id',
+                'user.sinhvien.current_hopdong.giuong.phong:id,ten_phong',
+            ]);
+        } else {
+            $registrationsQuery->with([
+                'user:id,name,email,phone',
+                'phong:id,ten_phong',
+            ]);
+        }
+
+        $registrations = $registrationsQuery->paginate(15)->withQueryString();
 
         if ($type === 'tra-phong') {
             $banGhi = $registrations->getCollection();

@@ -167,8 +167,8 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="button" data-modal-hide="modal-themthongbao" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                     <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-emerald-500/20">Phát hành thông báo</button>
+                    <button type="button" data-modal-hide="modal-themthongbao" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                 </div>
             </form>
          <?php echo $__env->renderComponent(); ?>
@@ -216,8 +216,8 @@
                     </div>
 
                     <div class="flex gap-3 pt-4">
-                        <button type="button" data-modal-hide="modal-suathongbao-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                         <button type="submit" class="saas-btn-primary flex-[2] h-12 shadow-lg shadow-emerald-500/20">Lưu thay đổi</button>
+                        <button type="button" data-modal-hide="modal-suathongbao-<?php echo e($item->id); ?>" class="saas-btn-secondary flex-1 h-12">Hủy bỏ</button>
                     </div>
                 </form>
              <?php echo $__env->renderComponent(); ?>

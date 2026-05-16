@@ -18,6 +18,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
+/**
+
+ * Khu vực: Shared / Gia hạn
+ 
+ * Vai trò: Nghiệp vụ gửi yêu cầu gia hạn và xử lý các điều kiện hợp đồng.
+
+ */
+
 class GiaHanService implements GiaHanServiceInterface
 {
     use PhanHoiService;

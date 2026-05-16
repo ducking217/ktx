@@ -14,6 +14,14 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+
+ * Khu vực: Auth
+ 
+ * Vai trò: Đặt lại mật khẩu từ token.
+
+ */
+
 class NewPasswordController extends Controller
 {
     /**

@@ -112,19 +112,18 @@ trait KiemtraKyluat
     {
         $danhSach = $this->dinhDangDanhSachLoi($loiConHieuLuc);
 
-        return 'Ban dang bi tam chan do cac vi pham con hieu luc: '.implode(' | ', $danhSach);
+        return 'Bạn đang bị tạm chặn do các vi phạm còn hiệu lực: '.implode(' | ', $danhSach);
     }
 
     private function dinhDangDanhSachLoi(Collection $loiConHieuLuc): array
     {
         return $loiConHieuLuc->map(function (Kyluat $kyluat, int $index) {
-            $ngay = $kyluat->ngay_vi_pham ? Carbon::parse($kyluat->ngay_vi_pham)->format('d/m/Y') : 'Khong ro ngay';
+            $ngay = $kyluat->ngay_vi_pham ? Carbon::parse($kyluat->ngay_vi_pham)->format('d/m/Y') : 'Không rõ ngày';
             $mucDoRaw = $kyluat->muc_do;
-            $mucDo = $mucDoRaw instanceof \App\Enums\DisciplineLevel ? $mucDoRaw->label() : trim((string) ($mucDoRaw ?? 'Khong ro muc do'));
-            $noiDung = trim((string) ($kyluat->noi_dung ?? 'Khong co noi dung'));
+            $mucDo = $mucDoRaw instanceof \App\Enums\DisciplineLevel ? $mucDoRaw->label() : trim((string) ($mucDoRaw ?? 'Không rõ mức độ'));
+            $noiDung = trim((string) ($kyluat->noi_dung ?? 'Không có nội dung'));
 
             return '#'.($index + 1).' ['.$ngay.'] '.$mucDo.': '.$noiDung;
         })->all();
     }
 }
-

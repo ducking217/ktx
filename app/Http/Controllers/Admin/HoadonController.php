@@ -8,6 +8,14 @@ use App\Contracts\Admin\TaiChinhServiceInterface;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+/**
+
+ * Khu vực: Admin / Hóa đơn
+ 
+ * Vai trò: Điều phối thao tác hóa đơn (tạo tháng, nhập hàng loạt, xác nhận/từ chối, xuất PDF).
+
+ */
+
 class HoadonController extends Controller
 {
     public function __construct(

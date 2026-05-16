@@ -6,6 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Contracts\Shared\GiaHanServiceInterface;
 use Illuminate\Http\Request;
 
+/**
+
+ * Khu vực: Admin / Gia hạn
+ 
+ * Vai trò: Duyệt/từ chối yêu cầu gia hạn hợp đồng.
+
+ */
+
 class GiaHanController extends Controller
 {
     public function __construct(

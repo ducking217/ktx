@@ -24,6 +24,14 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+/**
+
+ * Khu vực: Admin / Hóa đơn
+ 
+ * Vai trò: Xử lý lập hóa đơn, ghi chỉ số, đối soát thanh toán và các thao tác tài chính liên quan.
+
+ */
+
 class HoadonService implements HoadonServiceInterface
 {
     use PhanHoiService;
@@ -107,9 +115,13 @@ class HoadonService implements HoadonServiceInterface
                 ->orderByDesc('created_at')
                 ->paginate(20)
                 ->withQueryString(),
-            'danhsachphong' => Phong::with('toanha')
-                ->whereHas('giuongs', fn($q) => $q->where('trang_thai', BedStatus::Occupied))
-                ->get(),
+            'danhsachphong' => Cache::remember('admin.hoadon:rooms-for-meter:v1', now()->addMinutes(5), function () {
+                return Phong::query()
+                    ->select(['id', 'ten_phong'])
+                    ->whereHas('giuongs', fn ($q) => $q->where('trang_thai', BedStatus::Occupied))
+                    ->orderBy('ten_phong')
+                    ->get();
+            }),
             'thongke' => [
                 'tong_no'       => (int) (clone $baseNonRefundQuery)->whereIn('trang_thai', [InvoiceStatus::Unpaid, InvoiceStatus::PendingConfirmation, InvoiceStatus::Overdue])->sum('tong_tien'),
                 'so_qua_han'    => (int) (clone $baseNonRefundQuery)->where('trang_thai', InvoiceStatus::Overdue)->count(),
