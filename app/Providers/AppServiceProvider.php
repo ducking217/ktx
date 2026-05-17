@@ -61,6 +61,7 @@ use App\Models\Phong;
 use App\Models\Sinhvien;
 use App\Models\Taisan;
 use App\Models\Thongbao;
+use App\Models\ToaNha;
 use App\Models\Vattu;
 use App\Models\YeuCauGiaHan;
 use App\Observers\BaohongObserver;
@@ -75,6 +76,7 @@ use App\Observers\PhongObserver;
 use App\Observers\SinhvienObserver;
 use App\Observers\TaisanObserver;
 use App\Observers\ThongbaoObserver;
+use App\Observers\ToaNhaObserver;
 use App\Observers\VattuObserver;
 use App\Observers\YeuCauGiaHanObserver;
 use Illuminate\Support\Facades\Blade;
@@ -109,10 +111,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TrangChuServiceInterface::class, TrangChuService::class);
         $this->app->bind(KyluatServiceInterface::class, KyluatService::class);
         $this->app->bind(TaiChinhServiceInterface::class, TaiChinhService::class);
-        $this->app->bind(TaiChinhServiceInterface::class, TaiChinhService::class);
         $this->app->bind(BaoTriServiceInterface::class, BaoTriService::class);
         $this->app->bind(TienIchServiceInterface::class, TienIchService::class);
-        $this->app->bind(\App\Contracts\Shared\GiaHanServiceInterface::class, \App\Services\Shared\GiaHanService::class);
+        $this->app->bind(GiaHanServiceInterface::class, GiaHanService::class);
         $this->app->bind(\App\Contracts\Admin\BaoCaoServiceInterface::class, \App\Services\Admin\BaoCaoService::class);
         $this->app->bind(\App\Contracts\Admin\AccountServiceInterface::class, \App\Services\Admin\AccountService::class);
         $this->app->bind(ToaNhaServiceInterface::class, ToaNhaService::class);
@@ -137,6 +138,7 @@ class AppServiceProvider extends ServiceProvider
         Baohong::observe(BaohongObserver::class);
         Thongbao::observe(ThongbaoObserver::class);
         YeuCauGiaHan::observe(YeuCauGiaHanObserver::class);
+        ToaNha::observe(ToaNhaObserver::class);
 
         Blade::directive('badge', function ($expression) {
             return "<?php echo \App\View\Components\Badge::renderDirect($expression); ?>";
@@ -145,7 +147,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer(['admin.partials.navbar', 'admin.partials.sidebar'], function ($view) {
             $dangkyChoXuLy = Dangky::where('trang_thai', RegistrationStatus::Pending->value)->count();
             $soYeuCauTraPhongMoi = Dangky::where('trang_thai', RegistrationStatus::Pending->value)
-                ->where('ghi_chu', 'TRA_PHONG')
+                ->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)
                 ->count();
             $lienHeChoXuLy = Lienhe::where('trang_thai', Lienhe::TRANG_THAI_CHUA_XU_LY)->count();
 

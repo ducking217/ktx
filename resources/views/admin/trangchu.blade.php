@@ -75,7 +75,7 @@
             <div class="mt-6">
                 <div class="flex items-end gap-1.5 h-16 mb-3">
                     @foreach($xuHuongDoanhThu as $item)
-                        <div class="flex-1 rounded-md bg-slate-100 hover:bg-slate-800 transition-all cursor-default relative group/bar" style="--height: {{ $item['height'] }}%; height: var(--height);">
+                        <div class="flex-1 rounded-md bg-emerald-200 hover:bg-brand-emerald transition-colors cursor-default relative group/bar" style="--height: {{ $item['height'] }}%; height: var(--height);">
                             <div class="invisible absolute -top-9 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] px-2 py-1 rounded-lg opacity-0 group-hover/bar:visible group-hover/bar:opacity-100 transition-all whitespace-nowrap z-20 font-bold tabular-nums">
                                 {{ number_format($item['value']) }}đ
                             </div>

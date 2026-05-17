@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -45,6 +46,24 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+        if ($e instanceof TokenMismatchException) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Phiên làm việc đã hết hạn. Vui lòng tải lại trang và thử lại.',
+                ], 419);
+            }
+
+            $redirectTo = url()->previous() ?: url('/');
+
+            if ($request->route()?->named('logout') || $request->is('logout')) {
+                $redirectTo = url('/');
+            }
+
+            return redirect()
+                ->to($redirectTo)
+                ->with('error', 'Phiên làm việc đã hết hạn. Vui lòng tải lại trang và thử lại.');
+        }
+
         $response = parent::render($request, $e);
 
         if (method_exists($response, 'getStatusCode') && $response->getStatusCode() >= 500) {

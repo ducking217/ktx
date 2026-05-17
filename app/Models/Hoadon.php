@@ -14,8 +14,12 @@ class Hoadon extends Model
 
     protected $table = 'hoadon';
 
+    public const LOAI_MONTHLY = 'monthly';
+    public const LOAI_DIEN_NUOC = 'dien_nuoc';
     public const LOAI_DEPOSIT = 'deposit';
-    public const LOAI_PENALTY = 'extra';
+    public const LOAI_REFUND  = 'refund';
+    public const LOAI_EXTRA   = 'extra';
+    public const LOAI_PENALTY = self::LOAI_EXTRA;
 
     protected $fillable = [
         'hopdong_id',
@@ -77,10 +81,10 @@ class Hoadon extends Model
     public function getLoaiHoadonLabelAttribute(): string
     {
         return match ((string) $this->loai_hoadon) {
-            'monthly' => 'Tiền thuê tháng',
-            'deposit' => 'Tiền cọc',
-            'refund' => 'Hoàn cọc',
-            'extra' => 'Phát sinh',
+            self::LOAI_MONTHLY => 'Tiền thuê tháng',
+            self::LOAI_DEPOSIT => 'Tiền cọc',
+            self::LOAI_REFUND => 'Hoàn cọc',
+            self::LOAI_EXTRA => 'Phát sinh',
             default => 'Phát sinh',
         };
     }

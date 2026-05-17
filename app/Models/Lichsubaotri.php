@@ -10,6 +10,8 @@ class Lichsubaotri extends Model
 {
     use HasFactory;
 
+    public const STATUS_DONE = 'done';
+
     protected $table = 'lich_su_bao_tri';
 
     protected $fillable = [

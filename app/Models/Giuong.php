@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BedStatus;
+use App\Enums\ContractStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,6 +37,6 @@ class Giuong extends Model
 
     public function current_hopdong()
     {
-        return $this->hasOne(Hopdong::class, 'giuong_id')->where('trang_thai', 'active');
+        return $this->hasOne(Hopdong::class, 'giuong_id')->where('trang_thai', ContractStatus::Active->value);
     }
 }

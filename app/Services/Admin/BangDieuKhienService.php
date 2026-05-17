@@ -3,10 +3,11 @@
 namespace App\Services\Admin;
 
 use App\Contracts\Admin\BangDieuKhienServiceInterface;
+use App\Enums\BaohongStatus;
+use App\Enums\BedStatus;
 use App\Enums\ContractStatus;
 use App\Enums\InvoiceStatus;
 use App\Enums\RegistrationStatus;
-use App\Enums\BedStatus;
 use App\Models\Baohong;
 use App\Models\Dangky;
 use App\Models\Hoadon;
@@ -16,6 +17,7 @@ use App\Models\Phong;
 use App\Models\Sinhvien;
 use App\Models\Taisan;
 use App\Models\Thongbao;
+use App\Models\ToaNha;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -31,67 +33,19 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
     public function layDuLieuBangDieuKhienAdmin(): array
     {
         $now = now();
-        $t = (int)$now->month;
-        $n = (int)$now->year;
+        $t = (int) $now->month;
+        $n = (int) $now->year;
 
-        $tongphong = Phong::count();
-        $tongphongtrong = Phong::whereDoesntHave('giuongs', function ($query) {
-            $query->where('trang_thai', '!=', \App\Enums\BedStatus::Available->value);
-        })->count();
-        $phongDangSuDung = $tongphong - $tongphongtrong;
-        $tyLeLapDay = $tongphong > 0 ? (int)round(($phongDangSuDung / $tongphong) * 100) : 0;
-
-        $doanhthuthang = (int)Hoadon::whereMonth('ngay_thanh_toan', $t)->whereYear('ngay_thanh_toan', $n)
-            ->where('trang_thai', InvoiceStatus::Paid->value)
-            ->sum('tong_tien');
-
-        $xuHuongDoanhThuRaw = $this->layXuHuongDoanhThu();
-        $labels = $this->layNhanDoanhThu();
-
-        $xuHuongDoanhThu = [];
-        $maxVal = 1;
-        foreach ($labels as $index => $label) {
-            $val = (int)($xuHuongDoanhThuRaw['tienphong'][$index] ?? 0) + (int)($xuHuongDoanhThuRaw['tiendichvu'][$index] ?? 0);
-            $xuHuongDoanhThu[] = ['label' => $label, 'value' => $val];
-            if ($val > $maxVal) $maxVal = $val;
-        }
-
-        // Bổ sung phần trăm hiển thị cho biểu đồ
-        foreach ($xuHuongDoanhThu as &$item) {
-            $item['height'] = max(10, (int)round(($item['value'] / $maxVal) * 100));
-            $item['percentage'] = (int)round(($item['value'] / $maxVal) * 100);
-        }
-        unset($item);
-
-        // Tính tăng trưởng doanh thu so với tháng trước
-        $doanhThuThangTruoc = 0;
-        if (count($labels) >= 2) {
-            $idx = count($labels) - 2;
-            $doanhThuThangTruoc = (int)($xuHuongDoanhThuRaw['tienphong'][$idx] ?? 0) + (int)($xuHuongDoanhThuRaw['tiendichvu'][$idx] ?? 0);
-        }
-        $chenhLechDoanhThu = $doanhthuthang - $doanhThuThangTruoc;
-        $tyLeDoanhThu = $doanhThuThangTruoc > 0 ? (int)round(($chenhLechDoanhThu / $doanhThuThangTruoc) * 100) : 100;
+        $thongKePhong = $this->layThongKePhongAdmin();
+        $thongKeDoanhThu = $this->layThongKeDoanhThuAdmin($t, $n);
 
         $yeuCauTraPhongChoDuyet = Dangky::where('trang_thai', RegistrationStatus::Pending->value)
-            ->where('ghi_chu', 'like', 'TRA_PHONG%')
+            ->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)
             ->count();
 
-        $listTraPhong = Dangky::with(['user'])
-            ->where('trang_thai', RegistrationStatus::Pending->value)
-            ->where('ghi_chu', 'like', 'TRA_PHONG%')
-            ->orderByDesc('id')
-            ->limit(5)
-            ->get()
-            ->map(function ($dangky) {
-                $name = $dangky->user?->name ?? $dangky->ho_ten ?? 'Sinh viên';
-
-                return [
-                    'id'      => $dangky->id,
-                    'name'    => $name,
-                    'initial' => substr($name, 0, 1),
-                    'time'    => $dangky->created_at?->diffForHumans() ?? 'N/A',
-                ];
-            });
+        $listTraPhong = $this->layDanhSachTraPhongChoDuyet();
+        $listDangKy = $this->layDanhSachDangKyChoDuyet();
+        $listBaoHong = $this->layDanhSachBaoHongChoXuLy();
 
         return [
             'vaitro' => Auth::user()->vaitro ?? 'admin',
@@ -99,76 +53,28 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
             'namhientai' => $n,
 
             // Stats
-            'tongphong' => $tongphong,
-            'phongTrong' => $tongphongtrong,
-            'phongDangSuDung' => $phongDangSuDung,
-            'phongBaoTri' => Baohong::where('trang_thai', \App\Enums\BaohongStatus::Pending->value)->count(),
-            'tyLeLapDay' => $tyLeLapDay,
+            'tongphong' => $thongKePhong['tongphong'],
+            'phongTrong' => $thongKePhong['phongTrong'],
+            'phongDangSuDung' => $thongKePhong['phongDangSuDung'],
+            'phongBaoTri' => $thongKePhong['phongBaoTri'],
+            'tyLeLapDay' => $thongKePhong['tyLeLapDay'],
 
             // Tài chính
-            'doanhThuThangNay' => $doanhthuthang,
-            'xuHuongDoanhThu' => $xuHuongDoanhThu,
-            'maxDoanhThu' => $maxVal,
-            'chenhLechDoanhThu' => $chenhLechDoanhThu,
-            'tyLeDoanhThu' => $tyLeDoanhThu,
+            'doanhThuThangNay' => $thongKeDoanhThu['doanhThuThangNay'],
+            'xuHuongDoanhThu' => $thongKeDoanhThu['xuHuongDoanhThu'],
+            'maxDoanhThu' => $thongKeDoanhThu['maxDoanhThu'],
+            'chenhLechDoanhThu' => $thongKeDoanhThu['chenhLechDoanhThu'],
+            'tyLeDoanhThu' => $thongKeDoanhThu['tyLeDoanhThu'],
 
             // Hoạt động
             'dangKyChoDuyet' => Dangky::where('trang_thai', RegistrationStatus::Pending->value)->count(),
-            'suCoMo' => Baohong::where('trang_thai', \App\Enums\BaohongStatus::Pending->value)->count(),
+            'suCoMo' => $thongKePhong['phongBaoTri'],
             'yeuCauTraPhongChoDuyet' => $yeuCauTraPhongChoDuyet,
             
             // Danh sách
-            'listDangKy' => Dangky::with(['user', 'toanha', 'loaiphong'])
-                ->where('trang_thai', RegistrationStatus::Pending->value)
-                ->where(function ($query) {
-                    $query->whereNull('ghi_chu')->orWhere('ghi_chu', 'not like', 'TRA_PHONG%');
-                })
-                ->orderByDesc('id')
-                ->limit(5)
-                ->get()
-                ->map(function ($dangky) {
-                    $trangThai = $dangky->trang_thai;
-                    $statusLabel = 'Chờ duyệt';
-                    $statusClass = 'bg-status-warning/10 text-status-warning ring-1 ring-status-warning/20';
-
-                    if ($trangThai === RegistrationStatus::ApprovedPendingPayment) {
-                        $statusLabel = 'Chờ tiền';
-                        $statusClass = 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/20';
-                    } elseif ($trangThai === RegistrationStatus::Approved) {
-                        $statusLabel = 'Đã duyệt';
-                        $statusClass = 'bg-status-success/10 text-status-success ring-1 ring-status-success/20';
-                    } elseif ($trangThai === RegistrationStatus::Rejected) {
-                        $statusLabel = 'Từ chối';
-                        $statusClass = 'bg-status-error/10 text-status-error ring-1 ring-status-error/20';
-                    }
-
-                    $name = $dangky->user?->name ?? $dangky->ho_ten ?? 'Sinh viên';
-                    $phongName = $dangky->toanha?->ten_toa_nha . ' — ' . ($dangky->loaiphong?->ten_loai ?? 'N/A');
-                    return [
-                        'id'          => $dangky->id,
-                        'name'        => $name,
-                        'initial'     => substr($name, 0, 1),
-                        'phongName'   => $phongName,
-                        'time'        => $dangky->created_at?->diffForHumans() ?? 'N/A',
-                        'statusLabel' => $statusLabel,
-                        'statusClass' => $statusClass,
-                    ];
-                }),
+            'listDangKy' => $listDangKy,
             'listTraPhong' => $listTraPhong,
-            'listBaoHong' => Baohong::with('phong')
-                ->where('trang_thai', \App\Enums\BaohongStatus::Pending->value)
-                ->orderByDesc('id')
-                ->limit(5)
-                ->get()
-                ->map(function ($baohong) {
-                    return [
-                        'id'          => $baohong->id,
-                        'mota'        => $baohong->mo_ta ?? 'Yêu cầu bảo trì',
-                        'phongName'   => $baohong->phong?->ten_phong ?? 'N/A',
-                        'time'        => $baohong->created_at?->format('H:i • d/m') ?? 'N/A',
-                        'statusLabel' => $baohong->trang_thai?->label() ?? 'Đang chờ',
-                    ];
-                }),
+            'listBaoHong' => $listBaoHong,
             'listCongSuat' => $this->layCongSuatTheoToa(),
             
             // Các dữ liệu khác (nếu cần cho view cũ hoặc future use)
@@ -180,14 +86,24 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
     public function layDuLieuBangDieuKhienSinhVien(): array
     {
         $sinhvien = Sinhvien::where('user_id', Auth::id())->first();
-        $t = (int)now()->month; $n = (int)now()->year;
+        $t = (int) now()->month;
+        $n = (int) now()->year;
 
         $data = [
-            'vaitro' => Auth::user()->vaitro ?? 'sinhvien', 'thanghientai' => $t, 'namhientai' => $n,
-            'sinhvien' => $sinhvien, 'phonghientai' => null, 'taisanphong' => collect(),
-            'thanhviencungphong' => collect(), 'kyluatcuaem' => collect(),
-            'hoadonchuathanhtoan' => collect(), 'hoadonChoXacNhan' => collect(),
-            'lienhekhancap' => [['title' => 'Bảo vệ', 'phone' => '0900 111 222'], ['title' => 'Y tế', 'phone' => '0900 333 444']],
+            'vaitro' => Auth::user()->vaitro ?? 'sinhvien',
+            'thanghientai' => $t,
+            'namhientai' => $n,
+            'sinhvien' => $sinhvien,
+            'phonghientai' => null,
+            'taisanphong' => collect(),
+            'thanhviencungphong' => collect(),
+            'kyluatcuaem' => collect(),
+            'hoadonchuathanhtoan' => collect(),
+            'hoadonChoXacNhan' => collect(),
+            'lienhekhancap' => [
+                ['title' => 'Bảo vệ', 'phone' => '0900 111 222'],
+                ['title' => 'Y tế', 'phone' => '0900 333 444'],
+            ],
             'thongbao' => $this->layThongBaoChoSinhVien($sinhvien),
             'hopdongHienTai' => null,
             'soNgayCon' => null,
@@ -205,8 +121,8 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
                 $phong = $hopdongHienTai->giuong?->phong;
                 $data['phonghientai']      = $phong;
                 $data['soNgayCon']         = (int) now()->diffInDays($hopdongHienTai->ngay_ket_thuc, false);
-                $data['taisanphong']       = $phong ? \App\Models\Taisan::where('phong_id', $phong->id)->get() : collect();
-                $data['hoadonchuathanhtoan'] = \App\Models\Hoadon::where('hopdong_id', $hopdongHienTai->id)
+                $data['taisanphong']       = $phong ? Taisan::where('phong_id', $phong->id)->get() : collect();
+                $data['hoadonchuathanhtoan'] = Hoadon::where('hopdong_id', $hopdongHienTai->id)
                     ->where('trang_thai', InvoiceStatus::Unpaid->value)->get();
                 
                 // Bạn cùng giường/phòng
@@ -219,7 +135,7 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
                 }
             }
 
-            $data['kyluatcuaem'] = \App\Models\Kyluat::where('sinhvien_id', $sinhvien->id)
+            $data['kyluatcuaem'] = Kyluat::where('sinhvien_id', $sinhvien->id)
                 ->orderByDesc('ngay_vi_pham')->limit(5)->get();
         }
 
@@ -228,7 +144,7 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
 
     private function layThongBaoChoAdmin()
     {
-        return Thongbao::whereIn('doi_tuong_nhan', ['all', 'admin'])
+        return Thongbao::whereIn('doi_tuong_nhan', [Thongbao::TARGET_ALL, Thongbao::TARGET_ADMIN])
             ->orderByDesc('created_at')
             ->limit(5)
             ->get();
@@ -236,7 +152,7 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
 
     private function layThongBaoChoSinhVien($sinhvien)
     {
-        return Thongbao::whereIn('doi_tuong_nhan', ['all', 'sinhvien'])
+        return Thongbao::whereIn('doi_tuong_nhan', [Thongbao::TARGET_ALL, Thongbao::TARGET_STUDENT])
             ->orderByDesc('created_at')
             ->limit(5)
             ->get();
@@ -246,7 +162,7 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
     {
         // Đếm phòng còn giường trống theo kiến trúc Bed-Centric mới
         return Phong::whereHas('giuongs', fn($q) =>
-            $q->where('trang_thai', \App\Enums\BedStatus::Available->value)
+            $q->where('trang_thai', BedStatus::Available->value)
         )->count();
     }
 
@@ -280,7 +196,15 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
         return ['tienphong' => $tienphong, 'tiendichvu' => $tiendichvu];
     }
 
-    private function layNhanDoanhThu(): array { $labels = []; for ($i = 5; $i >= 0; $i--) { $labels[] = now()->subMonths($i)->format('m/Y'); } return $labels; }
+    private function layNhanDoanhThu(): array
+    {
+        $labels = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $labels[] = now()->subMonths($i)->format('m/Y');
+        }
+
+        return $labels;
+    }
 
     private function layHopDongSapHetHan() {
         return Hopdong::where('trang_thai', ContractStatus::Active->value)
@@ -298,7 +222,7 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
         $namTruoc = $sauThangTruoc->year;
 
         $hoadons = Hoadon::with('hopdong.giuong')
-            ->whereIn('loai_hoadon', ['dien_nuoc', 'monthly'])
+            ->whereIn('loai_hoadon', [Hoadon::LOAI_DIEN_NUOC, Hoadon::LOAI_MONTHLY])
             ->get();
 
         $hoadonThangTruoc = $hoadons->filter(function($h) use ($thangTruoc, $namTruoc) {
@@ -340,15 +264,158 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
 
     private function layCongSuatTheoToa() {
         // Theo kiến trúc mới: đếm giường trống/đã ở theo Tòa nhà
-        $toanhis = \App\Models\ToaNha::with(['phongs.giuongs'])->get();
+        $toanhis = ToaNha::with(['phongs.giuongs'])->get();
         $congSuat = [];
         foreach ($toanhis as $toa) {
             $allBeds    = $toa->phongs->flatMap(fn($p) => $p->giuongs);
             $total      = $allBeds->count();
-            $occupied   = $allBeds->where('trang_thai', \App\Enums\BedStatus::Occupied)->count();
+            $occupied   = $allBeds->where('trang_thai', BedStatus::Occupied)->count();
             $tyle       = $total > 0 ? (int)round(($occupied / $total) * 100) : 0;
             $congSuat[] = ['name' => $toa->ten_toa_nha, 'percentage' => $tyle];
         }
         return collect($congSuat)->sortBy('name')->values();
+    }
+
+    private function layThongKePhongAdmin(): array
+    {
+        $tongphong = Phong::count();
+        $tongphongtrong = Phong::whereDoesntHave('giuongs', function ($query) {
+            $query->where('trang_thai', '!=', BedStatus::Available->value);
+        })->count();
+
+        $phongDangSuDung = $tongphong - $tongphongtrong;
+        $tyLeLapDay = $tongphong > 0 ? (int) round(($phongDangSuDung / $tongphong) * 100) : 0;
+
+        $phongBaoTri = Baohong::where('trang_thai', BaohongStatus::Pending->value)->count();
+
+        return [
+            'tongphong' => $tongphong,
+            'phongTrong' => $tongphongtrong,
+            'phongDangSuDung' => $phongDangSuDung,
+            'tyLeLapDay' => $tyLeLapDay,
+            'phongBaoTri' => $phongBaoTri,
+        ];
+    }
+
+    private function layThongKeDoanhThuAdmin(int $t, int $n): array
+    {
+        $doanhThuThangNay = (int) Hoadon::whereMonth('ngay_thanh_toan', $t)
+            ->whereYear('ngay_thanh_toan', $n)
+            ->where('trang_thai', InvoiceStatus::Paid->value)
+            ->sum('tong_tien');
+
+        $xuHuongDoanhThuRaw = $this->layXuHuongDoanhThu();
+        $labels = $this->layNhanDoanhThu();
+
+        $xuHuongDoanhThu = [];
+        $maxVal = 1;
+        foreach ($labels as $index => $label) {
+            $val = (int) ($xuHuongDoanhThuRaw['tienphong'][$index] ?? 0) + (int) ($xuHuongDoanhThuRaw['tiendichvu'][$index] ?? 0);
+            $xuHuongDoanhThu[] = ['label' => $label, 'value' => $val];
+            if ($val > $maxVal) {
+                $maxVal = $val;
+            }
+        }
+
+        foreach ($xuHuongDoanhThu as &$item) {
+            $item['height'] = max(10, (int) round(($item['value'] / $maxVal) * 100));
+            $item['percentage'] = (int) round(($item['value'] / $maxVal) * 100);
+        }
+        unset($item);
+
+        $doanhThuThangTruoc = 0;
+        if (count($labels) >= 2) {
+            $idx = count($labels) - 2;
+            $doanhThuThangTruoc = (int) ($xuHuongDoanhThuRaw['tienphong'][$idx] ?? 0) + (int) ($xuHuongDoanhThuRaw['tiendichvu'][$idx] ?? 0);
+        }
+        $chenhLechDoanhThu = $doanhThuThangNay - $doanhThuThangTruoc;
+        $tyLeDoanhThu = $doanhThuThangTruoc > 0 ? (int) round(($chenhLechDoanhThu / $doanhThuThangTruoc) * 100) : 100;
+
+        return [
+            'doanhThuThangNay' => $doanhThuThangNay,
+            'xuHuongDoanhThu' => $xuHuongDoanhThu,
+            'maxDoanhThu' => $maxVal,
+            'chenhLechDoanhThu' => $chenhLechDoanhThu,
+            'tyLeDoanhThu' => $tyLeDoanhThu,
+        ];
+    }
+
+    private function layDanhSachTraPhongChoDuyet()
+    {
+        return Dangky::with(['user'])
+            ->where('trang_thai', RegistrationStatus::Pending->value)
+            ->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get()
+            ->map(function ($dangky) {
+                $name = $dangky->user?->name ?? $dangky->ho_ten ?? 'Sinh viên';
+
+                return [
+                    'id'      => $dangky->id,
+                    'name'    => $name,
+                    'initial' => substr($name, 0, 1),
+                    'time'    => $dangky->created_at?->diffForHumans() ?? 'N/A',
+                ];
+            });
+    }
+
+    private function layDanhSachDangKyChoDuyet()
+    {
+        return Dangky::with(['user', 'toanha', 'loaiphong'])
+            ->where('trang_thai', RegistrationStatus::Pending->value)
+            ->where(function ($query) {
+                $query->whereNull('ghi_chu')->orWhere('ghi_chu', 'not like', Dangky::GHI_CHU_TRA_PHONG_PREFIX);
+            })
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get()
+            ->map(function ($dangky) {
+                $trangThai = $dangky->trang_thai;
+                $statusLabel = 'Chờ duyệt';
+                $statusClass = 'bg-status-warning/10 text-status-warning ring-1 ring-status-warning/20';
+
+                if ($trangThai === RegistrationStatus::ApprovedPendingPayment) {
+                    $statusLabel = 'Chờ tiền';
+                    $statusClass = 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/20';
+                } elseif ($trangThai === RegistrationStatus::Approved) {
+                    $statusLabel = 'Đã duyệt';
+                    $statusClass = 'bg-status-success/10 text-status-success ring-1 ring-status-success/20';
+                } elseif ($trangThai === RegistrationStatus::Rejected) {
+                    $statusLabel = 'Từ chối';
+                    $statusClass = 'bg-status-error/10 text-status-error ring-1 ring-status-error/20';
+                }
+
+                $name = $dangky->user?->name ?? $dangky->ho_ten ?? 'Sinh viên';
+                $phongName = $dangky->toanha?->ten_toa_nha . ' — ' . ($dangky->loaiphong?->ten_loai ?? 'N/A');
+
+                return [
+                    'id'          => $dangky->id,
+                    'name'        => $name,
+                    'initial'     => substr($name, 0, 1),
+                    'phongName'   => $phongName,
+                    'time'        => $dangky->created_at?->diffForHumans() ?? 'N/A',
+                    'statusLabel' => $statusLabel,
+                    'statusClass' => $statusClass,
+                ];
+            });
+    }
+
+    private function layDanhSachBaoHongChoXuLy()
+    {
+        return Baohong::with('phong')
+            ->where('trang_thai', BaohongStatus::Pending->value)
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get()
+            ->map(function ($baohong) {
+                return [
+                    'id'          => $baohong->id,
+                    'mota'        => $baohong->mo_ta ?? 'Yêu cầu bảo trì',
+                    'phongName'   => $baohong->phong?->ten_phong ?? 'N/A',
+                    'time'        => $baohong->created_at?->format('H:i • d/m') ?? 'N/A',
+                    'statusLabel' => $baohong->trang_thai?->label() ?? 'Đang chờ',
+                ];
+            });
     }
 }

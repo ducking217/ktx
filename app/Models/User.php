@@ -83,7 +83,7 @@ class User extends Authenticatable
      */
     public function isStudent(): bool
     {
-        return $this->vaitro === UserRole::SinhVien;
+        return $this->vaitro === UserRole::Student;
     }
 
     /**

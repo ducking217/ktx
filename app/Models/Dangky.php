@@ -13,6 +13,9 @@ class Dangky extends Model
 
     protected $table = 'dangky';
 
+    public const GHI_CHU_TRA_PHONG = 'TRA_PHONG';
+    public const GHI_CHU_TRA_PHONG_PREFIX = self::GHI_CHU_TRA_PHONG . '%';
+
     protected $fillable = [
         'user_id',
         'ho_ten',

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\Gender;
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Sinhvien;
@@ -49,21 +51,23 @@ class RegisteredUserController extends Controller
             'gioitinh' => ['required', 'in:Nam,Nữ'],
         ]);
 
+        $gender = Gender::fromVietnamese((string) $request->gioitinh) ?? Gender::Other;
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'vaitro' => 'sinhvien', // Mặc định khi đăng ký là sinh viên
-            'gioitinh' => $request->gioitinh,
+            'vaitro' => UserRole::Student, // Mặc định khi đăng ký là sinh viên
+            'gender' => $gender,
         ]);
 
         // Tạo bản ghi sinh viên trống liên kết với user vừa tạo
         Sinhvien::create([
             'user_id' => $user->id,
-            'masinhvien' => null,
+            'ma_sinh_vien' => 'SV' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
             'lop' => null,
-            'sodienthoai' => null,
-            'phong_id' => null,
+            'khoa' => null,
+            'ngay_nhap_hoc' => null,
         ]);
 
         event(new Registered($user));

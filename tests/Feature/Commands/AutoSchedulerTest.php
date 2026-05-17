@@ -8,9 +8,9 @@ use App\Mail\CanhBaoHetHanHopDong;
 use App\Mail\NhacNoHoaDon;
 use App\Models\Hoadon;
 use App\Models\Hopdong;
+use App\Models\Giuong;
 use App\Models\Phong;
 use App\Models\Sinhvien;
-use App\Models\ToaNha;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -21,23 +21,15 @@ class AutoSchedulerTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Phong $phong;
+    private Giuong $giuong;
+
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $toaNha = ToaNha::create([
-            'ten_toa_nha' => 'Tòa A1',
-            'ma_toa_nha' => 'A1',
-        ]);
 
-        $this->phong = Phong::create([
-            'tenphong' => 'P101',
-            'tang' => 1,
-            'giaphong' => 1500000,
-            'succhuamax' => 4,
-            'dango' => 1,
-            'toa_nha_id' => $toaNha->id,
-        ]);
+        $this->phong = Phong::factory()->create()->load('loaiphong');
+        $this->giuong = Giuong::factory()->create(['phong_id' => $this->phong->id]);
     }
 
     private function createStudentWithEmail()
@@ -46,10 +38,9 @@ class AutoSchedulerTest extends TestCase
             'email' => 'student@test.com',
         ]);
 
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV' . $user->id,
-            'phong_id' => $this->phong->id,
+            'ma_sinh_vien' => 'SV' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
         ]);
 
         return [$user, $sinhvien];
@@ -66,10 +57,11 @@ class AutoSchedulerTest extends TestCase
         $hopdong = Hopdong::create([
             'sinhvien_id' => $sinhvien->id,
             'phong_id' => $this->phong->id,
+            'giuong_id' => $this->giuong->id,
             'ngay_bat_dau' => now()->subMonths(6),
             'ngay_ket_thuc' => now()->subDay(), // Hết hạn hôm qua
-            'trang_thai' => ContractStatus::Active->value,
-            'giaphong_luc_ky' => $this->phong->giaphong,
+            'trang_thai' => ContractStatus::Active,
+            'gia_thuc_te' => (int) ($this->phong->loaiphong?->gia_thang ?? 0),
         ]);
 
         $this->artisan('hopdong:kiem-tra-het-han')->assertSuccessful();
@@ -90,10 +82,11 @@ class AutoSchedulerTest extends TestCase
         $hopdong = Hopdong::create([
             'sinhvien_id' => $sinhvien->id,
             'phong_id' => $this->phong->id,
+            'giuong_id' => $this->giuong->id,
             'ngay_bat_dau' => now()->subMonths(5),
             'ngay_ket_thuc' => now()->addDays(29), // Rơi vào khoảng Between(28, 30)
-            'trang_thai' => ContractStatus::Active->value,
-            'giaphong_luc_ky' => $this->phong->giaphong,
+            'trang_thai' => ContractStatus::Active,
+            'gia_thuc_te' => (int) ($this->phong->loaiphong?->gia_thang ?? 0),
         ]);
 
         $this->artisan('hopdong:kiem-tra-het-han')->assertSuccessful();
@@ -111,24 +104,39 @@ class AutoSchedulerTest extends TestCase
      */
     public function test_command_chuyen_hoa_don_qua_han()
     {
+        Mail::fake();
         Carbon::setTestNow(now());
         [, $sinhvien] = $this->createStudentWithEmail();
 
-        $hoadon = Hoadon::create([
+        $hopdong = Hopdong::create([
             'sinhvien_id' => $sinhvien->id,
             'phong_id' => $this->phong->id,
-            'thang' => now()->subMonth()->month,
-            'nam' => now()->year,
-            'tongtien' => 1500000,
-            'trangthaithanhtoan' => InvoiceStatus::Pending->value,
-            'ngayxuat' => now()->subDays(31)->format('Y-m-d'), // Quá hạn 30 ngày
+            'giuong_id' => $this->giuong->id,
+            'ngay_bat_dau' => now()->subMonths(6),
+            'ngay_ket_thuc' => now()->addMonths(1),
+            'trang_thai' => ContractStatus::Active,
+            'gia_thuc_te' => (int) ($this->phong->loaiphong?->gia_thang ?? 0),
+        ]);
+
+        $hoadon = Hoadon::create([
+            'hopdong_id' => $hopdong->id,
+            'phong_id' => $this->phong->id,
+            'ma_hoa_don' => 'HD-TEST-OVERDUE-1',
             'loai_hoadon' => Hoadon::LOAI_MONTHLY,
+            'tien_phong' => 1500000,
+            'tien_dien' => 0,
+            'tien_nuoc' => 0,
+            'phi_dich_vu' => 0,
+            'tong_tien' => 1500000,
+            'trang_thai' => InvoiceStatus::Unpaid,
+            'ngay_het_han' => now()->subDay(),
+            'ngay_thanh_toan' => null,
         ]);
 
         $this->artisan('hoadon:kiem-tra-qua-han')->assertSuccessful();
 
         $hoadon->refresh();
-        $this->assertEquals(InvoiceStatus::Overdue, $hoadon->trangthaithanhtoan);
+        $this->assertEquals(InvoiceStatus::Overdue, $hoadon->trang_thai);
     }
 
     /**
@@ -140,15 +148,29 @@ class AutoSchedulerTest extends TestCase
         Carbon::setTestNow(now());
         [, $sinhvien] = $this->createStudentWithEmail();
 
-        $hoadon = Hoadon::create([
+        $hopdong = Hopdong::create([
             'sinhvien_id' => $sinhvien->id,
             'phong_id' => $this->phong->id,
-            'thang' => now()->subMonth()->month,
-            'nam' => now()->year,
-            'tongtien' => 1500000,
-            'trangthaithanhtoan' => InvoiceStatus::Pending->value,
-            'ngayxuat' => now()->subDays(31)->format('Y-m-d'),
+            'giuong_id' => $this->giuong->id,
+            'ngay_bat_dau' => now()->subMonths(6),
+            'ngay_ket_thuc' => now()->addMonths(1),
+            'trang_thai' => ContractStatus::Active,
+            'gia_thuc_te' => (int) ($this->phong->loaiphong?->gia_thang ?? 0),
+        ]);
+
+        Hoadon::create([
+            'hopdong_id' => $hopdong->id,
+            'phong_id' => $this->phong->id,
+            'ma_hoa_don' => 'HD-TEST-OVERDUE-2',
             'loai_hoadon' => Hoadon::LOAI_MONTHLY,
+            'tien_phong' => 1500000,
+            'tien_dien' => 0,
+            'tien_nuoc' => 0,
+            'phi_dich_vu' => 0,
+            'tong_tien' => 1500000,
+            'trang_thai' => InvoiceStatus::Unpaid,
+            'ngay_het_han' => now()->subDay(),
+            'ngay_thanh_toan' => null,
         ]);
 
         $this->artisan('hoadon:kiem-tra-qua-han')->assertSuccessful();

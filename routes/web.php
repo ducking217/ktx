@@ -51,16 +51,6 @@ Route::prefix('admin')
         
         Route::get('/trangchu', 'TrangchuController@index')->name('trangchu');
 
-        // Quản lý tòa nhà
-        Route::prefix('toa-nha')->controller('ToaNhaController')->group(function () {
-            Route::get('/', 'index')->name('toanha.index');
-            Route::get('/them', 'taoMoi')->name('toanha.tao');
-            Route::post('/them', 'luu')->name('toanha.luu');
-            Route::get('/{id}', 'chiTiet')->name('toanha.chitiet');
-            Route::put('/{id}', 'capNhat')->name('toanha.capnhat');
-            Route::delete('/{id}', 'xoa')->name('toanha.xoa');
-        });
-
         // Quản lý Phòng & Sơ đồ
         Route::prefix('phong')->name('phong.')->controller('PhongController')->group(function () {
             Route::get('/', 'index')->name('index');
@@ -107,9 +97,6 @@ Route::prefix('admin')
             Route::post('/{id}/tra-phong', 'xuLyTraPhong')->middleware('can:hopdong.manage')->name('traphong.xuly');
             Route::post('/{id}/tra-phong/tu-choi', 'tuChoiTraPhong')->middleware('can:hopdong.manage')->name('traphong.tuchoi');
         });
-
-        // Nhật ký hoạt động (Chỉ Super Admin)
-        Route::get('/activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-log');
 
         // Quản lý Hóa đơn & Công nợ
         Route::prefix('hoa-don')->name('hoadon.')->controller('HoadonController')->middleware('can:hoadon.manage')->group(function () {

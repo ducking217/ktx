@@ -25,6 +25,149 @@
 ---
 **Dự án đã đạt trạng thái Sẵn sàng vận hành (Production Ready).**
 
+## 2026-05-16 - Refactor an toàn: HoadonService (không đổi nghiệp vụ)
+- [x] Khoanh vùng refactor ở các hàm phụ trợ/bulk-entry (`xuLyHoaDonHangLoat`, `duLieuNhapHangLoat`) để giảm phức tạp nhưng giữ nguyên public API.
+- [x] Tách helper methods nội bộ (normalize payload + lấy chỉ số gần nhất) trong cùng file, không tạo file mới.
+- [x] Verify bằng PHPUnit: chạy `HoadonServiceFeatureTest` và `HoadonServiceTest` đều pass.
+
+## 2026-05-16 - Refactor an toàn: DangkyService (không đổi nghiệp vụ)
+- [x] Refactor `xacNhanThanhToan`: tách helper nội bộ (tìm giường trống, ghi nhận thanh toán cọc, gửi magic link) để giảm phức tạp, không đổi public API.
+- [x] Refactor `diChuyenFileDangKySangSinhvien`: chuẩn hoá đường dẫn private disk bằng helper nội bộ để tránh lặp logic.
+- [x] Update tests theo schema v2 + route names hiện tại, đảm bảo luồng Guest/Admin/Student trong module Đăng ký pass.
+- [x] Verify bằng PHPUnit: `AdminApproveGuestDangkyStatusTest`, `DangkyServiceTest`, `DangKyPhongTest` đều pass.
+
+## 2026-05-16 - Kế hoạch refactor theo GitNexus (Hướng 1 & 2)
+
+### Nguyên tắc an toàn (không phá luồng)
+- Mọi thay đổi đều bắt đầu bằng `gitnexus_impact` (upstream) cho symbol mục tiêu; nếu HIGH/CRITICAL thì dừng và khoanh phạm vi lại.
+- Không đổi public API (method signatures public, contract interface, route names, payload keys).
+- Không tạo file mới trừ khi bắt buộc; ưu tiên tách helper/private methods trong cùng file.
+- Mỗi bước refactor phải có verify: `gitnexus_detect_changes()` + chạy test/feature test liên quan.
+
+### Hướng 1: Refactor “điểm nóng” (hotspots) theo graph
+
+#### 1.1 SinhvienService (Shared)
+- [x] Preflight: `gitnexus_impact({target: "SinhvienService", direction: "upstream"})`
+- [x] Refactor nội bộ (giữ nguyên signatures):
+  - [x] Nhóm “Profile update + upload private disk”: tách helper thay file private disk (xóa file cũ + store file mới).
+  - [x] Nhóm “Assign/Remove room”: tách helper lấy sinh viên lockForUpdate; giữ nguyên transaction boundary.
+  - [ ] Chuẩn hoá message/return payload theo pattern `PhanHoiService` (không đổi keys đang dùng ở controller/view).
+- [x] Verify:
+  - [x] PHPUnit: `SinhvienServiceTest`, `DangKyPhongTest`
+  - [x] Diagnostics: không phát sinh lỗi mới.
+  - [x] `gitnexus_detect_changes()` scope unstaged
+
+#### 1.2 BangDieuKhienService (Admin)
+- [x] Preflight: `gitnexus_impact({target: "BangDieuKhienService", direction: "upstream"})`
+- [x] Refactor nội bộ (giữ nguyên output keys cho view):
+  - [x] Tách các đoạn “stats phòng”, “stats tài chính”, “lists” thành private helpers.
+  - [x] Giữ nguyên query semantics; chỉ gom nhóm và đặt tên rõ.
+- [x] Verify: diagnostics + `gitnexus_detect_changes()` (chưa có test trực tiếp cho dashboard).
+
+#### 1.3 TruyVanPhongService (Core)
+- [x] Preflight: `gitnexus_impact({target: "TruyVanPhongService", direction: "upstream"})`
+- [x] Refactor nội bộ:
+  - [x] Tách helper query builder theo use-case (admin/public/student) để giảm độ phức tạp.
+  - [x] Giữ nguyên select columns và eager-load hiện tại để tránh regression performance.
+- [x] Verify: diagnostics + `gitnexus_detect_changes()` + chạy regression tests liên quan (`DangKyPhongTest|SinhvienServiceTest`).
+
+### Hướng 2: Audit “cô lập” (no incoming CALLS) một cách đúng ngữ cảnh Laravel
+
+#### 2.1 Lập danh sách ứng viên từ graph
+- [ ] Dùng cypher để lấy danh sách function/method có 0 incoming CALLS (lọc theo `app/` và loại trừ `vendor/`), xuất ra top theo thư mục (Helpers/Traits/Enums).
+
+#### 2.2 Phân loại false-positive / true-dead
+- [ ] Enums: tìm usage trong Blade (`resources/views/**`) và casts/DB enum; nhiều case gọi `label()` từ UI nên graph không thấy.
+- [ ] Traits: dò `use <Trait>` trong codebase; xác định có đang “mang theo” trong service/model không.
+- [ ] Helpers: dò static call trong Services/Controllers/Requests; xác định có đang dùng cho security/search không.
+
+#### 2.3 Xử lý theo mức độ rủi ro
+- [ ] Nếu “true-dead”: đề xuất xóa hoặc deprecate; trước khi xóa chạy `gitnexus_impact` và `gitnexus_detect_changes` để tránh orphan.
+- [ ] Nếu “false-positive nhưng dùng ở runtime”: bổ sung test/coverage (hoặc ghi chú trong plan) để tránh refactor nhầm.
+
+## 2026-05-16 - Clean Code Roadmap (GitNexus-driven, không đổi nghiệp vụ)
+
+### Mục tiêu (định nghĩa “clean” cho dự án này)
+- Tên gọi nhất quán theo [STANDARDS.md](file:///d:/laragon/www/hethongquanlyktxv1/STANDARDS.md) (Vietnamese domain classes, English enums).
+- Service/Controller/Observer có ranh giới rõ; không “leak” nghiệp vụ vào Blade/Controller.
+- Không có symbol “mồ côi” hoặc trùng vai trò (vd: `StudentObserver` vs `SinhvienObserver`) gây side effect khó đoán.
+- Hotspots (fan-in/fan-out cao) được làm gọn bằng tách private helpers, giữ nguyên public API.
+- Các luồng nghiệp vụ trọng yếu có regression tests tối thiểu để refactor an toàn.
+
+### Nguyên tắc vận hành (cứng)
+- Preflight mỗi đợt: `npx gitnexus status` → nếu stale/corrupt: `npx gitnexus analyze --force`.
+- Trước mọi chỉnh sửa: `gitnexus_impact({target: "<symbol>", direction: "upstream"})`; HIGH/CRITICAL thì chỉ khoanh vùng, không chạm code.
+- Sau mỗi commit refactor: `gitnexus_detect_changes()` để đảm bảo phạm vi đúng dự kiến (không “lây” sang module khác).
+- Rename/refactor multi-file: chỉ dùng `gitnexus_rename`/`gitnexus_refactor` (không find-replace).
+
+### “100% Clean Code” = Definition of Done (định nghĩa nội bộ, đo được)
+- Không còn lệch chuẩn naming so với [STANDARDS.md](file:///d:/laragon/www/hethongquanlyktxv1/STANDARDS.md): domain classes tiếng Việt, Enum case name tiếng Anh, không còn “magic string” cho role/status trong core flows (chỉ dùng Enum hoặc constants).
+- Không còn file rác/artefact được track: cache Blade compiled, script test rời, output tooling, v.v. (chỉ giữ những gì có chủ đích).
+- Không còn true-dead code trong `app/**` (xác nhận bằng GitNexus + cross-check runtime Laravel: routes, Blade, events, observers, commands, policies).
+- Hotspots chính (fan-in/fan-out cao, cyclomatic cao) được “làm phẳng”:
+  - Public API giữ nguyên (route names, request keys, interface signatures).
+  - Mỗi method trọng yếu có ranh giới rõ (validate → query → domain action → side effects), side effects không bị trộn trong transaction nếu không cần.
+- Quality gates tự động (mục tiêu cuối):
+  - `php artisan test` pass (regression tối thiểu cho các process trọng yếu).
+  - Pint/format pass (nếu bật).
+  - Static analysis pass (Larastan/PHPStan ở mức đã chọn).
+  - IDE diagnostics không còn Error (Hint/Info được chấp nhận theo whitelist).
+
+### Chiến lược đạt “100%” (thực tế: tiến dần theo gate)
+1) **Ổn định nền tảng đo lường** (để “100%” có ý nghĩa):
+   - Bật Pint (PSR-12) + cấu hình tối thiểu.
+   - Bật Larastan/PHPStan mức Medium → High theo từng cụm module (không bật một lần cho toàn repo).
+   - Chuẩn hóa `.gitignore` cho cache/runtime outputs và dọn artefacts đã lỡ track.
+2) **Dọn naming + schema drift có kiểm soát**:
+   - Loại magic strings (role/status/type) ở “điểm nóng” trước (Auth/Accounts/Đăng ký/Hóa đơn/Hợp đồng).
+   - Đồng bộ Model `$casts` + migration schema để tránh “code đúng nhưng test fail” (SQLite vs MySQL).
+3) **Giảm hotspots theo graph** (ưu tiên high fan-in):
+   - Tách private helpers theo trách nhiệm; giảm nesting; giảm duplicate query snippets.
+   - Chuẩn hóa chỗ đặt side effects (Mail/Notification/Audit logs).
+4) **Audit dead code đúng ngữ cảnh Laravel**:
+   - Xóa theo cụm nhỏ (1–3 files/commit) sau khi đã khóa bằng tests/diagnostics.
+5) **Khóa regression theo process**:
+   - Mỗi process trọng yếu có tối thiểu 1 happy path + 1 guardrail test.
+   - “Không cần test” chỉ áp dụng cho cleanup thuần (imports/types/format/ignore); còn thay đổi flow/hotspot phải có test.
+
+### Trục 1 — Chuẩn hóa Naming/Structure (theo STANDARDS “Known Issues”)
+- [ ] Enum audit:
+  - [ ] `gitnexus_query({query: "enum"})` + lọc các enum tên/values không theo chuẩn (English PascalCase + backed value English).
+  - [ ] Chuẩn hóa dần theo module (Hợp đồng → Đăng ký → Hóa đơn) để giảm blast radius.
+- [ ] Service/Request/Controller còn tiếng Anh:
+  - [ ] Dò các class dạng `*Registration*|*Contract*|Approve*Request` để lên danh sách rename.
+  - [ ] Với mỗi rename: `gitnexus_impact` → `gitnexus_rename` → chạy test filter theo module.
+- [ ] Observer trùng/khó đoán:
+  - [ ] Dò `*Observer` theo concept “Student/Sinhvien/Hopdong/Hoadon” để xác định cái nào đang được register (AppServiceProvider/EventServiceProvider).
+  - [ ] Nếu phát hiện duplicate active: ưu tiên “1 model → 1 observer” và gom logic về observer canonical.
+
+### Trục 2 — Giảm Hotspots (fan-in/fan-out cao) theo graph
+- [ ] Lấy Top hotspots:
+  - [ ] `gitnexus://repo/ktx/clusters` để xem khu vực cohesion thấp / coupling cao.
+  - [ ] `gitnexus_query({query: "transaction lockForUpdate"})`, `gitnexus_query({query: "pending_confirmation"})`, `gitnexus_query({query: "private-files"})` để tìm luồng nhạy cảm.
+- [ ] Với mỗi hotspot:
+  - [ ] Chỉ tách private helpers + đặt tên rõ (không đổi signature/keys).
+  - [ ] Tách side effects (Notification/Mail/Observer) ra điểm cuối của transaction (nếu hiện có trộn lẫn).
+  - [ ] Verify: test module + `gitnexus_detect_changes()`.
+
+### Trục 3 — Audit Dead Code “đúng ngữ cảnh Laravel”
+- [ ] Ứng viên dead code:
+  - [ ] Cypher: liệt kê methods/functions có 0 incoming CALLS trong `app/**` (loại trừ `vendor/**`).
+  - [ ] Cross-check với: Routes, Blade usage, Model casts, events/observers, policies, commands/schedule.
+- [ ] Xử lý:
+  - [ ] Nếu “true-dead”: ưu tiên xóa theo cụm nhỏ (1-3 files/commit), kèm test/diagnostics.
+  - [ ] Nếu “false-positive”: ghi lại lý do runtime (Blade/event/DI) và bổ sung test để khóa hành vi.
+
+### Trục 4 — Regression Tests theo “process” (để refactor không sợ)
+- [ ] Chọn 8–12 execution flows quan trọng nhất từ `gitnexus://repo/ktx/processes` (ưu tiên: Đăng ký duyệt + xác nhận thanh toán, Hóa đơn pending_confirmation, Gia hạn hợp đồng, Private files).
+- [ ] Mỗi flow: viết/ổn định 1–2 feature tests cover “happy path + 1 guardrail”.
+- [ ] Quy ước verify: chạy test theo filter của flow sau mỗi refactor chạm vào cluster đó.
+
+### Giả định (để thực thi không bị lệch)
+- Cho phép rename trong phạm vi code (class/enum/method) miễn giữ nguyên public surface: routes, request payload keys, response keys đang dùng ở Blade/JS.
+- Ưu tiên “clean để vận hành” hơn “clean để đẹp”: dọn các điểm gây bug/khó bảo trì trước (Accounts/Auth/Đăng ký/Hóa đơn/Hợp đồng).
+- Cho phép bổ sung tooling quality gates (Pint + Larastan/PHPStan) theo lộ trình tăng dần.
+
 ## 2026-05-05 - Tắt tính năng Đánh giá (Sinh viên)
 - [x] Gỡ UI đánh giá khỏi “Phòng của tôi” (nút/CTA/modal).
 - [x] Tắt endpoints đánh giá phía Student (GET/POST `/student/danhgia` → redirect về Phòng của tôi).

@@ -34,7 +34,7 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
                 ->where('user_id', $sinhvien->user_id)
                 ->where(function ($q) {
                     $q->whereNull('ghi_chu')
-                        ->orWhere('ghi_chu', 'not like', 'TRA_PHONG%');
+                        ->orWhere('ghi_chu', 'not like', Dangky::GHI_CHU_TRA_PHONG_PREFIX);
                 })
                 ->orderByDesc('id')
                 ->first();
@@ -68,7 +68,7 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
 
         $daGuiYeuCauTraPhong = Dangky::where('user_id', $sinhvien->user_id)
             ->where('trang_thai', RegistrationStatus::Pending)
-            ->where('ghi_chu', 'like', 'TRA_PHONG%')
+            ->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)
             ->exists();
 
         return [
@@ -88,7 +88,7 @@ class PhongSinhvienService implements PhongSinhvienServiceInterface
                 ->whereMonth('created_at', now()->month)
                 ->exists(),
             'diemTrungBinh' => round(Danhgia::where('phong_id', $phongId)->avg('rating') ?? 0, 1),
-            'thongbaoMoiNhat' => Thongbao::whereIn('doi_tuong_nhan', ['all', 'sinhvien'])->orderByDesc('created_at')->limit(5)->get(),
+            'thongbaoMoiNhat' => Thongbao::whereIn('doi_tuong_nhan', [Thongbao::TARGET_ALL, Thongbao::TARGET_STUDENT])->orderByDesc('created_at')->limit(5)->get(),
             'canhBaoHetHan' => $this->layCanhBaoHetHan($hopdong),
         ];
     }

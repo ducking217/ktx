@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -134,7 +135,9 @@ class GiaHanService implements GiaHanServiceInterface
                 return $this->traVeThanhCong('Đã gửi yêu cầu gia hạn. Vui lòng chờ admin xét duyệt.');
             });
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('GiaHanService.guiYeuCau failed', ['hopdong_id' => $hopdongId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -186,7 +189,9 @@ class GiaHanService implements GiaHanServiceInterface
 
             return $this->traVeThanhCong('Duyệt yêu cầu gia hạn thành công.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('GiaHanService.duyetYeuCau failed', ['yeu_cau_id' => $yeuCauId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -228,7 +233,9 @@ class GiaHanService implements GiaHanServiceInterface
 
             return $this->traVeThanhCong('Đã từ chối yêu cầu gia hạn.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('GiaHanService.tuChoiYeuCau failed', ['yeu_cau_id' => $yeuCauId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 }

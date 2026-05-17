@@ -2,20 +2,26 @@
 
 namespace Tests\Unit\Services;
 
-use App\Services\Shared\SinhvienService;
-use App\Models\Sinhvien;
-use App\Models\Phong;
-use App\Models\Hopdong;
 use App\Contracts\Core\KiemToanServiceInterface;
+use App\Enums\BedStatus;
+use App\Services\Shared\SinhvienService;
 use App\Enums\ContractStatus;
-use Illuminate\Support\Facades\DB;
+use App\Models\Giuong;
+use App\Models\LoaiPhong;
+use App\Models\Phong;
+use App\Models\Sinhvien;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
 class SinhvienServiceTest extends TestCase
 {
-    private $sinhvienService;
-    private $kiemToanService;
+    use RefreshDatabase;
+
+    private SinhvienService $sinhvienService;
+    private KiemToanServiceInterface&MockInterface $kiemToanService;
 
     protected function setUp(): void
     {
@@ -30,66 +36,39 @@ class SinhvienServiceTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function test_assign_room_tao_hopdong_moi()
+    public function test_assign_room_tao_hopdong_moi(): void
     {
-        // Mock DB
-        DB::shouldReceive('transaction')->andReturnUsing(function ($callback) {
-            return $callback();
-        });
-        DB::shouldReceive('rollBack')->andReturnNull();
-
-        // Mock Sinhvien
-        $sinhvien = Mockery::mock('alias:App\Models\Sinhvien');
-        $svModel = Mockery::mock(\App\Models\Sinhvien::class)->makePartial();
-        $svModel->id = 1;
-        $svModel->phong_id = null;
-        $svModel->shouldReceive('update')->andReturn(true);
-        $sinhvien->shouldReceive('where->with->lockForUpdate->first')->andReturn($svModel);
-        $sinhvien->shouldReceive('where->count')->andReturn(0);
-
-        // Mock Phong
-        $phong = Mockery::mock('alias:App\Models\Phong');
-        $phongModel = Mockery::mock(\App\Models\Phong::class)->makePartial();
-        $phongModel->id = 10;
-        $phongModel->succhuamax = 8;
-        $phongModel->giaphong = 1000000;
-        $phong->shouldReceive('where->lockForUpdate->first')->andReturn($phongModel);
-        $phong->shouldReceive('where->update')->andReturn(true);
-
-        // Mock Hopdong
-        $hopdong = Mockery::mock('alias:App\Models\Hopdong');
-        $hopdong->shouldReceive('where->where->update')->andReturn(true); // terminateActiveContracts
-        
-        // EXPECTATION: Hopdong::create được gọi
-        $hopdong->shouldReceive('create')->once()->with(Mockery::on(function($data) {
-            return $data['sinhvien_id'] === 1 && $data['phong_id'] === 10;
-        }))->andReturn(new \App\Models\Hopdong());
-
-        // Mock Audit Log
         $this->kiemToanService->shouldReceive('ghiNhatKy')->once();
 
-        $result = $this->sinhvienService->assignRoom(1, 10);
+        $loaiPhong = LoaiPhong::factory()->create(['gia_thang' => 1000000]);
+        $phong = Phong::factory()->create(['loai_phong_id' => $loaiPhong->id]);
+        $giuong = Giuong::factory()->create([
+            'phong_id' => $phong->id,
+            'trang_thai' => BedStatus::Available,
+        ]);
+        $user = User::factory()->create();
+        $sinhvien = Sinhvien::factory()->create(['user_id' => $user->id]);
+
+        $result = $this->sinhvienService->assignRoom($sinhvien->id, $phong->id);
 
         $this->assertEquals('thanhcong', $result['toast_loai']);
-        $this->assertStringContainsString('tạo hợp đồng mới thành công', $result['toast_noidung']);
+        $this->assertStringContainsString('Xếp phòng thành công', $result['toast_noidung']);
+        $this->assertDatabaseHas('hopdong', [
+            'sinhvien_id' => $sinhvien->id,
+            'phong_id' => $phong->id,
+            'giuong_id' => $giuong->id,
+            'trang_thai' => ContractStatus::Active->value,
+        ]);
+        $this->assertEquals(BedStatus::Occupied->value, $giuong->fresh()->trang_thai->value);
     }
 
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function test_assign_room_rollback_khi_co_loi()
+    public function test_assign_room_bao_loi_khi_phong_khong_ton_tai(): void
     {
-        // Mock DB
-        DB::shouldReceive('transaction')->andThrow(new \Exception('Lỗi DB ngẫu nhiên'));
-
-        $result = $this->sinhvienService->assignRoom(1, 10);
+        $user = User::factory()->create();
+        $sinhvien = Sinhvien::factory()->create(['user_id' => $user->id]);
+        $result = $this->sinhvienService->assignRoom($sinhvien->id, 999999);
 
         $this->assertEquals('loi', $result['toast_loai']);
-        $this->assertEquals('Lỗi DB ngẫu nhiên', $result['toast_noidung']);
+        $this->assertEquals('Phòng không tồn tại.', $result['toast_noidung']);
     }
 }

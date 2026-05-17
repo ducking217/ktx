@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use App\Models\Hoadon;
+
 enum InvoiceStatus: string
 {
     case Unpaid = 'unpaid';
@@ -23,7 +25,7 @@ enum InvoiceStatus: string
 
     public function badgeClass(?string $invoiceType = null): string
     {
-        $isRefund = $invoiceType === 'refund';
+        $isRefund = $invoiceType === Hoadon::LOAI_REFUND;
 
         return match ($this) {
             self::Paid => 'saas-badge-success',
@@ -36,7 +38,7 @@ enum InvoiceStatus: string
 
     public function displayLabel(?string $invoiceType = null): string
     {
-        $isRefund = $invoiceType === 'refund';
+        $isRefund = $invoiceType === Hoadon::LOAI_REFUND;
         if (! $isRefund) {
             return $this->label();
         }

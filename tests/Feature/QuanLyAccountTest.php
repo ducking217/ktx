@@ -35,6 +35,13 @@ class QuanLyAccountTest extends TestCase
         $response = $this->actingAs($superAdmin)
             ->post(route('admin.accounts.luu'), $data);
 
+        if ($response->getSession()->has('error')) {
+            $this->fail((string) $response->getSession()->get('error'));
+        }
+
+        $response->assertRedirect(route('admin.accounts.index'));
+        $response->assertSessionHas('success');
+
         // Assert: DB có user với email đó
         $this->assertDatabaseHas('users', [
             'email' => $email,
@@ -48,8 +55,6 @@ class QuanLyAccountTest extends TestCase
         $this->assertTrue(Hash::check('password123', $user->password));
 
         // Assert: response redirect về index
-        $response->assertRedirect(route('admin.accounts.index'));
-        $response->assertSessionHas('success');
     }
 
     /**

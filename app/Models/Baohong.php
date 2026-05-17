@@ -11,6 +11,9 @@ class Baohong extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const PAYER_STUDENT = 'sinhvien';
+    public const SEVERITY_LOW = 'low';
+
     protected $table = 'baohong';
 
     protected $fillable = [

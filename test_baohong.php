@@ -1,1 +1,0 @@
-<?php use App\Models\Baohong; use App\Enums\BaohongStatus; try { Baohong::create(['sinhvien_id' => 1, 'phong_id' => 1, 'giuong_id' => null, 'mo_ta' => 'Test', 'hinh_anh_path' => null, 'trang_thai' => BaohongStatus::Pending->value, 'muc_do' => 'low']); echo 'SUCCESS'; } catch (\Exception $e) { echo 'ERROR: ' . $e->getMessage(); }

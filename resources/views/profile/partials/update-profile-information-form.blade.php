@@ -47,8 +47,8 @@
                 @endif
             </div>
         </div>
-
-        @if($user->vaitro === \App\Enums\UserRole::SinhVien)
+ 
+        @if($user->vaitro === \App\Enums\UserRole::Student)
             <div class="pt-8 border-t border-slate-100 grid gap-6 md:grid-cols-2">
                 {{-- Mã sinh viên --}}
                 <div class="space-y-2">

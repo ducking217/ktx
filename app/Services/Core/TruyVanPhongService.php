@@ -31,23 +31,7 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         $toaNhaId = $request->query('toa_nha_id', '');
         $viewMode = $request->query('view', 'table');
 
-        $danhsachphong = Phong::query()
-            ->select(['id', 'toa_nha_id', 'loai_phong_id', 'ten_phong', 'tang', 'gioi_tinh_han_che', 'trang_thai'])
-            ->with(['loaiphong', 'toanha'])
-            ->withCount(['giuongs as so_nguoi_dang_o' => function ($query) {
-                $query->where('trang_thai', \App\Enums\BedStatus::Occupied->value);
-            }])
-            ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
-            })
-            ->when($tangLoc, function ($query) use ($tangLoc) {
-                return $query->where('tang', $tangLoc);
-            })
-            ->when($toaNhaId, function ($query) use ($toaNhaId) {
-                return $query->where('toa_nha_id', $toaNhaId);
-            })
-            ->orderBy('tang')
-            ->orderBy('ten_phong')
+        $danhsachphong = $this->phongAdminQuery($tuKhoa, $tangLoc, $toaNhaId)
             ->paginate(20)
             ->withQueryString();
 
@@ -70,28 +54,7 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         $tangLoc = $request->query('tang', '');
         $gioiTinhLoc = $request->query('gioitinh', '');
 
-        $danhsachphong = Phong::select('id', 'toa_nha_id', 'loai_phong_id', 'ten_phong', 'tang', 'gioi_tinh_han_che', 'trang_thai')
-            ->with([
-                'loaiphong',
-                'toanha',
-                'taisans:id,phong_id,ten_tai_san,so_luong',
-                'vattus:id,phong_id,ten_vat_tu,so_luong',
-            ])
-            ->withCount(['giuongs as so_nguoi_dang_o' => function ($query) {
-                $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
-            }])
-            ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
-            })
-            ->when($tangLoc, function ($query) use ($tangLoc) {
-                return $query->where('tang', $tangLoc);
-            })
-            ->when($gioiTinhLoc, function ($query) use ($gioiTinhLoc) {
-                return $query->where('gioi_tinh_han_che', $gioiTinhLoc);
-            })
-            ->orderBy('tang')
-            ->orderBy('ten_phong')
-            ->get();
+        $danhsachphong = $this->phongCongKhaiQuery($tuKhoa, $tangLoc, $gioiTinhLoc)->get();
 
         $this->ganThongTinSapTrong($danhsachphong);
 
@@ -112,37 +75,7 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         $gioitinhSinhvien = $sinhvien?->user?->gender;
         $gioitinhValue = $gioitinhSinhvien instanceof \App\Enums\Gender ? $gioitinhSinhvien->value : null;
 
-        $danhsachphong = Phong::with([
-                'loaiphong',
-                'toanha',
-                'taisans:id,phong_id,ten_tai_san,so_luong',
-                'vattus:id,phong_id,ten_vat_tu,so_luong',
-            ])
-            ->withCount([
-                'giuongs as so_giuong_da_o' => function ($query) {
-                    $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
-                },
-                'giuongs as so_giuong_trong' => function ($query) {
-                    $query->where('trang_thai', \App\Enums\BedStatus::Available);
-                },
-                'taisans as so_tai_san_hong' => function ($query) {
-                    $query->whereIn('tinh_trang', ['damaged', 'broken']);
-                },
-            ])
-            ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
-            })
-            ->when($gioitinhValue, function ($query) use ($gioitinhValue) {
-                return $query->where(function ($q) use ($gioitinhValue) {
-                    $q->where('gioi_tinh_han_che', \App\Enums\Gender::Any->value)
-                        ->orWhere('gioi_tinh_han_che', $gioitinhValue);
-                });
-            })
-            ->whereHas('giuongs', function ($query) {
-                $query->where('trang_thai', \App\Enums\BedStatus::Available);
-            })
-            ->orderBy('tang')
-            ->orderBy('ten_phong')
+        $danhsachphong = $this->phongSinhVienQuery($tuKhoa, $gioitinhValue)
             ->paginate(20)
             ->withQueryString();
 
@@ -316,5 +249,86 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
             ->values();
 
         return $phongs;
+    }
+
+    private function phongAdminQuery(string $tuKhoa, string $tangLoc, string $toaNhaId)
+    {
+        return Phong::query()
+            ->select(['id', 'toa_nha_id', 'loai_phong_id', 'ten_phong', 'tang', 'gioi_tinh_han_che', 'trang_thai'])
+            ->with(['loaiphong', 'toanha'])
+            ->withCount(['giuongs as so_nguoi_dang_o' => function ($query) {
+                $query->where('trang_thai', \App\Enums\BedStatus::Occupied->value);
+            }])
+            ->when($tuKhoa, function ($query, $tuKhoa) {
+                return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
+            })
+            ->when($tangLoc, function ($query) use ($tangLoc) {
+                return $query->where('tang', $tangLoc);
+            })
+            ->when($toaNhaId, function ($query) use ($toaNhaId) {
+                return $query->where('toa_nha_id', $toaNhaId);
+            })
+            ->orderBy('tang')
+            ->orderBy('ten_phong');
+    }
+
+    private function phongCongKhaiQuery(string $tuKhoa, string $tangLoc, string $gioiTinhLoc)
+    {
+        return Phong::select('id', 'toa_nha_id', 'loai_phong_id', 'ten_phong', 'tang', 'gioi_tinh_han_che', 'trang_thai')
+            ->with([
+                'loaiphong',
+                'toanha',
+                'taisans:id,phong_id,ten_tai_san,so_luong',
+                'vattus:id,phong_id,ten_vat_tu,so_luong',
+            ])
+            ->withCount(['giuongs as so_nguoi_dang_o' => function ($query) {
+                $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+            }])
+            ->when($tuKhoa, function ($query, $tuKhoa) {
+                return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
+            })
+            ->when($tangLoc, function ($query) use ($tangLoc) {
+                return $query->where('tang', $tangLoc);
+            })
+            ->when($gioiTinhLoc, function ($query) use ($gioiTinhLoc) {
+                return $query->where('gioi_tinh_han_che', $gioiTinhLoc);
+            })
+            ->orderBy('tang')
+            ->orderBy('ten_phong');
+    }
+
+    private function phongSinhVienQuery(string $tuKhoa, ?string $gioitinhValue)
+    {
+        return Phong::with([
+                'loaiphong',
+                'toanha',
+                'taisans:id,phong_id,ten_tai_san,so_luong',
+                'vattus:id,phong_id,ten_vat_tu,so_luong',
+            ])
+            ->withCount([
+                'giuongs as so_giuong_da_o' => function ($query) {
+                    $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+                },
+                'giuongs as so_giuong_trong' => function ($query) {
+                    $query->where('trang_thai', \App\Enums\BedStatus::Available);
+                },
+                'taisans as so_tai_san_hong' => function ($query) {
+                    $query->whereIn('tinh_trang', ['damaged', 'broken']);
+                },
+            ])
+            ->when($tuKhoa, function ($query, $tuKhoa) {
+                return $query->where('ten_phong', 'like', '%' . \App\Helpers\SecurityHelper::escapeLike(trim($tuKhoa)) . '%');
+            })
+            ->when($gioitinhValue, function ($query) use ($gioitinhValue) {
+                return $query->where(function ($q) use ($gioitinhValue) {
+                    $q->where('gioi_tinh_han_che', \App\Enums\Gender::Any->value)
+                        ->orWhere('gioi_tinh_han_che', $gioitinhValue);
+                });
+            })
+            ->whereHas('giuongs', function ($query) {
+                $query->where('trang_thai', \App\Enums\BedStatus::Available);
+            })
+            ->orderBy('tang')
+            ->orderBy('ten_phong');
     }
 }

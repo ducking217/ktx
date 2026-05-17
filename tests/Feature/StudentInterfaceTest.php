@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Baohong;
 use App\Models\Giuong;
 use App\Models\Hopdong;
 use App\Models\LoaiPhong;
@@ -22,6 +21,10 @@ use Tests\TestCase;
 class StudentInterfaceTest extends TestCase
 {
     use RefreshDatabase;
+
+    private ToaNha $toaNha;
+    private LoaiPhong $loaiPhong;
+    private Phong $phong;
 
     protected function setUp(): void
     {
@@ -63,8 +66,8 @@ class StudentInterfaceTest extends TestCase
 
     public function test_student_can_view_vacant_rooms()
     {
-        $user = User::factory()->create(['vaitro' => UserRole::SinhVien, 'gender' => Gender::Male]);
-        $sinhvien = Sinhvien::create([
+        $user = User::factory()->create(['vaitro' => UserRole::Student, 'gender' => Gender::Male]);
+        Sinhvien::create([
             'user_id' => $user->id,
             'ma_sinh_vien' => 'SV001',
             'lop' => 'CNTT1',
@@ -83,7 +86,7 @@ class StudentInterfaceTest extends TestCase
 
     public function test_student_can_create_maintenance_report()
     {
-        $user = User::factory()->create(['vaitro' => UserRole::SinhVien, 'gender' => Gender::Male]);
+        $user = User::factory()->create(['vaitro' => UserRole::Student, 'gender' => Gender::Male]);
         $sinhvien = Sinhvien::create([
             'user_id' => $user->id,
             'ma_sinh_vien' => 'SV002',
@@ -124,8 +127,8 @@ class StudentInterfaceTest extends TestCase
 
     public function test_student_cannot_report_damage_without_active_contract()
     {
-        $user = User::factory()->create(['vaitro' => UserRole::SinhVien]);
-        $sinhvien = Sinhvien::create([
+        $user = User::factory()->create(['vaitro' => UserRole::Student]);
+        Sinhvien::create([
             'user_id' => $user->id,
             'ma_sinh_vien' => 'SV003',
             'lop' => 'CNTT1',
@@ -143,8 +146,8 @@ class StudentInterfaceTest extends TestCase
 
     public function test_student_can_book_room_successfully()
     {
-        $user = User::factory()->create(['vaitro' => UserRole::SinhVien, 'gender' => Gender::Male]);
-        $sinhvien = Sinhvien::create([
+        $user = User::factory()->create(['vaitro' => UserRole::Student, 'gender' => Gender::Male]);
+        Sinhvien::create([
             'user_id' => $user->id,
             'ma_sinh_vien' => 'SV_BOOK_001',
             'lop' => 'CNTT1',

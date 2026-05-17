@@ -11,6 +11,9 @@ class ThanhToan extends Model
 
     protected $table = 'thanh_toan';
 
+    public const METHOD_TRANSFER = 'transfer';
+    public const METHOD_CASH = 'cash';
+
     protected $fillable = [
         'hoadon_id',
         'nguoi_xac_nhan',

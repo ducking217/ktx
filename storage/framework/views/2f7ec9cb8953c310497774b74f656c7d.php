@@ -39,9 +39,10 @@
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5" id="room-container">
                 <?php $__empty_1 = true; $__currentLoopData = $danhsachphong; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $phong): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <?php
-                        $conTrong = max(0, $phong->succhuamax - $phong->dango);
+                        $dangO = (int) ($soluongdango_theophong[$phong->id] ?? ($phong->so_nguoi_dang_o ?? 0));
+                        $conTrong = max(0, $phong->succhuamax - $dangO);
                         $isAvailable = $conTrong > 0;
-                        $pct = $phong->succhuamax > 0 ? min(100, ($phong->dango / $phong->succhuamax) * 100) : 0;
+                        $pct = $phong->succhuamax > 0 ? min(100, ($dangO / $phong->succhuamax) * 100) : 0;
                         $sapTrongDate = $phong->ngay_trong_som_nhat instanceof \Illuminate\Support\Carbon
                             ? $phong->ngay_trong_som_nhat->format('d/m')
                             : null;
@@ -81,7 +82,7 @@
                             <div>
                                 <div class="flex justify-between text-[10px] font-bold text-ink-secondary mb-1.5">
                                     <span>Sức chứa: <?php echo e($phong->succhuamax); ?></span>
-                                    <span class="<?php echo e($isAvailable ? 'text-ink-primary' : 'text-red-500'); ?>">Đang ở: <?php echo e($phong->dango); ?></span>
+                                    <span class="<?php echo e($isAvailable ? 'text-ink-primary' : 'text-red-500'); ?>">Đang ở: <?php echo e($dangO); ?></span>
                                 </div>
                                 <div class="w-full bg-ui-bg h-1 overflow-hidden">
                                     <div class="h-full transition-all duration-500 ease-out <?php echo e($isAvailable ? 'bg-brand-emerald' : 'bg-red-500'); ?>" style="<?php echo \Illuminate\Support\Arr::toCssStyles(["width: $pct%"]) ?>"></div>

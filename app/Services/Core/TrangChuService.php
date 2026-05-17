@@ -52,7 +52,7 @@ class TrangChuService implements TrangChuServiceInterface
                 'soToa' => $soToa,
                 'phongList' => $phongList,
                 'cauhinh' => Cauhinh::pluck('giatri', 'ten')->toArray(),
-                'thongbao' => Thongbao::whereIn('doi_tuong_nhan', ['all', 'sinhvien'])
+                'thongbao' => Thongbao::whereIn('doi_tuong_nhan', [Thongbao::TARGET_ALL, Thongbao::TARGET_STUDENT])
                     ->orderByDesc('created_at')
                     ->limit(3)
                     ->get(),
@@ -67,7 +67,7 @@ class TrangChuService implements TrangChuServiceInterface
             Thongbao::create([
                 'tieu_de' => 'Liên hệ mới từ landing page',
                 'noi_dung' => "Họ tên: {$data['ho_ten']} | Email: {$data['email']} | Nội dung: {$data['noi_dung']}",
-                'doi_tuong_nhan' => 'admin',
+                'doi_tuong_nhan' => Thongbao::TARGET_ADMIN,
             ]);
         });
         return true;

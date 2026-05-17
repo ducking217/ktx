@@ -30,9 +30,10 @@
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5" id="room-container">
                 @forelse($danhsachphong as $phong)
                     @php
-                        $conTrong = max(0, $phong->succhuamax - $phong->dango);
+                        $dangO = (int) ($soluongdango_theophong[$phong->id] ?? ($phong->so_nguoi_dang_o ?? 0));
+                        $conTrong = max(0, $phong->succhuamax - $dangO);
                         $isAvailable = $conTrong > 0;
-                        $pct = $phong->succhuamax > 0 ? min(100, ($phong->dango / $phong->succhuamax) * 100) : 0;
+                        $pct = $phong->succhuamax > 0 ? min(100, ($dangO / $phong->succhuamax) * 100) : 0;
                         $sapTrongDate = $phong->ngay_trong_som_nhat instanceof \Illuminate\Support\Carbon
                             ? $phong->ngay_trong_som_nhat->format('d/m')
                             : null;
@@ -71,7 +72,7 @@
                             <div>
                                 <div class="flex justify-between text-[10px] font-bold text-ink-secondary mb-1.5">
                                     <span>Sức chứa: {{ $phong->succhuamax }}</span>
-                                    <span class="{{ $isAvailable ? 'text-ink-primary' : 'text-red-500' }}">Đang ở: {{ $phong->dango }}</span>
+                                    <span class="{{ $isAvailable ? 'text-ink-primary' : 'text-red-500' }}">Đang ở: {{ $dangO }}</span>
                                 </div>
                                 <div class="w-full bg-ui-bg h-1 overflow-hidden">
                                     <div class="h-full transition-all duration-500 ease-out {{ $isAvailable ? 'bg-brand-emerald' : 'bg-red-500' }}" @style(["width: $pct%"])></div>

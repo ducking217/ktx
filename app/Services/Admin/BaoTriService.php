@@ -8,6 +8,7 @@ use App\Models\Phong;
 use App\Models\Vattu;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
 
@@ -45,7 +46,9 @@ class BaoTriService implements BaoTriServiceInterface
             $lichsu->fill($data)->save();
             return $this->traVeThanhCong('Thao tác thành công.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('BaoTriService.luuBaoTri failed', ['lichsu_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -57,7 +60,9 @@ class BaoTriService implements BaoTriServiceInterface
             $lichsu->delete();
             return $this->traVeThanhCong('Xóa thành công.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('BaoTriService.xoaBaoTri failed', ['lichsu_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -66,10 +71,12 @@ class BaoTriService implements BaoTriServiceInterface
         try {
             $lichsu = Lichsubaotri::find($id);
             if (!$lichsu) return $this->traVeLoi('Không tìm thấy bản ghi.');
-            $lichsu->update(['trang_thai' => 'done']);
+            $lichsu->update(['trang_thai' => Lichsubaotri::STATUS_DONE]);
             return $this->traVeThanhCong('Đã hoàn thành bảo trì.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('BaoTriService.hoanThanhBaoTri failed', ['lichsu_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 }

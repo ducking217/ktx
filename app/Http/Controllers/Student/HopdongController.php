@@ -31,7 +31,7 @@ class HopdongController extends Controller
         $hopdongHieuLuc = $sinhvien ? $this->giaHanService->layHopdongHieuLuc((int) $sinhvien->id) : null;
         $yeuCauTraPhong = Dangky::query()
             ->where('user_id', auth()->id())
-            ->where('ghi_chu', 'like', 'TRA_PHONG%')
+            ->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)
             ->orderByDesc('id')
             ->first();
 
@@ -55,7 +55,7 @@ class HopdongController extends Controller
         $hopdongHieuLuc = $sinhvien ? $this->giaHanService->layHopdongHieuLuc((int) $sinhvien->id) : null;
         $yeuCauTraPhong = Dangky::query()
             ->where('user_id', auth()->id())
-            ->where('ghi_chu', 'like', 'TRA_PHONG%')
+            ->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)
             ->orderByDesc('id')
             ->first();
 

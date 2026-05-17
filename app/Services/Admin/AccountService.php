@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\Contracts\Admin\AccountServiceInterface;
+use App\Enums\Gender;
 use App\Enums\UserRole;
 use App\Models\User;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 /**
 
@@ -67,7 +68,9 @@ class AccountService implements AccountServiceInterface
 
             return $this->traVeThanhCong('Tạo tài khoản thành công.', ['user' => $user]);
         } catch (\Throwable $e) {
-            return $this->traVeLoi('Không thể tạo tài khoản: ' . $e->getMessage());
+            Log::error('AccountService.luu failed', ['exception' => $e]);
+            $message = config('app.debug') ? ('Không thể tạo tài khoản: ' . $e->getMessage()) : 'Không thể tạo tài khoản.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -107,7 +110,9 @@ class AccountService implements AccountServiceInterface
 
             return $this->traVeThanhCong('Cập nhật tài khoản thành công.', ['user' => $user]);
         } catch (\Throwable $e) {
-            return $this->traVeLoi('Lỗi khi cập nhật: ' . $e->getMessage());
+            Log::error('AccountService.capNhat failed', ['user_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? ('Lỗi khi cập nhật: ' . $e->getMessage()) : 'Lỗi khi cập nhật.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -133,7 +138,9 @@ class AccountService implements AccountServiceInterface
 
             return $this->traVeThanhCong('Đã xóa tài khoản.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi('Lỗi khi xóa: ' . $e->getMessage());
+            Log::error('AccountService.xoa failed', ['user_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? ('Lỗi khi xóa: ' . $e->getMessage()) : 'Lỗi khi xóa.';
+            return $this->traVeLoi($message);
         }
     }
 }

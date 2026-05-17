@@ -100,8 +100,9 @@ class DangkyService implements DangkyServiceInterface
                 return $this->traVeThanhCong('Gửi đăng ký phòng thành công, vui lòng chờ xác nhận.');
             });
         } catch (\Throwable $e) {
-            Log::error("Student registration failed: " . $e->getMessage());
-            return $this->traVeLoi('Có lỗi xảy ra: ' . $e->getMessage());
+            Log::error('DangkyService.luuDangKySinhVien failed', ['exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -146,7 +147,7 @@ class DangkyService implements DangkyServiceInterface
                 $coBaoHongSinhVien = Baohong::query()
                     ->where('sinhvien_id', $sinhvien->id)
                     ->where('phong_id', $phongId)
-                    ->where('nguoi_chiu_phi', 'sinhvien')
+                    ->where('nguoi_chiu_phi', Baohong::PAYER_STUDENT)
                     ->whereIn('trang_thai', [BaohongStatus::Pending->value, BaohongStatus::Processing->value, BaohongStatus::Done->value])
                     ->exists();
 
@@ -165,7 +166,9 @@ class DangkyService implements DangkyServiceInterface
                 return $this->traVeThanhCong('Đã xử lý trả phòng và thanh lý hợp đồng.');
             });
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('DangkyService.xuLyYeuCauTraPhong failed', ['dangky_id' => $dangkyId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -193,7 +196,9 @@ class DangkyService implements DangkyServiceInterface
                 return $this->traVeThanhCong('Đã từ chối yêu cầu trả phòng.');
             });
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('DangkyService.tuChoiYeuCauTraPhong failed', ['dangky_id' => $dangkyId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -242,7 +247,7 @@ class DangkyService implements DangkyServiceInterface
 
             return $this->traVeThanhCong('Gửi yêu cầu trả phòng thành công.');
         } catch (\Throwable $e) {
-            Log::error("Leave room request failed: " . $e->getMessage());
+            Log::error('DangkyService.yeuCauTraPhong failed', ['user_id' => Auth::id(), 'exception' => $e]);
             return $this->traVeLoi('Có lỗi xảy ra.');
         }
     }
@@ -400,7 +405,7 @@ class DangkyService implements DangkyServiceInterface
                     ->selectRaw('sinhvien_id, phong_id, COUNT(*) as so_bao_hong, COALESCE(SUM(chi_phi_du_kien), 0) as tong_chi_phi')
                     ->whereIn('sinhvien_id', $sinhvienIds)
                     ->whereIn('phong_id', $phongIds)
-                    ->where('nguoi_chiu_phi', 'sinhvien')
+                    ->where('nguoi_chiu_phi', Baohong::PAYER_STUDENT)
                     ->whereIn('trang_thai', [BaohongStatus::Pending->value, BaohongStatus::Processing->value, BaohongStatus::Done->value])
                     ->groupBy('sinhvien_id', 'phong_id')
                     ->get();
@@ -545,7 +550,9 @@ class DangkyService implements DangkyServiceInterface
 
             return $this->traVeThanhCong('Từ chối đăng ký thành công.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('DangkyService.tuChoiDangKy failed', ['dangky_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -700,7 +707,7 @@ class DangkyService implements DangkyServiceInterface
         try {
             Mail::to($user->email)->queue(new \App\Mail\LoginMagicLinkMail($user, $url));
         } catch (\Throwable $e) {
-            Log::error("Failed to send Magic Link Mail: " . $e->getMessage());
+            Log::error('DangkyService.guiMagicLinkDangNhap failed', ['user_id' => $user->id, 'exception' => $e]);
         }
     }
 
@@ -841,8 +848,9 @@ class DangkyService implements DangkyServiceInterface
                 }
             });
         } catch (\Throwable $e) {
-            Log::error("DuyetDangKy failed: " . $e->getMessage());
-            return $this->traVeLoi('Có lỗi xảy ra: ' . $e->getMessage());
+            Log::error('DangkyService.duyetDangKy failed', ['dangky_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 

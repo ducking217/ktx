@@ -28,7 +28,7 @@
                     @include('profile.partials.update-profile-information-form')
                 </div>
 
-                @if(($user->vaitro === 'sinhvien' || $user->vaitro === \App\Enums\UserRole::SinhVien) && $sinhvien)
+                @if(($user->vaitro === \App\Enums\UserRole::Student->value || $user->vaitro === \App\Enums\UserRole::Student) && $sinhvien)
                     {{-- History Dashboard --}}
                     <div class="saas-card p-6 space-y-6">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">

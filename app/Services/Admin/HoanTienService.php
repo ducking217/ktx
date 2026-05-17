@@ -23,7 +23,7 @@ class HoanTienService implements HoanTienServiceInterface
         try {
             // Tìm hóa đơn cọc đã thanh toán của hợp đồng này
             $hoadonCoc = Hoadon::where('hopdong_id', $hopdong->id)
-                ->where('loai_hoadon', 'deposit')
+                ->where('loai_hoadon', Hoadon::LOAI_DEPOSIT)
                 ->where('trang_thai', InvoiceStatus::Paid->value)
                 ->first();
 
@@ -47,7 +47,7 @@ class HoanTienService implements HoanTienServiceInterface
                     'tien_nuoc' => 0,
                     'phi_dich_vu' => $tienNo,
                     'tong_tien' => $tienNo,
-                    'loai_hoadon' => 'extra',
+                    'loai_hoadon' => Hoadon::LOAI_EXTRA,
                     'trang_thai' => InvoiceStatus::Unpaid->value,
                     'ngay_het_han' => now()->addDays(7),
                     'ghi_chu' => "Phí hư hại/vi phạm: " . number_format($phiHuHai) . "đ. Đã cấn trừ " . number_format($tienCoc) . "đ từ tiền cọc. Còn nợ: " . number_format($tienNo) . "đ.",
@@ -70,7 +70,7 @@ class HoanTienService implements HoanTienServiceInterface
                     'tien_nuoc' => 0,
                     'phi_dich_vu' => $phiHuHai,
                     'tong_tien' => $phiHuHai,
-                    'loai_hoadon' => 'extra',
+                    'loai_hoadon' => Hoadon::LOAI_EXTRA,
                     'trang_thai' => InvoiceStatus::Paid->value,
                     'ngay_thanh_toan' => now(),
                     'ghi_chu' => 'Phí hư hại/vi phạm. Đã cấn trừ trực tiếp vào tiền cọc.',
@@ -88,7 +88,7 @@ class HoanTienService implements HoanTienServiceInterface
                     'tien_nuoc' => 0,
                     'phi_dich_vu' => $tienHoan,
                     'tong_tien' => $tienHoan,
-                    'loai_hoadon' => 'refund',
+                    'loai_hoadon' => Hoadon::LOAI_REFUND,
                     'trang_thai' => InvoiceStatus::Unpaid->value, // Chờ kế toán thanh toán
                     'ngay_het_han' => now()->addDays(7),
                     'ghi_chu' => "Hoàn tiền thế chân. Tổng cọc: " . number_format($tienCoc) . "đ. Phí hư hại: " . number_format($phiHuHai) . "đ.",
@@ -97,8 +97,9 @@ class HoanTienService implements HoanTienServiceInterface
 
             return ['success' => true, 'message' => 'Đã xử lý hoàn cọc thành công.'];
         } catch (\Throwable $e) {
-            Log::error("Refund error: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Lỗi xử lý hoàn tiền: ' . $e->getMessage()];
+            Log::error('HoanTienService.xuLyHoanTien failed', ['hopdong_id' => $hopdong->id ?? null, 'exception' => $e]);
+            $message = config('app.debug') ? ('Lỗi xử lý hoàn tiền: ' . $e->getMessage()) : 'Lỗi xử lý hoàn tiền.';
+            return ['success' => false, 'message' => $message];
         }
     }
 }

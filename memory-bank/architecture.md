@@ -6,6 +6,7 @@
 - Luồng chuẩn: Route -> Controller -> Contract -> Service -> Model/Repository -> DB.
 - Cross-cutting: Middleware phân quyền, Observer đồng bộ nghiệp vụ, Notification/Mail cho giao tiếp người dùng.
 - Performance baseline: ưu tiên cache nhẹ (TTL ngắn) cho các trang thống kê/aggregate và filter dropdowns để giảm truy vấn lặp; tránh query trong Blade loops/modals bằng cách preload dữ liệu ở Service; không cache các trang chứa dữ liệu cá nhân theo user nếu chưa tách cache key theo user.
+- Stability: xử lý 419 (CSRF TokenMismatch) bằng redirect + toast lỗi, và đặt `SESSION_COOKIE` explicit theo project để tránh xung đột cookie session khi chạy nhiều app local.
 - Liên hệ từ Landing: `TrangChuService::guiLienHe()` tạo `lienhe` + thông báo admin; Admin quản lý tại `/admin/lien-he`, phản hồi qua email và lưu `ghi_chu_admin`.
 - Landing không tích hợp chatbot; hỗ trợ người dùng qua form Liên hệ và các kênh hotline/Zalo được hiển thị trên Landing.
 - Các trang Landing (danh sách phòng, chi tiết vật tư/tài sản) dùng `x-landing-layout` và token `ink/ui/brand` để giữ trải nghiệm nhất quán.
@@ -72,6 +73,9 @@
 - Soft deletes áp dụng rộng để hỗ trợ audit/khôi phục.
 
 Ghi chú: `toa_nha` có thêm metadata `so_phong`, `so_tang` để BQL quản trị quy mô tòa nhà (không đồng nghĩa tự động tạo/xóa phòng).
+
+Ghi chú: Hạ tầng KTX được cố định theo cấu hình triển khai: 2 tòa **A/B**, mỗi tòa **3 tầng**, mỗi tầng **4 phòng** (tạo qua seeder).
+Ghi chú: Hệ thống chỉ dùng 1 loại phòng duy nhất; mỗi phòng có **6 slot/giường** (tạo qua seeder).
 
 Ghi chú: Landing đăng ký khách không cho chọn giường. Hệ thống vẫn quản lý sức chứa bằng `giuong` nội bộ và tự động gán giường trống khi Admin xác nhận thanh toán.
 

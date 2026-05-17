@@ -17,7 +17,7 @@ class GuestLookupTest extends TestCase
     public function test_magic_link_login_redirects_to_dieuhuong(): void
     {
         $user = \App\Models\User::factory()->create([
-            'vaitro' => \App\Enums\UserRole::SinhVien,
+            'vaitro' => \App\Enums\UserRole::Student,
             'is_active' => true,
         ]);
 

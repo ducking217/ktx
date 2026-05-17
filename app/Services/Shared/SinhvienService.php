@@ -14,6 +14,7 @@ use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -100,7 +101,6 @@ class SinhvienService implements SinhvienServiceInterface
         if (!$user) return $this->traVeLoi('Không tìm thấy tài khoản liên kết.');
 
         DB::transaction(function () use ($user, $sinhvien, $data) {
-            // Cập nhật thông tin trên bảng users
             $user->fill([
                 'name' => $data['name'] ?? $user->name,
                 'email' => $data['email'] ?? $user->email,
@@ -117,7 +117,6 @@ class SinhvienService implements SinhvienServiceInterface
 
             $user->save();
 
-            // Cập nhật thông tin riêng của Sinhvien
             $sinhvien->fill([
                 'ma_sinh_vien' => $data['ma_sinh_vien'] ?? $sinhvien->ma_sinh_vien,
                 'lop' => $data['lop'] ?? null,
@@ -127,18 +126,20 @@ class SinhvienService implements SinhvienServiceInterface
 
             $anhThe = $data['anh_the'] ?? null;
             if ($anhThe instanceof UploadedFile) {
-                if ($sinhvien->anh_the_path) {
-                    Storage::disk('private')->delete($sinhvien->anh_the_path);
-                }
-                $sinhvien->anh_the_path = $anhThe->store("sinhvien/{$sinhvien->id}/anh-the", 'private');
+                $sinhvien->anh_the_path = $this->replacePrivateFile(
+                    $sinhvien->anh_the_path,
+                    $anhThe,
+                    "sinhvien/{$sinhvien->id}/anh-the"
+                );
             }
 
             $anhCccd = $data['anh_cccd'] ?? null;
             if ($anhCccd instanceof UploadedFile) {
-                if ($sinhvien->anh_cccd_path) {
-                    Storage::disk('private')->delete($sinhvien->anh_cccd_path);
-                }
-                $sinhvien->anh_cccd_path = $anhCccd->store("sinhvien/{$sinhvien->id}/anh-cccd", 'private');
+                $sinhvien->anh_cccd_path = $this->replacePrivateFile(
+                    $sinhvien->anh_cccd_path,
+                    $anhCccd,
+                    "sinhvien/{$sinhvien->id}/anh-cccd"
+                );
             }
 
             if ($sinhvien->isDirty()) {
@@ -156,16 +157,13 @@ class SinhvienService implements SinhvienServiceInterface
     {
         try {
             return DB::transaction(function () use ($sinhvienId, $phongId) {
-                $sinhvien = Sinhvien::where('id', $sinhvienId)->lockForUpdate()->first();
-                if (!$sinhvien) throw new \Exception('Không tìm thấy sinh viên.');
+                $sinhvien = $this->findSinhvienOrFailForUpdate($sinhvienId);
 
-                // ── Trường hợp: Rời phòng (phongId = null) ──────────────────
                 if ($phongId === null || $phongId === 0) {
                     $this->terminateActiveContracts($sinhvienId);
                     return $this->traVeThanhCong('Rời phòng thành công.');
                 }
 
-                // ── Trường hợp: Xếp vào phòng mới ──────────────────────────
                 $phong = Phong::with('loaiphong')->where('id', $phongId)->lockForUpdate()->first();
                 if (!$phong) throw new \Exception('Phòng không tồn tại.');
 
@@ -194,9 +192,9 @@ class SinhvienService implements SinhvienServiceInterface
                 $ngayVao    = now()->format('Y-m-d');
                 $ngayHetHan = now()->addMonths(5)->format('Y-m-d');
 
-                // Tạo hợp đồng gắn với giường cụ thể
                 Hopdong::create([
                     'sinhvien_id'   => $sinhvien->id,
+                    'phong_id'      => $phong->id,
                     'giuong_id'     => $giuong->id,
                     'ngay_bat_dau'  => $ngayVao,
                     'ngay_ket_thuc' => $ngayHetHan,
@@ -204,7 +202,6 @@ class SinhvienService implements SinhvienServiceInterface
                     'trang_thai'    => ContractStatus::Active->value,
                 ]);
 
-                // Cập nhật trạng thái giường
                 $giuong->update(['trang_thai' => BedStatus::Occupied->value]);
 
                 $this->kiemToanService->ghiNhatKy(
@@ -216,7 +213,9 @@ class SinhvienService implements SinhvienServiceInterface
                 return $this->traVeThanhCong("Xếp phòng thành công: {$phong->ten_phong} — Giường {$giuong->ma_giuong}.");
             });
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('SinhvienService.assignRoom failed', ['sinhvien_id' => $sinhvienId, 'phong_id' => $phongId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -224,14 +223,15 @@ class SinhvienService implements SinhvienServiceInterface
     {
         try {
             return DB::transaction(function () use ($id) {
-                $sinhvien = Sinhvien::where('id', $id)->lockForUpdate()->first();
-                if (!$sinhvien) throw new \Exception('Không tìm thấy sinh viên.');
+                $sinhvien = $this->findSinhvienOrFailForUpdate($id);
 
                 $this->terminateActiveContracts($sinhvien->id);
                 return $this->traVeThanhCong('Rời phòng thành công.');
             });
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('SinhvienService.removeFromRoom failed', ['sinhvien_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -246,8 +246,26 @@ class SinhvienService implements SinhvienServiceInterface
 
         foreach ($activeContracts as $contract) {
             $contract->update(['trang_thai' => ContractStatus::Terminated->value]);
-            // Giải phóng giường
             $contract->giuong?->update(['trang_thai' => BedStatus::Available->value]);
         }
+    }
+
+    private function replacePrivateFile(?string $existingPath, UploadedFile $file, string $directory): string
+    {
+        if ($existingPath) {
+            Storage::disk('private')->delete($existingPath);
+        }
+
+        return $file->store($directory, 'private');
+    }
+
+    private function findSinhvienOrFailForUpdate(int $sinhvienId): Sinhvien
+    {
+        $sinhvien = Sinhvien::where('id', $sinhvienId)->lockForUpdate()->first();
+        if (! $sinhvien) {
+            throw new \Exception('Không tìm thấy sinh viên.');
+        }
+
+        return $sinhvien;
     }
 }

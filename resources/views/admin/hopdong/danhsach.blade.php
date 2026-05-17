@@ -162,7 +162,12 @@
                     <div class="divide-y divide-slate-100 saas-card px-6 border-slate-100 shadow-sm">
                         <div class="flex items-center justify-between py-4">
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Phòng</span>
-                            <span class="text-sm font-bold text-slate-900">Tòa {{ $item->giuong?->phong?->toanha?->ten_toa_nha ?? '?' }} — {{ $item->giuong?->phong?->ten_phong ?? '?' }}</span>
+                            @php
+                                $toaName = $item->giuong?->phong?->toanha?->ten_toa_nha;
+                                $toaShort = $toaName ? preg_replace('/^tòa\\s*/iu', '', $toaName) : null;
+                                $toaLabel = $item->giuong?->phong?->toanha?->ma_toa_nha ?? ($toaShort ?? ($toaName ?? '?'));
+                            @endphp
+                            <span class="text-sm font-bold text-slate-900">Tòa {{ $toaLabel }} — {{ $item->giuong?->phong?->ten_phong ?? '?' }}</span>
                         </div>
                         <div class="flex items-center justify-between py-4">
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Giá thuê / tháng</span>

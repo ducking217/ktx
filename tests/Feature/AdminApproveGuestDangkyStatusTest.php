@@ -13,6 +13,7 @@ use App\Models\ThanhToan;
 use App\Models\ToaNha;
 use App\Services\Admin\DangkyService;
 use App\Contracts\Admin\HoanTienServiceInterface;
+use App\Contracts\Admin\HopdongServiceInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Mockery;
@@ -44,7 +45,10 @@ class AdminApproveGuestDangkyStatusTest extends TestCase
             'lookup_token' => str_repeat('a', 32),
         ]);
 
-        $service = new DangkyService(Mockery::mock(HoanTienServiceInterface::class));
+        $service = new DangkyService(
+            Mockery::mock(HoanTienServiceInterface::class),
+            Mockery::mock(HopdongServiceInterface::class)
+        );
         $result = $service->duyetHoSo($dangky->id);
 
         $this->assertSame('thanhcong', $result['toast_loai']);
@@ -82,7 +86,10 @@ class AdminApproveGuestDangkyStatusTest extends TestCase
             'lookup_token' => str_repeat('b', 32),
         ]);
 
-        $service = new DangkyService(Mockery::mock(HoanTienServiceInterface::class));
+        $service = new DangkyService(
+            Mockery::mock(HoanTienServiceInterface::class),
+            Mockery::mock(HopdongServiceInterface::class)
+        );
         $result = $service->xacNhanThanhToan($dangky->id);
 
         $this->assertSame('thanhcong', $result['toast_loai']);

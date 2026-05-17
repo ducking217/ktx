@@ -3,9 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\Dangky;
-use App\Models\Phong;
 use App\Enums\RegistrationStatus;
-use App\Enums\RegistrationType;
+use App\Models\LoaiPhong;
+use App\Models\ToaNha;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -16,15 +17,19 @@ class DangkyFactory extends Factory
     public function definition(): array
     {
         return [
-            'phong_id' => Phong::factory(),
-            'ho_ten' => $this->faker->name,
-            'email' => $this->faker->unique()->safeEmail,
-            'so_dien_thoai' => $this->faker->phoneNumber,
-            'so_cccd' => $this->faker->numerify('############'),
+            'user_id' => User::factory(),
+            'ho_ten' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'phone_encrypted' => encrypt($this->faker->phoneNumber()),
+            'id_card_encrypted' => encrypt($this->faker->numerify('############')),
+            'gender' => $this->faker->randomElement(['male', 'female', 'other']),
+            'dob' => $this->faker->date(),
+            'toa_nha_id' => ToaNha::factory(),
+            'loai_phong_id' => LoaiPhong::factory(),
+            'phong_id' => null,
             'lookup_token' => Str::random(32),
             'token_expires_at' => now()->addDays(30),
-            'loaidangky' => $this->faker->randomElement(RegistrationType::cases()),
-            'trangthai' => $this->faker->randomElement(RegistrationStatus::cases()),
+            'trang_thai' => RegistrationStatus::Pending,
         ];
     }
 }

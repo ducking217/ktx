@@ -73,22 +73,28 @@ class PhongController extends Controller
     public function luu(LuuPhongRequest $request)
     {
         $this->authorize('phong.manage');
-        $result = $this->nghiepVuPhongService->luuPhong($request->validated());
-        return redirect()->back()->with(['toast_loai' => $result['success'] ? 'thanhcong' : 'loi', 'toast_noidung' => $result['message']]);
+        return redirect()->back()->with([
+            'toast_loai' => 'loi',
+            'toast_noidung' => 'Cấu trúc phòng đã được cố định. Không thể thêm phòng mới.',
+        ]);
     }
 
     public function capNhat(CapNhatPhongRequest $request, int $id)
     {
         $this->authorize('phong.manage');
-        $result = $this->nghiepVuPhongService->capNhatPhong($id, $request->validated());
-        return redirect()->back()->with(['toast_loai' => $result['success'] ? 'thanhcong' : 'loi', 'toast_noidung' => $result['message']]);
+        return redirect()->back()->with([
+            'toast_loai' => 'loi',
+            'toast_noidung' => 'Cấu trúc phòng đã được cố định. Không thể chỉnh sửa phòng.',
+        ]);
     }
 
     public function xoa(int $id)
     {
         $this->authorize('phong.manage');
-        $result = $this->nghiepVuPhongService->xoaPhong($id);
-        return redirect()->back()->with(['toast_loai' => $result['success'] ? 'thanhcong' : 'loi', 'toast_noidung' => $result['message']]);
+        return redirect()->back()->with([
+            'toast_loai' => 'loi',
+            'toast_noidung' => 'Cấu trúc phòng đã được cố định. Không thể xóa phòng.',
+        ]);
     }
 
     public function soDo(Request $request)

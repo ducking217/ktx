@@ -84,6 +84,10 @@ class Phong extends Model
         return $this->loaiphong?->suc_chua ?? 0;
     }
 
+    /**
+     * CẢNH BÁO: Không dùng trong vòng lặp danh sách (ví dụ: Landing list) vì sẽ gây N+1 query.
+     * Hãy preload số đếm bằng withCount() trong query và dùng attribute đã đếm sẵn.
+     */
     public function getDangoAttribute()
     {
         return $this->giuongs()->where('trang_thai', \App\Enums\BedStatus::Occupied)->count();

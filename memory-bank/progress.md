@@ -1,12 +1,51 @@
 # Progress Log
 
 ## Trạng thái hiện tại
-- [x] **Cơ sở vật chất**: Tòa nhà, Phòng, Giường, Tài sản (Full CRUD).
+- [x] **Cơ sở vật chất**: Cấu trúc tòa nhà/phòng cố định (2 tòa A/B; mỗi tòa 3 tầng; mỗi tầng 4 phòng). Phòng & Tài sản vẫn quản lý tài sản theo phòng.
 - [x] **Vận hành**: Đăng ký cư trú (Guest/Student), Hợp đồng, Gia hạn (Full Flow).
 - [x] **Tài chính**: Chỉ số điện nước, Hóa đơn (Bulk entry, PDF export), Doanh thu.
 - [x] **Tương tác**: Báo hỏng, Kỷ luật, Thông báo.
-- [x] **Hệ thống**: Phân quyền (RBAC), Nhật ký hoạt động, Cấu hình.
+- [x] **Hệ thống**: Phân quyền (RBAC), Cấu hình.
 - [x] **UI/UX**: Thống nhất ngôn ngữ thiết kế @impeccable, Responsive, Empty States.
+
+## 2026-05-16 - Cố định hạ tầng KTX (2 tòa A/B)
+
+### Hoàn thành ✅
+- Seed cấu trúc cố định: 2 tòa A/B, mỗi tòa 3 tầng, mỗi tầng 4 phòng; tự tạo giường theo sức chứa loại phòng.
+- Chỉ duy trì 1 loại phòng duy nhất: “Phòng 6” (6 slot/giường mỗi phòng).
+- Tắt thao tác thêm/sửa/xóa phòng ở Admin để tránh phá vỡ cấu trúc cố định.
+- Dọn dữ liệu tòa C (và phòng thuộc tòa C) khi chạy seeder.
+- Gỡ điều hướng và route Admin của “Nhật ký” và “Tòa nhà”.
+
+## 2026-05-17 - Bugfix: 419 Page Expired (CSRF) thỉnh thoảng khi thao tác
+
+### Hoàn thành ✅
+- Đặt `SESSION_COOKIE` riêng cho project để tránh xung đột cookie session giữa nhiều app local cùng domain.
+- Bắt `TokenMismatchException` (419) và redirect kèm toast lỗi “Phiên làm việc đã hết hạn…”, tránh màn hình “Page Expired”.
+
+### Files Updated
+- `app/Exceptions/Handler.php`
+- `.env`
+
+## 2026-05-17 - Performance: Fix N+1 Query ở Landing danh sách phòng (accessor `dango`)
+
+### Hoàn thành ✅
+- Loại bỏ việc gọi accessor `Phong::dango` trong vòng lặp Blade của Landing; dùng số đếm preload từ query (`withCount`) để không phát sinh N query theo số phòng.
+- Giữ nguyên accessor `getDangoAttribute()` nhưng thêm cảnh báo không dùng trong vòng lặp danh sách.
+- Rebuild Blade cache: `php artisan view:cache`.
+
+### Files Updated
+- `app/Models/Phong.php`
+- `resources/views/landing/phong/danhsach.blade.php`
+
+## 2026-05-17 - Cấu hình demo/production: tắt debug và giảm log
+
+### Hoàn thành ✅
+- Đặt `APP_DEBUG=false` và `LOG_LEVEL=error`.
+- Cache config: `php artisan config:cache`.
+
+### Files Updated
+- `.env`
 
 ## Các mốc quan trọng
 - [x] Khắc phục Schema Drift v2 toàn hệ thống.

@@ -30,22 +30,30 @@ class BaoCaoService implements BaoCaoServiceInterface
         $nam = $nam ?: now()->year;
 
         return Cache::remember("admin.baocao.taichinh:v1:{$nam}", now()->addMinutes(5), function () use ($nam): array {
-            $doanhThuTheoThang = Hoadon::selectRaw('MONTH(ngay_thanh_toan) as thang, YEAR(ngay_thanh_toan) as nam, SUM(tong_tien) as tong, COUNT(*) as so_luong')
+            $driver = DB::connection()->getDriverName();
+            $monthExpr = $driver === 'sqlite'
+                ? "CAST(strftime('%m', ngay_thanh_toan) AS INTEGER)"
+                : 'MONTH(ngay_thanh_toan)';
+            $yearExpr = $driver === 'sqlite'
+                ? "CAST(strftime('%Y', ngay_thanh_toan) AS INTEGER)"
+                : 'YEAR(ngay_thanh_toan)';
+
+            $doanhThuTheoThang = Hoadon::selectRaw("{$monthExpr} as thang, {$yearExpr} as nam, SUM(tong_tien) as tong, COUNT(*) as so_luong")
                 ->where('trang_thai', InvoiceStatus::Paid)
                 ->whereNotNull('ngay_thanh_toan')
                 ->whereYear('ngay_thanh_toan', $nam)
-                ->groupBy(DB::raw('YEAR(ngay_thanh_toan)'), DB::raw('MONTH(ngay_thanh_toan)'))
-                ->orderBy(DB::raw('YEAR(ngay_thanh_toan)'))
-                ->orderBy(DB::raw('MONTH(ngay_thanh_toan)'))
+                ->groupBy(DB::raw($yearExpr), DB::raw($monthExpr))
+                ->orderBy(DB::raw($yearExpr))
+                ->orderBy(DB::raw($monthExpr))
                 ->get();
 
-            $tongCocHienTai = (float) Hoadon::where('loai_hoadon', 'deposit')
+            $tongCocHienTai = (float) Hoadon::where('loai_hoadon', Hoadon::LOAI_DEPOSIT)
                 ->where('trang_thai', InvoiceStatus::Paid)
                 ->sum('tong_tien');
 
             $tongPhong = Phong::count();
             $phongDangThue = Phong::whereHas('giuongs', function ($query) {
-                $query->where('trang_thai', \App\Enums\BedStatus::Occupied);
+                $query->where('trang_thai', BedStatus::Occupied->value);
             })->count();
             $tyLeLapDay = $tongPhong > 0 ? round(($phongDangThue / $tongPhong) * 100, 1) : 0;
 

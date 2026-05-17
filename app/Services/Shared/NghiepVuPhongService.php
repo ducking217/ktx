@@ -3,9 +3,11 @@
 namespace App\Services\Shared;
 
 use App\Contracts\Shared\NghiepVuPhongServiceInterface;
+use App\Enums\BedStatus;
+use App\Enums\ContractStatus;
 use App\Models\Phong;
-use App\Models\Hopdong;
 use App\Traits\PhanHoiService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -22,7 +24,7 @@ class NghiepVuPhongService implements NghiepVuPhongServiceInterface
 
     public function luuPhong(array $data): array
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data) {
             try {
                 // 1. Tạo phòng
                 $phong = Phong::create($data);
@@ -33,15 +35,16 @@ class NghiepVuPhongService implements NghiepVuPhongServiceInterface
                     for ($i = 1; $i <= $loaiPhong->suc_chua; $i++) {
                         $phong->giuongs()->create([
                             'ma_giuong' => $phong->ten_phong . '-G' . $i,
-                            'trang_thai' => \App\Enums\BedStatus::Available,
+                            'trang_thai' => BedStatus::Available,
                         ]);
                     }
                 }
 
                 return ['success' => true, 'message' => 'Thêm phòng và khởi tạo ' . ($loaiPhong->suc_chua ?? 0) . ' giường thành công.'];
             } catch (\Throwable $e) {
-                Log::error("Store room failed: " . $e->getMessage());
-                return ['success' => false, 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()];
+                Log::error('NghiepVuPhongService.luuPhong failed', ['exception' => $e]);
+                $message = config('app.debug') ? ('Có lỗi xảy ra: ' . $e->getMessage()) : 'Có lỗi xảy ra, vui lòng thử lại.';
+                return ['success' => false, 'message' => $message];
             }
         });
     }
@@ -55,14 +58,15 @@ class NghiepVuPhongService implements NghiepVuPhongServiceInterface
             $phong->update($data);
             return ['success' => true, 'message' => 'Cập nhật phòng thành công.'];
         } catch (\Throwable $e) {
-            Log::error("Update room failed: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()];
+            Log::error('NghiepVuPhongService.capNhatPhong failed', ['phong_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? ('Có lỗi xảy ra: ' . $e->getMessage()) : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return ['success' => false, 'message' => $message];
         }
     }
 
     public function xoaPhong(int $id): array
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+        return DB::transaction(function () use ($id) {
             try {
                 $phong = Phong::with('giuongs')->lockForUpdate()->find($id);
                 if (!$phong) return ['success' => false, 'message' => 'Không tìm thấy phòng.'];
@@ -74,8 +78,9 @@ class NghiepVuPhongService implements NghiepVuPhongServiceInterface
                 $phong->delete();
                 return ['success' => true, 'message' => 'Xóa phòng thành công.'];
             } catch (\Throwable $e) {
-                Log::error("Delete room failed: " . $e->getMessage());
-                return ['success' => false, 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()];
+                Log::error('NghiepVuPhongService.xoaPhong failed', ['phong_id' => $id, 'exception' => $e]);
+                $message = config('app.debug') ? ('Có lỗi xảy ra: ' . $e->getMessage()) : 'Có lỗi xảy ra, vui lòng thử lại.';
+                return ['success' => false, 'message' => $message];
             }
         });
     }
@@ -83,14 +88,14 @@ class NghiepVuPhongService implements NghiepVuPhongServiceInterface
     private function kiemTraRanhBuocXoa(Phong $phong): ?string
     {
         // 1. Kiểm tra xem có giường nào đang có người ở không
-        $hasOccupiedBed = $phong->giuongs()->where('trang_thai', \App\Enums\BedStatus::Occupied)->exists();
+        $hasOccupiedBed = $phong->giuongs()->where('trang_thai', BedStatus::Occupied->value)->exists();
         if ($hasOccupiedBed) {
             return 'Phòng vẫn còn giường đang có sinh viên cư trú.';
         }
 
         // 2. Kiểm tra xem có hợp đồng nào đang hiệu lực không
         $hasActiveContract = \App\Models\Hopdong::where('phong_id', $phong->id)
-            ->where('trang_thai', \App\Enums\ContractStatus::Active)
+            ->where('trang_thai', ContractStatus::Active->value)
             ->exists();
 
         if ($hasActiveContract) {

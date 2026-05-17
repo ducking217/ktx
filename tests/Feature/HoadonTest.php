@@ -60,7 +60,7 @@ class HoadonTest extends TestCase
         $hoadon = Hoadon::factory()->create(['trang_thai' => InvoiceStatus::Unpaid, 'ngay_thanh_toan' => null]);
 
         $response = $this->actingAs($admin)
-            ->post(route('admin.xacnhanthanhtoan', $hoadon->id));
+            ->post(route('admin.hoadon.xacnhan', $hoadon->id));
 
         $response->assertRedirect();
         $this->assertEquals(InvoiceStatus::Paid, $hoadon->fresh()->trang_thai);

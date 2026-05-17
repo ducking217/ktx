@@ -13,6 +13,7 @@ use App\Http\Requests\Admin\CapNhatToaNhaRequest;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 /**
 
@@ -152,9 +153,11 @@ class ToaNhaController extends Controller
                 'toast_noidung' => 'Đã xóa tòa nhà khỏi hệ thống.',
             ]);
         } catch (Exception $e) {
+            Log::error('ToaNhaController.xoa failed', ['toa_nha_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Không thể xóa tòa nhà. Vui lòng thử lại.';
             return redirect()->back()->with([
                 'toast_loai' => 'loi',
-                'toast_noidung' => $e->getMessage(),
+                'toast_noidung' => $message,
             ]);
         }
     }

@@ -9,6 +9,7 @@ use App\Models\Phong;
 use App\Models\Thongbao;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
 
@@ -37,13 +38,15 @@ class TaiChinhService implements TaiChinhServiceInterface
                 'noi_dung' => "Vui lòng thanh toán hóa đơn #{$hoadon->id}"
                     . ($tenPhong ? " (Phòng {$tenPhong})" : '')
                     . ' trị giá ' . number_format((int) $hoadon->tong_tien) . 'đ.',
-                'loai_thong_bao' => 'finance',
-                'doi_tuong_nhan' => 'sinhvien',
+                'loai_thong_bao' => Thongbao::TYPE_FINANCE,
+                'doi_tuong_nhan' => Thongbao::TARGET_STUDENT,
             ]);
 
             return $this->traVeThanhCong('Đã gửi thông báo nhắc nợ.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('TaiChinhService.nhacNo failed', ['invoice_id' => $invoiceId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 }

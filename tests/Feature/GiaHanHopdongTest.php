@@ -10,8 +10,8 @@ use App\Models\Hopdong;
 use App\Models\Sinhvien;
 use App\Models\User;
 use App\Models\YeuCauGiaHan;
-use App\Models\ToaNha;
 use App\Models\Phong;
+use App\Models\Giuong;
 use App\Services\Shared\GiaHanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -23,45 +23,42 @@ class GiaHanHopdongTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Phong $phong;
+    private Giuong $giuong;
+
     protected function setUp(): void
     {
         parent::setUp();
-        
-        // Tạo tòa nhà và phòng mặc định
-        $toaNha = ToaNha::create([
-            'ten_toa_nha' => 'Tòa A1',
-            'ma_toa_nha' => 'A1',
+
+        $this->phong = Phong::factory()->create([
+            'ten_phong' => 'P101',
+            'tang' => 1,
         ]);
 
-        $this->phong = Phong::create([
-            'tenphong' => 'P101',
-            'tang' => 1,
-            'giaphong' => 1500000,
-            'succhuamax' => 4,
-            'dango' => 1,
-            'toa_nha_id' => $toaNha->id,
+        $this->giuong = Giuong::factory()->create([
+            'phong_id' => $this->phong->id,
         ]);
     }
 
     private function createStudentWithContract()
     {
         $user = User::factory()->create([
-            'vaitro' => UserRole::SinhVien,
+            'vaitro' => UserRole::Student,
         ]);
 
-        $sinhvien = Sinhvien::create([
+        $sinhvien = Sinhvien::factory()->create([
             'user_id' => $user->id,
-            'masinhvien' => 'SV' . $user->id,
-            'phong_id' => $this->phong->id,
+            'ma_sinh_vien' => 'SV' . $user->id,
         ]);
 
         $hopdong = Hopdong::create([
             'sinhvien_id' => $sinhvien->id,
             'phong_id' => $this->phong->id,
-            'ngay_bat_dau' => now()->subMonths(5),
-            'ngay_ket_thuc' => now()->addMonth(),
+            'giuong_id' => $this->giuong->id,
+            'ngay_bat_dau' => now()->subMonths(5)->toDateString(),
+            'ngay_ket_thuc' => now()->addMonth()->toDateString(),
             'trang_thai' => ContractStatus::Active->value,
-            'giaphong_luc_ky' => $this->phong->giaphong,
+            'gia_thuc_te' => 1500000,
         ]);
 
         return [$user, $sinhvien, $hopdong];
@@ -135,32 +132,7 @@ class GiaHanHopdongTest extends TestCase
 
     public function test_khong_cho_gui_yeu_cau_neu_hopdong_thieu_ngay_ket_thuc()
     {
-        $user = User::factory()->create([
-            'vaitro' => UserRole::SinhVien,
-        ]);
-
-        $sinhvien = Sinhvien::create([
-            'user_id' => $user->id,
-            'masinhvien' => 'SV' . $user->id,
-            'phong_id' => $this->phong->id,
-        ]);
-
-        $hopdong = Hopdong::create([
-            'sinhvien_id' => $sinhvien->id,
-            'phong_id' => $this->phong->id,
-            'ngay_bat_dau' => now()->subMonths(5),
-            'ngay_ket_thuc' => null,
-            'trang_thai' => ContractStatus::Active->value,
-            'giaphong_luc_ky' => $this->phong->giaphong,
-        ]);
-
-        $response = $this->actingAs($user)->post(route('student.giahan.store'), [
-            'hopdong_id' => $hopdong->id,
-            'ngay_ket_thuc_moi' => now()->addMonths(6)->format('Y-m-d'),
-        ]);
-
-        $response->assertSessionHas('toast_loai', 'loi');
-        $this->assertDatabaseCount('yeu_cau_gia_han', 0);
+        $this->markTestSkipped('Schema v2 yêu cầu hopdong.ngay_ket_thuc NOT NULL nên trường hợp này không thể xảy ra.');
     }
 
     /**
@@ -189,10 +161,11 @@ class GiaHanHopdongTest extends TestCase
         $yeuCau->refresh();
         $hopdong->refresh();
         $sinhvien->refresh();
+        $sinhvien->loadMissing('current_hopdong');
 
         $this->assertEquals(ExtensionStatus::Approved, $yeuCau->trang_thai);
         $this->assertEquals($ngayMoi->format('Y-m-d'), $hopdong->ngay_ket_thuc->format('Y-m-d'));
-        $this->assertEquals($ngayMoi->format('Y-m-d'), $sinhvien->ngay_het_han->format('Y-m-d'));
+        $this->assertEquals($ngayMoi->format('Y-m-d'), $sinhvien->current_hopdong?->ngay_ket_thuc?->format('Y-m-d'));
         
         Mail::assertQueued(KetQuaGiaHanHopDongMail::class, function ($mail) use ($user) {
             return $mail->hasTo($user->email);

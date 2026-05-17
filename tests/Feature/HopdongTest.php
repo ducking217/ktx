@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\BedStatus;
+use App\Enums\ContractStatus;
+use App\Enums\InvoiceStatus;
+use App\Enums\RegistrationStatus;
 use App\Models\Dangky;
 use App\Models\Hopdong;
 use App\Models\Hoadon;
@@ -9,6 +13,8 @@ use App\Models\Phong;
 use App\Models\Sinhvien;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class HopdongTest extends TestCase
@@ -47,26 +53,40 @@ class HopdongTest extends TestCase
 
     public function test_admin_duyet_dangky_tao_hopdong()
     {
+        Mail::fake();
+
         $admin = $this->taoAdmin();
         $data = $this->taoSinhVienVaPhong();
 
-        $dangky = Dangky::create([
-            'sinhvien_id' => $data['sinhvien']->id,
+        $giuong = \App\Models\Giuong::factory()->create([
             'phong_id' => $data['phong']->id,
-            'loaidangky' => \App\Enums\RegistrationType::Rental,
-            'trangthai' => \App\Enums\RegistrationStatus::Pending,
+            'trang_thai' => BedStatus::Available->value,
         ]);
 
-        $ngayHetHan = now()->addMonths(6)->format('Y-m-d');
+        $dangky = Dangky::create([
+            'user_id' => $data['user']->id,
+            'toa_nha_id' => $data['phong']->toa_nha_id,
+            'loai_phong_id' => $data['phong']->loai_phong_id,
+            'phong_id' => null,
+            'lookup_token' => Str::random(32),
+            'token_expires_at' => now()->addHours(24),
+            'trang_thai' => RegistrationStatus::ApprovedPendingPayment->value,
+        ]);
 
-        $response = $this->actingAs($admin)->post(route('admin.xulyduyetdangky', $dangky->id), ['ngay_het_han' => $ngayHetHan]);
+        $response = $this->actingAs($admin)->post(route('admin.dangky.xacnhanthanhtoan', $dangky->id));
 
         $response->assertRedirect();
 
         $this->assertDatabaseHas('hopdong', [
             'sinhvien_id' => $data['sinhvien']->id,
             'phong_id' => $data['phong']->id,
-            'trang_thai' => \App\Enums\ContractStatus::Active->value,
+            'giuong_id' => $giuong->id,
+            'trang_thai' => ContractStatus::Active->value,
+        ]);
+
+        $this->assertDatabaseHas('giuong', [
+            'id' => $giuong->id,
+            'trang_thai' => BedStatus::Occupied->value,
         ]);
     }
 
@@ -82,7 +102,7 @@ class HopdongTest extends TestCase
             'giuong_id' => $giuong->id,
             'ngay_bat_dau' => now()->format('Y-m-d'),
             'ngay_ket_thuc' => now()->addMonths(3)->format('Y-m-d'),
-            'trang_thai' => \App\Enums\ContractStatus::Active->value,
+            'trang_thai' => ContractStatus::Active->value,
         ]);
 
         $ngayKetThucMoi = now()->addMonths(5)->format('Y-m-d');
@@ -90,10 +110,8 @@ class HopdongTest extends TestCase
         $response = $this->actingAs($admin)->post(route('admin.hopdong.giahan', $hopdong->id), ['ngay_ket_thuc' => $ngayKetThucMoi]);
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('hopdong', [
-            'id' => $hopdong->id,
-            'ngay_ket_thuc' => $ngayKetThucMoi,
-        ]);
+        $hopdong->refresh();
+        $this->assertEquals($ngayKetThucMoi, $hopdong->ngay_ket_thuc->format('Y-m-d'));
     }
 
     public function test_admin_thanhly_hopdong_va_giai_phong()
@@ -101,14 +119,17 @@ class HopdongTest extends TestCase
         $admin = $this->taoAdmin();
         $data = $this->taoSinhVienVaPhong();
 
-        $giuong = \App\Models\Giuong::factory()->create(['phong_id' => $data['phong']->id]);
+        $giuong = \App\Models\Giuong::factory()->create([
+            'phong_id' => $data['phong']->id,
+            'trang_thai' => BedStatus::Occupied->value,
+        ]);
         $hopdong = Hopdong::factory()->create([
             'sinhvien_id' => $data['sinhvien']->id,
             'phong_id' => $data['phong']->id,
             'giuong_id' => $giuong->id,
             'ngay_bat_dau' => now()->subMonths(3)->format('Y-m-d'),
             'ngay_ket_thuc' => now()->addMonths(2)->format('Y-m-d'),
-            'trang_thai' => \App\Enums\ContractStatus::Active->value,
+            'trang_thai' => ContractStatus::Active->value,
         ]);
 
         Hoadon::create([
@@ -121,7 +142,7 @@ class HopdongTest extends TestCase
             'tien_nuoc' => 0,
             'phi_dich_vu' => 500000,
             'tong_tien' => 500000,
-            'trang_thai' => \App\Enums\InvoiceStatus::Paid->value,
+            'trang_thai' => InvoiceStatus::Paid->value,
             'ngay_thanh_toan' => now()->toDateString(),
             'ngay_het_han' => now()->toDateString(),
             'ghi_chu' => 'Test deposit paid',
@@ -132,13 +153,18 @@ class HopdongTest extends TestCase
 
         $this->assertDatabaseHas('hopdong', [
             'id' => $hopdong->id,
-            'trang_thai' => \App\Enums\ContractStatus::Terminated->value,
+            'trang_thai' => ContractStatus::Terminated->value,
         ]);
 
         $this->assertDatabaseHas('hoadon', [
             'hopdong_id' => $hopdong->id,
             'loai_hoadon' => 'refund',
             'tong_tien' => 500000,
+        ]);
+
+        $this->assertDatabaseHas('giuong', [
+            'id' => $giuong->id,
+            'trang_thai' => BedStatus::Available->value,
         ]);
     }
 
@@ -147,36 +173,56 @@ class HopdongTest extends TestCase
         $admin = $this->taoAdmin();
         $data = $this->taoSinhVienVaPhong();
 
-        $phong2 = Phong::create([
-            'tenphong' => 'A102',
-            'giaphong' => 2300000,
-            'soluongtoida' => 4,
-            'mota' => 'Phòng test 2',
-            'gioitinh' => 'Nam',
+        $phong2 = Phong::factory()->create([
+            'toa_nha_id' => $data['phong']->toa_nha_id,
+            'loai_phong_id' => $data['phong']->loai_phong_id,
+            'ten_phong' => 'A102',
         ]);
 
-        $hopdong = Hopdong::create([
+        $giuong1 = \App\Models\Giuong::factory()->create([
+            'phong_id' => $data['phong']->id,
+            'trang_thai' => BedStatus::Occupied->value,
+        ]);
+        $giuong2 = \App\Models\Giuong::factory()->create([
+            'phong_id' => $phong2->id,
+            'trang_thai' => BedStatus::Available->value,
+        ]);
+
+        $hopdong = Hopdong::factory()->create([
             'sinhvien_id' => $data['sinhvien']->id,
             'phong_id' => $data['phong']->id,
+            'giuong_id' => $giuong1->id,
             'ngay_bat_dau' => now()->subMonths(3)->format('Y-m-d'),
             'ngay_ket_thuc' => now()->addMonths(2)->format('Y-m-d'),
-            'giaphong_luc_ky' => 2000000,
-            'trang_thai' => \App\Enums\ContractStatus::Active->value,
+            'trang_thai' => ContractStatus::Active->value,
         ]);
 
-        $data['sinhvien']->update(['phong_id' => $data['phong']->id]);
-
-        $response = $this->actingAs($admin)->post(route('admin.chuyenphong', $data['sinhvien']->id), ['phong_id' => $phong2->id]);
+        $response = $this->actingAs($admin)->post(route('admin.sinhvien.choroiophong', $data['sinhvien']->id));
         $response->assertRedirect();
 
         $this->assertDatabaseHas('hopdong', [
             'id' => $hopdong->id,
-            'trang_thai' => \App\Enums\ContractStatus::Terminated->value,
+            'trang_thai' => ContractStatus::Terminated->value,
+        ]);
+        $this->assertDatabaseHas('giuong', [
+            'id' => $giuong1->id,
+            'trang_thai' => BedStatus::Available->value,
         ]);
 
-        $this->assertDatabaseHas('sinhvien', [
-            'id' => $data['sinhvien']->id,
+        $response = $this->actingAs($admin)->post(route('admin.sinhvien.chuyenphong', $data['sinhvien']->id), [
             'phong_id' => $phong2->id,
+        ]);
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('hopdong', [
+            'sinhvien_id' => $data['sinhvien']->id,
+            'phong_id' => $phong2->id,
+            'giuong_id' => $giuong2->id,
+            'trang_thai' => ContractStatus::Active->value,
+        ]);
+        $this->assertDatabaseHas('giuong', [
+            'id' => $giuong2->id,
+            'trang_thai' => BedStatus::Occupied->value,
         ]);
     }
 }

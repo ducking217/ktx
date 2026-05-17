@@ -13,11 +13,11 @@ use App\Models\Giuong;
 use App\Models\Hoadon;
 use App\Models\Hopdong;
 use App\Models\Sinhvien;
-use App\Traits\HoTroNghiepVu;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
 
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\DB;
 
 class HopdongService implements HopdongServiceInterface
 {
-    use HoTroNghiepVu, PhanHoiService;
+    use PhanHoiService;
 
     public function __construct(
         private readonly HoanTienServiceInterface $hoanTienService
@@ -183,7 +183,9 @@ class HopdongService implements HopdongServiceInterface
                 return $this->traVeThanhCong('Tạo hợp đồng thành công.', ['contract' => $contract]);
             });
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('HopdongService.taoHopDong failed', ['exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -194,7 +196,11 @@ class HopdongService implements HopdongServiceInterface
                 $hopdong = Hopdong::lockForUpdate()->find($contractId);
                 if (!$hopdong) return $this->traVeLoi('Không tìm thấy hợp đồng.');
 
-                if ($hopdong->trang_thai !== ContractStatus::Active->value) {
+                $trangThai = $hopdong->trang_thai instanceof \BackedEnum
+                    ? $hopdong->trang_thai->value
+                    : (string) $hopdong->trang_thai;
+
+                if ($trangThai !== ContractStatus::Active->value) {
                     return $this->traVeLoi('Chỉ có thể gia hạn hợp đồng đang hoạt động.');
                 }
 
@@ -215,7 +221,9 @@ class HopdongService implements HopdongServiceInterface
                 return $this->traVeThanhCong('Gia hạn hợp đồng thành công.');
             });
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('HopdongService.giaHanHopDong failed', ['hopdong_id' => $contractId, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 

@@ -6,6 +6,7 @@ use App\Contracts\Shared\ThongbaoServiceInterface;
 use App\Models\Thongbao;
 use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
 
@@ -25,8 +26,8 @@ class ThongbaoService implements ThongbaoServiceInterface
         $nhom = $yeuCau->query('nhom', 'tatca');
 
         $baseQuery = Thongbao::where(function ($truyVan) {
-            $truyVan->where('doi_tuong_nhan', 'sinhvien')
-                ->orWhere('doi_tuong_nhan', 'all')
+            $truyVan->where('doi_tuong_nhan', Thongbao::TARGET_STUDENT)
+                ->orWhere('doi_tuong_nhan', Thongbao::TARGET_ALL)
                 ->orWhereNull('doi_tuong_nhan');
         });
 
@@ -35,8 +36,7 @@ class ThongbaoService implements ThongbaoServiceInterface
         }
 
         if ($nhom !== 'tatca') {
-            $allowed = ['general', 'finance', 'maintenance', 'discipline', 'system'];
-            if (in_array($nhom, $allowed, true)) {
+            if (in_array($nhom, Thongbao::ALLOWED_TYPES, true)) {
                 $baseQuery->where('loai_thong_bao', $nhom);
             }
         }
@@ -59,8 +59,8 @@ class ThongbaoService implements ThongbaoServiceInterface
     public function showForStudent(int $id): array
     {
         $query = Thongbao::where('id', $id)->where(function ($truyVan) {
-            $truyVan->where('doi_tuong_nhan', 'sinhvien')
-                ->orWhere('doi_tuong_nhan', 'all')
+            $truyVan->where('doi_tuong_nhan', Thongbao::TARGET_STUDENT)
+                ->orWhere('doi_tuong_nhan', Thongbao::TARGET_ALL)
                 ->orWhereNull('doi_tuong_nhan');
         });
 
@@ -71,8 +71,8 @@ class ThongbaoService implements ThongbaoServiceInterface
 
         $thongbaoLienQuan = Thongbao::where('id', '<>', $id)
             ->where(function ($truyVan) {
-                $truyVan->where('doi_tuong_nhan', 'sinhvien')
-                    ->orWhere('doi_tuong_nhan', 'all')
+                $truyVan->where('doi_tuong_nhan', Thongbao::TARGET_STUDENT)
+                    ->orWhere('doi_tuong_nhan', Thongbao::TARGET_ALL)
                     ->orWhereNull('doi_tuong_nhan');
             })
             ->orderByDesc('created_at')
@@ -99,13 +99,15 @@ class ThongbaoService implements ThongbaoServiceInterface
             $thongbao->fill([
                 'tieu_de' => $duLieu['tieu_de'],
                 'noi_dung' => $duLieu['noi_dung'],
-                'loai_thong_bao' => $duLieu['loai_thong_bao'] ?? 'general',
-                'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? 'all',
+                'loai_thong_bao' => $duLieu['loai_thong_bao'] ?? Thongbao::TYPE_GENERAL,
+                'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? Thongbao::TARGET_ALL,
             ])->save();
 
             return $this->traVeThanhCong('Thao tác thành công.');
         } catch (\Throwable $throwable) {
-            return $this->traVeLoi($throwable->getMessage());
+            Log::error('ThongbaoService.store failed', ['exception' => $throwable]);
+            $message = config('app.debug') ? $throwable->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -120,13 +122,15 @@ class ThongbaoService implements ThongbaoServiceInterface
             $thongbao->fill([
                 'tieu_de' => $duLieu['tieu_de'],
                 'noi_dung' => $duLieu['noi_dung'],
-                'loai_thong_bao' => $duLieu['loai_thong_bao'] ?? 'general',
-                'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? 'all',
+                'loai_thong_bao' => $duLieu['loai_thong_bao'] ?? Thongbao::TYPE_GENERAL,
+                'doi_tuong_nhan' => $duLieu['doi_tuong_nhan'] ?? Thongbao::TARGET_ALL,
             ])->save();
 
             return $this->traVeThanhCong('Thao tác thành công.');
         } catch (\Throwable $throwable) {
-            return $this->traVeLoi($throwable->getMessage());
+            Log::error('ThongbaoService.update failed', ['thongbao_id' => $id, 'exception' => $throwable]);
+            $message = config('app.debug') ? $throwable->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -141,7 +145,9 @@ class ThongbaoService implements ThongbaoServiceInterface
             $thongbao->delete();
             return $this->traVeThanhCong('Xóa thành công.');
         } catch (\Throwable $throwable) {
-            return $this->traVeLoi($throwable->getMessage());
+            Log::error('ThongbaoService.destroy failed', ['thongbao_id' => $id, 'exception' => $throwable]);
+            $message = config('app.debug') ? $throwable->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 }

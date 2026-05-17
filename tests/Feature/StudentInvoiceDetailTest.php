@@ -77,7 +77,7 @@ class StudentInvoiceDetailTest extends TestCase
         $response->assertSee('Tiền điện');
         $response->assertSee('Tiền nước');
         $response->assertSee('Phí dịch vụ');
-        $response->assertSee('Kỳ áp dụng: 5/2026');
+        $response->assertSee('Tháng áp dụng: 5/2026');
         $response->assertSee('120 → 150');
         $response->assertSee('10 → 15');
     }
@@ -141,7 +141,7 @@ class StudentInvoiceDetailTest extends TestCase
         $response = $this->actingAs($user)->get(route('student.hoadon.chitiet', $hoadon->id));
 
         $response->assertOk();
-        $response->assertSee('Chưa có chỉ số điện ghi nhận cho kỳ này.');
-        $response->assertSee('Chưa có chỉ số nước ghi nhận cho kỳ này.');
+        $response->assertSee('Chưa có chỉ số điện ghi nhận cho tháng này.');
+        $response->assertSee('Chưa có chỉ số nước ghi nhận cho tháng này.');
     }
 }

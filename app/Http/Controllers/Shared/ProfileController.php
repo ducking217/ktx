@@ -35,7 +35,7 @@ class ProfileController extends Controller
         $phongHienTai = null;
         $giuongHienTai = null;
         
-        if ($user->vaitro === UserRole::SinhVien) {
+        if ($user->vaitro === UserRole::Student) {
             $user->load([
                 'sinhvien.dangkys',
                 'sinhvien.hopdongs.giuong.phong.toanha',
@@ -92,7 +92,7 @@ class ProfileController extends Controller
 
         $nguoiDung->save();
 
-        if ($nguoiDung->vaitro === UserRole::SinhVien) {
+        if ($nguoiDung->vaitro === UserRole::Student) {
             $sinhvien = $nguoiDung->sinhvien;
             if ($sinhvien) {
                 $sinhvien->fill([

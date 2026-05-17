@@ -9,6 +9,7 @@ use App\Traits\PhanHoiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
 
@@ -56,7 +57,9 @@ class KyluatService implements KyluatServiceInterface
             $kyLuat->fill($data)->save();
             return $this->traVeThanhCong('Thao tác thành công.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('KyluatService.saveKyluat failed', ['kyluat_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 
@@ -68,7 +71,9 @@ class KyluatService implements KyluatServiceInterface
             $kyLuat->delete();
             return $this->traVeThanhCong('Xóa thành công.');
         } catch (\Throwable $e) {
-            return $this->traVeLoi($e->getMessage());
+            Log::error('KyluatService.deleteKyluat failed', ['kyluat_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return $this->traVeLoi($message);
         }
     }
 }

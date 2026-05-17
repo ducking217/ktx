@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Contracts\Shared\ThongbaoServiceInterface;
+use App\Models\Thongbao;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 /**
 
@@ -31,8 +33,8 @@ class ThongbaoController extends Controller
         $duLieu = $request->validate([
             'tieu_de' => ['required', 'string', 'max:255'],
             'noi_dung' => ['required', 'string'],
-            'loai_thong_bao' => ['nullable', 'in:general,emergency,maintenance,finance'],
-            'doi_tuong_nhan' => ['nullable', 'in:all,guest,sinhvien,admin'],
+            'loai_thong_bao' => ['nullable', Rule::in(Thongbao::ALLOWED_TYPES)],
+            'doi_tuong_nhan' => ['nullable', Rule::in(Thongbao::ALLOWED_TARGETS)],
         ]);
 
         $ketQua = $this->thongbaoService->store($duLieu);
@@ -44,8 +46,8 @@ class ThongbaoController extends Controller
         $duLieu = $request->validate([
             'tieu_de' => ['required', 'string', 'max:255'],
             'noi_dung' => ['required', 'string'],
-            'loai_thong_bao' => ['nullable', 'in:general,emergency,maintenance,finance'],
-            'doi_tuong_nhan' => ['nullable', 'in:all,guest,sinhvien,admin'],
+            'loai_thong_bao' => ['nullable', Rule::in(Thongbao::ALLOWED_TYPES)],
+            'doi_tuong_nhan' => ['nullable', Rule::in(Thongbao::ALLOWED_TARGETS)],
         ]);
 
         $ketQua = $this->thongbaoService->update($id, $duLieu);

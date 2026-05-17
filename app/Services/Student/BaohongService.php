@@ -90,7 +90,7 @@ class BaohongService implements BaohongServiceInterface
                     'mo_ta'         => $data['mota'],
                     'hinh_anh_path' => $imagePath,
                     'trang_thai'    => BaohongStatus::Pending->value,
-                    'muc_do'        => 'low',
+                    'muc_do'        => Baohong::SEVERITY_LOW,
                 ];
 
                 if (Schema::hasColumn('baohong', 'taisan_id')) {
@@ -220,8 +220,9 @@ class BaohongService implements BaohongServiceInterface
                 return ['success' => true, 'message' => 'Cập nhật thành công.'];
             });
         } catch (\Throwable $e) {
-            Log::error("Update maintenance failed: " . $e->getMessage());
-            return ['success' => false, 'message' => $e->getMessage()];
+            Log::error('BaohongService.updateMaintenance failed', ['baohong_id' => $id, 'exception' => $e]);
+            $message = config('app.debug') ? $e->getMessage() : 'Có lỗi xảy ra, vui lòng thử lại.';
+            return ['success' => false, 'message' => $message];
         }
     }
 
