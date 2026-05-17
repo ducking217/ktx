@@ -8,7 +8,7 @@ use App\Enums\BedStatus;
 use App\Enums\ContractStatus;
 use App\Enums\InvoiceStatus;
 use App\Enums\RegistrationStatus;
-use App\Enums\RegistrationType;
+use App\Enums\UserRole;
 use App\Contracts\Admin\DangkyServiceInterface;
 use App\Contracts\Admin\HoanTienServiceInterface;
 use App\Contracts\Admin\HopdongServiceInterface;
@@ -25,7 +25,6 @@ use App\Models\Sinhvien;
 use App\Models\ThanhToan;
 use App\Models\ToaNha;
 use App\Models\User;
-use App\Traits\HoTroNghiepVu;
 use App\Traits\PhanHoiService;
 use App\Traits\KiemtraKyluat;
 use App\Enums\BaohongStatus;
@@ -47,9 +46,7 @@ use Illuminate\Support\Str;
 
 class DangkyService implements DangkyServiceInterface
 {
-    use HoTroNghiepVu, PhanHoiService, KiemtraKyluat;
-
-    private const MESSAGE_ROOM_FULL = 'Phòng này đã đầy, vui lòng chọn phòng khác.';
+    use PhanHoiService, KiemtraKyluat;
 
     public function __construct(
         private readonly HoanTienServiceInterface $hoanTienService,
@@ -119,7 +116,7 @@ class DangkyService implements DangkyServiceInterface
                     return $this->traVeLoi('Yêu cầu này đã được xử lý.');
                 }
 
-                if (! Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG')) {
+                if (! Str::startsWith((string) $dangky->ghi_chu, Dangky::GHI_CHU_TRA_PHONG)) {
                     return $this->traVeLoi('Yêu cầu không hợp lệ (không phải trả phòng).');
                 }
 
@@ -138,7 +135,7 @@ class DangkyService implements DangkyServiceInterface
 
                 $soHoaDonChuaThanhToan = Hoadon::where('hopdong_id', $hopdong->id)
                     ->whereIn('trang_thai', [InvoiceStatus::Unpaid->value, InvoiceStatus::Overdue->value])
-                    ->where('loai_hoadon', '!=', 'refund')
+                    ->where('loai_hoadon', '!=', Hoadon::LOAI_REFUND)
                     ->count();
 
                 if ($soHoaDonChuaThanhToan > 0) {
@@ -183,14 +180,14 @@ class DangkyService implements DangkyServiceInterface
                     return $this->traVeLoi('Yêu cầu này đã được xử lý.');
                 }
 
-                if (! Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG')) {
+                if (! Str::startsWith((string) $dangky->ghi_chu, Dangky::GHI_CHU_TRA_PHONG)) {
                     return $this->traVeLoi('Yêu cầu không hợp lệ (không phải trả phòng).');
                 }
 
                 $note = trim((string) $reason);
                 $dangky->update([
                     'trang_thai' => RegistrationStatus::Rejected->value,
-                    'ghi_chu' => $note !== '' ? "TRA_PHONG|{$note}" : 'TRA_PHONG|',
+                    'ghi_chu' => $note !== '' ? Dangky::GHI_CHU_TRA_PHONG . "|{$note}" : Dangky::GHI_CHU_TRA_PHONG . '|',
                 ]);
 
                 return $this->traVeThanhCong('Đã từ chối yêu cầu trả phòng.');
@@ -217,7 +214,7 @@ class DangkyService implements DangkyServiceInterface
 
             $soHoaDonChuaThanhToan = Hoadon::where('hopdong_id', $hopdongHienTai->id)
                 ->whereIn('trang_thai', [InvoiceStatus::Unpaid->value, InvoiceStatus::Overdue->value])
-                ->where('loai_hoadon', '!=', 'refund')
+                ->where('loai_hoadon', '!=', Hoadon::LOAI_REFUND)
                 ->count();
 
             if ($soHoaDonChuaThanhToan > 0) {
@@ -227,7 +224,7 @@ class DangkyService implements DangkyServiceInterface
             if (Dangky::where('user_id', $sinhvien->user_id)
                 ->where('trang_thai', RegistrationStatus::Pending)
                 ->whereNotNull('user_id') // phân biệt đơn trả phòng
-                ->where('ghi_chu', 'like', 'TRA_PHONG%')
+                ->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)
                 ->exists()) {
                 return $this->traVeLoi('Bạn đã gửi yêu cầu trả phòng, đang chờ xử lý.');
             }
@@ -239,7 +236,7 @@ class DangkyService implements DangkyServiceInterface
                 'toa_nha_id'   => $hopdongHienTai->giuong->phong->toa_nha_id,
                 'loai_phong_id' => $hopdongHienTai->giuong->phong->loai_phong_id,
                 'trang_thai'   => RegistrationStatus::Pending,
-                'ghi_chu'      => $note !== '' ? "TRA_PHONG|{$note}" : 'TRA_PHONG|',
+                'ghi_chu'      => $note !== '' ? Dangky::GHI_CHU_TRA_PHONG . "|{$note}" : Dangky::GHI_CHU_TRA_PHONG . '|',
                 'lookup_token' => Str::random(32),
             ]);
 
@@ -330,10 +327,10 @@ class DangkyService implements DangkyServiceInterface
         $filteredQuery = Dangky::query()
             ->when($status && $status !== 'Tất cả', fn ($q) => $q->where('trang_thai', $status));
 
-        $countTraPhong = (clone $filteredQuery)->where('ghi_chu', 'like', 'TRA_PHONG%')->count();
+        $countTraPhong = (clone $filteredQuery)->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX)->count();
         $countThuePhong = (clone $filteredQuery)->where(function ($query) {
             $query->whereNull('ghi_chu')
-                ->orWhere('ghi_chu', 'not like', 'TRA_PHONG%');
+                ->orWhere('ghi_chu', 'not like', Dangky::GHI_CHU_TRA_PHONG_PREFIX);
         })->count();
 
         $registrationsQuery = (clone $filteredQuery)
@@ -351,12 +348,12 @@ class DangkyService implements DangkyServiceInterface
                 'created_at',
             ])
             ->when($type === 'tra-phong', function ($query) {
-                return $query->where('ghi_chu', 'like', 'TRA_PHONG%');
+                return $query->where('ghi_chu', 'like', Dangky::GHI_CHU_TRA_PHONG_PREFIX);
             })
             ->when($type !== 'tra-phong', function ($query) {
                 return $query->where(function ($sub) {
                     $sub->whereNull('ghi_chu')
-                        ->orWhere('ghi_chu', 'not like', 'TRA_PHONG%');
+                        ->orWhere('ghi_chu', 'not like', Dangky::GHI_CHU_TRA_PHONG_PREFIX);
                 });
             })
             ->orderByDesc('created_at');
@@ -472,13 +469,7 @@ class DangkyService implements DangkyServiceInterface
                 return $this->traVeLoi('Đơn không ở trạng thái chờ xác nhận thanh toán.');
             }
 
-            // Tìm giường trống phù hợp với nguyện vọng
-            $giuong = Giuong::whereHas('phong', fn($q) =>
-                $q->where('toa_nha_id', $dangky->toa_nha_id)
-                  ->where('loai_phong_id', $dangky->loai_phong_id)
-            )->where('trang_thai', BedStatus::Available)
-             ->lockForUpdate()
-             ->first();
+            $giuong = $this->timGiuongTrongChoDangKy($dangky);
 
             if (!$giuong) {
                 return $this->traVeLoi('Hiện tại không còn giường trống phù hợp với nguyện vọng.');
@@ -489,7 +480,7 @@ class DangkyService implements DangkyServiceInterface
                 ? User::find($dangky->user_id)
                 : $this->taoUserTuDangKy($dangky);
 
-            $sinhvien = Sinhvien::where('user_id', $user->id)->first() ?? $this->taoSinhvienTuDangKy($user, $dangky);
+            $sinhvien = Sinhvien::where('user_id', $user->id)->first() ?? $this->taoSinhvienTuDangKy($user);
             $this->diChuyenFileDangKySangSinhvien($dangky, $sinhvien);
 
             // Tạo Hopdong
@@ -512,20 +503,10 @@ class DangkyService implements DangkyServiceInterface
                 'phong_id'   => $giuong->phong_id,
             ]);
 
-            // Xác nhận thanh toán giữ chỗ/cọc: tạo hóa đơn cọc và đánh dấu đã thanh toán
             $invoiceService = app(\App\Services\Admin\HoadonService::class);
             $hoadonCoc = $invoiceService->taoHoaDonTheChan($sinhvien);
             $hoadonCoc->transitionTo(InvoiceStatus::Paid->value);
-
-            ThanhToan::create([
-                'hoadon_id' => $hoadonCoc->id,
-                'nguoi_xac_nhan' => Auth::id(),
-                'phuong_thuc' => 'transfer',
-                'ma_giao_dich' => null,
-                'so_tien' => (int) $hoadonCoc->tong_tien,
-                'ngay_giao_dich' => now(),
-                'ghi_chu' => 'Xác nhận thanh toán khi cấp phòng (guest).',
-            ]);
+            $this->taoThanhToanXacNhanCapPhongGuest($hoadonCoc);
 
             $hopdong->update([
                 'tien_coc' => (int) $hoadonCoc->tong_tien,
@@ -534,7 +515,7 @@ class DangkyService implements DangkyServiceInterface
             $kyGhiChu = 'Ky ' . now()->month . '/' . now()->year;
             $daCoHoaDonThang = \App\Models\Hoadon::query()
                 ->where('hopdong_id', $hopdong->id)
-                ->where('loai_hoadon', 'monthly')
+                ->where('loai_hoadon', Hoadon::LOAI_MONTHLY)
                 ->where('ghi_chu', $kyGhiChu)
                 ->exists();
 
@@ -542,20 +523,7 @@ class DangkyService implements DangkyServiceInterface
                 $invoiceService->taoHoaDonHangThang($sinhvien, (int) now()->month, (int) now()->year, now()->format('Y-m-d'));
             }
 
-            // Magic link
-            $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
-                'magic-link.login',
-                now()->addHours(72),
-                ['user_id' => $user->id]
-            );
-
-            try {
-                Mail::to($user->email)->queue(
-                    new \App\Mail\LoginMagicLinkMail($user, $url)
-                );
-            } catch (\Throwable $e) {
-                Log::error("Failed to send Magic Link Mail: " . $e->getMessage());
-            }
+            $this->guiMagicLinkDangNhap($user);
 
             return $this->traVeThanhCong('Xác nhận thành công. Đã gửi link đăng nhập tới sinh viên.');
         });
@@ -567,7 +535,7 @@ class DangkyService implements DangkyServiceInterface
             $dangky = Dangky::find($id);
             if (!$dangky) return $this->traVeLoi('Không tìm thấy đăng ký.');
 
-            if (Str::startsWith((string) $dangky->ghi_chu, 'TRA_PHONG')) {
+            if (Str::startsWith((string) $dangky->ghi_chu, Dangky::GHI_CHU_TRA_PHONG)) {
                 return $this->tuChoiYeuCauTraPhong($id, $reason);
             }
 
@@ -666,15 +634,8 @@ class DangkyService implements DangkyServiceInterface
     {
         $disk = Storage::disk('private');
 
-        $anhThe = is_string($dangky->anh_the_path) ? ltrim($dangky->anh_the_path, '/') : null;
-        $anhCccd = is_string($dangky->anh_cccd_path) ? ltrim($dangky->anh_cccd_path, '/') : null;
-
-        if ($anhThe && str_starts_with($anhThe, 'private/')) {
-            $anhThe = substr($anhThe, strlen('private/'));
-        }
-        if ($anhCccd && str_starts_with($anhCccd, 'private/')) {
-            $anhCccd = substr($anhCccd, strlen('private/'));
-        }
+        $anhThe = $this->chuanHoaDuongDanPrivateDisk($dangky->anh_the_path);
+        $anhCccd = $this->chuanHoaDuongDanPrivateDisk($dangky->anh_cccd_path);
 
         $updatesSinhvien = [];
         $updatesDangky = [];
@@ -706,18 +667,66 @@ class DangkyService implements DangkyServiceInterface
         }
     }
 
+    private function timGiuongTrongChoDangKy(Dangky $dangky): ?Giuong
+    {
+        return Giuong::whereHas('phong', fn ($q) => $q->where('toa_nha_id', $dangky->toa_nha_id)
+            ->where('loai_phong_id', $dangky->loai_phong_id))
+            ->where('trang_thai', BedStatus::Available)
+            ->lockForUpdate()
+            ->first();
+    }
+
+    private function taoThanhToanXacNhanCapPhongGuest(Hoadon $hoadonCoc): void
+    {
+        ThanhToan::create([
+            'hoadon_id' => $hoadonCoc->id,
+            'nguoi_xac_nhan' => Auth::id(),
+            'phuong_thuc' => ThanhToan::METHOD_TRANSFER,
+            'ma_giao_dich' => null,
+            'so_tien' => (int) $hoadonCoc->tong_tien,
+            'ngay_giao_dich' => now(),
+            'ghi_chu' => 'Xác nhận thanh toán khi cấp phòng (guest).',
+        ]);
+    }
+
+    private function guiMagicLinkDangNhap(User $user): void
+    {
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'magic-link.login',
+            now()->addHours(72),
+            ['user_id' => $user->id]
+        );
+
+        try {
+            Mail::to($user->email)->queue(new \App\Mail\LoginMagicLinkMail($user, $url));
+        } catch (\Throwable $e) {
+            Log::error("Failed to send Magic Link Mail: " . $e->getMessage());
+        }
+    }
+
+    private function chuanHoaDuongDanPrivateDisk(mixed $path): ?string
+    {
+        if (! is_string($path) || $path === '') {
+            return null;
+        }
+
+        $value = ltrim($path, '/');
+
+        return str_starts_with($value, 'private/') ? substr($value, strlen('private/')) : $value;
+    }
+
     private function taoUserTuDangKy(Dangky $dangky): User
     {
         return User::create([
             'name'      => $dangky->ho_ten,
             'email'     => $dangky->email,
             'password'  => bcrypt(Str::random(12)),
-            'vaitro'    => 'sinhvien',
+            'vaitro'    => UserRole::Student,
             'is_active' => true,
         ]);
     }
 
-    private function taoSinhvienTuDangKy(User $user, Dangky $dangky): Sinhvien
+    private function taoSinhvienTuDangKy(User $user): Sinhvien
     {
         return Sinhvien::create([
             'user_id'     => $user->id,
@@ -784,7 +793,7 @@ class DangkyService implements DangkyServiceInterface
                     $ngayBatDau = now()->format('Y-m-d');
                     $ngayKetThuc = $ngayHetHan ?: now()->addMonths(5)->format('Y-m-d');
 
-                    $hopdong = Hopdong::create([
+                    Hopdong::create([
                         'sinhvien_id'   => $sinhvien->id,
                         'phong_id'      => $giuong->phong_id,
                         'giuong_id'     => $giuong->id,

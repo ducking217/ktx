@@ -92,6 +92,146 @@
 - `app/Services/Student/KyluatService.php`
 - `app/Services/Admin/HoadonService.php`
 
+## 2026-05-16 - Refactor: Hóa đơn (an toàn, không đổi nghiệp vụ)
+
+### Hoàn thành ✅
+- Tách helper methods nội bộ cho bulk entry (`xuLyHoaDonHangLoat`, `duLieuNhapHangLoat`) để giảm độ phức tạp, giữ nguyên public API.
+- Fix lại `tests/Unit/Services/HoadonServiceTest.php` để chạy đúng Laravel TestCase (trước đó test bị fail do mock/facade).
+
+### Files Updated
+- `app/Services/Admin/HoadonService.php`
+- `tests/Unit/Services/HoadonServiceTest.php`
+
+## 2026-05-16 - Refactor: Đăng ký (an toàn, không đổi nghiệp vụ)
+
+### Hoàn thành ✅
+- Refactor `DangkyService::xacNhanThanhToan`: tách helper nội bộ (tìm giường trống, tạo bản ghi thanh toán cọc, gửi magic link) để giảm độ phức tạp, giữ nguyên luồng nghiệp vụ và thứ tự side effects.
+- Refactor `DangkyService::diChuyenFileDangKySangSinhvien`: chuẩn hoá đường dẫn private disk bằng helper nội bộ để tránh lặp logic.
+- Sửa test để phản ánh đúng constructor của `DangkyService` (đủ 2 dependency).
+- Sửa `DangKyPhongTest` theo schema v2 + route names hiện tại, bổ sung setup giường trống để luồng Guest đăng ký pass.
+
+### Verify ✅
+- PHPUnit: `AdminApproveGuestDangkyStatusTest`, `DangkyServiceTest`, `DangKyPhongTest` đều pass.
+
+### Files Updated
+- `app/Services/Admin/DangkyService.php`
+- `tests/Feature/AdminApproveGuestDangkyStatusTest.php`
+- `tests/Unit/Services/DangkyServiceTest.php`
+- `tests/Feature/DangKyPhongTest.php`
+
+## 2026-05-16 - Refactor: Hồ sơ Sinh viên (an toàn, không đổi nghiệp vụ)
+
+### Hoàn thành ✅
+- Refactor `SinhvienService::updateStudent`: tách helper thay thế file private disk để tránh lặp logic (xóa file cũ + store file mới).
+- Refactor `SinhvienService::assignRoom/removeFromRoom`: tách helper lấy sinh viên lockForUpdate; giữ nguyên transaction boundary và thông điệp trả về.
+- Bổ sung `phong_id` khi tạo `Hopdong` trong `assignRoom` để đảm bảo dữ liệu đầy đủ theo schema v2.
+- Sửa `SinhvienServiceTest` sang hướng integration (RefreshDatabase) để phản ánh đúng luồng thực tế.
+
+### Verify ✅
+- PHPUnit: `SinhvienServiceTest`, `DangKyPhongTest` đều pass.
+
+### Files Updated
+- `app/Services/Shared/SinhvienService.php`
+- `tests/Unit/Services/SinhvienServiceTest.php`
+
+## 2026-05-16 - Refactor: Dashboard Admin (an toàn, không đổi nghiệp vụ)
+
+### Hoàn thành ✅
+- Refactor `BangDieuKhienService::layDuLieuBangDieuKhienAdmin`: tách private helpers cho thống kê phòng, thống kê doanh thu, và các list dashboard (đăng ký/trả phòng/báo hỏng).
+- Giữ nguyên keys trả về cho view `admin.trangchu` và giữ nguyên semantics các query.
+
+### Files Updated
+- `app/Services/Admin/BangDieuKhienService.php`
+
+## 2026-05-16 - Refactor: Truy vấn phòng (an toàn, không đổi nghiệp vụ)
+
+### Hoàn thành ✅
+- Refactor `TruyVanPhongService`: tách private query builders cho 3 use-case (Admin/Public/Sinh viên) để giảm độ phức tạp, không đổi logic filter/sort/eager-load.
+
+### Verify ✅
+- PHPUnit: `DangKyPhongTest|SinhvienServiceTest` pass.
+
+### Files Updated
+- `app/Services/Core/TruyVanPhongService.php`
+
+## 2026-05-16 - Bugfix: Test Hợp đồng/Gia hạn (khớp schema v2)
+
+### Hoàn thành ✅
+- Cập nhật `GiaHanHopdongTest` và `HopdongTest` để dùng factories + route names hiện tại, tránh sai schema v2.
+- Fix bug `HopdongService::giaHanHopDong`: so sánh trạng thái hợp đồng đúng khi `trang_thai` được cast sang Enum.
+
+### Verify ✅
+- PHPUnit: `php artisan test --filter "GiaHanHopdongTest|HopdongTest"` pass (1 skipped vì trường hợp `hopdong.ngay_ket_thuc = null` không thể xảy ra ở schema v2).
+
+### Files Updated
+- `app/Services/Admin/HopdongService.php`
+- `tests/Feature/GiaHanHopdongTest.php`
+- `tests/Feature/HopdongTest.php`
+
+## 2026-05-16 - Clean code: Providers (an toàn, không đổi nghiệp vụ)
+
+### Hoàn thành ✅
+- Dọn `AppServiceProvider`: bỏ binding trùng và chuẩn hóa bind `GiaHanServiceInterface`.
+- Chuẩn hóa nơi đăng ký Observers: đưa `ToaNhaObserver` về cùng `AppServiceProvider` (thống nhất với các observer khác), dọn imports dư ở `EventServiceProvider`.
+- Fix `AccountService`: import đúng Enum `Gender`, bỏ import dư để tránh lỗi type.
+- Chuẩn hóa `Gender::Any->label()` về tiếng Việt để đồng bộ UI.
+- Dọn file test script rời (`test_*.php`) ở project root để tránh “dead code” và nhầm lẫn với PHPUnit tests.
+- Dọn `DangkyService` (không đổi nghiệp vụ): bỏ import/const không dùng, chỉnh signature private helper để loại cảnh báo và bỏ biến tạm không dùng.
+- Dọn `HoadonService` (không đổi nghiệp vụ): thêm type-hints cho private helpers để giảm cảnh báo và tăng độ rõ ràng.
+- Dọn Unit tests: chuẩn hóa type-hints cho mock dependencies, bỏ import không dùng để giảm cảnh báo IDE.
+- Chuẩn hóa Enum `UserRole`: đổi case `SinhVien` → `Student` (giữ backed value `sinhvien`) để đúng quy ước “Enum case name tiếng Anh”.
+- Fix schema drift cho `users`: bổ sung cột `toa_nha_id` để khớp model/service (đặc biệt module Accounts) và tránh fail khi chạy test với SQLite.
+- Dọn `StudentInterfaceTest`: khai báo typed properties để giảm cảnh báo IDE.
+- Chuẩn hóa chỗ gán role mặc định: thay string `'sinhvien'` bằng `UserRole::Student` để giảm magic string.
+- Repo hygiene: ignore và dọn cache Blade compiled tại `storage/framework/views` để tránh rác repo.
+- Repo hygiene: ignore các thư mục runtime khác trong `storage/` (logs/sessions/cache/testing) nhưng vẫn giữ `.gitignore` placeholder.
+- Fix runtime: khôi phục `storage/framework/views/.gitignore` và whitelist trong `.gitignore` để tránh lỗi “Please provide a valid cache path.” khi `view.compiled` dùng `realpath()`.
+- Xóa Enum không dùng (true-dead): `ContactStatus`, `MaintenanceStatus`.
+- Chuẩn hóa invoice type: gom constants `loai_hoadon` về `Hoadon::LOAI_*` và thay magic strings ở các service liên quan.
+- Chuẩn hóa “trả phòng” marker: gom `TRA_PHONG` về `Dangky::GHI_CHU_TRA_PHONG*` và thay magic strings ở query/startsWith.
+- Chuẩn hóa invoice types: bổ sung `Hoadon::LOAI_DIEN_NUOC` và bỏ magic string `refund` trong `InvoiceStatus`.
+- Chuẩn hóa payment method: thay `'transfer'` còn sót trong `DangkyService` bằng `ThanhToan::METHOD_TRANSFER`.
+- Fix `TienIchService` (Core): đồng bộ field `Thongbao` về `tieu_de/noi_dung/doi_tuong_nhan` và dùng `Thongbao::TARGET_*` để tránh insert/filter bị lệch schema.
+
+### Verify ✅
+- PHPUnit: `php artisan test --filter "DangKyPhongTest|SinhvienServiceTest"` pass.
+- PHPUnit: `php artisan test --filter "DangkyServiceTest|DangKyPhongTest|AdminApproveGuestDangkyStatusTest"` pass.
+- PHPUnit: `php artisan test --filter "HoadonServiceTest"` pass.
+- PHPUnit: `php artisan test --filter "DangkyServiceTest|SinhvienServiceTest"` pass.
+- PHPUnit: `php artisan test --filter "StudentInterfaceTest|DangkyServiceTest|DangKyPhongTest|GiaHanHopdongTest|QuanLyAccountTest|GuestLookupTest"` pass.
+
+### Files Updated
+- `app/Providers/AppServiceProvider.php`
+- `app/Providers/EventServiceProvider.php`
+- `app/Services/Admin/AccountService.php`
+- `app/Enums/Gender.php`
+- `app/Services/Admin/DangkyService.php`
+- `app/Services/Admin/HoadonService.php`
+- `tests/Unit/Services/DangkyServiceTest.php`
+- `tests/Unit/Services/SinhvienServiceTest.php`
+- `app/Enums/UserRole.php`
+- `app/Models/User.php`
+- `app/Http/Controllers/Shared/ProfileController.php`
+- `resources/views/profile/edit.blade.php`
+- `resources/views/profile/partials/update-profile-information-form.blade.php`
+- `tests/Feature/StudentInterfaceTest.php`
+- `tests/Feature/GuestLookupTest.php`
+- `tests/Feature/GiaHanHopdongTest.php`
+- `tests/Feature/QuanLyAccountTest.php`
+- `database/factories/UserFactory.php`
+- `database/seeders/DatabaseSeeder.php`
+- `database/migrations/2026_05_16_110000_add_toa_nha_id_to_users_table.php`
+- `app/Http/Controllers/Auth/RegisteredUserController.php`
+- `app/Services/Admin/DangkyService.php`
+- `.gitignore`
+- `storage/framework/views` (deleted)
+- `app/Enums/ContactStatus.php` (deleted)
+- `app/Enums/MaintenanceStatus.php` (deleted)
+- `test_baohong.php` (deleted)
+- `test_contract_simple.php` (deleted)
+- `test_contract_logic.php` (deleted)
+- `test_hoadon_constraints.php` (deleted)
+
 ## 2026-05-09 - Performance: Admin Phòng & Admin Hồ sơ Sinh viên (giảm N+1/giảm payload)
 
 ### Hoàn thành ✅
@@ -184,10 +324,6 @@
 - `resources/views/profile/edit.blade.php`
 - `resources/views/student/hoadon/danhsach.blade.php`
 
-## Việc cần làm tiếp theo (Bảo trì)
-- [ ] Tích hợp thanh toán Online (VNPay/Momo).
-- [ ] Mobile App cho Sinh viên.
-- [ ] Hệ thống AI dự báo bảo trì thiết bị.
 
 ## 2026-05-06 - Landing: Thống kê realtime từ DB
 

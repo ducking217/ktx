@@ -33,7 +33,7 @@ class TienIchService implements TienIchServiceInterface
 
     public function danhSachThongBao(string $target = 'all'): array
     {
-        return Thongbao::when($target !== 'all', fn ($q) => $q->where('doituong', $target))
+        return Thongbao::when($target !== Thongbao::TARGET_ALL, fn ($q) => $q->where('doi_tuong_nhan', $target))
             ->orderByDesc('created_at')
             ->get()
             ->toArray();
@@ -42,11 +42,9 @@ class TienIchService implements TienIchServiceInterface
     public function guiThongBao(array $data): void
     {
         Thongbao::create([
-            'tieude' => $data['tieude'],
-            'noidung' => $data['noidung'],
-            'doituong' => $data['doituong'] ?? 'sinhvien',
-            'phong_id' => $data['phong_id'] ?? null,
-            'sinhvien_id' => $data['sinhvien_id'] ?? null,
+            'tieu_de' => $data['tieu_de'] ?? $data['tieude'],
+            'noi_dung' => $data['noi_dung'] ?? $data['noidung'],
+            'doi_tuong_nhan' => $data['doi_tuong_nhan'] ?? $data['doituong'] ?? Thongbao::TARGET_STUDENT,
         ]);
     }
 
